@@ -107,13 +107,13 @@ cd dotfiles
 │   ├── mydotbins                    # CLI tool binaries managed by dotbins
 │   ├── oh-my-zsh                    # Zsh framework
 │   ├── rsync-time-backup
-│   ├── syncthing-resolve-conflicts  # File synchronization
+│   ├── syncthing-resolve-conflicts
 │   ├── tmux                         # oh-my-tmux configuration
 │   ├── truenas-zfs-unlock
-│   ├── zsh-autosuggestions          # Zsh-specific configuration
-│   ├── zsh-fzf-history-search       # Zsh-specific configuration
-│   ├── zsh-syntax-highlighting      # Zsh-specific configuration
-│   └── zsh-z                        # Zsh-specific configuration
+│   ├── zsh-autosuggestions          # Zsh autosuggestions plugin
+│   ├── zsh-fzf-history-search       # Fuzzy history search
+│   ├── zsh-syntax-highlighting      # Zsh syntax highlighting
+│   └── zsh-z
 └── uninstall.py                     # Uninstallation script
 ```
 
@@ -307,24 +307,24 @@ See the output of `dotbins status` below:
 ┏━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Tool       ┃ Version(s) ┃ Platforms                             ┃ Last Updated ┃
 ┡━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━┩
-│ atuin      │ 18.4.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ bat        │ 0.25.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ delta      │ 0.18.2     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ direnv     │ 2.35.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ duf        │ 0.8.1      │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ dust       │ 1.2.0      │ linux/amd64, linux/arm64, macos/arm64 │ 3d2h         │
-│ eza        │ 0.21.0     │ linux/amd64, linux/arm64              │ 2d9h         │
-│ fd         │ 10.2.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ fzf        │ 0.61.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ git-lfs    │ 3.6.1      │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ hyperfine  │ 1.19.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ lazygit    │ 0.48.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ micromamba │ 2.0.8-0    │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ rg         │ 14.1.1     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ starship   │ 1.22.1     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ uv         │ 0.6.12     │ linux/amd64, linux/arm64, macos/arm64 │ 2d4h         │
-│ yazi       │ 25.3.2     │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
-│ zoxide     │ 0.9.7      │ linux/amd64, linux/arm64, macos/arm64 │ 3d4h         │
+│ atuin      │ 18.4.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ bat        │ 0.25.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ delta      │ 0.18.2     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ direnv     │ 2.35.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ duf        │ 0.8.1      │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ dust       │ 1.2.0      │ linux/amd64, linux/arm64, macos/arm64 │ 3d17h        │
+│ eza        │ 0.21.0     │ linux/amd64, linux/arm64              │ 2d23h        │
+│ fd         │ 10.2.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ fzf        │ 0.61.0     │ linux/amd64, linux/arm64, macos/arm64 │ 14h          │
+│ git-lfs    │ 3.6.1      │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ hyperfine  │ 1.19.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ lazygit    │ 0.48.0     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ micromamba │ 2.0.8-0    │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ rg         │ 14.1.1     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ starship   │ 1.22.1     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ uv         │ 0.6.12     │ linux/amd64, linux/arm64, macos/arm64 │ 2d19h        │
+│ yazi       │ 25.3.2     │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
+│ zoxide     │ 0.9.7      │ linux/amd64, linux/arm64, macos/arm64 │ 3d18h        │
 └────────────┴────────────┴───────────────────────────────────────┴──────────────┘
 
 

@@ -23,7 +23,7 @@ def print_with_comments(result: str, descriptions: dict) -> str:
     for line in lines:
         processed_line = line
         for item, desc in descriptions.items():
-            if f"── {item}" in line and item in descriptions:
+            if line.endswith(f"── {item}") and item in descriptions:
                 padding = " " * (max_length - len(line))
                 processed_line = f"{line}{padding}# {desc}"
                 break
