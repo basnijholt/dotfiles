@@ -43,7 +43,7 @@
 *   **Key features:**
     *   **Autosuggestions & Syntax Highlighting:** For a better interactive experience.
     *   **Zoxide:** A smarter `cd` command that learns your habits.
-    *   **Atuin:** Replaces your shell history with a powerful, synced, and searchable database.
+    *   **Atuin:** Replaces your shell history with a powerful, synced, and searchable database (show `atuin wrapped 2025`).
     *   **Custom Aliases and Functions:** Shortcuts for common commands.
 
 ### Tooling Management with `dotbins`
