@@ -240,6 +240,16 @@ in
               '';
             };
           });
+
+      # llama-swap from GitHub releases
+      llama-swap = pkgs.runCommand "llama-swap" {} ''
+        mkdir -p $out/bin
+        tar -xzf ${pkgs.fetchurl {
+          url = "https://github.com/mostlygeek/llama-swap/releases/download/v150/llama-swap_150_linux_amd64.tar.gz";
+          hash = "";
+        }} -C $out/bin
+        chmod +x $out/bin/llama-swap
+      '';
     };
   };
 
