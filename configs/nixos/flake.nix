@@ -8,7 +8,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     llama-cpp = {
-      url = "github:ggerganov/llama.cpp/b6150";  # Latest stable tag
+      url = "github:ggerganov/llama.cpp/b6150";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

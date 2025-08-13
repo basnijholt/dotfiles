@@ -350,8 +350,8 @@ in
   # --- llama-swap service ---
   # Transparent proxy for automatic model swapping with llama.cpp
 
-  # Download GPT-OSS chat template
-  environment.etc."llama-swap/gpt-oss-chat-template.jinja".source = pkgs.fetchurl {
+  # GPT-OSS chat template directly from HuggingFace
+  environment.etc."llama-templates/openai-gpt-oss-20b.jinja".source = pkgs.fetchurl {
     url = "https://huggingface.co/openai/gpt-oss-20b/resolve/main/chat_template.jinja";
     sha256 = "sha256-pMmRnLvUrN1RzP/iLaBJJksbc+WQVfpYgRqZ7718gUY=";
   };
@@ -388,7 +388,6 @@ in
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
           --hf-file Qwen3-Coder-30B-A3B-q4_k_m.gguf
-          --port ''${PORT}
           --port ''${PORT}
           --ctx-size 32768
           --n-gpu-layers 99
@@ -437,7 +436,8 @@ in
           --ctx-size 32768
           --n-gpu-layers 99
           --main-gpu 0
-          --jinja /etc/llama-swap/gpt-oss-chat-template.jinja
+          --jinja
+          --chat-template-file /etc/llama-templates/openai-gpt-oss-20b.jinja
           --flash-attn
           --cont-batching
           --no-mmap
