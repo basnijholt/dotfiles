@@ -394,7 +394,7 @@ in
           --main-gpu 0
           --flash-attn
 
-      "devstral-small-22b":
+      "devstral-24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo mistralai/Devstral-Small-2507_gguf
