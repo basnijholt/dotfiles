@@ -32,4 +32,8 @@ if [[ $- == *i* ]]; then
     if [[ `uname` == 'Linux' ]]; then
         alias pbcopy='wl-copy'  # Just because of muscle memory...
     fi
+
+    if [[ `hostname` == 'nixos' ]]; then
+        alias nixswitch='sudo cp ~/dotfiles/configs/nixos/*.nix /etc/nixos/; sudo nixos-rebuild switch --flake /etc/nixos#nixos --upgrade-all; cp /etc/nixos/flake.lock ~/dotfiles/configs/nixos/'
+    fi
 fi
