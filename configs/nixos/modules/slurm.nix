@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 {
   # --- SLURM High-Performance Computing ---
@@ -8,7 +8,7 @@
   #
   # Test with: sinfo, squeue, srun hostname
   # Create required directories with proper permissions
-  systemd.tmpfiles.rules = [
+  systemd.tmpfiles.rules = lib.mkAfter [
     "d /etc/munge 0700 munge munge -"
     "d /var/spool/slurm 0755 slurm slurm -"
     "d /var/spool/slurmd 0755 slurm slurm -"

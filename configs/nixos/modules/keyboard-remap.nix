@@ -1,5 +1,5 @@
 #
-# Kinto.nix - A Declarative Kinto Replacement for NixOS
+# keyboard-remap.nix (formerly kinto.nix) - A Declarative Kinto Replacement for NixOS
 #
 # ## What is this?
 # This file is a NixOS module that replicates the core functionality of Kinto

@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./kinto.nix
+    ./modules/keyboard-remap.nix
     ./modules/boot.nix
     ./modules/storage.nix
     ./modules/networking.nix
