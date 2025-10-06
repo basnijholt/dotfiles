@@ -1,6 +1,10 @@
 { ... }:
 
 {
+  # ===================================
+  # Hardware Configuration
+  # ===================================
+
   services.fstrim.enable = true;
 
   # --- Snapper Btrfs Policies ---

@@ -4,6 +4,7 @@
   # ===================================
   # Desktop Environment
   # ===================================
+
   # --- X11 & Display Managers ---
   services.xserver.enable = true;
   services.xserver.xkb = {

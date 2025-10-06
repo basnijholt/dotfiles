@@ -44,6 +44,19 @@
   # --- System Compatibility ---
   programs.nix-ld.enable = true; # Run non-nix executables (e.g., micromamba)
 
+  # --- Audio ---
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true; # This provides PulseAudio compatibility
+    jack.enable = true; # For compatibility with JACK applications
+  };
+
+  # --- Shell & Terminal ---
+  programs.zsh.enable = true;
+  programs.direnv.enable = true;
+
   # --- Fonts ---
   fonts.packages = with pkgs; [
     fira-code
