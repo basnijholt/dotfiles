@@ -15,22 +15,50 @@
 
   outputs = { self, nixpkgs, home-manager, disko, ... }:
     let
-      system = "x86_64-linux";
       lib = nixpkgs.lib;
-    in {
-      nixosConfigurations.nixos = lib.nixosSystem {
-        inherit system;
-        modules = [
-          disko.nixosModules.disko
-          ./disko/4tb-ssd.nix
-          ./configuration.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-          }
-        ];
+
+      mkHost = { system ? "x86_64-linux", modules }:
+        lib.nixosSystem {
+          inherit system;
+          modules = modules;
+        };
+
+      baseModules = [
+        ./configuration.nix
+      ];
+
+      homeManagerModules = [
+        home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+        }
+      ];
+
+      hosts = {
+        nixos = {
+          system = "x86_64-linux";
+          modules =
+            [
+              disko.nixosModules.disko
+              ./disko/4tb-ssd.nix
+            ]
+            ++ baseModules
+            ++ [ ./hosts/pc/default.nix ]
+            ++ [ ./hardware-configuration.nix ]
+            ++ homeManagerModules;
+        };
+
+        nuc = {
+          system = "x86_64-linux";
+          modules =
+            baseModules
+            ++ homeManagerModules
+            ++ [ ./hosts/nuc/default.nix ];
+        };
       };
+    in {
+      nixosConfigurations = lib.mapAttrs (_name: host: mkHost host) hosts;
 
       diskoConfigurations.nvme1 = import ./disko/4tb-ssd.nix;
     };
