@@ -1,6 +1,8 @@
 { ... }:
 
 {
+  services.fstrim.enable = true;
+
   # --- Snapper Btrfs Policies ---
   services.snapper.configs = {
     root = {
@@ -32,4 +34,10 @@
       NUMBER_LIMIT = 20;
     };
   };
+
+  # Snapper snapshot roots must exist with correct permissions
+  systemd.tmpfiles.rules = [
+    "d /.snapshots 0755 root root -"
+    "d /home/.snapshots 0755 basnijholt users -"
+  ];
 }

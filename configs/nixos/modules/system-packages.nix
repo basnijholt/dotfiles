@@ -1,10 +1,7 @@
 { pkgs, ... }:
 
-{
-  # ===================================
-  # System Packages
-  # ===================================
-  environment.systemPackages = with pkgs; [
+let
+  guiApplications = with pkgs; [
     # GUI Applications
     _1password-gui
     _1password-cli
@@ -30,6 +27,9 @@
     tor-browser-bundle-bin
     vlc
     vscode
+  ];
+
+  cliPowerTools = with pkgs; [
     # CLI Power Tools & Utilities
     act
     asciinema
@@ -94,6 +94,9 @@
     xsel
     yq-go
     zellij
+  ];
+
+  developmentToolchains = with pkgs; [
     # Development Toolchains
     bun
     cargo
@@ -112,6 +115,9 @@
     rust-analyzer
     winetricks
     yarn
+  ];
+
+  terminalsAndAlternatives = with pkgs; [
     # Terminals & Linux-native Alternatives
     alacritty
     baobab
@@ -119,6 +125,9 @@
     ghostty
     kitty
     opensnitch
+  ];
+
+  hyprlandEssentials = with pkgs; [
     # Hyprland Essentials
     polkit_gnome
     waybar # Status bar (most popular by far)
@@ -133,4 +142,15 @@
     hyprpicker # Color picker
     hyprshot # Screenshot tool (Hyprland-specific)
   ];
+in
+{
+  # ===================================
+  # System Packages
+  # ===================================
+  environment.systemPackages =
+    guiApplications
+    ++ cliPowerTools
+    ++ developmentToolchains
+    ++ terminalsAndAlternatives
+    ++ hyprlandEssentials;
 }

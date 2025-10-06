@@ -9,8 +9,6 @@
   # Test with: sinfo, squeue, srun hostname
   # Create required directories with proper permissions
   systemd.tmpfiles.rules = [
-    "d /.snapshots 0755 root root -"
-    "d /home/.snapshots 0755 basnijholt users -"
     "d /etc/munge 0700 munge munge -"
     "d /var/spool/slurm 0755 slurm slurm -"
     "d /var/spool/slurmd 0755 slurm slurm -"
