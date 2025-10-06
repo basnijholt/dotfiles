@@ -6,7 +6,7 @@
 {
   imports = [
     ./kinto.nix
-    (builtins.path { path = ./modules/hardware.nix; name = "hardware.nix"; })
+    (builtins.path { path = ./modules/boot.nix; name = "boot.nix"; })
     (builtins.path { path = ./modules/storage.nix; name = "storage.nix"; })
     (builtins.path { path = ./modules/networking.nix; name = "networking.nix"; })
     (builtins.path { path = ./modules/audio.nix; name = "audio.nix"; })

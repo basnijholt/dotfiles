@@ -16,8 +16,8 @@
   };
 
   # Enable the advanced driver for modern Xbox wireless controllers.
-  hardware.xpadneo.enable = true;
   # This is crucial for proper functionality in Steam and other games.
+  hardware.xpadneo.enable = true;
 
   # This kernel option is a common fix for Bluetooth controller issues on Linux.
   # It disables Enhanced Re-Transmission Mode, which can cause lag or disconnects.

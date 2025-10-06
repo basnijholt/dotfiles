@@ -40,4 +40,12 @@
     "d /.snapshots 0755 root root -"
     "d /home/.snapshots 0755 basnijholt users -"
   ];
+
+  # --- Swap ---
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 16 * 1024; # 16GB
+    }
+  ];
 }

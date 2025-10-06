@@ -133,6 +133,7 @@ let
     waybar # Status bar (most popular by far)
     hyprpanel # Status bar (alternative to waybar)
     wofi # Application launcher (simpler than rofi)
+    rofi # Mechabar: rofi fallback launcher as packaged upstream
     mako # Notification daemon (Wayland-native)
     swww # Wallpaper daemon (smooth transitions)
     wl-clipboard # Clipboard manager (copy/paste support)
@@ -141,6 +142,12 @@ let
     hyprlock # Screen locker
     hyprpicker # Color picker
     hyprshot # Screenshot tool (Hyprland-specific)
+    # --- Mechabar Dependencies ---
+    bluetui
+    bluez
+    brightnessctl
+    pipewire
+    wireplumber
   ];
 in
 {

@@ -14,16 +14,6 @@
     {
       home.stateVersion = "25.05";
 
-      # --- Mechabar Dependencies ---
-      home.packages = with pkgs; [
-        bluetui
-        bluez
-        brightnessctl
-        pipewire
-        wireplumber
-        rofi
-      ];
-
       # Tell npm to install "global" packages into ~/.npm-global
       home.file.".npmrc".text = ''
         prefix=${config.home.homeDirectory}/.npm-global
