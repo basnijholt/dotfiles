@@ -46,6 +46,9 @@
         ];
       };
 
-      diskoConfigurations.nvme1 = import ./hosts/pc/disko.nix;
+      diskoConfigurations = {
+        nvme1 = import ./hosts/pc/disko.nix;
+        nuc = import ./hosts/nuc/disko-mount.nix;
+      };
     };
 }
