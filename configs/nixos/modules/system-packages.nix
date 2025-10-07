@@ -4,15 +4,12 @@ let
   guiApplications = with pkgs; [
     # GUI Applications
     _1password-gui
-    _1password-cli
     brave
     code-cursor
     cryptomator
-    docker
     dropbox
     filebot
     firefox
-    google-cloud-sdk
     handbrake
     inkscape
     moonlight-qt
@@ -31,6 +28,7 @@ let
 
   cliPowerTools = with pkgs; [
     # CLI Power Tools & Utilities
+    _1password-cli
     act
     asciinema
     atuin
@@ -40,12 +38,14 @@ let
     claude-code
     codex
     coreutils
+    docker
     dnsutils # Provides dig, nslookup, host
     duf
     eza
     fastfetch
     fzf
     gemini-cli
+    google-cloud-sdk
     gh
     git
     git-filter-repo
@@ -72,11 +72,9 @@ let
     nmap
     packer
     parallel
-    pavucontrol
     pinentry-gnome3
     postgresql
     psmisc # For killall
-    pulseaudio
     pwgen
     rclone
     ripgrep
@@ -118,7 +116,6 @@ let
     flameshot
     ghostty
     kitty
-    opensnitch
   ];
 
   hyprlandEssentials = with pkgs; [
@@ -135,6 +132,9 @@ let
     hyprlock
     hyprpicker
     hyprshot
+    opensnitch
+    pavucontrol
+    pulseaudio
   ];
 in
 {
