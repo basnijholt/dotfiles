@@ -1,8 +1,8 @@
-{ ... }:
+{ lib, ... }:
 
 {
   # --- Hostname & Networking ---
-  networking.hostName = "nixos";
+  networking.hostName = lib.mkDefault "nixos";
   networking.networkmanager.enable = true;
 
   # --- Ensure WiFi stays up ---
@@ -17,14 +17,6 @@
     127.0.0.1 s4.mindroom.lan api.s4.mindroom.lan
     127.0.0.1 s5.mindroom.lan api.s5.mindroom.lan
   '';
-
-  services.resolved = {
-    enable = true;
-    domains = [ "~local" ]; # Route .local queries to our DNS
-    extraConfig = ''
-      DNS=192.168.1.4 100.100.100.100
-    '';
-  };
 
   # NOTE: Kind’s pod network (10.244.0.0/16) changes host bridge names every time the
   #       cluster is rebuilt, so NixOS’ reverse-path filter would keep dropping pod→host

@@ -9,6 +9,8 @@
     ./modules/nix.nix
     ./modules/nixpkgs.nix
     ./modules/user.nix
+    ./modules/networking.nix
+    ./modules/desktop.nix
     ./modules/system-packages.nix
     ./modules/home-manager.nix
   ];

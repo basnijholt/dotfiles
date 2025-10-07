@@ -11,6 +11,15 @@
   # --- System Compatibility ---
   programs.nix-ld.enable = true; # Run non-nix executables (e.g., micromamba)
 
+  # --- DNS Resolver Defaults ---
+  services.resolved = {
+    enable = true;
+    domains = [ "~local" ]; # Route .local queries to our DNS
+    extraConfig = ''
+      DNS=192.168.1.4 100.100.100.100
+    '';
+  };
+
   # --- Audio ---
   services.pipewire = {
     enable = true;
