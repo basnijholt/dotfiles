@@ -2,18 +2,18 @@
 
 {
   imports = [
-    ./modules/boot.nix
-    ./modules/storage.nix
+    ./boot.nix
+    ./storage.nix
     ../../modules/networking.nix
-    ./modules/desktop.nix
-    ./modules/services.nix
-    ./modules/system-packages.nix
-    ./modules/keyboard-remap.nix
-    ./modules/gaming.nix
-    ./modules/debugging.nix
-    ./modules/ai.nix
-    ./modules/backup.nix
-    ./modules/nvidia-graphics.nix
-    ./modules/slurm.nix
+    ./desktop.nix
+    ./services.nix
+    ./system-packages.nix
+    ./keyboard-remap.nix
+    ./gaming.nix
+    ./debugging.nix
+    ./ai.nix
+    ./backup.nix
+    ./nvidia-graphics.nix
+    ./slurm.nix
   ];
 }
