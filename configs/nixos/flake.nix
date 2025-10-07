@@ -32,6 +32,7 @@
           inherit system;
           modules = commonModules ++ extraModules;
         };
+
     in {
       nixosConfigurations = {
         nixos = mkHost [
@@ -42,6 +43,7 @@
         ];
 
         nuc = mkHost [
+          ./hosts/nuc/hardware-configuration.nix
           ./hosts/nuc/default.nix
         ];
       };
@@ -50,5 +52,6 @@
         nvme1 = import ./hosts/pc/disko.nix;
         nuc = import ./hosts/nuc/disko-mount.nix;
       };
+
     };
 }

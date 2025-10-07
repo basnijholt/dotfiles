@@ -1,5 +1,13 @@
-{ ... }:
+{ lib, ... }:
 
+let
+  mountOpts = [
+    "compress=zstd"
+    "noatime"
+    "discard=async"
+    "space_cache=v2"
+  ];
+in
 {
   disko.devices = {
     disk.nvme = {
@@ -8,7 +16,9 @@
       content = {
         type = "gpt";
         partitions = {
-          ESP = {
+          esp = {
+            label = "EFI-NUC";
+            size = "512M";
             type = "EF00";
             content = {
               type = "filesystem";
@@ -18,58 +28,32 @@
             };
           };
 
-          rpool = {
-            type = "BF01"; # existing ZFS member
+          root = {
+            label = "ROOT-NUC";
+            size = "100%";
             content = {
-              type = "zpool";
-              name = "rpool";
-              mode = "disk";
-              rootFsOptions = {
-                mountpoint = "none";
-              };
-
-              datasets = {
-                "ROOT" = {
-                  type = "zfs_fs";
-                  options = {
-                    mountpoint = "none";
-                    canmount = "off";
-                  };
-                };
-
-                "ROOT/nixos" = {
-                  type = "zfs_fs";
-                  options = {
-                    mountpoint = "none";
-                    canmount = "off";
-                  };
-                };
-
-                "ROOT/nixos/system" = {
-                  type = "zfs_fs";
+              type = "btrfs";
+              extraArgs = [ "-f" "-L" "NUC-BTRFS" ];
+              subvolumes = {
+                "@root" = {
                   mountpoint = "/";
-                  options = {
-                    mountpoint = "legacy";
-                    canmount = "noauto";
-                  };
+                  mountOptions = mountOpts;
                 };
-
-                "nix" = {
-                  type = "zfs_fs";
+                "@nix" = {
                   mountpoint = "/nix";
-                  options = {
-                    mountpoint = "legacy";
-                    canmount = "noauto";
-                  };
+                  mountOptions = mountOpts;
                 };
-
-                "var/log" = {
-                  type = "zfs_fs";
-                  mountpoint = "/var/log";
-                  options = {
-                    mountpoint = "legacy";
-                    canmount = "noauto";
-                  };
+                "@var" = {
+                  mountpoint = "/var";
+                  mountOptions = mountOpts;
+                };
+                "@home" = {
+                  mountpoint = "/home";
+                  mountOptions = mountOpts;
+                };
+                "@snapshots" = {
+                  mountpoint = "/.snapshots";
+                  mountOptions = mountOpts;
                 };
               };
             };
@@ -79,4 +63,3 @@
     };
   };
 }
-

@@ -7,6 +7,7 @@
   imports = [
     ./modules/system-core.nix
     ./modules/nix.nix
+    ./modules/nixpkgs.nix
     ./modules/user.nix
     ./modules/desktop.nix
     ./modules/services.nix
