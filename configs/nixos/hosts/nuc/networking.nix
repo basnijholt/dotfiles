@@ -1,7 +1,6 @@
-{ lib, ... }:
+{ ... }:
 
 {
-  networking.hostName = lib.mkForce "nuc";
-
+  networking.hostName = "nuc";
   networking.firewall.allowedTCPPorts = [ ];
 }

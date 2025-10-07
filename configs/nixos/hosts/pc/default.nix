@@ -4,6 +4,7 @@
   imports = [
     ./boot.nix
     ./storage.nix
+    ./networking.nix
     ./services.nix
     ./system-packages.nix
     ./keyboard-remap.nix
