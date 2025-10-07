@@ -2,18 +2,18 @@
 
 {
   # ===================================
-  # System Programs & Services
+  # Shared System Services
   # ===================================
-  # --- Other Services ---
   services.fwupd.enable = true;
   services.syncthing.enable = true;
   services.tailscale.enable = true;
   services.printing.enable = true;
   programs.thunderbird.enable = true;
 
-  # --- Virtualization ---
+  # --- Virtualisation Stack ---
   virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
+  virtualisation.incus.enable = true;
   programs.virt-manager.enable = true;
 
   # --- SSH ---
@@ -33,8 +33,4 @@
     enableSSHSupport = true;
     pinentryPackage = pkgs.pinentry-gnome3;
   };
-
-  programs._1password.enable = true;
-  programs._1password-gui.enable = true;
-  programs._1password-gui.polkitPolicyOwners = [ "basnijholt" ];
 }

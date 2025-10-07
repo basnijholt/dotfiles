@@ -5,7 +5,7 @@
     ./boot.nix
     ./storage.nix
     ./networking.nix
-    ./services.nix
+    ./1password.nix
     ./system-packages.nix
     ./keyboard-remap.nix
     ./gaming.nix
