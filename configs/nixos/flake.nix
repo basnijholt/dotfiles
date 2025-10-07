@@ -36,8 +36,8 @@
       nixosConfigurations = {
         nixos = mkHost [
           disko.nixosModules.disko
-          ./disko/4tb-ssd.nix
-          ./hardware-configuration.nix
+          ./hosts/pc/disko.nix
+          ./hosts/pc/hardware-configuration.nix
           ./hosts/pc/default.nix
         ];
 
@@ -46,6 +46,6 @@
         ];
       };
 
-      diskoConfigurations.nvme1 = import ./disko/4tb-ssd.nix;
+      diskoConfigurations.nvme1 = import ./hosts/pc/disko.nix;
     };
 }
