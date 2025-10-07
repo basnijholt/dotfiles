@@ -64,15 +64,12 @@ let
     lazydocker
     lazygit
     libnotify
-    llama-cpp
     lm_sensors
     lsof
     micro
     neovim
     nixfmt-rfc-style
     nmap
-    nvtopPackages.full
-    ollama
     packer
     parallel
     pavucontrol
@@ -101,7 +98,6 @@ let
     bun
     cargo
     cmake
-    cudatoolkit
     gcc
     go
     gnumake
@@ -112,8 +108,6 @@ let
     pnpm
     portaudio
     (python3.withPackages (ps: [ ps.pipx ]))
-    rust-analyzer
-    winetricks
     yarn
   ];
 
@@ -130,17 +124,17 @@ let
   hyprlandEssentials = with pkgs; [
     # Hyprland Essentials
     polkit_gnome
-    waybar # Status bar (most popular by far)
-    hyprpanel # Status bar (alternative to waybar)
-    wofi # Application launcher (simpler than rofi)
-    mako # Notification daemon (Wayland-native)
-    swww # Wallpaper daemon (smooth transitions)
-    wl-clipboard # Clipboard manager (copy/paste support)
-    wl-clip-persist # Clipboard persistence
-    cliphist # Clipboard history
-    hyprlock # Screen locker
-    hyprpicker # Color picker
-    hyprshot # Screenshot tool (Hyprland-specific)
+    waybar
+    hyprpanel
+    wofi
+    mako
+    swww
+    wl-clipboard
+    wl-clip-persist
+    cliphist
+    hyprlock
+    hyprpicker
+    hyprshot
   ];
 in
 {
