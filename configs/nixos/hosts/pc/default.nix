@@ -5,9 +5,8 @@
     ./boot.nix
     ./storage.nix
     ../../modules/networking.nix
-    ./desktop.nix
+    ../../modules/desktop.nix
     ./services.nix
-    ./system-packages.nix
     ./keyboard-remap.nix
     ./gaming.nix
     ./debugging.nix
