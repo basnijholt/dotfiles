@@ -16,18 +16,10 @@
   outputs = { self, nixpkgs, home-manager, disko, ... }:
     let
       lib = nixpkgs.lib;
+      system = "x86_64-linux";
 
-      mkHost = { system ? "x86_64-linux", modules }:
-        lib.nixosSystem {
-          inherit system;
-          modules = modules;
-        };
-
-      baseModules = [
+      commonModules = [
         ./configuration.nix
-      ];
-
-      homeManagerModules = [
         home-manager.nixosModules.home-manager
         {
           home-manager.useGlobalPkgs = true;
@@ -35,30 +27,24 @@
         }
       ];
 
-      hosts = {
-        nixos = {
-          system = "x86_64-linux";
-          modules =
-            [
-              disko.nixosModules.disko
-              ./disko/4tb-ssd.nix
-            ]
-            ++ baseModules
-            ++ [ ./hosts/pc/default.nix ]
-            ++ [ ./hardware-configuration.nix ]
-            ++ homeManagerModules;
+      mkHost = extraModules:
+        lib.nixosSystem {
+          inherit system;
+          modules = commonModules ++ extraModules;
         };
-
-        nuc = {
-          system = "x86_64-linux";
-          modules =
-            baseModules
-            ++ homeManagerModules
-            ++ [ ./hosts/nuc/default.nix ];
-        };
-      };
     in {
-      nixosConfigurations = lib.mapAttrs (_name: host: mkHost host) hosts;
+      nixosConfigurations = {
+        nixos = mkHost [
+          disko.nixosModules.disko
+          ./disko/4tb-ssd.nix
+          ./hardware-configuration.nix
+          ./hosts/pc/default.nix
+        ];
+
+        nuc = mkHost [
+          ./hosts/nuc/default.nix
+        ];
+      };
 
       diskoConfigurations.nvme1 = import ./disko/4tb-ssd.nix;
     };
