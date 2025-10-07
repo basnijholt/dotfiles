@@ -3,26 +3,8 @@
 let
   guiApplications = with pkgs; [
     # GUI Applications
-    _1password-gui
     brave
-    code-cursor
-    cryptomator
-    dropbox
-    filebot
     firefox
-    handbrake
-    inkscape
-    moonlight-qt
-    mullvad-vpn
-    obs-studio
-    obsidian
-    qbittorrent
-    signal-desktop
-    slack
-    spotify
-    telegram-desktop
-    tor-browser-bundle-bin
-    vlc
     vscode
   ];
 
