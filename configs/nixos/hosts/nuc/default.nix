@@ -3,7 +3,7 @@
 {
   imports = [
     ../../modules/networking.nix
-    ../../modules/desktop.nix
+    ./desktop.nix
     ./services.nix
     ./system-packages.nix
   ];

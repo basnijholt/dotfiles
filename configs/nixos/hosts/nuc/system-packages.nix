@@ -1,24 +1,19 @@
 { pkgs, ... }:
 
 let
+  # ===================================
+  # Living-Room GUI Applications
+  # ===================================
   guiApps = with pkgs; [
-    firefox
-    chromium
-    vlc
+    # Living-Room GUI Applications
     kodi
   ];
 
-  cliApps = with pkgs; [
-    curl
-    git
-    htop
-    jq
-    ripgrep
-    tmux
-    unzip
-    wget
-  ];
+  # ===================================
+  # Living-Room CLI Essentials
+  # ===================================
+  cliApps = with pkgs; [ ];
 in
 {
-  environment.systemPackages = guiApps ++ cliApps;
+  environment.systemPackages = guiApps;
 }

@@ -9,6 +9,7 @@
     ./modules/nix.nix
     ./modules/nixpkgs.nix
     ./modules/user.nix
+    ./modules/system-packages.nix
     ./modules/home-manager.nix
   ];
   # The system state version is critical and should match the installed NixOS release.
