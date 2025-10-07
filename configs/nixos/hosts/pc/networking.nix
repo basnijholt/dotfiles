@@ -4,6 +4,8 @@
   # --- Hostname & Networking ---
   networking.hostName = lib.mkDefault "nixos";
   networking.networkmanager.enable = true;
+  networking.nftables.enable = true;
+  networking.firewall.enable = true;
 
   # --- Ensure WiFi stays up ---
   networking.networkmanager.settings."connection"."wifi.powersave" = 2;
