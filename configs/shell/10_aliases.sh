@@ -44,4 +44,10 @@ if [[ $- == *i* ]]; then
         local host=${1:-$(hostname)}
         cd ~/dotfiles/configs/nixos && nix flake update && sudo nixos-rebuild switch --flake .#$host && cd -
     }
+
+    zyolo() {
+        export ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
+        export ANTHROPIC_AUTH_TOKEN="$Z_API_KEY"
+        claude --dangerously-skip-permissions "$@"
+    }
 fi
