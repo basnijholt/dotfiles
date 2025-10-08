@@ -49,8 +49,8 @@
       };
 
       diskoConfigurations = {
-        nvme1 = import ./hosts/pc/disko.nix;
-        nuc = import ./hosts/nuc/disko-mount.nix;
+        nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
+        nuc = (import ./hosts/nuc/disko-mount.nix) { inherit lib; };
       };
 
     };
