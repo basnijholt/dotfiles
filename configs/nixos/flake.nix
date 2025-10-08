@@ -46,6 +46,14 @@
           ./hosts/nuc/hardware-configuration.nix
           ./hosts/nuc/default.nix
         ];
+
+        installer = lib.nixosSystem {
+          inherit system;
+          modules = [
+            (import (nixpkgs + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"))
+            ./installers/iso.nix
+          ];
+        };
       };
 
       diskoConfigurations = {
