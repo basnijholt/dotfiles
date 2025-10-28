@@ -30,7 +30,7 @@ from rich.status import Status
 
 # --- Configuration ---
 MY_OLLAMA_HOST = os.getenv("MY_OLLAMA_HOST", "http://localhost:11434")
-DEFAULT_MODEL = "devstral:24b"
+DEFAULT_MODEL = "gpt-oss:20b"
 
 # The agent's core identity and immutable rules.
 SYSTEM_PROMPT = """\
