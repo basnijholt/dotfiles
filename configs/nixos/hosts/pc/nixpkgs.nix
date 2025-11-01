@@ -7,15 +7,13 @@
     cudaSupport = true;
     packageOverrides = pkgs: {
       ollama = pkgs.ollama.overrideAttrs (oldAttrs: rec {
-        version = "0.12.8";
+        version = "0.12.9";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-po7BxJAj9eOpOaXsLDmw6/1RyjXPtXza0YUv0pVojZ0=";
+          hash = "sha256-D61jCyOUYXyPgztgEAFHd2oL5IXsO5TnE2AGEHOnows=";
         };
-        # Disable tests due to flaky TestConvertAdapter
-        doCheck = false;
       });
 
       # Override llama-cpp to latest version b6150 with CUDA support
