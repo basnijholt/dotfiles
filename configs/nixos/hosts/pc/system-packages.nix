@@ -23,7 +23,7 @@
     slack
     spotify
     telegram-desktop
-    tor-browser-bundle-bin
+    tor-browser
     vlc
     winetricks
   ];
