@@ -92,23 +92,26 @@
           --n-gpu-layers 99
           --main-gpu 0
 
-      "gpt-oss-20b":
+      "gpt-oss:20b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/gpt-oss-20b-GGUF
-          --hf-file gpt-oss-20b-Q4_K_M.gguf
+          -hf ggml-org/gpt-oss-20b-GGUF
           --port ''${PORT}
           --ctx-size 32768
+          --batch-size 4096
+          --ubatch-size 2048
           --n-gpu-layers 99
           --main-gpu 0
+          --threads 1
+          --flash-attn on
           --jinja
-          --chat-template-file /etc/llama-templates/openai-gpt-oss-20b.jinja
-          --reasoning-format auto
-          --flash-attn
-          --cont-batching
-          --no-mmap
-          --threads 12
-          --parallel 2
+
+      "embeddinggemma:300m":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf ggml-org/embeddinggemma-300M-GGUF
+          --port ''${PORT}
+          --embeddings
 
     healthCheckTimeout: 600  # 10 minutes for large model download + loading
 
@@ -166,6 +169,17 @@
       language = "nl";
       device = "cuda";
       uri = "tcp://0.0.0.0:10301";
+    };
+  };
+
+  # Auto-restart faster-whisper on failure (including OOM kills)
+  systemd.services.wyoming-faster-whisper-english = {
+    serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = 10;
+      # Memory limits to prevent system-wide OOM
+      MemoryMax = "16G";
+      MemoryHigh = "14G";
     };
   };
 
