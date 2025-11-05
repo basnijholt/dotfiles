@@ -1,14 +1,14 @@
 ###############################################
-# Files/directories to remove from shareable branch
+# Files/directories to remove from the public branch
 # Lines starting with '#' are comments.
-# Paths are repo-root relative; globs supported by `git rm -r`.
+# Paths are repo-root relative; exact matches only (no globs).
 ###############################################
 
 # Private submodule with secrets
 secrets
 
 # -----------------------------
-# Sensitive/private
+# Irrelevant configs/scripts
 # -----------------------------
 configs/nixos
 configs/agent-cli/config.toml
@@ -16,6 +16,8 @@ scripts/rclone.sh
 scripts/sync-photos-to-truenas.sh
 scripts/signature.html
 submodules/rsync-time-backup
+scripts/rpi
+.cursorignore
 
 # -----------------------------
 # Mac-only or very personal
@@ -23,8 +25,3 @@ submodules/rsync-time-backup
 configs/karabiner
 scripts/eqMac.sh
 scripts/eqMac.py
-
-# -----------------------------
-# Machine-specific (optional)
-# -----------------------------
-scripts/rpi
