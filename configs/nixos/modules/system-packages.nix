@@ -65,6 +65,7 @@ let
     tealdeer
     terraform
     tmux
+    tre-command
     tree
     typst
     wget
