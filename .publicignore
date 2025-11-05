@@ -7,11 +7,6 @@
 # Private submodule with secrets
 secrets
 
-# Example: uncomment to remove private/local-only items
-#configs/keyboard-maestro
-#scripts/rclone.sh
-#scripts/sync-photos-to-truenas.sh
-
 # -----------------------------
 # Sensitive/private
 # -----------------------------
