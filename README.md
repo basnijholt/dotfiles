@@ -59,6 +59,36 @@ Why not?
 
 ### Prerequisites
 
+- Git installed
+- SSH key set up with GitHub
+
+### Install for others using Shareable (Sanitized) Branch
+
+If you’re not me and just want a clean version without private bits, use the always-up-to-date `shareable` branch.
+CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.publicignore), like the `secrets` submodule, personal machine configs, etc.
+
+```bash
+# Clone the sanitized branch with submodules (shallow)
+git clone --depth=1 --branch shareable --single-branch \
+  --recurse-submodules -j8 --shallow-submodules \
+  git@github.com:basnijholt/dotfiles.git
+cd dotfiles
+./install
+```
+
+#### macOS Terminal Font
+
+If prompt icons show as empty squares, install a Nerd Font and select it in Terminal.app:
+
+```bash
+brew install --cask font-fira-mono-nerd-font
+```
+
+Then in Terminal: Settings → Profiles → Text → Font → choose “FiraMono Nerd Font Mono”.
+The “Mono” variant forces single‑width glyphs so powerline/nerd icons align perfectly in Terminal.app.
+
+### Installation for me (@basnijholt)
+
 First, you need to set up SSH authentication to access private submodules.
 
 <details>
@@ -72,8 +102,6 @@ export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agen
 
 </details>
 
-### Installation
-
 ```bash
 # Clone the repository with submodules
 git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
@@ -82,35 +110,6 @@ cd dotfiles
 # Run the installation script
 ./install
 ```
-
-### Shareable (Sanitized) Branch
-
-If you’re not me and just want a clean version without private bits, use the always-up-to-date `shareable` branch. CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.publicignore), like the `secrets` submodule, personal machine configs, etc.
-
-```bash
-# Clone the sanitized branch with submodules (shallow)
-git clone --depth=1 --branch shareable --single-branch \
-  --recurse-submodules -j8 --shallow-submodules \
-  git@github.com:basnijholt/dotfiles.git
-cd dotfiles
-./install
-```
-
-Notes:
-- The install config is automatically patched to skip links/commands for removed paths, so Dotbot won’t error on missing files.
-- Submodules are required (e.g., Dotbot lives in `submodules/dotbot`), so cloning with `--recurse-submodules` is recommended.
-- To change what’s excluded, edit `.publicignore` on `main` and push; CI will refresh `shareable` automatically.
-
-### macOS Terminal Font
-
-If prompt icons show as empty squares, install a Nerd Font and select it in Terminal.app:
-
-```bash
-brew install --cask font-fira-mono-nerd-font
-```
-
-Then in Terminal: Settings → Profiles → Text → Font → choose “FiraMono Nerd Font Mono”.
-The “Mono” variant forces single‑width glyphs so powerline/nerd icons align perfectly in Terminal.app.
 
 ### Trying with Docker
 
