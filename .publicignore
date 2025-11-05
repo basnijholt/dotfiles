@@ -25,8 +25,6 @@ submodules/rsync-time-backup
 # -----------------------------
 # Mac-only or very personal
 # -----------------------------
-configs/keyboard-maestro
-configs/iterm
 configs/karabiner
 scripts/eqMac.sh
 scripts/eqMac.py
@@ -34,6 +32,4 @@ scripts/eqMac.py
 # -----------------------------
 # Machine-specific (optional)
 # -----------------------------
-configs/hypr
-configs/hyprpanel
 scripts/rpi

@@ -83,6 +83,24 @@ cd dotfiles
 ./install
 ```
 
+### Shareable (Sanitized) Branch
+
+If you’re not me and just want a clean version without private bits, use the always-up-to-date `shareable` branch. CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.publicignore), like the `secrets` submodule, personal machine configs, etc.
+
+```bash
+# Clone the sanitized branch with submodules (shallow)
+git clone --depth=1 --branch shareable --single-branch \
+  --recurse-submodules -j8 --shallow-submodules \
+  git@github.com:basnijholt/dotfiles.git
+cd dotfiles
+./install
+```
+
+Notes:
+- The install config is automatically patched to skip links/commands for removed paths, so Dotbot won’t error on missing files.
+- Submodules are required (e.g., Dotbot lives in `submodules/dotbot`), so cloning with `--recurse-submodules` is recommended.
+- To change what’s excluded, edit `.publicignore` on `main` and push; CI will refresh `shareable` automatically.
+
 ### Trying with Docker
 
 > [!NOTE]
@@ -447,14 +465,19 @@ This submodule requires SSH authentication to access, which is why setting up SS
 To customize these dotfiles for your own use:
 
 1. Fork this repository
-2. Remove the `secrets` submodule
+2. Easiest: start from the sanitized `shareable` branch (no secrets, less personal config):
+   ```bash
+   git clone --depth=1 --branch shareable --single-branch https://github.com/basnijholt/dotfiles.git ~/dotfiles
+   cd ~/dotfiles
+   ```
+   Advanced: if you need everything, clone `main` and adjust manually.
 3. Update Git configurations with your information in `configs/git/`, specifically `gitconfig-personal`
 4. Modify shell configurations in `configs/shell/`
 5. Adjust the `install.conf.yaml` to match your needs
 6. Update the dotbins.yaml configuration with your preferred tools
 7. Remove or modify platform-specific configurations as necessary
 
-Commands to get started with the current setup:
+Commands to get started with the current setup (from `main`):
 
 ```bash
 # Clone the repository and initialize submodules (optionally fork and replace username)
