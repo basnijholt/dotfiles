@@ -462,38 +462,30 @@ This submodule requires SSH authentication to access, which is why setting up SS
 
 ## 🔍 Customization
 
-To customize these dotfiles for your own use:
+Pick one path:
 
-1. Fork this repository
-2. Easiest: start from the sanitized `shareable` branch (no secrets, less personal config):
-   ```bash
-   git clone --depth=1 --branch shareable --single-branch https://github.com/basnijholt/dotfiles.git ~/dotfiles
-   cd ~/dotfiles
-   ```
-   Advanced: if you need everything, clone `main` and adjust manually.
-3. Update Git configurations with your information in `configs/git/`, specifically `gitconfig-personal`
-4. Modify shell configurations in `configs/shell/`
-5. Adjust the `install.conf.yaml` to match your needs
-6. Update the dotbins.yaml configuration with your preferred tools
-7. Remove or modify platform-specific configurations as necessary
+- Recommended (most users): start from the sanitized `shareable` branch — see “Shareable (Sanitized) Branch” above. It excludes private bits via `.publicignore` and the installer is auto-patched accordingly.
+- Advanced (maintainers/power users): start from `main` if you need the full repo and plan to manage your own secrets.
 
-Commands to get started with the current setup (from `main`):
+Steps common to both:
+- Update your details in `configs/git/gitconfig-personal` (copy from `gitconfig-personal.example`).
+- Adjust `configs/shell/`, `install.conf.yaml`, and `submodules/dotbins/dotbins.yaml` to taste.
+
+Details: starting from `main` (advanced)
 
 ```bash
-# Clone the repository and initialize submodules (optionally fork and replace username)
-git clone https://github.com/basnijholt/dotfiles.git ~/dotfiles
+# Clone with submodules
+git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-# Remove the secrets submodule
-git rm -fr secrets
-git submodule update --init --recursive --jobs 8
-# Overwrite my personal gitconfig (Add your name in `gitconfig-personal` later)
-mv ~/dotfiles/configs/git/gitconfig-personal.example ~/dotfiles/configs/git/gitconfig-personal
-# Move existing files to backup
-mv ~/.zshrc ~/.zshrc.bak
-mv ~/.bash_profile ~/.bash_profile.bak
-mv ~/.bashrc ~/.bashrc.bak
-mv ~/.gitconfig ~/.gitconfig.bak
-# Run the installation script
+
+# Remove the private secrets submodule (you won't have access)
+git submodule deinit -f secrets || true
+git rm -f secrets || true
+git config -f .gitmodules --remove-section submodule.secrets || true
+
+# Personalize Git (edit the file afterward)
+cp configs/git/gitconfig-personal.example configs/git/gitconfig-personal
+
 ./install
 ```
 

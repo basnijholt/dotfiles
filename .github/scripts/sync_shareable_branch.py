@@ -59,16 +59,8 @@ def main() -> int:
         rel = str(path.relative_to(repo_root))
         # Try to deinit in case it is a submodule; ignore errors
         run(["git", "submodule", "deinit", "-f", "--", rel], check=False)
-        # Remove from index
-        run(["git", "rm", "-r", "-q", "--cached", "--ignore-unmatch", "--", rel], check=False)
-        # Remove from working tree if present
-        if path.is_dir():
-            shutil.rmtree(path, ignore_errors=True)
-        else:
-            try:
-                path.unlink()
-            except FileNotFoundError:
-                pass
+        # Remove and stage changes (this updates .gitmodules for submodules)
+        run(["git", "rm", "-f", "--", rel], check=False)
 
     # 2) Replace personal gitconfig with example
     example = repo_root / "configs/git/gitconfig-personal.example"
