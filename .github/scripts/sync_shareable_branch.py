@@ -49,35 +49,69 @@ def main() -> int:
     run(["git", "reset", "--hard", f"origin/{base}"])
 
     # 1) Remove listed items
+    log("Applying removals from .publicignore")
     ignore_file = repo_root / ".publicignore"
-    if ignore_file.exists():
-        log("Applying removals from .publicignore")
-        for raw in ignore_file.read_text().splitlines():
-            line = raw.strip()
-            if not line or line.startswith("#"):
-                continue
-            path = repo_root / line
-            rel = str(path.relative_to(repo_root))
-            # Try to deinit in case it is a submodule; ignore errors
-            run(["git", "submodule", "deinit", "-f", "--", rel], check=False)
-            # Remove from index
-            run(["git", "rm", "-r", "-q", "--cached", "--ignore-unmatch", "--", rel], check=False)
-            # Remove from working tree if present
-            if path.is_dir():
-                shutil.rmtree(path, ignore_errors=True)
-            else:
-                try:
-                    path.unlink()
-                except FileNotFoundError:
-                    pass
+    for raw in ignore_file.read_text().splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        path = repo_root / line
+        rel = str(path.relative_to(repo_root))
+        # Try to deinit in case it is a submodule; ignore errors
+        run(["git", "submodule", "deinit", "-f", "--", rel], check=False)
+        # Remove from index
+        run(["git", "rm", "-r", "-q", "--cached", "--ignore-unmatch", "--", rel], check=False)
+        # Remove from working tree if present
+        if path.is_dir():
+            shutil.rmtree(path, ignore_errors=True)
+        else:
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                pass
 
     # 2) Replace personal gitconfig with example
     example = repo_root / "configs/git/gitconfig-personal.example"
     target = repo_root / "configs/git/gitconfig-personal"
-    if example.exists():
-        log("Replacing configs/git/gitconfig-personal with example")
-        target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(example, target)
+    log("Replacing configs/git/gitconfig-personal with example")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(example, target)
+
+    # 2b) Patch install.conf.yaml to drop links we removed
+    install_conf = repo_root / "install.conf.yaml"
+    log("Patching install.conf.yaml based on .publicignore")
+    # Read ignore paths (assumes .publicignore exists)
+    ignore_paths = [
+        s.strip()
+        for s in (repo_root / ".publicignore").read_text().splitlines()
+        if s.strip() and not s.strip().startswith("#")
+    ]
+
+    def should_drop_link_line(line: str) -> bool:
+        # Matches lines like: "    ~/.config/foo: configs/foo/bar"
+        if ":" not in line:
+            return False
+        src = line.split(":", 1)[1].strip()
+        if (src.startswith('"') and src.endswith('"')) or (src.startswith("'") and src.endswith("'")):
+            src = src[1:-1]
+        return any(src == p or src.startswith(p + "/") for p in ignore_paths)
+
+    lines = install_conf.read_text().splitlines()
+    new_lines: list[str] = []
+    skip_next_stdout = False
+    for ln in lines:
+        if skip_next_stdout:
+            skip_next_stdout = False
+            continue
+        if "- command:" in ln and any(p in ln for p in ignore_paths):
+            skip_next_stdout = True  # also drop the next stdout: line
+            continue
+        if should_drop_link_line(ln):
+            continue
+        new_lines.append(ln)
+
+    if new_lines != lines:
+        install_conf.write_text("\n".join(new_lines) + "\n")
 
     # 3) Commit and push if there are changes
     run(["git", "add", "-A"]) 
