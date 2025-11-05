@@ -11,6 +11,7 @@ My main goal is to have consistency and a super smooth bootstrapping experience 
 
 Try out my setup in Docker without installing anything! 🐳
 See [this section](#trying-with-docker).
+Want to install right away? Use the [`public` branch](#install-the-public-branch) for a sanitized version without private bits.
 
 > [!TIP]
 > I have written several blog posts about my shell setup and the tools I use.
