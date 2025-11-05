@@ -1,0 +1,14 @@
+###############################################
+# Files/directories to remove from shareable branch
+# Lines starting with '#' are comments.
+# Paths are repo-root relative; globs supported by `git rm -r`.
+###############################################
+
+# Private submodule with secrets
+secrets
+
+# Example: uncomment to remove private/local-only items
+#configs/keyboard-maestro
+#scripts/rclone.sh
+#scripts/sync-photos-to-truenas.sh
+
