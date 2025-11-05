@@ -5,7 +5,7 @@
 A carefully designed cross-platform dotfiles configuration that powers my development environments across macOS  and Linux 🐧 systems.
 This repository represents years of refinement to create a consistent, modular, and reliable setup.
 
-I run this configuration on at least 10 machines, including `arm64` *macOS*, `x86_64` and `aarm64` versions of *Ubuntu*, *Debian*, *DietPi*, *Raspberry Pi OS*, *NixOS*, *Pop!_OS*, and even on my *iPhone* via iSH which emulates `i386` Linux.
+I run this configuration on at least 10 machines, including `arm64` *macOS*, `x86_64` and `aarch64` versions of *Ubuntu*, *Debian*, *DietPi*, *Raspberry Pi OS*, *NixOS*, *Pop!_OS*, and even on my *iPhone* via iSH which emulates `i386` Linux.
 
 My main goal is to have consistency and a super smooth bootstrapping experience for new machines, and to have a consistent setup across all my devices.
 
@@ -60,7 +60,12 @@ Why not?
 ### Prerequisites
 
 - Git installed
-- SSH key set up with GitHub
+- SSH key set up with GitHub (submodules use SSH)
+
+```bash
+# Ensure your key is loaded in the agent
+ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/id_ed25519
+```
 
 ### Install for others using Shareable (Sanitized) Branch
 
