@@ -2,18 +2,41 @@ from tree import print_with_comments, list_files
 
 # Directory and file descriptions
 descriptions = {
-    "eqMac.sh": "Poor man's Supervisord/Launchd/Systemd for eqMac because it keeps crashing",
-    "nbviewer.sh": "Script to share Jupyter notebooks via nbviewer",
-    "pypi-sha256.sh": "Generate the commands to update a conda-forge feedstock",
-    "rclone.sh": "Scheduled backups to B2 cloud storage",
-    "run.sh": "Run any command from the .dotbins directory without having PATH set up",
+    # Maintenance / system
+    "apt-update.sh": "Debian/Ubuntu update: apt update/upgrade/autoremove/autoclean",
+    "setup-atuin-daemon.sh": "Setup Atuin as a user systemd service",
+
+    # Git / code helpers
+    "commit.py": "Generate a conventional commit message from staged changes",
+    "git-fixup-file.sh": "Remove a file from commits since branching from main",
+
+    # macOS / audio
+    "eqMac.sh": "Keep eqMac running via cron on macOS",
+    "eqMac.py": "Inspect macOS audio devices and defaults",
+
+    # Notebooks and uploads
+    "nbviewer.sh": "Share a Jupyter notebook via nbviewer (after upload)",
+    "upload-file.sh": "Upload files to various paste/file hosts",
+
+    # Backups / sync
+    "rclone.sh": "Scheduled backups to Backblaze B2 (and rsync to TrueNAS)",
     "rsync-time-machine.sh": "Create incremental Time Machine-like backups using rsync",
-    "setup-atuin-daemon.sh": "Setup atuin daemon with systemd",
-    "sync-dotfiles.sh": "Sync dotfiles to remote machines",
-    "sync-local-dotfiles.sh": "Update dotfiles on the local machine",
+    "sync-dotfiles.sh": "Push updater to hosts and trigger sync/install",
+    "sync-local-dotfiles.sh": "On a host: pull latest and optionally run ./install",
     "sync-photos-to-truenas.sh": "Sync photos to TrueNAS server",
     "sync-uv-tools.sh": "Globally install uv tools I frequently use",
-    "upload-file.sh": "Share files via various file hosting services",
+
+    # AI / LLM utilities
+    "fix_my_text_ollama.py": "Clipboard text grammar fix using a local Ollama model",
+    "transcribe.py": "Stream mic audio to a Wyoming ASR server (clipboard optional)",
+    "voice_clipboard_assistant.py": "Voice command assistant for clipboard text via Ollama",
+
+    # Repo helpers
+    "post-clone.sh": "Initialize submodules with LFS skip for mydotbins, then init rest",
+    "remove-box.py": "Strip box-drawing characters from copied code snippets",
+    "run.sh": "Run a command from .dotbins platform bin directory",
+    "pypi-sha256.sh": "Print commands to update a conda-forge feedstock checksum",
+    "rpi": "Raspberry Pi helper scripts (mount/unmount LUKS USB)",
 }
 
 if __name__ == "__main__":
