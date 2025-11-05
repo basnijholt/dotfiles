@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Minimal shareable-branch sync.
+"""Minimal public-branch sync.
 
 Steps:
  1) Checkout/reset PUBLIC_BRANCH from origin/BASE_BRANCH
@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 def log(msg: str) -> None:
-    print(f"[sync-shareable] {msg}")
+    print(f"[sync-public] {msg}")
 
 
 def run(args, *, check=True, capture=False):
@@ -34,14 +34,14 @@ def main() -> int:
     os.chdir(repo_root)
 
     base = os.getenv("BASE_BRANCH", "main")
-    public = os.getenv("PUBLIC_BRANCH", "shareable")
+    public = os.getenv("PUBLIC_BRANCH", "public")
 
     # Make sure we have the latest origin state
     run(["git", "fetch", "--prune", "origin"], check=False)
     short_sha = run(["git", "rev-parse", "--short", f"origin/{base}"], capture=True).stdout.strip()
 
     log(f"Base branch:    {base}")
-    log(f"Shareable branch: {public}")
+    log(f"Public branch: {public}")
     log(f"Repo root:       {repo_root}")
     log(f"Checking out {public} from origin/{base} ({short_sha})")
 
@@ -115,7 +115,7 @@ def main() -> int:
     run([
         "git", "-c", "user.name=github-actions[bot]",
         "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
-        "commit", "-m", f"chore(shareable): sync from {base} {short_sha} and sanitize",
+        "commit", "-m", f"chore(public): sync from {base} {short_sha} and sanitize",
     ])
 
     if os.getenv("CI") == "true" or os.getenv("PUSH") == "1":

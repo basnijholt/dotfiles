@@ -1,4 +1,4 @@
-name: Sync shareable branch
+name: Sync public branch
 
 on:
   push:
@@ -9,12 +9,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: sync-shareable-${{ github.ref }}
+  group: sync-public-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   sync:
-    name: Build sanitized shareable branch
+    name: Build sanitized public branch
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -26,6 +26,6 @@ jobs:
       - name: Sync and sanitize
         env:
           BASE_BRANCH: main
-          PUBLIC_BRANCH: shareable
+          PUBLIC_BRANCH: public
         run: |
-          python3 .github/scripts/sync_shareable_branch.py
+          python3 .github/scripts/sync_public_branch.py

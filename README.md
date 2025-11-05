@@ -67,14 +67,14 @@ Why not?
 ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/id_ed25519
 ```
 
-### Install for others using Shareable (Sanitized) Branch
+### Install the Public Branch
 
-If you’re not me and just want a clean version without private bits, use the always-up-to-date `shareable` branch.
+If you’re not me and just want a clean version without private bits, use the always-up-to-date [`public` branch](https://github.com/basnijholt/dotfiles/tree/public).
 CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.publicignore), like the `secrets` submodule, personal machine configs, etc.
 
 ```bash
 # Clone the sanitized branch with submodules (shallow)
-git clone --depth=1 --branch shareable --single-branch \
+git clone --depth=1 --branch public --single-branch \
   --recurse-submodules -j8 --shallow-submodules \
   git@github.com:basnijholt/dotfiles.git
 cd dotfiles
@@ -500,7 +500,7 @@ This submodule requires SSH authentication to access, which is why setting up SS
 
 Pick one path:
 
-- Recommended (most users): start from the sanitized `shareable` branch — see “Shareable (Sanitized) Branch” above. It excludes private bits via `.publicignore` and the installer is auto-patched accordingly.
+- Recommended (most users): start from the sanitized [`public` branch](https://github.com/basnijholt/dotfiles/tree/public) — see “Install the Public Branch” above. It excludes private bits via [`.publicignore`](.publicignore) and the installer is auto-patched accordingly.
 - Advanced (maintainers/power users): start from `main` if you need the full repo and plan to manage your own secrets.
 
 Steps common to both:
