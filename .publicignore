@@ -12,3 +12,28 @@ secrets
 #scripts/rclone.sh
 #scripts/sync-photos-to-truenas.sh
 
+# -----------------------------
+# Sensitive/private
+# -----------------------------
+configs/nixos
+configs/agent-cli/config.toml
+scripts/rclone.sh
+scripts/sync-photos-to-truenas.sh
+scripts/signature.html
+submodules/rsync-time-backup
+
+# -----------------------------
+# Mac-only or very personal
+# -----------------------------
+configs/keyboard-maestro
+configs/iterm
+configs/karabiner
+scripts/eqMac.sh
+scripts/eqMac.py
+
+# -----------------------------
+# Machine-specific (optional)
+# -----------------------------
+configs/hypr
+configs/hyprpanel
+scripts/rpi
