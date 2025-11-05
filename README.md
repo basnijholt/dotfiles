@@ -60,7 +60,7 @@ Why not?
 
 ### Prerequisites
 
-- Git installed
+- Git and Git LFS installed (on macOS `brew install git git-lfs` or `apt install git git-lfs` on Debian/Ubuntu)
 - SSH key set up with GitHub (submodules use SSH)
 
 ```bash

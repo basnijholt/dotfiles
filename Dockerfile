@@ -4,20 +4,17 @@
 
 FROM ubuntu:25.04
 
-# Install git and zsh (only Git is required!)
-RUN apt-get update && apt-get install -y git zsh
+# Install git and zsh (only Git and Git LFS are required!)
+RUN apt-get update && apt-get install -y git zsh git-lfs
 
-# Clone the dotfiles repository using HTTPS instead of SSH
+# Ensure any git@github.com URLs in submodules are fetched via HTTPS in the
+# container (no SSH keys in build context)
 RUN git config --global url."https://github.com/".insteadOf git@github.com:
 
-# Clone the dotfiles repository
-RUN git clone https://github.com/basnijholt/dotfiles.git ~/dotfiles
-
-# Initialize submodules and skip the private 'secrets' submodule
-RUN cd ~/dotfiles && \
-    git submodule init && \
-    git config submodule.secrets.update none && \
-    git submodule update --init --recursive --jobs 8
+# Clone the public branch with submodules (shallow)
+RUN git clone --depth 1 --branch public --single-branch \
+    --recurse-submodules -j8 --shallow-submodules \
+    https://github.com/basnijholt/dotfiles.git ~/dotfiles
 
 # Install the dotfiles
 RUN cd ~/dotfiles && ./install || true
