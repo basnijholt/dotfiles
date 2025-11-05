@@ -101,6 +101,17 @@ Notes:
 - Submodules are required (e.g., Dotbot lives in `submodules/dotbot`), so cloning with `--recurse-submodules` is recommended.
 - To change what’s excluded, edit `.publicignore` on `main` and push; CI will refresh `shareable` automatically.
 
+### macOS Terminal Font
+
+If prompt icons show as empty squares, install a Nerd Font and select it in Terminal.app:
+
+```bash
+brew install --cask font-fira-mono-nerd-font
+```
+
+Then in Terminal: Settings → Profiles → Text → Font → choose “FiraMono Nerd Font Mono”.
+The “Mono” variant forces single‑width glyphs so powerline/nerd icons align perfectly in Terminal.app.
+
 ### Trying with Docker
 
 > [!NOTE]
