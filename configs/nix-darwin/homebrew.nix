@@ -53,12 +53,14 @@
       "lego" # Let's Encrypt client
       "meson" # Build system
       "micro" # Terminal-based text editor
+      "mosh" # Mobile shell
       "nano" # Text editor
       "neovim" # Text editor
       "nmap" # Network scanner
       "node" # JavaScript runtime
       "ollama" # Ollama LLMs
       "openjdk" # Java development kit
+      "pandoc" # Document converter
       "parallel" # GNU parallel
       "pipx" # Python app installer
       "portaudio" # Audio I/O library
@@ -68,11 +70,13 @@
       "rsync" # File sync tool
       "ruby" # Ruby programming language
       "rustup" # Rust toolchain installer
+      "skhd-zig" # Hotkey daemon
       "ssh-copy-id" # SSH public key installer
       "starship" # Shell prompt
       "superfile" # Modern terminal file manager
       "swiftformat" # Swift code formatter
       "tealdeer" # Fast alternative to tldr
+      "terminal-notifier" # macOS notification tool
       "terraform" # Infrastructure as code
       "tmux" # Terminal multiplexer
       "tre-command" # Tree command, improved
@@ -82,7 +86,16 @@
       "wget" # File downloader
       "yq" # YAML processor
       "zsh" # Shell
-    ];
+    ] ++ (
+      if config.isPersonal then
+        []
+      else
+        [
+          "llvm@17" # LLVM toolchain
+          "protobuf" # Protocol Buffers
+          "slackdump" # Slack archiver
+        ]
+    );
 
     # GUI Applications (Casks)
     casks = [
@@ -96,7 +109,6 @@
       "brave-browser" # Web browser
       "calibre" # E-book manager
       "chromedriver" # Chrome automation
-      "claude-code" # Claude Desktop (AI)
       "cryptomator" # File encryption
       "cursor" # Cursor editor
       "cyberduck" # FTP client
@@ -136,7 +148,6 @@
       "microsoft-teams" # Team communication
       "monitorcontrol" # External display control
       "mounty" # NTFS mounter
-      "stolendata-mpv" # Media player
       "musicbrainz-picard" # Music tagger
       "obs" # Streaming software
       "obsidian" # Note taking app
@@ -155,6 +166,7 @@
       "sloth" # Process monitor
       "spotify" # Music streaming
       "steam" # Game platform
+      "stolendata-mpv" # Media player
       "submariner" # Subsonic music client
       "switchresx" # Display manager
       "syncthing-app" # File synchronization
@@ -182,14 +194,15 @@
         [
           "gcloud-cli" # Google Cloud CLI
           "google-drive" # Cloud storage
-          "xquartz" # X11 server
           "klayout" # GDS Layout viewer
+          "xquartz" # X11 server
         ]
     );
 
     # Additional repositories
     taps = [
       "gromgit/fuse" # For SSHFS
+      "jackielii/tap" # for skhd-zig
     ];
   };
 }
