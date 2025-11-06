@@ -19,7 +19,6 @@
       "blueutil" # Bluetooth utility
       "brew-cask-completion" # Completion for brew cask
       "btop" # System monitor
-      "claude" # Claude Desktop (AI)
       "cloudflared" # Cloudflare tunnel
       "cmake" # Build system
       "cmatrix" # Matrix-style screen animation
@@ -73,8 +72,6 @@
       "starship" # Shell prompt
       "superfile" # Modern terminal file manager
       "swiftformat" # Swift code formatter
-      "syncthing" # File synchronization
-      "tailscale" # VPN service
       "tealdeer" # Fast alternative to tldr
       "terraform" # Infrastructure as code
       "tmux" # Terminal multiplexer
@@ -99,17 +96,18 @@
       "brave-browser" # Web browser
       "calibre" # E-book manager
       "chromedriver" # Chrome automation
-      "cursor" # Cursor editor
+      "claude-code" # Claude Desktop (AI)
       "cryptomator" # File encryption
+      "cursor" # Cursor editor
       "cyberduck" # FTP client
       "db-browser-for-sqlite" # SQLite browser
       "disk-inventory-x" # Disk space visualizer
-      "docker" # Container platform
+      "docker-desktop" # Container platform
       "dropbox" # Cloud storage
       "eqmac" # Audio equalizer
       "filebot" # File renamer
       "firefox" # Web browser
-      "flux" # Screen color adjuster
+      "flux-app" # Screen color adjuster
       "font-fira-code" # Programming font
       "font-fira-mono-nerd-font" # Nerd font
       "foobar2000" # Music player
@@ -117,7 +115,7 @@
       "git-credential-manager" # Git credential helper
       "github" # GitHub desktop
       "google-earth-pro" # 3D earth viewer
-      "handbrake" # Video transcoder
+      "handbrake-app" # Video transcoder
       "inkscape" # Vector graphics editor
       "istat-menus" # System monitor
       "iterm2" # Terminal emulator
@@ -138,10 +136,8 @@
       "microsoft-teams" # Team communication
       "monitorcontrol" # External display control
       "mounty" # NTFS mounter
-      "mpv" # Media player
+      "stolendata-mpv" # Media player
       "musicbrainz-picard" # Music tagger
-      "mullvadvpn" # VPN client
-      "nordvpn" # VPN client
       "obs" # Streaming software
       "obsidian" # Note taking app
       "onyx" # System maintenance
@@ -161,7 +157,7 @@
       "steam" # Game platform
       "submariner" # Subsonic music client
       "switchresx" # Display manager
-      "syncthing" # File synchronization
+      "syncthing-app" # File synchronization
       "teamviewer" # Remote control
       "telegram" # Messenger
       "tor-browser" # Private browser
@@ -177,11 +173,14 @@
         [
           "1password" # Password manager
           "google-chrome" # Web browser
+          "mullvad-vpn" # VPN client
+          "nordvpn" # VPN client
+          "tailscale" # VPN service
           "zoom" # Video conferencing
         ]
       else
         [
-          "google-cloud-sdk" # Google Cloud CLI
+          "gcloud-cli" # Google Cloud CLI
           "google-drive" # Cloud storage
           "xquartz" # X11 server
           "klayout" # GDS Layout viewer
