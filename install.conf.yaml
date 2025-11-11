@@ -22,6 +22,7 @@
     ~/.config/git/attributes: configs/git/attributes
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin
+    ~/.config/nvim: configs/nvim
     ~/.config/starship.toml: configs/starship/starship.toml
     ~/.config/wezterm/wezterm.lua: configs/wezterm/wezterm.lua
     ~/.config/zellij/config.kdl: configs/zellij/config.kdl
@@ -29,8 +30,8 @@
     ~/.dotbins: submodules/mydotbins
     ~/.gitconfig-personal: configs/git/gitconfig-personal
     ~/.gitconfig: configs/git/gitconfig
-    ~/.local/bin/nbviewer: scripts/nbviewer.sh
     ~/.local/bin/git-fixup-file: scripts/git-fixup-file.sh
+    ~/.local/bin/nbviewer: scripts/nbviewer.sh
     ~/.local/bin/pypi-sha256: scripts/pypi-sha256.sh
     ~/.local/bin/run: scripts/run.sh
     ~/.local/bin/sync-dotfiles: scripts/sync-dotfiles.sh
