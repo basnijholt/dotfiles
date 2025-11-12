@@ -10,3 +10,5 @@
 	directory = /opt/stacks
 [include]
 	path = ~/.gitconfig-sign
+[credential "https://git.lab.nijho.lt"]
+	provider = generic
