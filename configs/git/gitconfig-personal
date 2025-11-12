@@ -8,3 +8,5 @@
 	repo = ~/dotfiles/pipefunc/src
 [safe]
 	directory = /opt/stacks
+[include]
+	path = ~/.gitconfig-sign

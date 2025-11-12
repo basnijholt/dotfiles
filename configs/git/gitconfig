@@ -1,6 +1,4 @@
 [include]
-	path = ~/.gitconfig-sign
-[include]
 	path = ~/.gitconfig-personal
 [push]
 	default = simple
