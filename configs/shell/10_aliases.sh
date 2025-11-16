@@ -16,6 +16,7 @@ if [[ $- == *i* ]]; then
     alias gcaia="${HOME}/dotfiles/scripts/commit.py --edit --all "
     alias c='code'
     alias ze='zellij attach --create'
+    alias killagent="pkill -9 -f '[a]gent-cli'"
 
     if [[ `uname` == 'Darwin' ]]; then
         alias j='jupyter notebook'
