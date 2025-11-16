@@ -106,6 +106,20 @@
           --flash-attn on
           --jinja
 
+      "gpt-oss:120b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf ggml-org/gpt-oss-120b-GGUF
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 4096
+          --ubatch-size 2048
+          --n-gpu-layers 99
+          --main-gpu 0
+          --threads 1
+          --flash-attn on
+          --jinja
+
       "embeddinggemma:300m":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
