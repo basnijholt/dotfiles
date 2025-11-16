@@ -114,7 +114,25 @@
           --ctx-size 32768
           --batch-size 4096
           --ubatch-size 2048
-          --n-gpu-layers 99
+          --n-gpu-layers 999
+          --tensor-split 3,1.3
+          --n-cpu-moe 15
+          --main-gpu 0
+          --threads 1
+          --flash-attn on
+          --jinja
+
+      "gpt-oss:120b-q8-unsloth":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/gpt-oss-120b-GGUF:q8_0
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 4096
+          --ubatch-size 2048
+          --n-gpu-layers 999
+          --tensor-split 3,1.3
+          --n-cpu-moe 15
           --main-gpu 0
           --threads 1
           --flash-attn on
