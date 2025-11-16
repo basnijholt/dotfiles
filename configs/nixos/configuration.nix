@@ -10,6 +10,7 @@
     ./modules/nixpkgs.nix
     ./modules/user.nix
     ./modules/desktop.nix
+    ./modules/nvidia-undervolt.nix
     ./modules/services.nix
     ./modules/system-packages.nix
     ./modules/home-manager.nix

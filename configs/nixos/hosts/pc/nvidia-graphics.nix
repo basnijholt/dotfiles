@@ -33,6 +33,13 @@ in
 {
   # --- NVIDIA Graphics ---
   services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.deviceSection = ''
+    Section "Device"
+      Identifier "nvidia-undervolt"
+      Driver "nvidia"
+      Option "Coolbits" "28"
+    EndSection
+  '';
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = true;
