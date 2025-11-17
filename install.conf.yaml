@@ -75,6 +75,7 @@
 - link:
     ~/.gitconfig-sign: configs/git/gitconfig-sign
     ~/.config/karabiner/karabiner.json: configs/karabiner/karabiner.json
+    ~/.config/skhd/skhdrc: configs/skhd/skhdrc
     ~/Work/.stignore: configs/syncthing/stignore
     ~/Lightroom/.stignore: configs/syncthing/stignore
     ~/Sync/.stignore: configs/syncthing/stignore
