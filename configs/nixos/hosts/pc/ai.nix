@@ -33,7 +33,7 @@
           --hf-repo bartowski/Qwen2.5-0.5B-Instruct-GGUF
           --hf-file Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
           --port ''${PORT}
-          --ctx-size 8192
+          --ctx-size 0
           --n-gpu-layers 99
           --main-gpu 0
 
@@ -43,7 +43,7 @@
           --hf-repo unsloth/SmolLM2-135M-Instruct-GGUF
           --hf-file SmolLM2-135M-Instruct-Q8_0.gguf
           --port ''${PORT}
-          --ctx-size 4096
+          --ctx-size 0
           --n-gpu-layers 99
           --main-gpu 0
 
@@ -54,10 +54,10 @@
           --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
           --hf-file Qwen3-Coder-30B-A3B-q4_k_m.gguf
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 0
           --n-gpu-layers 99
           --main-gpu 0
-          --flash-attn
+          --flash-attn on
 
       "devstral-24b":
         cmd: |
@@ -65,10 +65,10 @@
           --hf-repo mistralai/Devstral-Small-2507_gguf
           --hf-file Devstral-Small-2507-Q4_K_M.gguf
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 0
           --n-gpu-layers 99
           --main-gpu 0
-          --flash-attn
+          --flash-attn on
 
       # Large reasoning models
       "dolphin-mistral-24b":
@@ -77,10 +77,10 @@
           --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF
           --hf-file cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-Q4_K_M.gguf
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 0
           --n-gpu-layers 99
           --main-gpu 0
-          --flash-attn
+          --flash-attn on
 
       "qwen3-thinking-4b":
         cmd: |
@@ -88,18 +88,62 @@
           --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF
           --hf-file Qwen3-4B-Thinking-2507-Q4_K_M.gguf
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 0
           --n-gpu-layers 99
           --main-gpu 0
+
+      "hermes-4:70b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Hermes-4-70B-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 4096
+          --ubatch-size 2048
+          --n-gpu-layers 99
+          --main-gpu 0
+          --threads 1
+          --flash-attn on
+          --jinja
 
       "gpt-oss:20b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           -hf ggml-org/gpt-oss-20b-GGUF
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 0
           --batch-size 4096
           --ubatch-size 2048
+          --n-gpu-layers 99
+          --main-gpu 0
+          --threads 1
+          --chat-template-kwargs '{"reasoning_effort": "high"}'
+          --flash-attn on
+          --jinja
+
+      "qwen3-30b-a3b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 4096
+          --ubatch-size 4096
+          --n-gpu-layers 99
+          --main-gpu 0
+          --threads 1
+          --flash-attn on
+          --jinja
+
+      # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
+      "qwen3-30b-a3b-abliterated":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf mradermacher/Qwen3-30B-A3B-abliterated-erotic-i1-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 4096
+          --ubatch-size 4096
           --n-gpu-layers 99
           --main-gpu 0
           --threads 1
@@ -111,30 +155,36 @@
           ${pkgs.llama-cpp}/bin/llama-server
           -hf ggml-org/gpt-oss-120b-GGUF
           --port ''${PORT}
-          --ctx-size 32768
-          --batch-size 4096
+          --ctx-size 65536
+          --batch-size 2048
           --ubatch-size 2048
           --n-gpu-layers 999
+          --split-mode layer
           --tensor-split 3,1.3
           --n-cpu-moe 15
-          --main-gpu 0
-          --threads 1
+          --threads 8
+          --chat-template-kwargs '{"reasoning_effort": "high"}'
           --flash-attn on
           --jinja
+
+      # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
+      # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
+      # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
 
       "gpt-oss:120b-q8-unsloth":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo unsloth/gpt-oss-120b-GGUF:q8_0
           --port ''${PORT}
-          --ctx-size 32768
-          --batch-size 4096
-          --ubatch-size 2048
-          --n-gpu-layers 999
-          --tensor-split 3,1.3
-          --n-cpu-moe 15
-          --main-gpu 0
-          --threads 1
+          --ctx-size 65536
+          --batch-size 512
+          --ubatch-size 512
+          --n-gpu-layers 99
+          --split-mode layer
+          --tensor-split 1.8,1
+          --n-cpu-moe 13
+          --threads 8
+          --chat-template-kwargs '{"reasoning_effort": "high"}'
           --flash-attn on
           --jinja
 
