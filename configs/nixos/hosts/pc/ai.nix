@@ -27,9 +27,9 @@
     # llama-swap configuration
     # This config uses llama.cpp's server to serve models on demand
 
-    models:
+    models:  # Ordered from newest to oldest
 
-      # Released 2025-10-31
+      # Uploaded 2025-10-31
       "qwen3-vl-thinking:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -41,7 +41,7 @@
           --threads 1
           --jinja
 
-      # Released 2025-10-31
+      # Uploaded 2025-10-31
       "qwen3-vl:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -53,7 +53,39 @@
           --threads 1
           --jinja
 
-      # Released 2025-10-30
+      # Uploaded 2025-09-04
+      "embeddinggemma:300m":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf ggml-org/embeddinggemma-300M-GGUF
+          --port ''${PORT}
+          --embeddings
+
+      # Uploaded 2025-08-27
+      "hermes-4:70b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Hermes-4-70B-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-08-24
+      "seed-oss:36b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Seed-OSS-36B-Instruct-GGUF
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-08-10
       "gpt-oss:20b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -66,7 +98,7 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Released 2025-10-30
+      # Uploaded 2025-08-10
       "gpt-oss:120b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -82,41 +114,11 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Released 2025-09-11
-      "qwen3-thinking-4b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf unsloth/Qwen3-4B-Thinking-2507-GGUF
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Released 2025-09-04
-      "embeddinggemma:300m":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf ggml-org/embeddinggemma-300M-GGUF
-          --port ''${PORT}
-          --embeddings
-
-
-
-      # Released 2025-08-27
-      "hermes-4:70b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Hermes-4-70B-GGUF
-          --port ''${PORT}
-          --ctx-size 0
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
       # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
 
-      # Released 2025-08-25
+      # Uploaded 2025-08-08
       "gpt-oss:120b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -132,20 +134,8 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Released 2025-08-24
-      "seed-oss:36b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Seed-OSS-36B-Instruct-GGUF
-          --port ''${PORT}
-          --ctx-size 32768
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
       # Coding models
-      # Released 2025-08-08
+      # Uploaded 2025-08-08
       "qwen3-coder-30b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -154,7 +144,15 @@
           --port ''${PORT}
           --ctx-size 0
 
-      # Released 2025-07-23
+      # Uploaded 2025-08-06
+      "qwen3-thinking-4b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf unsloth/Qwen3-4B-Thinking-2507-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+
+      # Uploaded 2025-07-23
       "devstral-24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -164,7 +162,7 @@
           --ctx-size 0
 
       # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
-      # Released 2025-07-11
+      # Uploaded 2025-07-11
       "qwen3-30b-a3b-abliterated":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -176,7 +174,7 @@
           --threads 1
           --jinja
 
-      # Released 2025-07-07
+      # Uploaded 2025-07-07
       "dolphin-mistral-24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -185,7 +183,7 @@
           --port ''${PORT}
           --ctx-size 0
   
-      # Released 2025-05-25
+      # Uploaded 2025-05-25
       "qwen3-thinking-8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -193,7 +191,7 @@
           --port ''${PORT}
           --ctx-size 0
 
-      # Released 2024-10-31
+      # Uploaded 2024-10-31
       "smollm2-135m":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -203,7 +201,7 @@
           --ctx-size 0
 
       # Small models
-      # Released 2024-09-17
+      # Uploaded 2024-09-17
       "qwen2.5-0.5b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
