@@ -28,93 +28,6 @@
     # This config uses llama.cpp's server to serve models on demand
 
     models:
-      # Small models
-      # Released 2024-09-17
-      "qwen2.5-0.5b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo bartowski/Qwen2.5-0.5B-Instruct-GGUF
-          --hf-file Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Released 2024-10-31
-      "smollm2-135m":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/SmolLM2-135M-Instruct-GGUF
-          --hf-file SmolLM2-135M-Instruct-Q8_0.gguf
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
-      # Released 2025-07-11
-      "qwen3-30b-a3b-abliterated":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf mradermacher/Qwen3-30B-A3B-abliterated-erotic-i1-GGUF
-          --port ''${PORT}
-          --ctx-size 0
-          --batch-size 4096
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Coding models
-      # Released 2025-08-08
-      "qwen3-coder-30b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
-          --hf-file Qwen3-Coder-30B-A3B-q4_k_m.gguf
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Released 2025-07-23
-      "devstral-24b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo mistralai/Devstral-Small-2507_gguf
-          --hf-file Devstral-Small-2507-Q4_K_M.gguf
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Released 2025-07-07
-      "dolphin-mistral-24b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF
-          --hf-file cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-Q4_K_M.gguf
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Released 2025-09-11
-      "qwen3-thinking-4b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf unsloth/Qwen3-4B-Thinking-2507-GGUF
-          --port ''${PORT}
-          --ctx-size 0
-  
-      # Released 2025-05-25
-      "qwen3-thinking-8b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf unsloth/Qwen3-8B-128K-GGUF
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Released 2025-08-27
-      "hermes-4:70b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Hermes-4-70B-GGUF
-          --port ''${PORT}
-          --ctx-size 0
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
 
       # Released 2025-10-31
       "qwen3-vl-thinking:32b":
@@ -133,18 +46,6 @@
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           -hf unsloth/Qwen3-VL-32B-Instruct-GGUF
-          --port ''${PORT}
-          --ctx-size 32768
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Released 2025-08-24
-      "seed-oss:36b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Seed-OSS-36B-Instruct-GGUF
           --port ''${PORT}
           --ctx-size 32768
           --batch-size 2048
@@ -181,6 +82,36 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
+      # Released 2025-09-11
+      "qwen3-thinking-4b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf unsloth/Qwen3-4B-Thinking-2507-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+
+      # Released 2025-09-04
+      "embeddinggemma:300m":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf ggml-org/embeddinggemma-300M-GGUF
+          --port ''${PORT}
+          --embeddings
+
+
+
+      # Released 2025-08-27
+      "hermes-4:70b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Hermes-4-70B-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
       # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
@@ -201,13 +132,85 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Released 2025-09-04
-      "embeddinggemma:300m":
+      # Released 2025-08-24
+      "seed-oss:36b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf ggml-org/embeddinggemma-300M-GGUF
+          -hf unsloth/Seed-OSS-36B-Instruct-GGUF
           --port ''${PORT}
-          --embeddings
+          --ctx-size 32768
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Coding models
+      # Released 2025-08-08
+      "qwen3-coder-30b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
+          --hf-file Qwen3-Coder-30B-A3B-q4_k_m.gguf
+          --port ''${PORT}
+          --ctx-size 0
+
+      # Released 2025-07-23
+      "devstral-24b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo mistralai/Devstral-Small-2507_gguf
+          --hf-file Devstral-Small-2507-Q4_K_M.gguf
+          --port ''${PORT}
+          --ctx-size 0
+
+      # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
+      # Released 2025-07-11
+      "qwen3-30b-a3b-abliterated":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf mradermacher/Qwen3-30B-A3B-abliterated-erotic-i1-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 4096
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Released 2025-07-07
+      "dolphin-mistral-24b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF
+          --hf-file cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-Q4_K_M.gguf
+          --port ''${PORT}
+          --ctx-size 0
+  
+      # Released 2025-05-25
+      "qwen3-thinking-8b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf unsloth/Qwen3-8B-128K-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+
+      # Released 2024-10-31
+      "smollm2-135m":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/SmolLM2-135M-Instruct-GGUF
+          --hf-file SmolLM2-135M-Instruct-Q8_0.gguf
+          --port ''${PORT}
+          --ctx-size 0
+
+      # Small models
+      # Released 2024-09-17
+      "qwen2.5-0.5b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo bartowski/Qwen2.5-0.5B-Instruct-GGUF
+          --hf-file Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+          --port ''${PORT}
+          --ctx-size 0
 
     healthCheckTimeout: 600  # 10 minutes for large model download + loading
 
