@@ -188,7 +188,7 @@
 
       # Coding models
       # Uploaded 2025-08-08
-      "qwen3-coder-30b":
+      "qwen3-coder:30b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
@@ -197,7 +197,7 @@
           --ctx-size 0
 
       # Uploaded 2025-08-06
-      "qwen3-thinking-4b":
+      "qwen3-thinking:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf unsloth/Qwen3-4B-Thinking-2507-GGUF
@@ -205,7 +205,7 @@
           --ctx-size 0
 
       # Uploaded 2025-07-23
-      "devstral-24b":
+      "devstral:24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo mistralai/Devstral-Small-2507_gguf
@@ -227,7 +227,7 @@
           --jinja
 
       # Uploaded 2025-07-07
-      "dolphin-mistral-24b":
+      "dolphin-mistral:24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF
@@ -236,7 +236,7 @@
           --ctx-size 0
   
       # Uploaded 2025-05-25
-      "qwen3-thinking-8b":
+      "qwen3-thinking:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf unsloth/Qwen3-8B-128K-GGUF
@@ -244,7 +244,7 @@
           --ctx-size 0
 
       # Uploaded 2024-10-31
-      "smollm2-135m":
+      "smollm2:135m":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo unsloth/SmolLM2-135M-Instruct-GGUF
@@ -254,7 +254,7 @@
 
       # Small models
       # Uploaded 2024-09-17
-      "qwen2.5-0.5b":
+      "qwen2.5:0.5b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo bartowski/Qwen2.5-0.5B-Instruct-GGUF
