@@ -33,10 +33,9 @@
       "qwen3-vl-thinking:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-4B-Thinking-GGUF
-          --hf-file Qwen3VL-4B-Thinking-Q8_0.gguf
+          -hf Qwen/Qwen3-VL-4B-Thinking-GGUF:Q8_0
           --port ''${PORT}
-          --ctx-size 16384
+          --ctx-size 65536
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
@@ -46,10 +45,9 @@
       "qwen3-vl:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-4B-Instruct-GGUF
-          --hf-file Qwen3VL-4B-Instruct-Q8_0.gguf
+          -hf Qwen/Qwen3-VL-4B-Instruct-GGUF:Q8_0
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 65536
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
@@ -59,10 +57,9 @@
       "qwen3-vl-thinking:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-8B-Thinking-GGUF
-          --hf-file Qwen3VL-8B-Thinking-Q8_0.gguf
+          -hf Qwen/Qwen3-VL-8B-Thinking-GGUF:Q8_0
           --port ''${PORT}
-          --ctx-size 16384
+          --ctx-size 65536
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
@@ -72,10 +69,9 @@
       "qwen3-vl:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-8B-Instruct-GGUF
-          --hf-file Qwen3VL-8B-Instruct-Q8_0.gguf
+          -hf Qwen/Qwen3-VL-8B-Instruct-GGUF:Q8_0
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 65536
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
@@ -85,23 +81,35 @@
       "qwen3-vl-thinking:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Thinking-GGUF
+          -hf unsloth/Qwen3-VL-32B-Thinking-GGUF:Q4_K_M
           --port ''${PORT}
-          --ctx-size 16384
+          --ctx-size 32768
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
           --jinja
 
       # Uploaded 2025-10-31
-      "qwen3-vl:32b":
+      "qwen3-vl:32b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF
+          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:Q4_K_M
           --port ''${PORT}
           --ctx-size 32768
           --batch-size 2048
           --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-10-31
+      "qwen3-vl:32b-q8":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:Q8_0
+          --port ''${PORT}
+          --ctx-size 16384
+          --batch-size 2048
+          --ubatch-size 512
           --threads 1
           --jinja
 
@@ -117,11 +125,13 @@
       "hermes-4:70b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Hermes-4-70B-GGUF
+          -hf unsloth/Hermes-4-70B-GGUF:Q4_K_M
           --port ''${PORT}
-          --ctx-size 0
-          --batch-size 2048
-          --ubatch-size 2048
+          --ctx-size 16384
+          --batch-size 512
+          --ubatch-size 512
+          --gpu-layers 70
+          --n-cpu-moe 11
           --threads 1
           --jinja
 
@@ -131,7 +141,7 @@
           ${pkgs.llama-cpp}/bin/llama-server
           -hf unsloth/Seed-OSS-36B-Instruct-GGUF
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 65536
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
@@ -193,13 +203,13 @@
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M
           --port ''${PORT}
-          --ctx-size 0
+          --ctx-size 131072
 
       # Uploaded 2025-08-06
       "qwen3-thinking:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf unsloth/Qwen3-4B-Thinking-2507-GGUF
+          --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF
           --port ''${PORT}
           --ctx-size 0
 
@@ -209,14 +219,14 @@
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo mistralai/Devstral-Small-2507_gguf:Q4_K_M
           --port ''${PORT}
-          --ctx-size 0
+          --ctx-size 65536
 
       # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
       # Uploaded 2025-07-11
       "qwen3-30b-a3b-abliterated":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf mradermacher/Qwen3-30B-A3B-abliterated-erotic-i1-GGUF
+          --hf-repo mradermacher/Qwen3-30B-A3B-abliterated-erotic-i1-GGUF
           --port ''${PORT}
           --ctx-size 0
           --batch-size 4096
@@ -230,13 +240,13 @@
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF:Q4_K_M
           --port ''${PORT}
-          --ctx-size 0
+          --ctx-size 65536
   
       # Uploaded 2025-05-25
       "qwen3-thinking:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf unsloth/Qwen3-8B-128K-GGUF
+          --hf-repo unsloth/Qwen3-8B-128K-GGUF
           --port ''${PORT}
           --ctx-size 0
 
