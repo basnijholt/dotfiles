@@ -1,4 +1,6 @@
 [defaults]
+llm-provider = "openai" # "ollama"
+
 # Ollama
 llm-ollama-model = "gpt-oss:20b"
 llm-ollama-host = "http://192.168.1.143:11434"
@@ -6,7 +8,6 @@ llm-ollama-host = "http://192.168.1.143:11434"
 # llama.cpp
 llm-openai-model = "gpt-oss:20b"
 openai-base-url = "http://pc.local:9292/v1"
-llm-provider = "local"
 
 # Other
 asr-wyoming-ip = "192.168.1.143"
