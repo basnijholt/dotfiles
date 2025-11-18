@@ -30,6 +30,58 @@
     models:  # Ordered from newest to oldest
 
       # Uploaded 2025-10-31
+      "qwen3-vl-thinking:4b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf Qwen/Qwen3-VL-4B-Thinking-GGUF
+          --hf-file Qwen3VL-4B-Thinking-Q8_0.gguf
+          --port ''${PORT}
+          --ctx-size 16384
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-10-31
+      "qwen3-vl:4b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf Qwen/Qwen3-VL-4B-Instruct-GGUF
+          --hf-file Qwen3VL-4B-Instruct-Q8_0.gguf
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-10-31
+      "qwen3-vl-thinking:8b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf Qwen/Qwen3-VL-8B-Thinking-GGUF
+          --hf-file Qwen3VL-8B-Thinking-Q8_0.gguf
+          --port ''${PORT}
+          --ctx-size 16384
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-10-31
+      "qwen3-vl:8b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf Qwen/Qwen3-VL-8B-Instruct-GGUF
+          --hf-file Qwen3VL-8B-Instruct-Q8_0.gguf
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-10-31
       "qwen3-vl-thinking:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
