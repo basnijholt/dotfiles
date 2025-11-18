@@ -39,6 +39,8 @@
     8009 # Synapse
     8448 # Synapse
     9292 # llama-swap proxy
+    9898 # asr_custom_model = "nvidia/canary-qwen-2.5b"
+    11434 # ollama
     8080 # element
     30080 # mindroom ingress http (kind)
     30443 # mindroom ingress https (kind)
