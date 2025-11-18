@@ -191,8 +191,7 @@
       "qwen3-coder:30b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
-          --hf-file Qwen3-Coder-30B-A3B-q4_k_m.gguf
+          --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M
           --port ''${PORT}
           --ctx-size 0
 
@@ -208,8 +207,7 @@
       "devstral:24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo mistralai/Devstral-Small-2507_gguf
-          --hf-file Devstral-Small-2507-Q4_K_M.gguf
+          --hf-repo mistralai/Devstral-Small-2507_gguf:Q4_K_M
           --port ''${PORT}
           --ctx-size 0
 
@@ -230,8 +228,7 @@
       "dolphin-mistral:24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF
-          --hf-file cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-Q4_K_M.gguf
+          --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF:Q4_K_M
           --port ''${PORT}
           --ctx-size 0
   
@@ -247,8 +244,7 @@
       "smollm2:135m":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/SmolLM2-135M-Instruct-GGUF
-          --hf-file SmolLM2-135M-Instruct-Q8_0.gguf
+          --hf-repo unsloth/SmolLM2-135M-Instruct-GGUF:Q8_0
           --port ''${PORT}
           --ctx-size 0
 
@@ -257,8 +253,7 @@
       "qwen2.5:0.5b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo bartowski/Qwen2.5-0.5B-Instruct-GGUF
-          --hf-file Qwen2.5-0.5B-Instruct-Q4_K_M.gguf
+          --hf-repo bartowski/Qwen2.5-0.5B-Instruct-GGUF:Q4_K_M
           --port ''${PORT}
           --ctx-size 0
 
