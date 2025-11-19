@@ -1,5 +1,5 @@
 {
   "includeCoAuthoredBy": false,
-  "model": "claude-sonnet-4-5@20250929",
+  "model": "sonnet[1m]",
   "alwaysThinkingEnabled": true
 }
