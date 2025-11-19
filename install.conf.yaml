@@ -18,7 +18,7 @@
     ~/.config/codex/config.toml: configs/codex/config.toml
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
-    ~/.config/gemini/settings.json: configs/gemini/settings.json
+    ~/.config/gemini: configs/gemini
     ~/.config/git/attributes: configs/git/attributes
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin
