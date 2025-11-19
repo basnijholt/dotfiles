@@ -6,7 +6,7 @@ llm-ollama-model = "gpt-oss:20b"
 llm-ollama-host = "http://192.168.1.143:11434"
 
 # llama.cpp
-llm-openai-model = "gpt-oss:20b"
+llm-openai-model = "gpt-oss-low:20b"
 openai-base-url = "http://pc.local:9292/v1"
 
 # Other
