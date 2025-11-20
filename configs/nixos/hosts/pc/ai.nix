@@ -120,6 +120,8 @@
           -hf ggml-org/embeddinggemma-300M-GGUF
           --port ''${PORT}
           --embeddings
+          --batch-size 2048
+          --ubatch-size 2048
 
       # Uploaded 2025-08-27
       "hermes-4:70b":
@@ -148,7 +150,33 @@
           --jinja
 
       # Uploaded 2025-08-10
-      "gpt-oss:20b":
+      "gpt-oss-low:20b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf ggml-org/gpt-oss-20b-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 4096
+          --ubatch-size 2048
+          --threads 1
+          --chat-template-kwargs '{"reasoning_effort": "low"}'
+          --jinja
+
+      # Uploaded 2025-08-10
+      "gpt-oss-medium:20b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf ggml-org/gpt-oss-20b-GGUF
+          --port ''${PORT}
+          --ctx-size 0
+          --batch-size 4096
+          --ubatch-size 2048
+          --threads 1
+          --chat-template-kwargs '{"reasoning_effort": "medium"}'
+          --jinja
+
+      # Uploaded 2025-08-10
+      "gpt-oss-high:20b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           -hf ggml-org/gpt-oss-20b-GGUF
@@ -271,19 +299,16 @@
 
     # TTL keeps models in memory for specified seconds after last use
     ttl: 3600  # Keep models loaded for 1 hour (like OLLAMA_KEEP_ALIVE)
+
     # Groups allow running multiple models simultaneously
-    # Uncomment and adjust based on your VRAM (24GB RTX 3090)
-    # groups:
-    #   small:  # ~2-4GB VRAM total
-    #     - "qwen2.5-0.5b"
-    #     - "smollm2-135m"
-    #     - "qwen3-thinking-4b"
-    #   coding:  # Can't run both together (~15-20GB each)
-    #     - "qwen3-coder-30b"
-    #     - "devstral-small-22b"
-    #   large:  # ~13-15GB VRAM each
-    #     - "dolphin-mistral-24b"
-    #     - "gpt-oss-20b"
+    groups:
+      embedding:
+        # Keep embedding model always loaded alongside any other model
+        persistent: true  # Prevents other groups from unloading this
+        swap: false       # Don't swap models within this group
+        exclusive: false  # Don't unload other groups when loading this
+        members:
+          - "embeddinggemma:300m"
   '';
 
   systemd.services.llama-swap = {
