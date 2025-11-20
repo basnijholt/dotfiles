@@ -18,6 +18,9 @@ wake-server-ip = "192.168.1.143"
 input-device-name = "q9,brio,logitech,airpods,macbook"
 output-device-name = "iloud,airpods,dell,macbook"
 
+# RAG / memory
+embedding-model = "embeddinggemma:300m"
+
 [transcribe]
 extra-instructions = """
 Assume the user is often discussing Python programming.
