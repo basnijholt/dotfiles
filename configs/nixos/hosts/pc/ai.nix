@@ -29,7 +29,7 @@
 
     models:  # Ordered from newest to oldest
 
-      # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144
+      # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144, layers: 36
       "qwen3-vl-thinking:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -41,7 +41,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144
+      # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144, layers: 36
       "qwen3-vl:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -53,7 +53,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-31, size 8.8 GB, max ctx: 262144
+      # Uploaded 2025-10-31, size 8.8 GB, max ctx: 262144, layers: 36
       "qwen3-vl-thinking:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -65,7 +65,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-31, size 8.8 GB, max ctx: 262144
+      # Uploaded 2025-10-31, size 8.8 GB, max ctx: 262144, layers: 36
       "qwen3-vl:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -77,7 +77,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-31, size 18.4 GB, max ctx: 262144
+      # Uploaded 2025-10-30, size 18.4 GB, max ctx: 262144, layers: 64
       "qwen3-vl-thinking:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -89,7 +89,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-31, size 18.4 GB, max ctx: 262144
+      # Uploaded 2025-10-30, size 18.4 GB, max ctx: 262144, layers: 64
       "qwen3-vl:32b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -101,7 +101,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-31, size 32.4 GB, max ctx: 262144
+      # Uploaded 2025-10-30, size 32.4 GB, max ctx: 262144, layers: 64
       "qwen3-vl:32b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -113,7 +113,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-09-04, size 0.3 GB, max ctx: 2048
+      # Uploaded 2025-09-04, size 0.3 GB, max ctx: 2048, layers: 24
       "embeddinggemma:300m":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -123,7 +123,7 @@
           --batch-size 2048
           --ubatch-size 2048
 
-      # Uploaded 2025-08-27, size 39.6 GB, max ctx: 131072
+      # Uploaded 2025-08-27, size 39.6 GB, max ctx: 131072, layers: 80
       "hermes-4:70b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -137,7 +137,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-08-24, size 20.3 GB, max ctx: 524288
+      # Uploaded 2025-08-24, size 20.3 GB, max ctx: 524288, layers: 64
       "seed-oss:36b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -149,7 +149,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-08-10, size 11.3 GB, max ctx: 131072
+      # Uploaded 2025-08-02, size 11.3 GB, max ctx: 131072, layers: 24
       "gpt-oss-low:20b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -162,7 +162,7 @@
           --chat-template-kwargs '{"reasoning_effort": "low"}'
           --jinja
 
-      # Uploaded 2025-08-10, size 11.3 GB, max ctx: 131072
+      # Uploaded 2025-08-02, size 11.3 GB, max ctx: 131072, layers: 24
       "gpt-oss-medium:20b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -175,7 +175,7 @@
           --chat-template-kwargs '{"reasoning_effort": "medium"}'
           --jinja
 
-      # Uploaded 2025-08-10, size 11.3 GB, max ctx: 131072
+      # Uploaded 2025-08-02, size 11.3 GB, max ctx: 131072, layers: 24
       "gpt-oss-high:20b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -188,7 +188,7 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Uploaded 2025-08-10, size 59.0 GB, max ctx: 131072
+      # Uploaded 2025-08-02, size 59.0 GB, max ctx: 131072, layers: 36
       "gpt-oss:120b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -208,7 +208,7 @@
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
       # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
 
-      # Uploaded 2025-08-08, size 59.0 GB, max ctx: 131072
+      # Uploaded 2025-08-05, size 59.0 GB, max ctx: 131072, layers: 36
       "gpt-oss:120b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -225,7 +225,7 @@
           --jinja
 
       # Coding models
-      # Uploaded 2025-08-08, size 17.3 GB, max ctx: 262144
+      # Uploaded 2025-07-31, size 17.3 GB, max ctx: 262144, layers: 48
       "qwen3-coder:30b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -233,7 +233,7 @@
           --port ''${PORT}
           --ctx-size 131072
 
-      # Uploaded 2025-08-06, size 2.3 GB, max ctx: 262144
+      # Uploaded 2025-08-06, size 2.3 GB, max ctx: 262144, layers: 36
       "qwen3-thinking:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -241,7 +241,7 @@
           --port ''${PORT}
           --ctx-size 0
 
-      # Uploaded 2025-07-23, size 13.3 GB, max ctx: 131072
+      # Uploaded 2025-07-07, size 13.3 GB, max ctx: 131072, layers: 40
       "devstral:24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -250,7 +250,7 @@
           --ctx-size 65536
 
       # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
-      # Uploaded 2025-07-11, size 17.3 GB, max ctx: 40960
+      # Uploaded 2025-05-10, size 17.3 GB, max ctx: 40960, layers: 48
       "qwen3-30b-a3b-abliterated":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -262,7 +262,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-07-07, size 13.3 GB, max ctx: 32768
+      # Uploaded 2025-05-09, size 13.3 GB, max ctx: 32768, layers: 40
       "dolphin-mistral:24b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -270,7 +270,7 @@
           --port ''${PORT}
           --ctx-size 65536
   
-      # Uploaded 2025-05-25, size 4.7 GB, max ctx: 131072
+      # Uploaded 2025-04-28, size 4.7 GB, max ctx: 131072, layers: 36
       "qwen3-thinking:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -278,7 +278,7 @@
           --port ''${PORT}
           --ctx-size 0
 
-      # Uploaded 2024-10-31, size 0.1 GB, max ctx: 8192
+      # Uploaded 2024-10-31, size 0.1 GB, max ctx: 8192, layers: 30
       "smollm2:135m":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -287,7 +287,7 @@
           --ctx-size 0
 
       # Small models
-      # Uploaded 2024-09-17, size 0.4 GB, max ctx: 32768
+      # Uploaded 2024-09-17, size 0.4 GB, max ctx: 32768, layers: 24
       "qwen2.5:0.5b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
