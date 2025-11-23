@@ -29,6 +29,18 @@
 
     models:  # Ordered from newest to oldest
 
+      # Uploaded 2025-11-07, size 34.8 GB, max ctx: 32768, layers: 64
+      "qwen3-vl-thinking-abliterated:32b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf Huihui-AI/Qwen3-VL-32B-Thinking-abliterated:Q8_0
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
       # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144, layers: 36
       "qwen3-vl-thinking:4b":
         cmd: |
