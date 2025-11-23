@@ -4,10 +4,7 @@ let
   # ===================================
   # Living-Room GUI Applications
   # ===================================
-  guiApps = with pkgs; [
-    # Living-Room GUI Applications
-    kodi
-  ];
+  guiApps = with pkgs; [ ];
 
   # ===================================
   # Living-Room CLI Essentials
