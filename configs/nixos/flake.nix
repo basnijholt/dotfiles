@@ -61,12 +61,13 @@
           ./hosts/hp/default.nix
           ({ modulesPath, lib, ... }: {
             imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
-            networking.hostName = "hp-vm";
+            networking.hostName = lib.mkForce "hp-vm";
             
             # Disable Disko's FS generation so qemu-vm can take over
             disko.enableConfig = lib.mkForce false;
 
             # Virtualization-friendly settings
+            virtualisation.graphics = false;
             boot.loader.grub.device = "/dev/vda";
             services.qemuGuest.enable = true;
           })
