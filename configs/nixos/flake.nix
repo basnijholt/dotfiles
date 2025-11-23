@@ -61,12 +61,12 @@
           ./hosts/hp/default.nix
           ({ modulesPath, lib, ... }: {
             networking.hostName = lib.mkForce "hp-vm";
-            
+
             # Virtualization-friendly settings
             boot.loader.grub.device = lib.mkForce "/dev/vda";
             services.qemuGuest.enable = true;
             disko.memSize = 4096;
-            
+
             # Set a password for root for easy login
             users.users.root.password = "nixos";
           })
