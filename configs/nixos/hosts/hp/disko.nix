@@ -5,8 +5,6 @@
     disk = {
       nvme = {
         type = "disk";
-        # Placeholder: update this to the actual disk ID (e.g. /dev/disk/by-id/...)
-        # when you have the hardware.
         device = "/dev/nvme0n1";
         content = {
           type = "gpt";

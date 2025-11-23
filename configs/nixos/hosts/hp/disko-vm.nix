@@ -3,10 +3,9 @@
 {
   disko.devices = {
     disk = {
-      # Changed identifier to 'main' for VM clarity
-      main = {
+      nvme = {
         type = "disk";
-        device = "/dev/vda"; # Standard virtio disk
+        device = "/dev/vda";
         content = {
           type = "gpt";
           partitions = {
@@ -36,7 +35,7 @@
     zpool = {
       zroot = {
         type = "zpool";
-        mode = "";
+        mode = ""; # Single disk
         options = {
           ashift = "12";
           autotrim = "on";
