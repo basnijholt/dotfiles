@@ -59,12 +59,17 @@
           ./hosts/hp/disko-vm.nix
           ./hosts/hp/hardware-configuration.nix
           ./hosts/hp/default.nix
-          {
+          ({ modulesPath, lib, ... }: {
+            imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
             networking.hostName = "hp-vm";
+            
+            # Disable Disko's FS generation so qemu-vm can take over
+            disko.enableConfig = lib.mkForce false;
+
             # Virtualization-friendly settings
             boot.loader.grub.device = "/dev/vda";
             services.qemuGuest.enable = true;
-          }
+          })
         ];
 
         installer = lib.nixosSystem {
