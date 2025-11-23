@@ -54,6 +54,19 @@
           ./hosts/hp/default.nix
         ];
 
+        hp-vm = mkHost [
+          disko.nixosModules.disko
+          ./hosts/hp/disko-vm.nix
+          ./hosts/hp/hardware-configuration.nix
+          ./hosts/hp/default.nix
+          {
+            networking.hostName = "hp-vm";
+            # Virtualization-friendly settings
+            boot.loader.grub.device = "/dev/vda";
+            services.qemuGuest.enable = true;
+          }
+        ];
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
