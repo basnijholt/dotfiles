@@ -47,6 +47,13 @@
           ./hosts/nuc/default.nix
         ];
 
+        hp = mkHost [
+          disko.nixosModules.disko
+          ./hosts/hp/disko.nix
+          ./hosts/hp/hardware-configuration.nix
+          ./hosts/hp/default.nix
+        ];
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
@@ -59,6 +66,7 @@
       diskoConfigurations = {
         nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
+        hp = (import ./hosts/hp/disko.nix) { inherit lib; };
       };
 
     };
