@@ -60,16 +60,15 @@
           ./hosts/hp/hardware-configuration.nix
           ./hosts/hp/default.nix
           ({ modulesPath, lib, ... }: {
-            imports = [ (modulesPath + "/virtualisation/qemu-vm.nix") ];
             networking.hostName = lib.mkForce "hp-vm";
             
-            # Disable Disko's FS generation so qemu-vm can take over
-            disko.enableConfig = lib.mkForce false;
-
             # Virtualization-friendly settings
-            virtualisation.graphics = false;
-            boot.loader.grub.device = "/dev/vda";
+            boot.loader.grub.device = lib.mkForce "/dev/vda";
             services.qemuGuest.enable = true;
+            disko.memSize = 4096;
+            
+            # Set a password for root for easy login
+            users.users.root.password = "nixos";
           })
         ];
 
@@ -86,6 +85,7 @@
         nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
+        hp-vm = (import ./hosts/hp/disko-vm.nix) { inherit lib; };
       };
 
     };
