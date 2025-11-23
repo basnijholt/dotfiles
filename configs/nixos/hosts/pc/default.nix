@@ -14,6 +14,7 @@
     ./ai.nix
     ./backup.nix
     ./nvidia-graphics.nix
+    ./nvidia-undervolt.nix
     ./slurm.nix
   ];
 }
