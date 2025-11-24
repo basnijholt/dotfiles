@@ -89,27 +89,20 @@ scp root@proxmox:~/vm-100.qcow2 .
 ```
 
 **Step C: Import to Incus**
-1.  **Initialize Empty VM:**
-    ```bash
-    incus init --vm --empty my-vm-name
-    ```
-2.  **Resize Disk (Optional):**
-    If the source disk is larger than default (10GB), resize the Incus volume first.
-    ```bash
-    incus config device set my-vm-name root size=50GiB
-    ```
-3.  **Import Disk Image:**
-    Use `incus-migrate` or write directly to the volume block device.
-    *   *Direct Write (if using ZFS/LVM):* `qemu-img convert -O raw vm-100.qcow2 /dev/zvol/...`
-    *   *Standard Import:*
-        ```bash
-        # This is the easiest generic method
-        incus config device add my-vm-name root disk source=/absolute/path/to/vm-100.qcow2
-        ```
-        *Warning:* This attaches the file as a disk. For better performance, import it into the storage pool properly using `incus import`.
+We use a helper script `migrate-vm.sh` to create the VM and attach the disk.
 
-4.  **Start VM:**
+1.  **Run the Migration Script:**
+    This script creates an empty VM and attaches your exported QCow2 disk file to it.
     ```bash
-    incus start my-vm-name
-    incus console my-vm-name
+    # Usage: ./migrate-vm.sh <qcow2-file> <vm-name>
+    ./migrate-vm.sh vm-100.qcow2 haos
+    ```
+
+    **⚠️ Important:** The script attaches the `.qcow2` file directly as the VM's disk. **Do not delete or move this file** after running the script, or the VM will stop working.
+
+2.  **Verify & Access:**
+    The VM should be running. You can access its console to check boot progress.
+    ```bash
+    incus console haos
+    # Press Ctrl+a, q to exit the console
     ```
