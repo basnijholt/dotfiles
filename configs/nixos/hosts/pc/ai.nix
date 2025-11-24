@@ -33,7 +33,8 @@
       "qwen3-vl-thinking-abliterated:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf Huihui-AI/Qwen3-VL-32B-Thinking-abliterated:Q8_0
+          -hf huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated
+          --hf-file GGUF/ggml-model-q8_0.gguf
           --port ''${PORT}
           --ctx-size 32768
           --batch-size 2048
