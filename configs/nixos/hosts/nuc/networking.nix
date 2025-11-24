@@ -6,6 +6,9 @@
   networking.firewall.enable = true;
   networking.networkmanager.enable = false;
   
+  # Disable global DHCP since we're using systemd-networkd
+  networking.useDHCP = false;
+  
   # Enable systemd-networkd for bridge configuration
   systemd.network.enable = true;
   
