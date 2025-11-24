@@ -33,6 +33,8 @@ Migrate workloads (LXC Containers and KVM VMs) from a Proxmox host to a new NixO
     *   **Imperative:** Run `sudo incus admin init` once.
 3.  **User Permissions:** Add your user to the `incus-admin` group in `users.users.<name>.extraGroups`.
     *   *Tip:* Run `newgrp incus-admin` if you just added it.
+4.  **Firewall:** Trust the bridge interface to allow DHCP/DNS traffic.
+    *   Add `networking.firewall.trustedInterfaces = [ "incusbr0" ];` to `networking.nix`.
 
 ---
 
@@ -60,13 +62,16 @@ Since Proxmox backups are just rootfs tarballs without Incus metadata, we create
     tar --use-compress-program=unzstd -xf vzdump-lxc-101-*.tar.zst -C restore_temp
     ```
 
-2.  **Create Base Container:**
+2.  **Identify OS:**
+    Check `cat restore_temp/etc/os-release` to verify if it is Debian, Ubuntu, or Alpine.
+
+3.  **Create Base Container:**
     Use a base image matching the source OS (e.g., `images:debian/12` or `images:ubuntu/22.04`).
     ```bash
     incus init images:debian/12 my-container-name
     ```
 
-3.  **Push Root Filesystem:**
+4.  **Push Root Filesystem:**
     Push the extracted files, overwriting the default template.
     ```bash
     # Iterate to avoid shell globbing issues if using sudo/sg
@@ -75,12 +80,12 @@ Since Proxmox backups are just rootfs tarballs without Incus metadata, we create
     done
     ```
 
-4.  **Start Container:**
+5.  **Start Container:**
     ```bash
     incus start my-container-name
     ```
 
-5.  **Verify & Cleanup:**
+6.  **Verify & Cleanup:**
     ```bash
     incus list my-container-name
     rm -rf restore_temp

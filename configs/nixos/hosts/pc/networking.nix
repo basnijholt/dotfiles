@@ -27,6 +27,9 @@
   #       recreates its Docker network.
   networking.firewall.checkReversePath = false;
 
+  # Allow traffic from Incus containers (DHCP, DNS, outbound)
+  networking.firewall.trustedInterfaces = [ "incusbr0" ];
+
   networking.firewall.allowedTCPPorts = [
     10200 # Wyoming Piper
     10300 # Wyoming Faster Whisper - English
