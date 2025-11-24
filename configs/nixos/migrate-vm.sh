@@ -2,6 +2,9 @@
 
 # Usage: ./migrate-vm.sh <qcow2-file> <vm-name>
 
+# NOTE: First run `sudo usermod -aG incus-admin $USER`
+#       and re-login to have permissions.
+
 QCOW2_FILE=$1
 VM_NAME=$2
 
