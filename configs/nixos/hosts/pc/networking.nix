@@ -41,6 +41,7 @@
     8008 # Synapse
     8009 # Synapse
     8448 # Synapse
+    8188 # ComfyUI
     9292 # llama-swap proxy
     9898 # asr_custom_model = "nvidia/canary-qwen-2.5b"
     11434 # ollama
