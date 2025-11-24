@@ -35,10 +35,11 @@
           ${pkgs.llama-cpp}/bin/llama-server
           -hf huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated
           --hf-file GGUF/ggml-model-q8_0.gguf
+          --mmproj-url https://huggingface.co/huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated/resolve/main/GGUF/mmproj-model-f16.gguf
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 16384
           --batch-size 2048
-          --ubatch-size 2048
+          --ubatch-size 512
           --threads 1
           --jinja
 
