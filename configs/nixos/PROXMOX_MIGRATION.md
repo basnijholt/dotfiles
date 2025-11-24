@@ -54,35 +54,22 @@ scp root@proxmox:/var/lib/vz/dump/vzdump-lxc-101-*.tar.zst .
 ```
 
 **Step C: Restore to Incus**
-Since Proxmox backups are just rootfs tarballs, we create a fresh container and overwrite its filesystem directly from the archive. This method preserves permissions and handles complex files (like Docker layers) much better than extracting to a temporary directory.
+We use a helper script `migrate-lxc.sh` to automate the restoration process. This script creates a fresh container, enables nesting (required for Docker), and streams the Proxmox backup directly into the running container to preserve permissions.
 
-1.  **Create Base Container:**
-    Initialize a fresh container. Using `images:debian/12` is a safe default for most Linux containers as we will overwrite the OS anyway.
+1.  **Run the Migration Script:**
     ```bash
-    incus init images:debian/12 my-container-name
-    # Optional: Enable nesting if the container runs Docker
-    incus config set my-container-name security.nesting true
+    # Usage: ./migrate-lxc.sh <backup-file> <new-container-name>
+    ./migrate-lxc.sh vzdump-lxc-101-*.tar.zst ubuntu
     ```
 
-2.  **Start Container:**
-    The container must be running to execute the restore command inside it.
+2.  **Verify:**
+    The container will automatically restart. Check that it is running and accessible.
     ```bash
-    incus start my-container-name
+    incus list
+    incus shell ubuntu
     ```
 
-3.  **Stream Backup to Container:**
-    We pipe the backup directly into the container's root (`/`), overwriting the template files.
-    *Note: You may see "Operation not permitted" errors for `/proc` and `/sys`. These are safe to ignore.*
-    ```bash
-    zstdcat vzdump-lxc-101-*.tar.zst | incus exec my-container-name -- tar -x -C /
-    ```
-
-4.  **Verify & Reboot:**
-    Check if the restore worked (e.g., check for your files in `/root`).
-    ```bash
-    incus exec my-container-name -- ls -la /root
-    incus restart my-container-name
-    ```
+    *Note: You may see harmless errors during the script execution regarding `/proc`, `/sys`, or `/etc/machine-id`. These are expected when overwriting a live container's rootfs and can be 100% ignored.*
 
 ---
 
