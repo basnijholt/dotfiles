@@ -29,8 +29,6 @@
   systemd.network.networks."40-br0" = {
     matchConfig.Name = "br0";
     networkConfig.DHCP = "yes";
-    # Use the MAC address of the first slave (eno1) to maintain the same IP
-    bridgeConfig.MACAddressPolicy = "persistent"; 
   };
 
   # Trust the bridge so VMs can do DHCP/DNS
