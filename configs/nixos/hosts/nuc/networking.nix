@@ -15,6 +15,7 @@
     netdevConfig = {
       Kind = "bridge";
       Name = "br0";
+      MACAddress = "1c:69:7a:0c:b6:37"; # Mimic eno1 MAC for Static DHCP
     };
   };
 
