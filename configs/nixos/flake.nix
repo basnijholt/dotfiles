@@ -54,6 +54,9 @@
           ./hosts/hp/default.nix
         ];
 
+        # To test the HP configuration in a VM with Disko partitioning:
+        # 1. Build: nix build .#nixosConfigurations.hp-vm.config.system.build.vmWithDisko
+        # 2. Run:   ./result/bin/disko-vm -nographic
         hp-vm = mkHost [
           disko.nixosModules.disko
           ./hosts/hp/disko-vm.nix
