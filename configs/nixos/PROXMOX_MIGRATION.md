@@ -54,41 +54,34 @@ scp root@proxmox:/var/lib/vz/dump/vzdump-lxc-101-*.tar.zst .
 ```
 
 **Step C: Restore to Incus**
-Since Proxmox backups are just rootfs tarballs without Incus metadata, we create an empty container and overwrite its filesystem.
+Since Proxmox backups are just rootfs tarballs, we create a fresh container and overwrite its filesystem directly from the archive. This method preserves permissions and handles complex files (like Docker layers) much better than extracting to a temporary directory.
 
-1.  **Extract Backup:**
-    ```bash
-    mkdir -p restore_temp
-    tar --use-compress-program=unzstd -xf vzdump-lxc-101-*.tar.zst -C restore_temp
-    ```
-
-2.  **Identify OS:**
-    Check `cat restore_temp/etc/os-release` to verify if it is Debian, Ubuntu, or Alpine.
-
-3.  **Create Base Container:**
-    Use a base image matching the source OS (e.g., `images:debian/12` or `images:ubuntu/22.04`).
+1.  **Create Base Container:**
+    Initialize a fresh container. Using `images:debian/12` is a safe default for most Linux containers as we will overwrite the OS anyway.
     ```bash
     incus init images:debian/12 my-container-name
+    # Optional: Enable nesting if the container runs Docker
+    incus config set my-container-name security.nesting true
     ```
 
-4.  **Push Root Filesystem:**
-    Push the extracted files, overwriting the default template.
-    ```bash
-    # Iterate to avoid shell globbing issues if using sudo/sg
-    for item in restore_temp/*; do
-      incus file push -r -p "$item" my-container-name/
-    done
-    ```
-
-5.  **Start Container:**
+2.  **Start Container:**
+    The container must be running to execute the restore command inside it.
     ```bash
     incus start my-container-name
     ```
 
-6.  **Verify & Cleanup:**
+3.  **Stream Backup to Container:**
+    We pipe the backup directly into the container's root (`/`), overwriting the template files.
+    *Note: You may see "Operation not permitted" errors for `/proc` and `/sys`. These are safe to ignore.*
     ```bash
-    incus list my-container-name
-    rm -rf restore_temp
+    zstdcat vzdump-lxc-101-*.tar.zst | incus exec my-container-name -- tar -x -C /
+    ```
+
+4.  **Verify & Reboot:**
+    Check if the restore worked (e.g., check for your files in `/root`).
+    ```bash
+    incus exec my-container-name -- ls -la /root
+    incus restart my-container-name
     ```
 
 ---
