@@ -8,13 +8,13 @@ Migrate workloads (LXC Containers and KVM VMs) from a Proxmox host to a new NixO
 ### LXC Containers (System Containers)
 | ID | Name | Backup Status | Migration Status |
 | :--- | :--- | :--- | :--- |
-| 101 | `ubuntu` | ✅ Transferred (11GB) | Pending |
-| 102 | `debian-stijn` | ✅ Transferred (225MB) | Pending |
-| 107 | `debian` | ✅ Transferred (2.8GB) | Pending |
+| 101 | `ubuntu` | ✅ Transferred (11GB) | ✅ **SUCCESS** (Running on `pc`) |
+| 102 | `debian-stijn` | ✅ Transferred (225MB) | ✅ **SUCCESS** (Running on `pc`) |
+| 107 | `debian` | ✅ Transferred (2.8GB) | ✅ **SUCCESS** (Running on `pc`) |
 | 118 | `homepage` | ✅ Transferred (496MB) | ✅ **SUCCESS** (Running on `pc`) |
-| 122 | `debian-wg` | ✅ Transferred (514MB) | Pending |
+| 122 | `debian-wg` | ✅ Transferred (514MB) | ✅ **SUCCESS** (Running on `pc`) |
 | 126 | `meshcentral` | ✅ Transferred (761MB) | ✅ **SUCCESS** (Running on `pc`) |
-| 128 | `docker` | ✅ Transferred (5.3GB) | Pending |
+| 128 | `docker` | ✅ Transferred (5.3GB) | ✅ **SUCCESS** (Running on `pc`) |
 
 ### Virtual Machines (KVM)
 | ID | Name | Backup Status | Migration Status |
