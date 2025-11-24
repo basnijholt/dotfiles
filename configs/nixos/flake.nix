@@ -69,6 +69,12 @@
 
             # Set a password for root for easy login
             users.users.root.password = "nixos";
+
+            # Rename VM interface to match hardware config for testing
+            # Force rename the first ethernet device (eth0) to eno1 so systemd-networkd finds it
+            services.udev.extraRules = ''
+              SUBSYSTEM=="net", ACTION=="add", KERNEL=="eth*", NAME="eno1"
+            '';
           })
         ];
 
