@@ -89,16 +89,16 @@ scp root@proxmox:~/vm-100.qcow2 .
 ```
 
 **Step C: Import to Incus**
-We use a helper script `migrate-vm.sh` to create the VM and attach the disk.
+We use a helper script `migrate-vm.sh` to import the disk and create the VM.
 
 1.  **Run the Migration Script:**
-    This script creates an empty VM and attaches your exported QCow2 disk file to it.
+    This script imports the QCow2 disk into the Incus storage pool and creates a VM from it.
     ```bash
     # Usage: ./migrate-vm.sh <qcow2-file> <vm-name>
     ./migrate-vm.sh vm-100.qcow2 haos
     ```
 
-    **⚠️ Important:** The script attaches the `.qcow2` file directly as the VM's disk. **Do not delete or move this file** after running the script, or the VM will stop working.
+    *Note: Since the disk is imported into the Incus storage pool, you can safely delete the original `.qcow2` file after verifying the VM works.*
 
 2.  **Verify & Access:**
     The VM should be running. You can access its console to check boot progress.
