@@ -10,7 +10,6 @@
   networking.bridges = {
     "br0" = {
       interfaces = [ "eno1" ];
-      stp = false; # Disable STP to avoid startup delays/timeouts on consumer routers
     };
   };
   
