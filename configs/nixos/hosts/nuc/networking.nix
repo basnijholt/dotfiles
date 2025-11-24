@@ -17,7 +17,7 @@
   networking.interfaces.eno1.useDHCP = false;
 
   # Trust the bridge so VMs can do DHCP/DNS
-  networking.firewall.trustedInterfaces = [ "br0" ];
+  networking.firewall.trustedInterfaces = [ "br0" "incusbr0" ];
 
   networking.firewall.allowedTCPPorts = [ 8080 ]; # Kodi web interface
   networking.firewall.allowedUDPPortRanges = [
