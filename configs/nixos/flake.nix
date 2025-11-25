@@ -79,23 +79,12 @@
             ./installers/iso.nix
           ];
         };
-
-        # Minimal test VM for debugging boot issues (no home-manager, no services)
-        test-vm = lib.nixosSystem {
-          inherit system;
-          modules = [
-            disko.nixosModules.disko
-            ./hosts/test-vm/disko.nix
-            ./hosts/test-vm/default.nix
-          ];
-        };
       };
 
       diskoConfigurations = {
         nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
-        test-vm = (import ./hosts/test-vm/disko.nix) { inherit lib; };
       };
 
     };
