@@ -17,6 +17,8 @@
       enable = true;
       device = "nodev";
       efiSupport = true;
+      # copyKernels is required for ZFS: GRUB cannot read ZFS datasets directly,
+      # so kernels must be copied to the EFI partition where GRUB can access them.
       copyKernels = true;
     };
     efi.canTouchEfiVariables = true;

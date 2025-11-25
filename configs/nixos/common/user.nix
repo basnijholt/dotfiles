@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 
+let
+  homeDir = config.users.users.basnijholt.home;
+in
 {
   # ===================================
   # User Configuration
@@ -15,13 +18,14 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMRmEP/ZUShYdZj/h3vghnuMNgtWExV+FEZHYyguMkX basnijholt@blink"
     ];
   };
+
   # Run Atuins history daemon using existing ~/.config/atuin/config.toml
   systemd.user.services."atuin-daemon" = {
     description = "Atuin history daemon";
     wantedBy = [ "default.target" ];
     serviceConfig = {
       ExecStart = "${pkgs.atuin}/bin/atuin daemon";
-      Environment = [ "ATUIN_CONFIG=/home/basnijholt/.config/atuin/config.toml" ];
+      Environment = [ "ATUIN_CONFIG=${homeDir}/.config/atuin/config.toml" ];
       Restart = "on-failure";
     };
   };
@@ -35,7 +39,7 @@
       ExecStart = "${pkgs.uv}/bin/uvx agent-cli server";
       Restart = "always";
       RestartSec = 5;
-      WorkingDirectory = "/home/basnijholt";
+      WorkingDirectory = homeDir;
     };
   };
 }

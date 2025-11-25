@@ -1,13 +1,6 @@
 { pkgs, ... }:
 
 let
-  guiApplications = with pkgs; [
-    # GUI Applications
-    brave
-    firefox
-    vscode
-  ];
-
   cliPowerTools = with pkgs; [
     # CLI Power Tools & Utilities
     _1password-cli
@@ -92,43 +85,12 @@ let
     (python3.withPackages (ps: [ ps.pipx ]))
     yarn
   ];
-
-  terminalsAndAlternatives = with pkgs; [
-    # Terminals & Linux-native Alternatives
-    alacritty
-    baobab
-    flameshot
-    ghostty
-    kitty
-  ];
-
-  hyprlandEssentials = with pkgs; [
-    # Hyprland Essentials
-    polkit_gnome
-    waybar
-    hyprpanel
-    wofi
-    mako
-    swww
-    wl-clipboard
-    wl-clip-persist
-    cliphist
-    hyprlock
-    hyprpicker
-    hyprshot
-    opensnitch
-    pavucontrol
-    pulseaudio
-  ];
 in
 {
   # ===================================
   # System Packages
   # ===================================
   environment.systemPackages =
-    guiApplications
-    ++ cliPowerTools
-    ++ developmentToolchains
-    ++ terminalsAndAlternatives
-    ++ hyprlandEssentials;
+    cliPowerTools
+    ++ developmentToolchains;
 }

@@ -43,6 +43,8 @@
         ];
 
         nuc = mkHost [
+          disko.nixosModules.disko
+          ./hosts/nuc/disko.nix
           ./hosts/nuc/hardware-configuration.nix
           ./hosts/nuc/default.nix
         ];
