@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # setup-atuin-daemon.sh - Sets up systemd user service for Atuin daemon
 
 # Create systemd user directory if it doesn't exist
