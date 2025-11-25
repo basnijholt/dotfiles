@@ -35,7 +35,10 @@
   # Trust the bridge so VMs can do DHCP/DNS
   networking.firewall.trustedInterfaces = [ "br0" "incusbr0" ];
 
-  networking.firewall.allowedTCPPorts = [ 8080 ]; # Kodi web interface
+  networking.firewall.allowedTCPPorts = [ 
+    8080 # Kodi web interface
+    8443 # Incus
+  ];
   networking.firewall.allowedUDPPortRanges = [
     { from = 60000; to = 61000; } # mosh
   ];
