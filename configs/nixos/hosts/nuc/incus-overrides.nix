@@ -47,26 +47,20 @@
 { modulesPath, lib, ... }:
 
 {
-  imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
+  imports = [
+    (modulesPath + "/profiles/qemu-guest.nix")
+    ./hardware-configuration.nix
+  ];
 
   networking.hostName = lib.mkForce "nuc-incus";
 
-  # --- Disk: Incus exposes root disk as SCSI (sda), not the real NVMe by-id ---
+  # --- Hardware overrides for VM ---
+  # Incus exposes root disk as SCSI (sda), not NVMe by-id
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
-
-  # --- Boot: VM-compatible (EFI mode, same as real NUC) ---
+  # Use virtio modules instead of physical hardware modules
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
-  boot.supportedFilesystems = [ "btrfs" ];
-  boot.loader = {
-    grub = {
-      enable = true;
-      device = "nodev";  # EFI mode
-      efiSupport = true;
-    };
-    efi.canTouchEfiVariables = true;
-  };
-
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  # No Intel microcode updates needed in VM
+  hardware.cpu.intel.updateMicrocode = lib.mkForce false;
 
   # --- Networking: keep bridge setup, adapt for VM ---
   # Match any ethernet interface (VM doesn't have eno1)

@@ -47,29 +47,22 @@
 { modulesPath, lib, ... }:
 
 {
-  imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];
+  imports = [
+    (modulesPath + "/profiles/qemu-guest.nix")
+    ./hardware-configuration.nix
+  ];
 
   networking.hostName = lib.mkForce "hp-incus";
   # Unique hostId for ZFS (different from real HP)
   networking.hostId = lib.mkForce "a7d4a137";
 
-  # --- Disk: Incus exposes root disk as SCSI (sda), not virtio (vda) ---
+  # --- Hardware overrides for VM ---
+  # Incus exposes root disk as SCSI (sda), not NVMe
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
-
-  # --- Boot: VM-compatible (EFI mode, same as real HP) ---
+  # Use virtio modules instead of physical hardware modules
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.loader = {
-    grub = {
-      enable = true;
-      device = "nodev";  # EFI mode
-      efiSupport = true;
-      copyKernels = true;  # Required for ZFS
-    };
-    efi.canTouchEfiVariables = true;
-  };
-
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  # No Intel microcode updates needed in VM
+  hardware.cpu.intel.updateMicrocode = lib.mkForce false;
 
   # --- Networking: keep bridge setup, adapt for VM ---
   # Match any ethernet interface (VM doesn't have eno1)
