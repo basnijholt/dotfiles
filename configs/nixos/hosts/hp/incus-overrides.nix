@@ -35,6 +35,8 @@
    nixos-install --root /mnt --no-root-passwd \
      --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#hp-incus'
 
+   passwd basnijholt # Set user password
+
 6. Remove ISO and reboot (from your PC, not the VM):
 
    incus stop hp-incus --force

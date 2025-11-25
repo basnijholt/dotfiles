@@ -26,14 +26,16 @@
    incus list                # Find the VM's IP address
    ssh root@<IP>             # SSH in (no password needed)
 
-5. Partition with Disko and install (use branch name, e.g., "hp" or "main"):
+5. Partition with Disko and install (use branch name, e.g., "nuc" or "main"):
 
    nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- \
      --mode destroy,format,mount \
-     --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#nuc-incus'
+     --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#nuc-incus'
 
    nixos-install --root /mnt --no-root-passwd \
-     --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#nuc-incus'
+     --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#nuc-incus'
+
+   passwd basnijholt # Set user password
 
 6. Remove ISO and reboot (from your PC, not the VM):
 
@@ -45,7 +47,7 @@
 
    incus list                # Get new IP
    ssh root@<IP>
-   nixos-rebuild switch --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#nuc-incus'
+   nixos-rebuild switch --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#nuc-incus'
 
 8. Change passwords.
 */
