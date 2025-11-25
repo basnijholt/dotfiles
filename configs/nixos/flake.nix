@@ -64,6 +64,14 @@
           ./hosts/hp/incus-overrides.nix
         ];
 
+        # Incus VM version of NUC - same services/packages, VM-appropriate hardware
+        nuc-incus = mkHost [
+          disko.nixosModules.disko
+          ./hosts/nuc/disko.nix
+          ./hosts/nuc/default.nix
+          ./hosts/nuc/incus-overrides.nix
+        ];
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
