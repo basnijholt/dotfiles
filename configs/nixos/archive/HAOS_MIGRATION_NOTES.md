@@ -7,9 +7,16 @@
 wget https://github.com/home-assistant/operating-system/releases/download/16.3/haos_ova-16.3.qcow2.xz
 unxz haos_ova-16.3.qcow2.xz
 
-# Interactive import
-incus-migrate
-# Select: 2 (virtual-machine), name it "haos", point to qcow2 file
+# Interactive import (requires root)
+sudo nix-shell -p incus --run "incus-migrate"
+# Prompts:
+#   Local server target: yes (Enter)
+#   Type: 2 (Virtual Machine)
+#   Name: haos
+#   Path: haos_ova-16.3.qcow2
+#   UEFI: yes (Enter)
+#   Secure Boot: no
+#   Begin migration: 1 (Enter)
 
 # Start
 incus start haos
