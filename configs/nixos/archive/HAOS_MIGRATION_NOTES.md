@@ -24,7 +24,18 @@ incus start haos
 
 ## Networking Setup
 
-Because the host is on WiFi (`wlp7s0`), bridging was not feasible. We used **Incus Static IPs** combined with **NixOS NAT Forwarding**.
+### Option 1: Bridge (recommended if host has wired ethernet)
+
+Attach the VM to the host's bridge so it gets its own IP from the network:
+
+```bash
+incus config device override haos eth0 network=br0
+incus restart haos
+```
+
+### Option 2: NAT (if host is on WiFi)
+
+Because WiFi (`wlp7s0`) can't bridge, use **Incus Static IPs** combined with **NixOS NAT Forwarding**.
 
 **Incus Configuration:**
 ```bash
