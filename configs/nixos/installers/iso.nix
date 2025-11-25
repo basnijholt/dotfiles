@@ -1,6 +1,5 @@
 { config, pkgs, ... }:
 {
-
   # SSH up on boot; key-only; root login allowed but NO passwords.
   services.openssh.enable = true;
   services.openssh.settings = {

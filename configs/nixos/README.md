@@ -64,7 +64,8 @@ nixos-install \
 
 ```bash
 nix build .#nixosConfigurations.installer.config.system.build.isoImage
-sudo dd if=result/iso/nixos-minimal-25.11.20251002.7df7ff7-x86_64-linux.iso of=/dev/sdX bs=4M status=progress conv=fsync
+cp result/iso/*.iso /tmp/nixos.iso
+sudo dd if=/tmp/nixos.iso of=/dev/sdX bs=4M status=progress conv=fsync
 ```
 
 Replace `/dev/sdX` with the target USB device. The ISO boots with SSH enabled and `root`’s console password set to `nixos`.
