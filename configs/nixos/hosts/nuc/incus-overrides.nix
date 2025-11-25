@@ -35,7 +35,7 @@
    nixos-install --root /mnt --no-root-passwd \
      --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#nuc-incus'
 
-   passwd basnijholt # Set user password
+   nixos-enter --root /mnt -c 'passwd basnijholt' # Set user password
 
 6. Remove ISO and reboot (from your PC, not the VM):
 
@@ -46,7 +46,7 @@
 7. SSH in and update to latest (if needed):
 
    incus list                # Get new IP
-   ssh root@<IP>
+   ssh basnijholt@<IP>
    nixos-rebuild switch --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#nuc-incus'
 
 8. Change passwords.
@@ -69,6 +69,8 @@
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
   # No Intel microcode updates needed in VM
   hardware.cpu.intel.updateMicrocode = lib.mkForce false;
+  # Console output for Incus VM (serial + VGA)
+  boot.kernelParams = [ "console=tty0" "console=ttyS0,115200" ];
 
   # --- Networking: keep bridge setup, adapt for VM ---
   # Match any ethernet interface (VM doesn't have eno1)
