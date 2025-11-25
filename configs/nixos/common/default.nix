@@ -4,7 +4,7 @@
 
 {
   imports = [
-    ./locale.nix
+    ./core.nix
     ./nix.nix
     ./nixpkgs.nix
     ./user.nix

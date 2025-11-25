@@ -1,23 +1,26 @@
 # Bas Nijholt's NixOS configs
 
-- `modules/`: Shared modules every host imports by default (core system settings, shared packages, services, desktop profile).
-- `hosts/pc/`: Desktop/workstation-specific modules (boot, disk layout, nixpkgs overlay, workstation packages, 1Password, GPU, AI extras, Slurm, etc.).
-- `hosts/nuc/`: NUC-specific overrides (networking, Kodi packages, etc.).
-- `hosts/hp/`: HP-specific overrides (networking, Kodi packages, ZFS, etc.).
-- `flake.nix`: Defines the `pc`, `nuc`, and `hp` NixOS configurations on top of shared modules.
+## 3-Tier Module Architecture
+
+- `common/`: **Tier 1** - Modules shared by ALL hosts (core settings, CLI packages, SSH, user config).
+- `optional/`: **Tier 2** - Modules hosts can opt-in to (desktop, audio, virtualization, GUI packages).
+- `hosts/`: **Tier 3** - Host-specific modules.
+  - `hosts/pc/`: Desktop/workstation (NVIDIA GPU, AI services, 1Password, Slurm, etc.).
+  - `hosts/nuc/`: Media box (Kodi, Btrfs).
+  - `hosts/hp/`: Headless server (ZFS, no desktop).
+- `flake.nix`: Defines the `pc`, `nuc`, and `hp` NixOS configurations.
 
 ## Host Roles
 
-- **PC (`nixos` configuration)**: Full workstation with Docker/Incus, GPU, Hyprland desktop, dev toolchains, AI services. Only this host inherits the heavy packages/modules under `hosts/pc/`.
-- **NUC (`nuc` configuration)**: Lightweight dev + media box. Shares basic packages and services but has its own networking tweaks and skips workstation-only modules.
-- **HP (`hp` configuration)**: Similar to NUC (lightweight dev + media box) but uses ZFS instead of Btrfs.
+- **PC (`nixos` configuration)**: Full workstation with Docker/Incus, NVIDIA GPU, Hyprland desktop, dev toolchains, AI services.
+- **NUC (`nuc` configuration)**: Media box with Kodi, Btrfs. Imports all optional modules (desktop, audio, GUI).
+- **HP (`hp` configuration)**: Headless server with ZFS. Only imports `optional/virtualization.nix` (no desktop/audio/GUI).
 
 ## Workflow Notes
 
 - Build the PC system: `nix build .#nixosConfigurations.nixos.config.system.build.toplevel`
 - Build the NUC system: `nix build .#nixosConfigurations.nuc.config.system.build.toplevel`
 - Build the HP system: `nix build .#nixosConfigurations.hp.config.system.build.toplevel`
-- Host-specific overlays live under `hosts/<name>/` to keep shared modules tidy.
 
 ## Quick Install Cheatsheet
 
