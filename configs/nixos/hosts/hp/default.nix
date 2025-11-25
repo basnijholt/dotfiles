@@ -5,11 +5,10 @@
     # Optional modules (Tier 2)
     # Note: HP is a headless server, so no desktop/audio/gui-packages
     ../../optional/virtualization.nix
+    ../../optional/power.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
-    ./system-packages.nix
-    ./power.nix
   ];
 
   # Required for ZFS

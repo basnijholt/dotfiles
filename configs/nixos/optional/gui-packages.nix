@@ -35,6 +35,13 @@ let
     pavucontrol
     pulseaudio
   ];
+
+  guiCliTools = with pkgs; [
+    # CLI tools that require GUI/X11
+    libnotify
+    xclip
+    xsel
+  ];
 in
 {
   # ===================================
@@ -43,5 +50,6 @@ in
   environment.systemPackages =
     guiApplications
     ++ terminalsAndAlternatives
-    ++ hyprlandEssentials;
+    ++ hyprlandEssentials
+    ++ guiCliTools;
 }

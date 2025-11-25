@@ -38,7 +38,6 @@ let
     keyd
     lazydocker
     lazygit
-    libnotify
     lm_sensors
     lsof
     mosh
@@ -48,7 +47,6 @@ let
     nmap
     packer
     parallel
-    pinentry-gnome3
     postgresql
     psmisc # For killall
     pwgen
@@ -62,8 +60,6 @@ let
     tree
     typst
     wget
-    xclip
-    xsel
     yq-go
     zellij
   ];
