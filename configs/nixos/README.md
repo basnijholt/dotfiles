@@ -50,4 +50,4 @@ nixos-install --root /mnt --no-root-passwd \
 
 For Incus VM installation, see the instructions in `hosts/hp/incus-overrides.nix`.
 
-> **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
+> **Note:** The installer ISO has root password `nixos` for console access (SSH is key-only). After install, set `basnijholt` password with `nixos-enter --root /mnt -c 'passwd basnijholt'`.
