@@ -56,31 +56,12 @@
           ./hosts/hp/default.nix
         ];
 
-        # To test the HP configuration in a VM with Disko partitioning:
-        # 1. Build: nix build .#nixosConfigurations.hp-vm.config.system.build.vmWithDisko
-        # 2. Run:   ./result/bin/disko-vm -nographic
-        hp-vm = mkHost [
+        # Incus VM version of HP - same services/packages, VM-appropriate hardware
+        hp-incus = mkHost [
           disko.nixosModules.disko
-          ./hosts/hp/disko-vm.nix
-          ./hosts/hp/hardware-configuration.nix
+          ./hosts/hp/disko.nix
           ./hosts/hp/default.nix
-          ({ modulesPath, lib, ... }: {
-            networking.hostName = lib.mkForce "hp-vm";
-
-            # Virtualization-friendly settings
-            boot.loader.grub.device = lib.mkForce "/dev/vda";
-            services.qemuGuest.enable = true;
-            disko.memSize = 4096;
-
-            # Set a password for root for easy login
-            users.users.root.password = "nixos";
-
-            # Rename VM interface to match hardware config for testing
-            # Force rename the first ethernet device (eth0) to eno1 so systemd-networkd finds it
-            services.udev.extraRules = ''
-              SUBSYSTEM=="net", ACTION=="add", KERNEL=="eth*", NAME="eno1"
-            '';
-          })
+          ./hosts/hp/incus-overrides.nix
         ];
 
         installer = lib.nixosSystem {
@@ -96,7 +77,7 @@
         nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
-        hp-vm = (import ./hosts/hp/disko-vm.nix) { inherit lib; };
+        # hp-incus uses hp's disko.nix with device override in flake
       };
 
     };
