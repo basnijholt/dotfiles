@@ -60,13 +60,14 @@
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
   boot.loader.grub.device = lib.mkForce "/dev/sda";
 
-  # --- Networking: simple DHCP, no bridging ---
-  # Real HP needs bridging to host VMs; this VM just needs connectivity
-  systemd.network.enable = lib.mkForce false;
-  systemd.network.netdevs = lib.mkForce { };
-  systemd.network.networks = lib.mkForce { };
-  networking.useDHCP = lib.mkForce true;
-  networking.firewall.trustedInterfaces = lib.mkForce [ ];
+  # --- Networking: keep bridge setup, adapt for VM ---
+  # Match any ethernet interface (VM doesn't have eno1)
+  systemd.network.networks."30-eno1".matchConfig.Name = lib.mkForce "en*";
+  # Override bridge config without hardcoded MAC (real HP uses MAC for DHCP reservation)
+  systemd.network.netdevs."20-br0".netdevConfig = lib.mkForce {
+    Kind = "bridge";
+    Name = "br0";
+  };
 
   # Easy login for testing
   users.users.root.password = "nixos";

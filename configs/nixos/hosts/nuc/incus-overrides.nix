@@ -68,13 +68,14 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
-  # --- Networking: simple DHCP, no bridging ---
-  # Real NUC needs bridging to host VMs; this VM just needs connectivity
-  systemd.network.enable = lib.mkForce false;
-  systemd.network.netdevs = lib.mkForce { };
-  systemd.network.networks = lib.mkForce { };
-  networking.useDHCP = lib.mkForce true;
-  networking.firewall.trustedInterfaces = lib.mkForce [ ];
+  # --- Networking: keep bridge setup, adapt for VM ---
+  # Match any ethernet interface (VM doesn't have eno1)
+  systemd.network.networks."30-eno1".matchConfig.Name = lib.mkForce "en*";
+  # Override bridge config without hardcoded MAC (real NUC uses MAC for DHCP reservation)
+  systemd.network.netdevs."20-br0".netdevConfig = lib.mkForce {
+    Kind = "bridge";
+    Name = "br0";
+  };
 
   # Easy login for testing
   users.users.root.password = "nixos";
