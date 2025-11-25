@@ -58,6 +58,18 @@
 
   # --- Boot: VM-compatible (EFI mode, same as real HP) ---
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.loader = {
+    grub = {
+      enable = true;
+      device = "nodev";  # EFI mode
+      efiSupport = true;
+      copyKernels = true;  # Required for ZFS
+    };
+    efi.canTouchEfiVariables = true;
+  };
+
+  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 
   # --- Networking: keep bridge setup, adapt for VM ---
   # Match any ethernet interface (VM doesn't have eno1)
