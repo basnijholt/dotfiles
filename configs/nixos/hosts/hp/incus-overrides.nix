@@ -56,9 +56,8 @@
   # --- Disk: Incus exposes root disk as SCSI (sda), not virtio (vda) ---
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
 
-  # --- Boot: VM-compatible ---
+  # --- Boot: VM-compatible (EFI mode, same as real HP) ---
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
-  boot.loader.grub.device = lib.mkForce "/dev/sda";
 
   # --- Networking: keep bridge setup, adapt for VM ---
   # Match any ethernet interface (VM doesn't have eno1)

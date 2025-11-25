@@ -54,13 +54,13 @@
   # --- Disk: Incus exposes root disk as SCSI (sda), not the real NVMe by-id ---
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
 
-  # --- Boot: VM-compatible ---
+  # --- Boot: VM-compatible (EFI mode, same as real NUC) ---
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
   boot.supportedFilesystems = [ "btrfs" ];
   boot.loader = {
     grub = {
       enable = true;
-      device = "/dev/sda";
+      device = "nodev";  # EFI mode
       efiSupport = true;
     };
     efi.canTouchEfiVariables = true;
