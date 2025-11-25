@@ -29,8 +29,15 @@ incus start haos
 Attach the VM to the host's bridge so it gets its own IP from the network:
 
 ```bash
-incus config device override haos eth0 network=br0
-incus restart haos
+incus stop haos
+incus config device override haos eth0 network= nictype=bridged parent=br0
+incus start haos
+```
+
+If DHCP doesn't work, set a static IP inside HAOS (login as `root`, no password):
+
+```bash
+ha network update enp5s0 --ipv4-method static --ipv4-address 192.168.1.200/24 --ipv4-gateway 192.168.1.1
 ```
 
 ### Option 2: NAT (if host is on WiFi)
