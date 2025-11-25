@@ -35,13 +35,19 @@
    nixos-install --root /mnt --no-root-passwd \
      --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#nuc-incus'
 
-6. Remove ISO and reboot:
+6. Remove ISO and reboot (from your PC, not the VM):
 
    incus stop nuc-incus --force
    incus config device remove nuc-incus iso
    incus start nuc-incus
 
-7. SSH in again and change passwords.
+7. SSH in and update to latest (if needed):
+
+   incus list                # Get new IP
+   ssh root@<IP>
+   nixos-rebuild switch --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#nuc-incus'
+
+8. Change passwords.
 */
 
 { modulesPath, lib, ... }:
