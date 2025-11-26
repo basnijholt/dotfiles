@@ -1,15 +1,14 @@
+# Backup configuration (Restic to TrueNAS)
 { ... }:
 
 {
-  # --- Backup Service (Restic to TrueNAS) ---
   services.restic.backups.truenas = {
     repository = "sftp:restic@truenas.local:/mnt/tank/backups/nixos";
     paths = [
       "/home"
       "/etc/nixos"
-      "/root/.ssh" # Important: backup SSH keys!
-      "/var/lib/qdrant" # Your vector database
-      # Add other important /var/lib/* directories as needed
+      "/root/.ssh"       # Important: backup SSH keys!
+      "/var/lib/qdrant"  # Vector database
     ];
     exclude = [
       "/home/*/.cache"

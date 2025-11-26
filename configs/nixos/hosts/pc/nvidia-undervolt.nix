@@ -1,8 +1,9 @@
+# NVIDIA GPU power limit configuration
+# 270 W: Puget Systems + LocalLLaMA measurements show ~95% RTX 3090 perf
+# at a much lower wall draw, perfect for dual 3090 rigs.
 { lib, pkgs, ... }:
 
 let
-  # 270 W: Puget Systems + LocalLLaMA measurements show ~95% RTX 3090 perf
-  # at a much lower wall draw, perfect for dual 3090 rigs.
   gpuPowerLimitW = 270;
   gpuIndices = [ 0 1 ];
   gpuList = lib.concatMapStringsSep " " toString gpuIndices;

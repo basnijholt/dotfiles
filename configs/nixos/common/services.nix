@@ -1,9 +1,7 @@
+# System services shared by all hosts
 { pkgs, ... }:
 
 {
-  # ===================================
-  # Shared System Services
-  # ===================================
   services.fwupd.enable = true;
   services.syncthing.enable = true;
   services.tailscale.enable = true;

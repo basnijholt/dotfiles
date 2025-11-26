@@ -1,7 +1,8 @@
+# Gaming configuration (Bluetooth, Xbox controllers, Steam)
 { pkgs, ... }:
 
 {
-  # --- Bluetooth & Xbox Controller ---
+  # --- Bluetooth ---
   services.blueman.enable = true;
 
   hardware.bluetooth = {
@@ -15,21 +16,21 @@
     };
   };
 
-  # Enable the advanced driver for modern Xbox wireless controllers.
-  # This is crucial for proper functionality in Steam and other games.
+  # --- Xbox Controller Support ---
+  # Advanced driver for modern Xbox wireless controllers
   hardware.xpadneo.enable = true;
-
-  # This kernel option is a common fix for Bluetooth controller issues on Linux.
-  # It disables Enhanced Re-Transmission Mode, which can cause lag or disconnects.
+  # Disable ERTM to fix Bluetooth controller lag/disconnects
   boot.extraModprobeConfig = ''
     options bluetooth disable_ertm=Y
   '';
 
+  # --- Steam ---
   programs.steam.enable = true;
 
-  # Sunshine notes: Had to change the `https://discourse.nixos.org/t/give-user-cap-sys-admin-p-capabillity/62611/2`
-  # in Sunshine Steam App `sudo -u myuser setsid steam steam://open/bigpicture` as Detached Command
-  # then in Steam Settings: Interface -> "Enable GPU accelerated ..." but disable "hardware video decoding"
+  # --- Sunshine (Game Streaming) ---
+  # Note: Had to change per https://discourse.nixos.org/t/give-user-cap-sys-admin-p-capabillity/62611/2
+  # In Sunshine Steam App use `sudo -u myuser setsid steam steam://open/bigpicture` as Detached Command.
+  # In Steam Settings: Interface -> enable "GPU accelerated..." but disable "hardware video decoding".
   services.sunshine = {
     enable = true;
     autoStart = true;

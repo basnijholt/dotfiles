@@ -1,12 +1,10 @@
-{ pkgs, config, ... }:
+# User account configuration
+{ config, pkgs, ... }:
 
 let
   homeDir = config.users.users.basnijholt.home;
 in
 {
-  # ===================================
-  # User Configuration
-  # ===================================
   users.users.basnijholt = {
     isNormalUser = true;
     description = "Bas Nijholt";
@@ -19,6 +17,7 @@ in
     ];
   };
 
+  # --- Atuin History Daemon ---
   # Run Atuins history daemon using existing ~/.config/atuin/config.toml
   systemd.user.services."atuin-daemon" = {
     description = "Atuin history daemon";
@@ -30,7 +29,7 @@ in
     };
   };
 
-  # Keep the uvx agent-cli server available for local automation tooling.
+  # --- `agent-cli server` Daemon ---
   systemd.user.services."uvx-agent-cli" = {
     description = "uvx agent-cli server";
     wantedBy = [ "default.target" ];

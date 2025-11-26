@@ -1,3 +1,4 @@
+# PC-specific packages (GUI apps, CUDA tools)
 { pkgs, ... }:
 
 {
