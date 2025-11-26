@@ -1,7 +1,8 @@
+# AI and machine learning services (Ollama, llama-swap, Wyoming, Qdrant)
 { pkgs, ... }:
 
 {
-  # --- AI & Machine Learning ---
+  # --- Ollama ---
   services.ollama = {
     enable = true;
     acceleration = "cuda";
@@ -14,9 +15,8 @@
     };
   };
 
-  # --- llama-swap service ---
+  # --- llama-swap Service ---
   # Transparent proxy for automatic model swapping with llama.cpp
-
   # GPT-OSS chat template directly from HuggingFace
   environment.etc."llama-templates/openai-gpt-oss-20b.jinja".source = pkgs.fetchurl {
     url = "https://huggingface.co/unsloth/gpt-oss-20b-GGUF/resolve/main/template";
@@ -349,6 +349,7 @@
     };
   };
 
+  # --- Wyoming Faster Whisper ---
   services.wyoming.faster-whisper = {
     servers.english = {
       enable = true;
@@ -366,7 +367,8 @@
     };
   };
 
-  # Auto-restart faster-whisper on failure (including OOM kills)
+  # --- Wyoming Faster Whisper Hardening ---
+  # Auto-restart on failure (including OOM kills)
   systemd.services.wyoming-faster-whisper-english = {
     serviceConfig = {
       Restart = "on-failure";
@@ -377,6 +379,7 @@
     };
   };
 
+  # --- Wyoming Piper TTS ---
   services.wyoming.piper.servers.yoda = {
     enable = true;
     voice = "en-us-ryan-high";
@@ -384,11 +387,13 @@
     useCUDA = true;
   };
 
+  # --- Wyoming OpenWakeWord ---
   services.wyoming.openwakeword = {
     enable = true;
     uri = "tcp://0.0.0.0:10400";
   };
 
+  # --- Qdrant Vector Database ---
   services.qdrant = {
     enable = true;
     settings = {

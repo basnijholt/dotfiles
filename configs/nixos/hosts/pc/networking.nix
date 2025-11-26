@@ -1,16 +1,16 @@
+# Network configuration for PC workstation
 { lib, ... }:
 
 {
-  # --- Hostname & Networking ---
   networking.hostName = lib.mkDefault "nixos";
   networking.networkmanager.enable = true;
   networking.nftables.enable = true;
   networking.firewall.enable = true;
 
-  # --- Ensure WiFi stays up ---
+  # --- WiFi Power Management ---
   networking.networkmanager.settings."connection"."wifi.powersave" = 2;
 
-  # Use systemd-resolved with local DNS server for .local domains
+  # --- Local DNS Overrides ---
   networking.extraHosts = ''
     127.0.0.1 mindroom.lan api.mindroom.lan
     127.0.0.1 s1.mindroom.lan api.s1.mindroom.lan
@@ -20,16 +20,14 @@
     127.0.0.1 s5.mindroom.lan api.s5.mindroom.lan
   '';
 
-  # NOTE: Kind’s pod network (10.244.0.0/16) changes host bridge names every time the
-  #       cluster is rebuilt, so NixOS’ reverse-path filter would keep dropping pod→host
-  #       packets unless we constantly refresh a matching route. Disabling the check
-  #       here prevents rpfilter from black-holing inter-node traffic whenever kind
-  #       recreates its Docker network.
+  # --- Firewall Configuration ---
+  # NOTE: Kind's pod network (10.244.0.0/16) changes host bridge names every time
+  # the cluster is rebuilt, so NixOS' reverse-path filter would keep dropping
+  # pod->host packets unless we constantly refresh a matching route. Disabling
+  # the check here prevents rpfilter from black-holing inter-node traffic
+  # whenever kind recreates its Docker network.
   networking.firewall.checkReversePath = false;
-
-  # Allow traffic from Incus containers (DHCP, DNS, outbound)
   networking.firewall.trustedInterfaces = [ "incusbr0" ];
-
   networking.firewall.allowedTCPPorts = [
     10200 # Wyoming Piper
     10300 # Wyoming Faster Whisper - English
@@ -52,9 +50,10 @@
   ];
 
   networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; } # mosh
+    { from = 60000; to = 61000; }  # mosh
   ];
 
+  # --- NAT for Incus Containers ---
   networking.nat = {
     enable = true;
     externalInterface = "wlp7s0";

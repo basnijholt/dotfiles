@@ -1,8 +1,9 @@
+# System packages shared by all hosts
 { pkgs, ... }:
 
 let
+  # --- CLI Power Tools & Utilities ---
   cliPowerTools = with pkgs; [
-    # CLI Power Tools & Utilities
     _1password-cli
     act
     asciinema
@@ -64,8 +65,8 @@ let
     zellij
   ];
 
+  # --- Development Toolchains ---
   developmentToolchains = with pkgs; [
-    # Development Toolchains
     bun
     cargo
     cmake
@@ -83,9 +84,6 @@ let
   ];
 in
 {
-  # ===================================
-  # System Packages
-  # ===================================
   environment.systemPackages =
     cliPowerTools
     ++ developmentToolchains;

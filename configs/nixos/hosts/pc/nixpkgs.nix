@@ -1,8 +1,8 @@
+# PC-specific nixpkgs overrides (CUDA, custom packages)
+# Note: allowUnfree is set in common/nixpkgs.nix
 { pkgs, ... }:
 
 {
-  # --- Nixpkgs Configuration (PC-specific) ---
-  # Note: allowUnfree is set in common/nixpkgs.nix
   nixpkgs.config = {
     cudaSupport = true;
     packageOverrides = pkgs: {

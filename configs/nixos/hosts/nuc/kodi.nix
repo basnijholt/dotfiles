@@ -1,6 +1,8 @@
-{ config, pkgs, ... }:
+# Kodi media center configuration
+{ pkgs, ... }:
 
 {
+  # --- Kodi Desktop ---
   services.xserver = {
     enable = true;
     desktopManager.kodi = {
@@ -11,6 +13,7 @@
     };
   };
 
+  # --- Auto-login to Kodi ---
   services.displayManager = {
     autoLogin = {
       enable = true;
@@ -19,6 +22,6 @@
     defaultSession = "kodi";
   };
 
-  # Xbox controller support
+  # --- Xbox Controller Support ---
   hardware.xpadneo.enable = true;
 }

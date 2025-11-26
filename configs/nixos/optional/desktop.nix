@@ -1,10 +1,7 @@
-{ config, pkgs, ... }:
+# Desktop environment (GNOME + Hyprland)
+{ pkgs, ... }:
 
 {
-  # ===================================
-  # Desktop Environment
-  # ===================================
-
   # --- X11 & Display Managers ---
   services.xserver.enable = true;
   services.xserver.xkb = {

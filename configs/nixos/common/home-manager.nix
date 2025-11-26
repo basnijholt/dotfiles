@@ -1,9 +1,7 @@
-{ pkgs, lib, config, ... }:
+# Home Manager configuration
+{ lib, pkgs, ... }:
 
 {
-  # ===================================
-  # Home Manager Configuration
-  # ===================================
   home-manager.users.basnijholt =
     {
       pkgs,

@@ -1,15 +1,16 @@
+# GUI packages for workstations
 { pkgs, ... }:
 
 let
+  # --- GUI Applications ---
   guiApplications = with pkgs; [
-    # GUI Applications
     brave
     firefox
     vscode
   ];
 
+  # --- Terminals & Linux-native Alternatives ---
   terminalsAndAlternatives = with pkgs; [
-    # Terminals & Linux-native Alternatives
     alacritty
     baobab
     flameshot
@@ -17,8 +18,8 @@ let
     kitty
   ];
 
+  # --- Hyprland Essentials ---
   hyprlandEssentials = with pkgs; [
-    # Hyprland Essentials
     polkit_gnome
     waybar
     hyprpanel
@@ -36,17 +37,14 @@ let
     pulseaudio
   ];
 
+  # --- CLI Tools that Require GUI/X11 ---
   guiCliTools = with pkgs; [
-    # CLI tools that require GUI/X11
     libnotify
     xclip
     xsel
   ];
 in
 {
-  # ===================================
-  # GUI Packages (workstations only)
-  # ===================================
   environment.systemPackages =
     guiApplications
     ++ terminalsAndAlternatives
