@@ -95,6 +95,9 @@ incus stop meshcentral && incus config set meshcentral volatile.eth0.hwaddr=BC:2
 
 # ubuntu: BC:24:11:02:F5:FF -> 192.168.1.102
 incus stop ubuntu && incus config set ubuntu volatile.eth0.hwaddr=BC:24:11:02:F5:FF && incus start ubuntu
+
+# haos: 02:A7:1D:99:CA:B0 ->
+incus stop haos && incus config set haos volatile.eth0.hwaddr=02:A7:1D:99:CA:B0 && incus start haos
 ```
 ---
 
