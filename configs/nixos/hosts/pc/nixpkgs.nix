@@ -1,9 +1,9 @@
 { pkgs, ... }:
 
 {
-  # --- Nixpkgs Configuration ---
+  # --- Nixpkgs Configuration (PC-specific) ---
+  # Note: allowUnfree is set in common/nixpkgs.nix
   nixpkgs.config = {
-    allowUnfree = true;
     cudaSupport = true;
     packageOverrides = pkgs: {
       ollama = pkgs.ollama.overrideAttrs (oldAttrs: rec {

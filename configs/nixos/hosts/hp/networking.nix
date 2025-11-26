@@ -1,7 +1,7 @@
 { ... }:
 
 {
-  networking.hostName = "nuc";
+  networking.hostName = "hp";
   networking.nftables.enable = true;
   networking.firewall.enable = true;
   networking.networkmanager.enable = false;
@@ -15,7 +15,7 @@
     netdevConfig = {
       Kind = "bridge";
       Name = "br0";
-      MACAddress = "1c:69:7a:0c:b6:37"; # Mimic eno1 MAC for Static DHCP
+      MACAddress = "c8:d9:d2:0c:e0:34"; # Mimic eno1 MAC for Static DHCP
     };
   };
 
@@ -35,10 +35,6 @@
   # Trust the bridge so VMs can do DHCP/DNS
   networking.firewall.trustedInterfaces = [ "br0" "incusbr0" ];
 
-  networking.firewall.allowedTCPPorts = [ 
-    8080 # Kodi web interface
-    8443 # Incus
-  ];
   networking.firewall.allowedUDPPortRanges = [
     { from = 60000; to = 61000; } # mosh
   ];

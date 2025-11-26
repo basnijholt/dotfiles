@@ -1,5 +1,5 @@
 {
   "includeCoAuthoredBy": false,
-  "model": "sonnet[1m]",
+  "model": "opus",
   "alwaysThinkingEnabled": true
 }

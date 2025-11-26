@@ -3,17 +3,15 @@
 {
   imports = [
     # Optional modules (Tier 2)
-    ../../optional/desktop.nix
-    ../../optional/audio.nix
+    # Note: HP is a headless server, so no desktop/audio/gui-packages
     ../../optional/virtualization.nix
-    ../../optional/printing.nix
-    ../../optional/gui-packages.nix
     ../../optional/power.nix
     ../../optional/iscsi.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
-    ./system-packages.nix
-    ./kodi.nix
   ];
+
+  # Required for ZFS
+  networking.hostId = "37a1d4a7";
 }

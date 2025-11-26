@@ -43,8 +43,33 @@
         ];
 
         nuc = mkHost [
+          disko.nixosModules.disko
+          ./hosts/nuc/disko.nix
           ./hosts/nuc/hardware-configuration.nix
           ./hosts/nuc/default.nix
+        ];
+
+        hp = mkHost [
+          disko.nixosModules.disko
+          ./hosts/hp/disko.nix
+          ./hosts/hp/hardware-configuration.nix
+          ./hosts/hp/default.nix
+        ];
+
+        # Incus VM version of HP - same services/packages, VM-appropriate hardware
+        hp-incus = mkHost [
+          disko.nixosModules.disko
+          ./hosts/hp/disko.nix
+          ./hosts/hp/default.nix
+          ./hosts/hp/incus-overrides.nix
+        ];
+
+        # Incus VM version of NUC - same services/packages, VM-appropriate hardware
+        nuc-incus = mkHost [
+          disko.nixosModules.disko
+          ./hosts/nuc/disko.nix
+          ./hosts/nuc/default.nix
+          ./hosts/nuc/incus-overrides.nix
         ];
 
         installer = lib.nixosSystem {
@@ -59,6 +84,7 @@
       diskoConfigurations = {
         nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
+        hp = (import ./hosts/hp/disko.nix) { inherit lib; };
       };
 
     };

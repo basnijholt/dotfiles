@@ -2,6 +2,14 @@
 
 {
   imports = [
+    # Optional modules (Tier 2)
+    ../../optional/desktop.nix
+    ../../optional/audio.nix
+    ../../optional/virtualization.nix
+    ../../optional/printing.nix
+    ../../optional/gui-packages.nix
+
+    # Host-specific modules (Tier 3)
     ./boot.nix
     ./storage.nix
     ./networking.nix

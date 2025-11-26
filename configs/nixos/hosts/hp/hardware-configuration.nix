@@ -1,5 +1,3 @@
-# Hardware configuration for NUC
-# Filesystem layout is managed by disko.nix
 { config, lib, pkgs, modulesPath, ... }:
 
 {
@@ -12,21 +10,21 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  boot.supportedFilesystems = [ "btrfs" ];
+  boot.supportedFilesystems = [ "zfs" ];
 
   boot.loader = {
     grub = {
       enable = true;
       device = "nodev";
       efiSupport = true;
+      # copyKernels is required for ZFS: GRUB cannot read ZFS datasets directly,
+      # so kernels must be copied to the EFI partition where GRUB can access them.
       copyKernels = true;
     };
     efi.canTouchEfiVariables = true;
   };
 
-  # Filesystems are managed by disko.nix
-
-  swapDevices = [ ];
+  # File systems are managed by disko
 
   networking.useDHCP = lib.mkDefault true;
 
