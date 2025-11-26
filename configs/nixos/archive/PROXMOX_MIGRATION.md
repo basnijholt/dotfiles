@@ -131,3 +131,26 @@ We use a helper script `migrate-vm.sh` to import the disk and create the VM.
     incus console haos
     # Press Ctrl+a, q to exit the console
     ```
+
+---
+
+## 6. Attaching iSCSI Disks to VMs
+
+For VMs that need iSCSI storage (e.g., `truenas-jbweston`), first ensure the host has iSCSI configured (see `optional/iscsi.nix`) and the disks are connected.
+
+**One-time iSCSI setup on host:**
+```bash
+sudo iscsiadm -m discovery -t sendtargets -p 192.168.1.214
+sudo iscsiadm -m node --login
+lsblk | grep sd  # Verify disks appeared (e.g., /dev/sdb, /dev/sdc)
+```
+
+**Attach disks to VM:**
+```bash
+incus stop truenas-jbweston
+incus config device add truenas-jbweston iscsi1 disk source=/dev/sdb
+incus config device add truenas-jbweston iscsi2 disk source=/dev/sdc
+incus start truenas-jbweston
+```
+
+The VM will see these as regular block devices and can use them for ZFS pools, etc.
