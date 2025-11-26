@@ -111,7 +111,7 @@ Create a DNS record `nix-cache.local` pointing to the container's IP address (or
 
 ### Step 6: Configure Clients
 
-The cache is already configured in `common/nix.nix`. After merging the harmonia branch, all hosts will use the cache automatically.
+The cache is already configured in `common/nix.nix`. All hosts will use it automatically.
 
 ### Step 7: Populate the Cache
 
