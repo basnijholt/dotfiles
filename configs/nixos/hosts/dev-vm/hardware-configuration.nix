@@ -23,5 +23,5 @@
 
   networking.useDHCP = lib.mkDefault true;
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  # hostPlatform is set by the flake's system parameter (x86_64 or aarch64)
 }
