@@ -53,7 +53,7 @@
 8. Change passwords.
 */
 
-{ modulesPath, lib, ... }:
+{ lib, modulesPath, ... }:
 
 {
   imports = [
