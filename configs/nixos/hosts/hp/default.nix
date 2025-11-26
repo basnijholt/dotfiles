@@ -6,6 +6,7 @@
     # Note: HP is a headless server, so no desktop/audio/gui-packages
     ../../optional/virtualization.nix
     ../../optional/power.nix
+    ../../optional/iscsi.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix

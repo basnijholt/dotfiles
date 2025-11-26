@@ -9,6 +9,7 @@
     ../../optional/printing.nix
     ../../optional/gui-packages.nix
     ../../optional/power.nix
+    ../../optional/iscsi.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
