@@ -61,6 +61,7 @@ let
     tree
     typst
     wget
+    yazi
     yq-go
     zellij
   ];
