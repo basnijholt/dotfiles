@@ -4,9 +4,9 @@
 {
   home-manager.users.basnijholt =
     {
-      pkgs,
       config,
       lib,
+      pkgs,
       ...
     }:
     {
