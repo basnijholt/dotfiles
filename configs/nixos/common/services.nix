@@ -21,6 +21,6 @@
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
-    pinentryPackage = pkgs.pinentry-gnome3;
+    # pinentryPackage is set in optional/desktop.nix (requires GUI)
   };
 }

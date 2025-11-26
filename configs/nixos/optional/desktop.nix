@@ -1,7 +1,17 @@
 # Desktop environment (GNOME + Hyprland)
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
+  # --- Mechabar Dependencies (Home Manager) ---
+  home-manager.users.basnijholt.home.packages = with pkgs; [
+    bluetui
+    bluez
+    brightnessctl
+    pipewire
+    wireplumber
+    rofi
+  ];
+
   # --- X11 & Display Managers ---
   services.xserver.enable = true;
   services.xserver.xkb = {
@@ -31,4 +41,10 @@
       hyprland.default = [ "hyprland" "gtk" ];
     };
   };
+
+  # --- GPG Pinentry (GUI) ---
+  programs.gnupg.agent.pinentryPackage = pkgs.pinentry-gnome3;
+
+  # --- Desktop Applications ---
+  programs.thunderbird.enable = true;
 }
