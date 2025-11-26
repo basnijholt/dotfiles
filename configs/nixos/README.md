@@ -105,32 +105,43 @@ incus exec build-vm -- systemctl status harmonia
 incus exec build-vm -- curl -s http://localhost:5000/nix-cache-info
 ```
 
-### Step 5: Configure Clients
+### Step 5: Set Up DNS
 
-Add to `common/nix.nix` on machines that should use the cache:
+Create a DNS record `nix-cache.local` pointing to the container's IP address (or use the IP directly in the next step).
 
-```nix
-nix.settings = {
-  substituters = [
-    "https://cache.nixos.org/"
-    "http://nix-cache.local:5000"
-  ];
-  trusted-public-keys = [
-    "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-    "build-vm-1:YOUR_PUBLIC_KEY_HERE"  # From Step 3
-  ];
-};
-```
+### Step 6: Configure Clients
 
-### Building and Caching
+The cache is already configured in `common/nix.nix`. After merging the harmonia branch, all hosts will use the cache automatically.
+
+### Step 7: Populate the Cache
+
+The auto-build service runs daily and builds all host configurations. To start it immediately:
 
 ```bash
-# On build-vm: build PC configuration (includes CUDA)
-cd ~/dotfiles/configs/nixos
-nix flake update
-nix build .#nixosConfigurations.nixos.config.system.build.toplevel \
-  --out-link /tmp/result-pc
+incus exec build-vm -- sudo systemctl start nix-auto-build
+```
 
-# On your PC: rebuild will pull from cache
-sudo nixos-rebuild switch --flake .#nixos
+Monitor progress:
+
+```bash
+incus exec build-vm -- sudo journalctl -fu nix-auto-build
+```
+
+Check timer status:
+
+```bash
+incus exec build-vm -- systemctl list-timers nix-auto-build
+```
+
+The first build takes several hours (especially CUDA packages). Subsequent builds are fast since most packages are cached.
+
+### Manual Builds
+
+To manually build a specific configuration:
+
+```bash
+incus exec build-vm -- bash -c '
+  cd /var/lib/nix-auto-build/dotfiles/configs/nixos
+  nix build .#nixosConfigurations.nixos.config.system.build.toplevel
+'
 ```
