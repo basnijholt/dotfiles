@@ -21,7 +21,7 @@ in
   # The lxc-container.nix drop-in clears LoadCredential=, breaking harmonia.
   # Pass the key path directly via environment variable instead.
   # See: https://github.com/NixOS/nixpkgs/issues/260670
-  systemd.services.harmonia.environment.SIGN_KEY_PATHS = keyPath;
+  systemd.services.harmonia.environment.SIGN_KEY_PATHS = lib.mkForce keyPath;
 
   # Ensure harmonia key directory and file have correct permissions
   systemd.tmpfiles.rules = [
