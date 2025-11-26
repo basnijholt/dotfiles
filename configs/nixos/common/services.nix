@@ -6,16 +6,6 @@
   services.syncthing.enable = true;
   services.tailscale.enable = true;
 
-  # --- mDNS/Avahi (hostname.local resolution) ---
-  services.avahi = {
-    enable = true;
-    nssmdns4 = true;
-    publish = {
-      enable = true;
-      addresses = true;
-    };
-  };
-
   # --- SSH ---
   services.openssh = {
     enable = true;
