@@ -75,7 +75,7 @@ CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.p
 
 ```bash
 # Clone the sanitized branch with submodules (shallow)
-git clone --depth=1 --branch public --single-branch \
+GIT_LFS_SKIP_SMUDGE=0 git clone --depth=1 --branch public --single-branch \
   --recurse-submodules -j8 --shallow-submodules \
   git@github.com:basnijholt/dotfiles.git ~/dotfiles
 cd dotfiles
@@ -110,7 +110,7 @@ export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agen
 
 ```bash
 # Clone the repository with submodules
-git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
+GIT_LFS_SKIP_SMUDGE=0 git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
 cd dotfiles
 
 # Run the installation script
