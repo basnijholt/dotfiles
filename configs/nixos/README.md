@@ -113,7 +113,7 @@ Add to `common/nix.nix` on machines that should use the cache:
 nix.settings = {
   substituters = [
     "https://cache.nixos.org/"
-    "http://build-vm.local:5000"  # Or use IP address
+    "http://nix-cache.local:5000"
   ];
   trusted-public-keys = [
     "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
