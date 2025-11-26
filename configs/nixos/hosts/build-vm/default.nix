@@ -11,5 +11,6 @@
     ./nix-build.nix
     ./harmonia.nix
     ./system-packages.nix
+    ./auto-build.nix
   ];
 }
