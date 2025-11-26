@@ -40,7 +40,7 @@
       Type = "oneshot";
       User = "root";
       # Generous timeout for CUDA builds
-      TimeoutStartSec = "4h";
+      TimeoutStartSec = "12h";
     };
   };
 
@@ -48,7 +48,7 @@
   systemd.timers.nix-auto-build = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "daily";
+      OnCalendar = "*-*-* 02:00:00";
       Persistent = true;
       RandomizedDelaySec = "1h";
     };
