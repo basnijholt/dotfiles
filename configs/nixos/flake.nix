@@ -72,6 +72,14 @@
           ./hosts/nuc/incus-overrides.nix
         ];
 
+        # Lightweight development VM for Incus
+        dev-vm = mkHost [
+          disko.nixosModules.disko
+          ./hosts/dev-vm/disko.nix
+          ./hosts/dev-vm/hardware-configuration.nix
+          ./hosts/dev-vm/default.nix
+        ];
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
@@ -85,6 +93,7 @@
         nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
+        dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
       };
 
     };
