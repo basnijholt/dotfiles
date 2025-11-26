@@ -16,4 +16,7 @@
     ./system-packages.nix
     ./kodi.nix
   ];
+
+  # Required for ZFS
+  networking.hostId = "8a5b2c1f";
 }
