@@ -6,26 +6,41 @@
 configs/nixos/
 ├── common/           # Tier 1: shared by ALL hosts
 ├── optional/         # Tier 2: opt-in modules (desktop, audio, virtualization, power, etc.)
-├── hosts/            # Tier 3: host-specific (pc, nuc, hp)
+├── hosts/            # Tier 3: host-specific (pc, nuc, hp, dev-vm, build-vm)
 ├── installers/       # ISO builder
 └── archive/          # Old migration scripts/notes
 ```
 
 ## Configurations
 
+**Physical Host Configurations**
+
 | Config | Description |
 |--------|-------------|
 | `nixos` | Desktop/workstation (NVIDIA, Hyprland, AI services) |
 | `nuc` | Media box (Kodi, Btrfs, desktop + power management) |
 | `hp` | Headless server (ZFS, virtualization + power management) |
-| `hp-incus` | HP config for Incus VM testing |
-| `nuc-incus` | NUC config for Incus VM testing |
-| `pc-incus` | PC config for Incus VM testing (GPU services build but won't run) |
+
+**Development VM Configurations and Installer**
+
+| Config | Description |
+|--------|-------------|
 | `dev-vm` | Lightweight dev VM for Incus x86_64 (familiar env anywhere) |
 | `dev-vm-aarch64` | Lightweight dev VM for Incus aarch64 (for ARM Macs) |
 | `nix-cache` | Nix cache server container with Harmonia (for CUDA/large builds) |
 | `build-vm` | Build server container with Harmonia cache (for CUDA/large builds) |
 | `installer` | Minimal ISO with SSH enabled |
+
+**Incus VM Configurations**
+
+The following configs build my NixOS configurations for Incus VMs.
+The goal is to mimic the physical hosts as closely as possible, they only have a small override for Incus compatibility.
+
+| Config | Description |
+|--------|-------------|
+| `hp-incus` | HP config for Incus VM testing |
+| `nuc-incus` | NUC config for Incus VM testing |
+| `pc-incus` | PC config for Incus VM testing (GPU services build but won't run) |
 
 ## Quick Commands
 
