@@ -22,7 +22,9 @@ configs/nixos/
 | `nuc-incus` | NUC config for Incus VM testing |
 | `pc-incus` | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Lightweight dev VM for Incus x86_64 (familiar env anywhere) |
+| `dev-vm-aarch64` | Lightweight dev VM for Incus aarch64 (for ARM Macs) |
 | `nix-cache` | Nix cache server container with Harmonia (for CUDA/large builds) |
+| `build-vm` | Build server container with Harmonia cache (for CUDA/large builds) |
 | `installer` | Minimal ISO with SSH enabled |
 
 ## Quick Commands
