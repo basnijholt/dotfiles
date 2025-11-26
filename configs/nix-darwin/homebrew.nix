@@ -44,6 +44,7 @@
       "htop" # Process viewer
       "hugo" # Static site generator
       "imagemagick" # Image manipulation
+      "incus" # Container hypervisor
       "iperf" # Network bandwidth tool
       "iperf3" # Network bandwidth tool v3
       "jq" # JSON processor
