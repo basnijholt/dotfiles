@@ -64,6 +64,9 @@ Why not?
 - SSH key set up with GitHub (submodules use SSH)
 
 ```bash
+# Initialize Git LFS (required once per machine, sets up global hooks)
+git lfs install
+
 # Ensure your key is loaded in the agent
 ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/id_ed25519
 ```
@@ -110,6 +113,7 @@ export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agen
 
 ```bash
 # Clone the repository with submodules
+git lfs install
 git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
 cd dotfiles
 
