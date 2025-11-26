@@ -6,15 +6,15 @@ Migrate workloads (LXC Containers and KVM VMs) from a Proxmox host to a new NixO
 ## 2. Inventory & Status
 
 ### LXC Containers (System Containers)
-| ID | Name | Backup Status | Migration Status |
-| :--- | :--- | :--- | :--- |
-| 101 | `ubuntu` | ✅ Transferred (11GB) | ✅ **SUCCESS** (Running on `pc`) |
-| 102 | `debian-stijn` | ✅ Transferred (225MB) | ✅ **SUCCESS** (Running on `pc`) |
-| 107 | `debian` | ✅ Transferred (2.8GB) | ✅ **SUCCESS** (Running on `pc`) |
-| 118 | `homepage` | ✅ Transferred (496MB) | ✅ **SUCCESS** (Running on `pc`) |
-| 122 | `debian-wg` | ✅ Transferred (514MB) | ✅ **SUCCESS** (Running on `pc`) |
-| 126 | `meshcentral` | ✅ Transferred (761MB) | ✅ **SUCCESS** (Running on `pc`) |
-| 128 | `docker` | ✅ Transferred (5.3GB) | ✅ **SUCCESS** (Running on `pc`) |
+| ID | Name | Proxmox MAC | Reserved IP | Backup Status | Migration Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| 101 | `ubuntu` | `BC:24:11:02:F5:FF` | 192.168.1.102 | ✅ Transferred (11GB) | ✅ **SUCCESS** (Running on `pc`) |
+| 102 | `debian-stijn` | `BC:24:11:4D:0D:DE` | 192.168.1.171 | ✅ Transferred (225MB) | ✅ **SUCCESS** (Running on `pc`) |
+| 107 | `debian` | `BC:24:11:8A:58:14` | 192.168.1.149 | ✅ Transferred (2.8GB) | ✅ **SUCCESS** (Running on `pc`) |
+| 118 | `homepage` | `BC:24:11:46:6D:25` | 192.168.1.19 | ✅ Transferred (496MB) | ✅ **SUCCESS** (Running on `pc`) |
+| 122 | `debian-wg` | `BC:24:11:A5:9A:1B` | 192.168.1.206 | ✅ Transferred (514MB) | ✅ **SUCCESS** (Running on `pc`) |
+| 126 | `meshcentral` | `BC:24:11:E9:A3:40` | 192.168.1.15 | ✅ Transferred (761MB) | ✅ **SUCCESS** (Running on `pc`) |
+| 128 | `docker` | `BC:24:11:4D:70:FD` | 192.168.1.4 | ✅ Transferred (5.3GB) | ✅ **SUCCESS** (Running on `pc`) |
 
 ### Virtual Machines (KVM)
 | ID | Name | Backup Status | Migration Status |
@@ -71,6 +71,31 @@ We use a helper script `migrate-lxc.sh` to automate the restoration process. Thi
 
     *Note: You may see harmless errors during the script execution regarding `/proc`, `/sys`, or `/etc/machine-id`. These are expected when overwriting a live container's rootfs and can be 100% ignored.*
 
+
+3. Set MAC Address
+
+```bash
+# debian: BC:24:11:8A:58:14 -> 192.168.1.149
+incus stop debian && incus config set debian volatile.eth0.hwaddr=BC:24:11:8A:58:14 && incus start debian
+
+# debian-stijn: BC:24:11:4D:0D:DE -> 192.168.1.171
+incus stop debian-stijn && incus config set debian-stijn volatile.eth0.hwaddr=BC:24:11:4D:0D:DE && incus start debian-stijn
+
+# debian-wg: BC:24:11:A5:9A:1B -> 192.168.1.206
+incus stop debian-wg && incus config set debian-wg volatile.eth0.hwaddr=BC:24:11:A5:9A:1B && incus start debian-wg
+
+# docker: BC:24:11:4D:70:FD -> 192.168.1.4
+incus stop docker && incus config set docker volatile.eth0.hwaddr=BC:24:11:4D:70:FD && incus start docker
+
+# homepage: BC:24:11:46:6D:25 -> 192.168.1.19
+incus stop homepage && incus config set homepage volatile.eth0.hwaddr=BC:24:11:46:6D:25 && incus start homepage
+
+# meshcentral: BC:24:11:E9:A3:40 -> 192.168.1.15
+incus stop meshcentral && incus config set meshcentral volatile.eth0.hwaddr=BC:24:11:E9:A3:40 && incus start meshcentral
+
+# ubuntu: BC:24:11:02:F5:FF -> 192.168.1.102
+incus stop ubuntu && incus config set ubuntu volatile.eth0.hwaddr=BC:24:11:02:F5:FF && incus start ubuntu
+```
 ---
 
 ## 5. Migration Workflow: Virtual Machines
