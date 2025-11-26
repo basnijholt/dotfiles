@@ -61,46 +61,63 @@ For Incus VM installation, see the instructions in:
 
 ## Build Server Setup (build-vm)
 
-The `build-vm` configuration runs a Harmonia binary cache server for offloading expensive builds (CUDA, PyTorch, etc.) to a TrueNAS Incus VM.
+The `build-vm` configuration runs a Harmonia binary cache server in an Incus **container** for offloading expensive builds (CUDA, PyTorch, etc.) to a TrueNAS server.
 
-### Initial Setup
+### Step 1: Create Container
 
 ```bash
-# Create VM on TrueNAS (adjust resources as needed)
-incus launch images:nixos/unstable build-vm --vm \
-  -c limits.cpu=12 \
-  -c limits.memory=24GB \
-  -d root,size=200GB
+# On TrueNAS (adjust CPU/memory as needed)
+incus launch images:nixos/unstable build-vm \
+  -c limits.cpu=16 \
+  -c limits.memory=24GB
+```
 
-# Apply NixOS configuration
+> **Note:** This creates a container (not a VM). Containers share the host kernel and have better performance.
+
+### Step 2: Apply NixOS Configuration
+
+```bash
 incus exec build-vm -- nixos-rebuild switch \
-  --flake github:basnijholt/dotfiles/main?dir=configs/nixos#build-vm
+  --flake "github:basnijholt/dotfiles/main?dir=configs/nixos#build-vm" \
+  --option sandbox false
 ```
 
-### Generate Cache Signing Key
+> **Note:** `--option sandbox false` is required because Incus containers don't support the kernel namespaces needed for Nix sandboxing. This is configured permanently in the build-vm config.
+
+### Step 3: Generate Cache Signing Key
 
 ```bash
-# On build-vm
-sudo mkdir -p /var/lib/harmonia
-sudo nix key generate-secret --key-name build-vm-1 | sudo tee /var/lib/harmonia/cache-priv-key.pem > /dev/null
-sudo nix key convert-secret-to-public < /var/lib/harmonia/cache-priv-key.pem
-# Save the public key for client configuration
-sudo systemctl restart harmonia
+incus exec build-vm -- bash -c '
+  sudo mkdir -p /var/lib/harmonia
+  sudo nix key generate-secret --key-name build-vm-1 > /tmp/key.pem
+  sudo mv /tmp/key.pem /var/lib/harmonia/cache-priv-key.pem
+  sudo chmod 600 /var/lib/harmonia/cache-priv-key.pem
+  sudo systemctl restart harmonia
+  echo "Public key (save this):"
+  sudo nix key convert-secret-to-public < /var/lib/harmonia/cache-priv-key.pem
+'
 ```
 
-### Client Configuration
+### Step 4: Verify Harmonia is Running
 
-Add to your NixOS config (e.g., `common/nix.nix`):
+```bash
+incus exec build-vm -- systemctl status harmonia
+incus exec build-vm -- curl -s http://localhost:5000/nix-cache-info
+```
+
+### Step 5: Configure Clients
+
+Add to `common/nix.nix` on machines that should use the cache:
 
 ```nix
 nix.settings = {
   substituters = [
     "https://cache.nixos.org/"
-    "http://build-vm:5000"  # Or use IP address
+    "http://build-vm.local:5000"  # Or use IP address
   ];
   trusted-public-keys = [
     "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-    "build-vm-1:YOUR_PUBLIC_KEY_HERE"
+    "build-vm-1:YOUR_PUBLIC_KEY_HERE"  # From Step 3
   ];
 };
 ```
@@ -112,9 +129,8 @@ nix.settings = {
 cd ~/dotfiles/configs/nixos
 nix flake update
 nix build .#nixosConfigurations.nixos.config.system.build.toplevel \
-  --out-link /tmp/result-pc \
-  --log-format bar-with-logs
+  --out-link /tmp/result-pc
 
-# On your PC: rebuild will now pull from cache
+# On your PC: rebuild will pull from cache
 sudo nixos-rebuild switch --flake .#nixos
 ```
