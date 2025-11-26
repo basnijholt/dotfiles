@@ -20,6 +20,8 @@ configs/nixos/
 | `hp` | Headless server (ZFS, virtualization + power management) |
 | `hp-incus` | HP config for Incus VM testing |
 | `nuc-incus` | NUC config for Incus VM testing |
+| `pc-incus` | PC config for Incus VM testing (GPU services build but won't run) |
+| `dev-vm` | Lightweight dev VM for Incus (familiar env anywhere) |
 | `installer` | Minimal ISO with SSH enabled |
 
 ## Quick Commands
@@ -48,6 +50,10 @@ nixos-install --root /mnt --no-root-passwd \
   --flake github:basnijholt/dotfiles/main?dir=configs/nixos#hp
 ```
 
-For Incus VM installation, see the instructions in `hosts/hp/incus-overrides.nix`.
+For Incus VM installation, see the instructions in:
+- `hosts/hp/incus-overrides.nix` (HP VM)
+- `hosts/nuc/incus-overrides.nix` (NUC VM)
+- `hosts/pc/incus-overrides.nix` (PC VM)
+- `scripts/create-dev-vm.sh` (dev-vm helper script)
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
