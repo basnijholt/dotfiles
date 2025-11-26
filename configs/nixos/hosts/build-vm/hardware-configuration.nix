@@ -16,6 +16,10 @@
     options = [ "defaults" ];
   };
 
+  # --- Fix LoadCredential in LXC containers ---
+  # See: https://github.com/NixOS/nixpkgs/issues/157449
+  boot.specialFileSystems."/run".options = [ "rshared" ];
+
   # --- Disable systemd-resolved (container uses host DNS) ---
   services.resolved.enable = lib.mkForce false;
 
