@@ -1,4 +1,4 @@
-# PC-specific nixpkgs overrides (CUDA, custom packages)
+# PC-specific package overrides (CUDA, custom packages)
 # Note: allowUnfree is set in common/nixpkgs.nix
 { pkgs, ... }:
 
