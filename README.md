@@ -64,6 +64,9 @@ Why not?
 - SSH key set up with GitHub (submodules use SSH)
 
 ```bash
+# Initialize Git LFS (required once per machine, sets up global hooks)
+git lfs install
+
 # Ensure your key is loaded in the agent
 ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/id_ed25519
 ```
@@ -75,7 +78,7 @@ CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.p
 
 ```bash
 # Clone the sanitized branch with submodules (shallow)
-GIT_LFS_SKIP_SMUDGE=0 git clone --depth=1 --branch public --single-branch \
+git clone --depth=1 --branch public --single-branch \
   --recurse-submodules -j8 --shallow-submodules \
   git@github.com:basnijholt/dotfiles.git ~/dotfiles
 cd dotfiles
@@ -110,7 +113,8 @@ export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agen
 
 ```bash
 # Clone the repository with submodules
-GIT_LFS_SKIP_SMUDGE=0 git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
+git lfs install
+git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
 cd dotfiles
 
 # Run the installation script
