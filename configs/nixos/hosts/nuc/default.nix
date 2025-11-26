@@ -6,7 +6,6 @@
     ../../optional/desktop.nix
     ../../optional/audio.nix
     ../../optional/virtualization.nix
-    ../../optional/printing.nix
     ../../optional/gui-packages.nix
     ../../optional/power.nix
     ../../optional/iscsi.nix

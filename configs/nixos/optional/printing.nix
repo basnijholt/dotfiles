@@ -1,7 +1,6 @@
-# Printing and related desktop applications
+# Printing support
 { ... }:
 
 {
   services.printing.enable = true;
-  programs.thunderbird.enable = true;
 }

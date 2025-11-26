@@ -8,6 +8,7 @@
     ../../optional/virtualization.nix
     ../../optional/printing.nix
     ../../optional/gui-packages.nix
+    ../../optional/power.nix
 
     # Host-specific modules (Tier 3)
     ./boot.nix
@@ -20,6 +21,7 @@
     ./gaming.nix
     ./debugging.nix
     ./ai.nix
+    ./agent-cli.nix
     ./backup.nix
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix

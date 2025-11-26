@@ -26,10 +26,4 @@
   # --- NVIDIA VRAM Bug Workaround ---
   # Don't preserve VRAM across suspend/VT switches (bug trigger)
   boot.kernelParams = [ "nvidia.NVreg_PreserveVideoMemoryAllocations=0" ];
-
-  # --- Disable Sleep States ---
-  systemd.sleep.extraConfig = ''
-    AllowSuspend=no
-    AllowHibernation=no
-  '';
 }
