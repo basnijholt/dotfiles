@@ -38,22 +38,22 @@
         nixos = mkHost [
           disko.nixosModules.disko
           ./hosts/pc/disko.nix
-          ./hosts/pc/hardware-configuration.nix
           ./hosts/pc/default.nix
+          ./hosts/pc/hardware-configuration.nix
         ];
 
         nuc = mkHost [
           disko.nixosModules.disko
           ./hosts/nuc/disko.nix
-          ./hosts/nuc/hardware-configuration.nix
           ./hosts/nuc/default.nix
+          ./hosts/nuc/hardware-configuration.nix
         ];
 
         hp = mkHost [
           disko.nixosModules.disko
           ./hosts/hp/disko.nix
-          ./hosts/hp/hardware-configuration.nix
           ./hosts/hp/default.nix
+          ./hosts/hp/hardware-configuration.nix
         ];
 
         # Incus VM version of HP - same services/packages, VM-appropriate hardware
@@ -72,12 +72,21 @@
           ./hosts/nuc/incus-overrides.nix
         ];
 
+        # Incus VM version of PC - same services/packages, VM-appropriate hardware
+        # GPU-dependent services (NVIDIA, CUDA, AI) build but won't function at runtime
+        pc-incus = mkHost [
+          disko.nixosModules.disko
+          ./hosts/pc/disko.nix
+          ./hosts/pc/default.nix
+          ./hosts/pc/incus-overrides.nix
+        ];
+
         # Lightweight development VM for Incus
         dev-vm = mkHost [
           disko.nixosModules.disko
           ./hosts/dev-vm/disko.nix
-          ./hosts/dev-vm/hardware-configuration.nix
           ./hosts/dev-vm/default.nix
+          ./hosts/dev-vm/hardware-configuration.nix
         ];
 
         installer = lib.nixosSystem {
