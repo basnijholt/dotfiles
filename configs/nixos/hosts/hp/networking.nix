@@ -1,3 +1,4 @@
+# Network configuration for HP server
 { ... }:
 
 {
@@ -6,7 +7,7 @@
   networking.firewall.enable = true;
   networking.networkmanager.enable = false;
 
-  # --- Systemd-Networkd Configuration (Robust Bridging) ---
+  # --- Systemd-Networkd (Bridge for VMs) ---
   networking.useDHCP = false; # Disable legacy scripted networking
   systemd.network.enable = true;
 
@@ -32,10 +33,9 @@
     networkConfig.DHCP = "yes";
   };
 
-  # Trust the bridge so VMs can do DHCP/DNS
+  # --- Firewall ---
   networking.firewall.trustedInterfaces = [ "br0" "incusbr0" ];
-
   networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; } # mosh
+    { from = 60000; to = 61000; }  # mosh
   ];
 }

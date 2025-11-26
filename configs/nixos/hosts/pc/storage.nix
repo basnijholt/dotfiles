@@ -1,10 +1,7 @@
+# Storage configuration (Btrfs snapshots, swap)
 { ... }:
 
 {
-  # ===================================
-  # Hardware Configuration
-  # ===================================
-
   services.fstrim.enable = true;
 
   # --- Snapper Btrfs Policies ---

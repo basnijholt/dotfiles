@@ -1,3 +1,4 @@
+# 1Password integration
 { ... }:
 
 {

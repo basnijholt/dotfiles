@@ -1,7 +1,9 @@
+# Power management for always-on servers
 { ... }:
 
 {
-  # Disable hibernation/sleep to keep SSH available
+  # --- Disable Sleep/Hibernation ---
+  # Keep SSH available by preventing sleep states
   systemd.sleep.extraConfig = ''
     AllowSuspend=no
     AllowHibernation=no
@@ -9,6 +11,7 @@
     AllowHybridSleep=no
   '';
 
+  # --- Ignore Lid/Power Button ---
   services.logind.settings.Login = {
     HandleLidSwitch = "ignore";
     HandlePowerKey = "ignore";

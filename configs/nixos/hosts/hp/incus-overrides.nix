@@ -1,5 +1,6 @@
 # VM-specific overrides for running HP config in Incus
 # All differences from real HP hardware are centralized here
+#
 /*
 === Installation Instructions ===
 
@@ -61,10 +62,9 @@
   ];
 
   networking.hostName = lib.mkForce "hp-incus";
-  # Unique hostId for ZFS (different from real HP)
-  networking.hostId = lib.mkForce "a7d4a137";
+  networking.hostId = lib.mkForce "a7d4a137";  # Unique hostId for ZFS
 
-  # --- Hardware overrides for VM ---
+  # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
   # Use virtio modules instead of physical hardware modules
@@ -74,15 +74,15 @@
   # Console output for Incus VM (serial + VGA)
   boot.kernelParams = [ "console=tty0" "console=ttyS0,115200" ];
 
-  # --- Networking: keep bridge setup, adapt for VM ---
+  # --- Networking Overrides for VM ---
   # Match any ethernet interface (VM doesn't have eno1)
   systemd.network.networks."30-eno1".matchConfig.Name = lib.mkForce "en*";
-  # Override bridge config without hardcoded MAC (real HP uses MAC for DHCP reservation)
+  # No hardcoded MAC (real HP uses MAC for DHCP reservation)
   systemd.network.netdevs."20-br0".netdevConfig = lib.mkForce {
     Kind = "bridge";
     Name = "br0";
   };
 
-  # Easy login for testing
+  # --- Testing ---
   users.users.root.password = "nixos";
 }

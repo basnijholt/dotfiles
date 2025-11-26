@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+# Nix package manager settings
+{ ... }:
 
 {
-  # --- Nix Package Manager Settings ---
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     substituters = [

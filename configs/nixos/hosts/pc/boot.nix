@@ -1,9 +1,7 @@
-{ pkgs, config, ... }:
+# Boot loader configuration with custom GRUB theme
+{ config, pkgs, ... }:
 
 {
-  # ===================================
-  # Boot Configuration
-  # ===================================
   boot.loader.grub = {
     enable = true;
     efiSupport = true;
