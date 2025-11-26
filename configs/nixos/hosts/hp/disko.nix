@@ -31,7 +31,7 @@
         };
       };
     };
-    
+
     zpool = {
       zroot = {
         type = "zpool";
@@ -47,7 +47,7 @@
           xattr = "sa";
           atime = "off";
         };
-        
+
         datasets = {
           root = {
             type = "zfs_fs";
