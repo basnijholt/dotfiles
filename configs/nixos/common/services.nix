@@ -12,6 +12,7 @@
     openFirewall = true;
     settings = {
       PasswordAuthentication = false;
+      PermitRootLogin = "no";
       UseDns = true;
       X11Forwarding = true;
     };
