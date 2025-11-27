@@ -105,7 +105,7 @@
       };
 
       diskoConfigurations = {
-        nvme1 = (import ./hosts/pc/disko.nix) { inherit lib; };
+        pc = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
