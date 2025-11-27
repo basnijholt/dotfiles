@@ -127,6 +127,18 @@
           --threads 1
           --jinja
 
+      # Uploaded 2025-10-02, size 15.3 GB, max ctx: 131072, layers: 48
+      "apriel-thinker:15b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Apriel-1.5-15b-Thinker-GGUF:Q8_0
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 2048
+          --ubatch-size 2048
+          --threads 1
+          --jinja
+
       # Uploaded 2025-09-04, size 0.3 GB, max ctx: 2048, layers: 24
       "embeddinggemma:300m":
         cmd: |
