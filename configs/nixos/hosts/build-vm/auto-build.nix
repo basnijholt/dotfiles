@@ -43,9 +43,9 @@
       User = "root";
       # Generous timeout for CUDA builds
       TimeoutStartSec = "12h";
-      # Memory limits - push to max (24GB container + 16GB swap)
+      # Memory limits - push to max (24GB RAM + 64GB swap)
       MemoryMax = "23G";
-      MemorySwapMax = "16G";
+      MemorySwapMax = "64G";
     };
   };
 

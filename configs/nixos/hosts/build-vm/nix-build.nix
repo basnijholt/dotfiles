@@ -24,7 +24,7 @@
     LimitNOFILE = 1048576;
     LimitNPROC = 1048576;
     MemoryMax = "23G";
-    MemorySwapMax = "16G";
+    MemorySwapMax = "64G";
   };
 
   # --- Tmpdir Configuration ---
@@ -43,6 +43,6 @@
   # Safety net for memory-intensive builds like PyTorch/CUDA
   swapDevices = [{
     device = "/var/swapfile";
-    size = 16 * 1024; # 16GB swap
+    size = 64 * 1024; # 64GB swap
   }];
 }
