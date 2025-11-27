@@ -23,7 +23,8 @@
   systemd.services.nix-daemon.serviceConfig = {
     LimitNOFILE = 1048576;
     LimitNPROC = 1048576;
-    MemoryMax = "20G"; # Prevent OOM kills, leave headroom for system
+    MemoryMax = "23G";
+    MemorySwapMax = "16G";
   };
 
   # --- Tmpdir Configuration ---

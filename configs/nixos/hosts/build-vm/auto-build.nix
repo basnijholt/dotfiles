@@ -25,12 +25,14 @@
       # Update flake inputs
       nix flake update
 
-      # Build all host configurations
+      # Build all host configurations (--cores 1 to limit memory usage)
       for host in nixos nuc hp; do
         echo "Building $host..."
         nix build .#nixosConfigurations.$host.config.system.build.toplevel \
           --no-link \
           --print-out-paths \
+          --cores 1 \
+          --max-jobs 1 \
           || echo "Warning: $host build failed, continuing..."
       done
 
@@ -41,6 +43,9 @@
       User = "root";
       # Generous timeout for CUDA builds
       TimeoutStartSec = "12h";
+      # Memory limits - push to max (24GB container + 16GB swap)
+      MemoryMax = "23G";
+      MemorySwapMax = "16G";
     };
   };
 
