@@ -27,12 +27,12 @@
     server.enable = true;
     client.enable = true;
     clusterName = "homelab";
-    controlMachine = "nixos";
+    controlMachine = "pc";
     nodeName = [
-      "nixos CPUs=24 State=UNKNOWN" # Adjust CPUs to match your system
+      "pc CPUs=24 State=UNKNOWN" # Adjust CPUs to match your system
     ];
     partitionName = [
-      "cpu Nodes=nixos Default=YES MaxTime=INFINITE State=UP"
+      "cpu Nodes=pc Default=YES MaxTime=INFINITE State=UP"
     ];
     extraConfig = ''
       AccountingStorageType=accounting_storage/none
