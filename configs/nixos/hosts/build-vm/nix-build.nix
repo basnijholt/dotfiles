@@ -4,8 +4,8 @@
 {
   # --- Build Parallelism ---
   nix.settings = {
-    max-jobs = "auto";
-    cores = 0; # Use all available cores per job
+    max-jobs = 1; # Single build at a time to prevent OOM on PyTorch/CUDA
+    cores = 1; # Single core per job to minimize peak memory usage
 
     # Disable sandbox (required for Incus containers)
     sandbox = false;
@@ -23,6 +23,7 @@
   systemd.services.nix-daemon.serviceConfig = {
     LimitNOFILE = 1048576;
     LimitNPROC = 1048576;
+    MemoryMax = "20G"; # Prevent OOM kills, leave headroom for system
   };
 
   # --- Tmpdir Configuration ---
@@ -36,4 +37,11 @@
   systemd.tmpfiles.rules = [
     "d /var/cache/nix-build 0755 root root -"
   ];
+
+  # --- Swap for Peak Memory ---
+  # Safety net for memory-intensive builds like PyTorch/CUDA
+  swapDevices = [{
+    device = "/var/swapfile";
+    size = 16 * 1024; # 16GB swap
+  }];
 }
