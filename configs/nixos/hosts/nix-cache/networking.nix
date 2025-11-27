@@ -1,8 +1,8 @@
-# Network configuration for build-vm
+# Network configuration for nix-cache
 { ... }:
 
 {
-  networking.hostName = "build-vm";
+  networking.hostName = "nix-cache";
   networking.networkmanager.enable = true;
   networking.nftables.enable = true;
   networking.firewall.enable = true;

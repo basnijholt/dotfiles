@@ -3,7 +3,7 @@
 {
   imports = [
     # Optional modules (Tier 2)
-    # Note: build-vm is a headless build server, no desktop/audio
+    # Note: nix-cache is a headless build server, no desktop/audio
     ../../optional/virtualization.nix
 
     # Host-specific modules (Tier 3)

@@ -89,10 +89,10 @@
           ./hosts/dev-vm/hardware-configuration.nix
         ];
 
-        # Build server VM for Incus - caches NixOS builds
-        build-vm = mkHost [
-          ./hosts/build-vm/default.nix
-          ./hosts/build-vm/hardware-configuration.nix
+        # Nix cache server VM for Incus - builds and caches NixOS configurations
+        nix-cache = mkHost [
+          ./hosts/nix-cache/default.nix
+          ./hosts/nix-cache/hardware-configuration.nix
         ];
 
         installer = lib.nixosSystem {

@@ -22,7 +22,7 @@ configs/nixos/
 | `nuc-incus` | NUC config for Incus VM testing |
 | `pc-incus` | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Lightweight dev VM for Incus x86_64 (familiar env anywhere) |
-| `build-vm` | Build server container with Harmonia cache (for CUDA/large builds) |
+| `nix-cache` | Nix cache server container with Harmonia (for CUDA/large builds) |
 | `installer` | Minimal ISO with SSH enabled |
 
 ## Quick Commands
@@ -59,6 +59,6 @@ For Incus VM installation, see the instructions in:
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
 
-## Build Server Setup (build-vm)
+## Nix Cache Server Setup (nix-cache)
 
-See [hosts/build-vm/README.md](./hosts/build-vm/README.md) for instructions on setting up the build server container with Harmonia cache.
+See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on setting up the cache server container with Harmonia.
