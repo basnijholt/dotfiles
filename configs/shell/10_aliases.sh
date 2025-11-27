@@ -36,13 +36,19 @@ if [[ $- == *i* ]]; then
     fi
 
     nixswitch() {
-        local host=${1:-$(hostname)}
-        sudo nixos-rebuild switch --flake ~/dotfiles/configs/nixos#$host
+        local args=()
+        if [[ -n "$1" ]]; then
+            args=(--option max-jobs "$1" --option cores "$1")
+        fi
+        sudo nixos-rebuild switch --flake ~/dotfiles/configs/nixos#$(hostname) "${args[@]}"
     }
     
     nixupdate() {
-        local host=${1:-$(hostname)}
-        cd ~/dotfiles/configs/nixos && nix flake update && sudo nixos-rebuild switch --flake .#$host && cd -
+        local args=()
+        if [[ -n "$1" ]]; then
+            args=(--option max-jobs "$1" --option cores "$1")
+        fi
+        cd ~/dotfiles/configs/nixos && nix flake update && sudo nixos-rebuild switch --flake .#$(hostname) "${args[@]}" && cd -
     }
 
     zyolo() {
