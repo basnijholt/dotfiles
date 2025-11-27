@@ -35,7 +35,7 @@
 
     in {
       nixosConfigurations = {
-        nixos = mkHost [
+        pc = mkHost [
           disko.nixosModules.disko
           ./hosts/pc/disko.nix
           ./hosts/pc/default.nix

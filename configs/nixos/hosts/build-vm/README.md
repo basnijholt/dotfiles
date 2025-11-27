@@ -81,6 +81,6 @@ To manually build a specific configuration:
 ```bash
 incus exec build-vm -- bash -c '
   cd /var/lib/nix-auto-build/dotfiles/configs/nixos
-  nix build .#nixosConfigurations.nixos.config.system.build.toplevel
+  nix build .#nixosConfigurations.pc.config.system.build.toplevel
 '
 ```

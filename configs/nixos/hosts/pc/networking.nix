@@ -2,7 +2,7 @@
 { lib, ... }:
 
 {
-  networking.hostName = lib.mkDefault "nixos";
+  networking.hostName = lib.mkDefault "pc";
   networking.networkmanager.enable = true;
   networking.nftables.enable = true;
   networking.firewall.enable = true;

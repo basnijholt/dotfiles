@@ -26,7 +26,7 @@
       nix flake update
 
       # Build all host configurations (--cores 1 to limit memory usage)
-      for host in nixos nuc hp; do
+      for host in pc nuc hp; do
         echo "Building $host..."
         nix build .#nixosConfigurations.$host.config.system.build.toplevel \
           --no-link \
