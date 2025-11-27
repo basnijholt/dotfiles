@@ -274,6 +274,7 @@
           --hf-repo mistralai/Devstral-Small-2507_gguf:Q4_K_M
           --port ''${PORT}
           --ctx-size 65536
+          --jinja
 
       # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
       # Uploaded 2025-05-10, size 17.3 GB, max ctx: 40960, layers: 48
@@ -295,6 +296,7 @@
           --hf-repo bartowski/cognitivecomputations_Dolphin-Mistral-24B-Venice-Edition-GGUF:Q4_K_M
           --port ''${PORT}
           --ctx-size 65536
+          --jinja
 
       # Uploaded 2025-04-28, size 4.7 GB, max ctx: 131072, layers: 36
       "qwen3-thinking:8b":
