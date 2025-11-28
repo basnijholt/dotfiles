@@ -23,8 +23,6 @@
   systemd.services.nix-daemon.serviceConfig = {
     LimitNOFILE = 1048576;
     LimitNPROC = 1048576;
-    MemoryMax = "23G";
-    MemorySwapMax = "64G";
   };
 
   # --- Tmpdir Configuration ---

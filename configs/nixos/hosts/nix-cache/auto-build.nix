@@ -8,6 +8,7 @@
     path = with pkgs; [ git nix openssh ];
     script = ''
       set -euo pipefail
+      export NIX_REMOTE=daemon
 
       DOTFILES="/var/lib/nix-auto-build/dotfiles"
 
@@ -43,9 +44,6 @@
       User = "root";
       # Generous timeout for CUDA builds
       TimeoutStartSec = "12h";
-      # Memory limits - push to max (24GB RAM + 64GB swap)
-      MemoryMax = "23G";
-      MemorySwapMax = "64G";
     };
   };
 
