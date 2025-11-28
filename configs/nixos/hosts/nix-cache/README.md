@@ -8,7 +8,8 @@ The `nix-cache` configuration runs a Harmonia binary cache server in an Incus **
 # On TrueNAS (adjust CPU/memory as needed)
 incus launch images:nixos/unstable nix-cache \
   -c limits.cpu=16 \
-  -c limits.memory=24GB
+  -c limits.memory=24GB \
+  -c limits.memory.swap=true
 ```
 
 > **Note:** This creates a container (not a VM). Containers share the host kernel and have better performance.

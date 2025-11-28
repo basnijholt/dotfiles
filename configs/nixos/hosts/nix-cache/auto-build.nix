@@ -43,7 +43,7 @@
       Type = "oneshot";
       User = "root";
       # Generous timeout for CUDA builds
-      TimeoutStartSec = "12h";
+      TimeoutStartSec = "3d";
     };
   };
 
