@@ -17,18 +17,27 @@ It lowered the barrier to entry for me and taught me almost everything I know ab
 But fundamentally, Proxmox is built around **clicking buttons**.
 It is a GUI-first paradigm.
 While you *can* automate it with Terraform or Ansible, it often feels like fighting the tool.
-State drift is real; you change a setting in the UI to debug something, forget about it, and six months later your "infrastructure as code" is out of sync with reality.
+State drift is real.
+You change a setting in the UI to debug something, forget about it, and six months later your "infrastructure as code" is out of sync with reality.
+For a human, this is annoying.
+For an AI agent, it is a dead end.
 
 ## The Agentic Future
 
 I have written before about [my shift towards agentic coding](/post/agentic-coding/).
 In a world where AI agents execute tasks, **CLI-first** and **declarative** systems are king.
 An AI agent cannot reliably "click buttons" in a web interface to configure a VLAN tag or resize a disk.
-But it can read a `flake.nix`, understand the exact desired state, and execute a command to make it so.
+It needs text.
+It needs determinism.
+
 By moving to NixOS, my entire infrastructure is defined in text files.
 This means my AI agents can read, understand, and even safely modify my infrastructure.
 Proxmox's opaque database and UI-driven workflow were a black box to my agents.
 NixOS is an open book.
+If I want my agent to "ensure the Home Assistant VM has 8GB of RAM", it doesn't need to navigate a menu.
+It just changes one line in a `.nix` file and runs a command.
+The agent can even verify the change was successful by checking the git diff or the active configuration.
+This is the infrastructure counterpart to the "agentic coding" revolution I'm living in.
 
 ## Why Incus?
 
@@ -87,3 +96,4 @@ My "pets" live comfortably inside Incus, but their cage is defined declaratively
 I can wipe my host machine, reinstall NixOS, run a restore script, and be back online in minutes.
 Best of all, I never have to remember which checkbox I clicked in a web UI three years ago.
 It is all in the code.
+And because it is code, my agents can help me manage it.
