@@ -53,7 +53,8 @@ Use lowercase with hyphens. Brevity is key - save horizontal space.
 SINGLE_TAB_INSTRUCTIONS = """\
 Generate a short tmux window name (<10 chars preferred) based on the terminal screen content.
 Focus on: project name, directory, or task. Keep it brief!
-Examples: dotfiles, docker, ssh-nuc, git, npm, pipefunc
+For TUI apps (htop, btop, vim, nvim, etc), use the app name itself.
+Examples: dotfiles, docker, ssh-nuc, git, npm, pipefunc, htop, nvim
 """
 
 MULTI_TAB_INSTRUCTIONS = """\
@@ -62,6 +63,7 @@ Return a JSON list with exactly one name per window, in order.
 
 RULES:
 - Max 10 characters per name - shorter is better!
+- TUI apps (htop, btop, vim, nvim, k9s, etc): use the app name itself
 - SSH sessions: use "<host>-<dir>" format (e.g., "nuc-home", "nuc-code")
   - Detect via "🌐 <host>" in prompt or "ssh <host>" command
   - IMPORTANT: The REMOTE prompt shows the remote cwd, not the local one!
@@ -69,7 +71,7 @@ RULES:
 - Local: use directory basename only (e.g., "dotfiles" not "dotfiles-scripts")
 - Always use the MOST RECENT prompt line to determine current state
 
-Examples: ["dotfiles", "pipefunc", "nuc-home", "docker"]
+Examples: ["dotfiles", "pipefunc", "nuc-home", "htop"]
 """
 
 
