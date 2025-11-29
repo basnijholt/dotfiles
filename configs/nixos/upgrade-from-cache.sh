@@ -5,7 +5,7 @@
 
 set -e
 
-CACHE_HOST="${CACHE_HOST:-nix-cache}"
+CACHE_HOST="${CACHE_HOST:-basnijholt@nix-cache.local}"
 # Use the short hostname (e.g., 'pc' instead of 'pc.local')
 HOSTNAME="${HOSTNAME:-$(hostname -s)}"
 REMOTE_FILE="/var/lib/nix-auto-build/${HOSTNAME}.rev"
