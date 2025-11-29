@@ -5,7 +5,7 @@
   # --- Auto-Build Service ---
   systemd.services.nix-auto-build = {
     description = "Build and cache NixOS configurations";
-    path = with pkgs; [ git nix openssh ];
+    path = with pkgs; [ git nix openssh jq ];
     script = ''
       set -euo pipefail
       export NIX_REMOTE=daemon
@@ -26,15 +26,21 @@
       # Update flake inputs
       nix flake update
 
+      # Get the commit ID of the nixpkgs input (unstable)
+      COMMIT_ID=$(nix flake metadata nixpkgs --json | jq -r .revision)
+
       # Build all host configurations (--cores 1 to limit memory usage)
       for host in pc nuc hp; do
         echo "Building $host..."
-        nix build .#nixosConfigurations.$host.config.system.build.toplevel \
+        if nix build .#nixosConfigurations.$host.config.system.build.toplevel \
           --no-link \
           --print-out-paths \
           --cores 1 \
-          --max-jobs 1 \
-          || echo "Warning: $host build failed, continuing..."
+          --max-jobs 1; then
+            echo "$COMMIT_ID" > "/var/lib/nix-auto-build/$host.rev"
+        else
+            echo "Warning: $host build failed, continuing..."
+        fi
       done
 
       echo "All builds completed at $(date)"
