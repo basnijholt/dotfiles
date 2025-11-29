@@ -23,6 +23,8 @@
     sha256 = "sha256-UUaKD9kBuoWITv/AV6Nh9t0z5LPJnq1F8mc9L9eaiUM=";
   };
 
+  environment.etc."llama-templates/apriel-thinker.jinja".source = ./apriel-thinker.jinja;
+
   environment.etc."llama-swap/config.yaml".text = ''
     # llama-swap configuration
     # This config uses llama.cpp's server to serve models on demand
@@ -127,7 +129,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-02, size 15.3 GB, max ctx: 131072, layers: 48
+      # Uploaded 2025-10-02, size 15.1 GB, max ctx: 262400, layers: 48
       "apriel-thinker:15b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -137,7 +139,7 @@
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
-          --jinja
+          --chat-template-file /etc/llama-templates/apriel-thinker.jinja
 
       # Uploaded 2025-09-04, size 0.3 GB, max ctx: 2048, layers: 24
       "embeddinggemma:300m":

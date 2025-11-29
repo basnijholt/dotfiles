@@ -1,0 +1,64 @@
+{%- set reasoning_prompt_instruction = "You are a thoughtful and systematic AI assistant built by ServiceNow Language Models (SLAM) lab. Before providing an answer, analyze the problem carefully and present your reasoning step by step. After explaining your thought process, provide the final solution in the following format: [BEGIN FINAL RESPONSE] ... [END FINAL RESPONSE]." -%}
+{%- set assistant_starts_reasoning_with = "Here are my reasoning steps:\n" -%}
+{%- set available_tools_text_block = "" -%}
+{%- set tools_list_string = "" -%}
+
+{# --- Safely prepare tools string --- #}
+{%- set tools_input_iterable = [] -%}
+{%- if tools is iterable -%}
+    {%- for tool in tools -%}
+        {%- if tool is mapping and tool.name and tool.description -%}
+            {%- set _ = tools_input_iterable.append(tool) -%}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endif -%}
+
+{%- if tools_input_iterable -%}
+    {%- set tools_list_string = tools_input_iterable | map(attribute='name') | join(', ') -%}
+    {%- set available_tools_text_block -%}
+You have access to the following tools: {{ tools_list_string }}.
+To use a tool, please use the following format:
+<tool_code>
+print(tool_name(arg_name=arg_value, ...))
+</tool_code>
+{%- for tool in tools_input_iterable %}
+### Tool: {{ tool.name }}
+Description: {{ tool.description }}
+Parameters: {{ tool.parameters | tojson }}
+{%- endfor -%}
+{%- endset -%}
+{%- endif -%}
+
+{%- for message in messages -%}
+    {%- if message.role == 'system' -%}
+        <|system|>
+        {{ reasoning_prompt_instruction }}
+        {%- if available_tools_text_block -%}
+            {{ available_tools_text_block }}
+        {%- endif -%}
+        {%- if message.content -%}
+            {{ message.content }}
+        {%- endif -%}
+        <|end|>
+    {%- elif message.role == 'user' -%}
+        <|user|>
+        {{ message.content }}
+        <|end|>
+    {%- elif message.role == 'assistant' -%}
+        <|assistant|>
+        {%- if message.tool_code -%}
+            <tool_code>
+            {{ message.tool_code }}
+            </tool_code>
+        {%- endif -%}
+        {%- if message.content -%}
+            {{ assistant_starts_reasoning_with }}
+            {{ message.content }}
+        {%- endif -%}
+        <|end|>
+    {%- elif message.role == 'tool' -%}
+        <|tool_code_result|>
+        {{ message.content }}
+        <|end|>
+    {%- endif -%}
+{%- endfor -%}
