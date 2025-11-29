@@ -26,6 +26,7 @@
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
     ~/.config/starship.toml: configs/starship/starship.toml
     ~/.config/wezterm/wezterm.lua: configs/wezterm/wezterm.lua
+    ~/.config/yazi: configs/yazi
     ~/.config/zellij/config.kdl: configs/zellij/config.kdl
     ~/.direnvrc: configs/direnv/direnvrc
     ~/.dotbins: submodules/mydotbins
