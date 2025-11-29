@@ -26,8 +26,8 @@
       # Update flake inputs
       nix flake update
 
-      # Get the commit ID of the nixpkgs input (unstable)
-      COMMIT_ID=$(nix flake metadata nixpkgs --json | jq -r .revision)
+      # Get the commit ID of the nixpkgs input (locked in flake.lock)
+      COMMIT_ID=$(jq -r .nodes.nixpkgs.locked.rev flake.lock)
 
       # Build all host configurations (--cores 1 to limit memory usage)
       for host in pc nuc hp; do
