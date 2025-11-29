@@ -8,9 +8,9 @@
 """Auto-name Zellij tabs based on terminal context using a local AI model.
 
 Usage:
-    zellij-tab-namer.py              # Rename current tab
-    zellij-tab-namer.py --all        # Rename all tabs (single AI query)
-    zellij-tab-namer.py --all --debug  # Show full prompt and response
+    zellij-rename-tab.py              # Rename current tab
+    zellij-rename-tab.py --all        # Rename all tabs (single AI query)
+    zellij-rename-tab.py --all --debug  # Show full prompt and response
 
 Environment variables:
     ZELLIJ_NAMER_BASE_URL: API base URL. Default: http://192.168.1.143:9292/v1
