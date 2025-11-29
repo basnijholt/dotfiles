@@ -8,6 +8,7 @@
 
   # --- System Compatibility ---
   programs.nix-ld.enable = true; # Run non-nix executables (e.g., micromamba)
+  boot.kernel.sysctl."kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
 
   # --- DNS Resolver Defaults ---
   services.resolved = {

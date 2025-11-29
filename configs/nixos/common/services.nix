@@ -6,6 +6,13 @@
   services.syncthing.enable = true;
   services.tailscale.enable = true;
 
+  # --- System Stability ---
+  services.earlyoom = {
+    enable = true;
+    freeSwapThreshold = 2;
+    freeMemThreshold = 2;
+  };
+
   # --- SSH ---
   services.openssh = {
     enable = true;
