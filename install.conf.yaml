@@ -9,7 +9,6 @@
     ~/.bashrc: configs/bash/bashrc
     ~/.claude/settings.json: configs/claude/settings.json
     ~/.condarc: configs/conda/condarc
-    ~/.config/agent-cli/config.toml: configs/agent-cli/config.toml
     ~/.config/amp/settings.json: configs/amp/settings.json
     ~/.config/atuin: configs/atuin
     ~/.config/bat/config: configs/bat/config
@@ -53,8 +52,6 @@
 - shell:
   - bash scripts/sync-uv-tools.sh
   - git submodule update --init --recursive
-  - command: '[[ "$(uname)" = "Darwin" ]] && [ -f ./secrets/install ] && (echo "SECRETS" && ./secrets/install) || true'
-    stdout: true
 
 # -- Only on Linux --
 - defaults:
@@ -76,7 +73,6 @@
       if: '[ "$(uname)" = "Darwin" ]'
 - link:
     ~/.gitconfig-sign: configs/git/gitconfig-sign
-    ~/.config/karabiner/karabiner.json: configs/karabiner/karabiner.json
     ~/.config/skhd/skhdrc: configs/skhd/skhdrc
     ~/Work/.stignore: configs/syncthing/stignore
     ~/Lightroom/.stignore: configs/syncthing/stignore
