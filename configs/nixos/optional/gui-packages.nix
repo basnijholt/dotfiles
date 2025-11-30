@@ -5,7 +5,7 @@ let
   # --- GUI Applications ---
   guiApplications = with pkgs; [
     brave
-    firefox
+    firefox-bin
     vscode
   ];
 
