@@ -33,7 +33,7 @@
       for host in pc nuc hp; do
         echo "Building $host..."
         if nix build .#nixosConfigurations.$host.config.system.build.toplevel \
-          --no-link \
+          --out-link "/var/lib/nix-auto-build/result-$host" \
           --print-out-paths \
           --cores 1 \
           --max-jobs 1; then
