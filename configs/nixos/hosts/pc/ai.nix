@@ -31,7 +31,31 @@
 
     models:  # Ordered from newest to oldest
 
-      # Uploaded 2025-08-04, size 73.1 GB, max ctx: 131072, layers: 46
+      # Uploaded 2025-11-28, size 45.1 GB, max ctx: 262144, layers: 48
+      "qwen3-next-80b-a3b:q4_k_m":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:Q4_K_M
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 2048
+          --ubatch-size 512
+          --threads 8
+          --jinja
+
+      # Uploaded 2025-11-28, size 45.1 GB, max ctx: 262144, layers: 48
+      "qwen3-next-80b-a3b:q4_k_xl":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:UD-Q4_K_XL
+          --port ''${PORT}
+          --ctx-size 32768
+          --batch-size 2048
+          --ubatch-size 512
+          --threads 8
+          --jinja
+
+      # Uploaded 2025-08-05, size 68.0 GB, max ctx: 131072, layers: 47
       "glm-4.5-air:ud-q4_k_xl":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -49,7 +73,7 @@
           --threads 8
           --jinja
 
-      # Uploaded 2025-11-07, size 34.8 GB, max ctx: 32768, layers: 64
+      # Uploaded 2025-10-23, size 32.4 GB, max ctx: 262144, layers: 64
       "qwen3-vl-thinking-abliterated:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -147,7 +171,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-02, size 15.1 GB, max ctx: 262400, layers: 48
+      # Uploaded 2025-10-02, size 14.3 GB, max ctx: 262400, layers: 48
       "apriel-thinker:15b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -343,7 +367,7 @@
           --port ''${PORT}
           --ctx-size 0
 
-    healthCheckTimeout: 600  # 10 minutes for large model download + loading
+    healthCheckTimeout: 3600  # 1 hour for large model download + loading
 
     # TTL keeps models in memory for specified seconds after last use
     ttl: 3600  # Keep models loaded for 1 hour (like OLLAMA_KEEP_ALIVE)
