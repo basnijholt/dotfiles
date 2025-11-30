@@ -16,6 +16,8 @@ HOSTS=(
   "nuc"
   "dietpi"
   "pc"
+  "hp"
+  "nuc"
 )
 
 # Arrays to track results
