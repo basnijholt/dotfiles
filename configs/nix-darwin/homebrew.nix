@@ -60,6 +60,7 @@
       "nmap" # Network scanner
       "node" # JavaScript runtime
       "ollama" # Ollama LLMs
+      "opencode" # Open source coding agent CLI
       "openjdk" # Java development kit
       "pandoc" # Document converter
       "parallel" # GNU parallel
