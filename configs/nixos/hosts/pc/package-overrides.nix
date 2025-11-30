@@ -69,8 +69,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v172/llama-swap_172_linux_amd64.tar.gz";
-            hash = "sha256-m3zRTEpZrMoNz8MXxtXhDLix1UGYBeqb4WgLrNnUri0=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v175/llama-swap_175_linux_amd64.tar.gz";
+            hash = "sha256-zeyVz0ldMxV4HKK+u5TtAozfRI6IJmeBo92IJTgkGrQ=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
