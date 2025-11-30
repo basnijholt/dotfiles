@@ -5,40 +5,12 @@
 # ]
 # ///
 import os
-import re
 import yaml
 import shlex
 import subprocess
 import sys
 
-# Path to the ai.nix file
-AI_NIX_PATH = os.path.join(os.path.dirname(__file__), "../hosts/pc/ai.nix")
 CONFIG_YAML_PATH = "/etc/llama-swap/config.yaml"
-
-
-def extract_yaml_from_nix(file_path):
-    with open(file_path, "r") as f:
-        content = f.read()
-
-    # Regex to find the content between environment.etc."llama-swap/config.yaml".text = '' and '';
-    match = re.search(
-        r'environment\.etc\."llama-swap/config\.yaml"\.text\s*=\s*\'\'(.*?)\'\';',
-        content,
-        re.DOTALL,
-    )
-    if not match:
-        print("Error: Could not find config.yaml content in ai.nix")
-        sys.exit(1)
-
-    yaml_content = match.group(1)
-
-    # Sanitize Nix interpolation for YAML parsing
-    # Replace ${pkgs.llama-cpp} with a placeholder or simple string
-    yaml_content = re.sub(r"\$\{pkgs\.llama-cpp\}", "pkgs.llama-cpp", yaml_content)
-    # Replace ${PORT} with a placeholder
-    yaml_content = re.sub(r"\$\{PORT\}", "8080", yaml_content)
-
-    return yaml_content
 
 
 def parse_args_from_cmd(cmd_str):
@@ -65,19 +37,13 @@ def parse_args_from_cmd(cmd_str):
 
 
 def main():
-    yaml_text = ""
-    if os.path.exists(CONFIG_YAML_PATH):
-        print(f"Reading configuration from {CONFIG_YAML_PATH}...")
-        with open(CONFIG_YAML_PATH, "r") as f:
-            yaml_text = f.read()
-    elif os.path.exists(AI_NIX_PATH):
-        print(
-            f"Warning: {CONFIG_YAML_PATH} not found. Falling back to {AI_NIX_PATH}..."
-        )
-        yaml_text = extract_yaml_from_nix(AI_NIX_PATH)
-    else:
-        print(f"Error: Neither {CONFIG_YAML_PATH} nor {AI_NIX_PATH} found.")
+    if not os.path.exists(CONFIG_YAML_PATH):
+        print(f"Error: {CONFIG_YAML_PATH} not found.")
         sys.exit(1)
+
+    print(f"Reading configuration from {CONFIG_YAML_PATH}...")
+    with open(CONFIG_YAML_PATH, "r") as f:
+        yaml_text = f.read()
 
     try:
         config = yaml.safe_load(yaml_text)
@@ -109,7 +75,14 @@ def main():
         cli_cmd = (
             ["llama-cli"]
             + dl_args
-            + ["-p", "System check", "-n", "1", "--no-display-prompt"]
+            + [
+                "-p",
+                "System check",
+                "-n",
+                "1",
+                "--no-display-prompt",
+                "--no-conversation",
+            ]
         )
 
         print(f"  Running: {' '.join(cli_cmd)}")
@@ -117,7 +90,7 @@ def main():
         try:
             # We allow it to fail if it's just a download check, but ideally it succeeds.
             # Using subprocess.call to show output to user so they see download progress.
-            subprocess.run(cli_cmd, check=True)
+            subprocess.run(cli_cmd, check=True, stdin=subprocess.DEVNULL)
             print("  -> Success/Verified.")
         except subprocess.CalledProcessError:
             print("  -> Failed (or maybe just interrupted).")
