@@ -41,9 +41,11 @@
           --ctx-size 131072
           --batch-size 2048
           --ubatch-size 512
-          --split-mode layer
-          --tensor-split 1,1
-          --n-cpu-moe 24
+          --tensor-split 28,20
+          --n-cpu-moe 38
+          --no-mmap
+          --no-context-shift
+          --swa-full
           --threads 8
           --jinja
 
