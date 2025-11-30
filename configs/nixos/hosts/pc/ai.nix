@@ -32,26 +32,17 @@
     models:  # Ordered from newest to oldest
 
       # Uploaded 2025-11-28, size 45.1 GB, max ctx: 262144, layers: 48
-      "qwen3-next-80b-a3b:q4_k_m":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:Q4_K_M
-          --port ''${PORT}
-          --ctx-size 32768
-          --batch-size 2048
-          --ubatch-size 512
-          --threads 8
-          --jinja
-
-      # Uploaded 2025-11-28, size 45.1 GB, max ctx: 262144, layers: 48
       "qwen3-next-80b-a3b:q4_k_xl":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           -hf unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:UD-Q4_K_XL
           --port ''${PORT}
-          --ctx-size 32768
+          --ctx-size 65536
           --batch-size 2048
           --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1,1
+          --n-cpu-moe 10
           --threads 8
           --jinja
 
@@ -66,7 +57,7 @@
           --batch-size 2048
           --ubatch-size 512
           --tensor-split 28,20
-          --n-cpu-moe 38
+          --n-cpu-moe 20
           --no-mmap
           --no-context-shift
           --swa-full
