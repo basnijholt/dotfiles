@@ -31,6 +31,22 @@
 
     models:  # Ordered from newest to oldest
 
+      # Uploaded 2025-08-04, size 73.1 GB, max ctx: 131072, layers: 46
+      "glm-4.5-air:ud-q4_k_xl":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/GLM-4.5-Air-GGUF
+          --hf-file UD-Q4_K_XL/GLM-4.5-Air-UD-Q4_K_XL-00001-of-00002.gguf
+          --port ''${PORT}
+          --ctx-size 131072
+          --batch-size 2048
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1,1
+          --n-cpu-moe 24
+          --threads 8
+          --jinja
+
       # Uploaded 2025-11-07, size 34.8 GB, max ctx: 32768, layers: 64
       "qwen3-vl-thinking-abliterated:32b":
         cmd: |
