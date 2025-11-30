@@ -46,5 +46,8 @@
   programs.gnupg.agent.pinentryPackage = pkgs.pinentry-gnome3;
 
   # --- Desktop Applications ---
-  programs.thunderbird.enable = true;
+  programs.thunderbird = {
+    enable = true;
+    package = pkgs.thunderbird-bin;
+  };
 }
