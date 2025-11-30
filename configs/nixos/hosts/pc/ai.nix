@@ -55,7 +55,7 @@
           --threads 8
           --jinja
 
-      # Uploaded 2025-08-05, size 68.0 GB, max ctx: 131072, layers: 47
+      # Uploaded 2025-08-04, size 68.0 GB, max ctx: 131072, layers: 47
       "glm-4.5-air:ud-q4_k_xl":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -139,7 +139,7 @@
       "qwen3-vl-thinking:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Thinking-GGUF:Q4_K_M
+          -hf unsloth/Qwen3-VL-32B-Thinking-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 32768
           --batch-size 2048
@@ -151,7 +151,7 @@
       "qwen3-vl:32b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:Q4_K_M
+          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 32768
           --batch-size 2048
@@ -163,7 +163,7 @@
       "qwen3-vl:32b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:Q8_0
+          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:UD-Q8_K_XL
           --port ''${PORT}
           --ctx-size 16384
           --batch-size 2048
@@ -175,7 +175,7 @@
       "apriel-thinker:15b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Apriel-1.5-15b-Thinker-GGUF:Q8_0
+          -hf unsloth/Apriel-1.5-15b-Thinker-GGUF:UD-Q8_K_XL
           --port ''${PORT}
           --ctx-size 65536
           --batch-size 2048
@@ -197,7 +197,7 @@
       "hermes-4:70b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Hermes-4-70B-GGUF:Q4_K_M
+          -hf unsloth/Hermes-4-70B-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 16384
           --batch-size 512
@@ -211,7 +211,7 @@
       "seed-oss:36b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Seed-OSS-36B-Instruct-GGUF
+          -hf unsloth/Seed-OSS-36B-Instruct-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 65536
           --batch-size 2048
@@ -299,7 +299,7 @@
       "qwen3-coder:30b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:Q4_K_M
+          --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 131072
 
@@ -307,7 +307,7 @@
       "qwen3-thinking:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF
+          --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 0
 
@@ -346,7 +346,7 @@
       "qwen3-thinking:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-8B-128K-GGUF
+          --hf-repo unsloth/Qwen3-8B-128K-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 0
 
