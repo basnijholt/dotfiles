@@ -32,29 +32,29 @@ wget --mirror \
 
 ## Step 2: Convert to Markdown
 
-We use a Python script `clean_convert.py` to extract the relevant content from the HTML files and convert it to Markdown. This script uses `beautifulsoup4` to clean the HTML and `pandoc` for high-quality conversion.
+We use a Python script `nixos-wiki-convert.py` to extract the relevant content from the HTML files and convert it to Markdown. This script uses `beautifulsoup4` to clean the HTML and `pandoc` for high-quality conversion.
 
-1.  **Create the conversion script** (`clean_convert.py`):
+1.  **Create the conversion script** (`nixos-wiki-convert.py`):
 
-    (See the `clean_convert.py` file in this directory)
+    (See the `nixos-wiki-convert.py` file in this directory)
 
 2.  **Run the script**:
 
-    Ensure `clean_convert.py` is executable:
+    Ensure `nixos-wiki-convert.py` is executable:
     ```bash
-    chmod +x clean_convert.py
+    chmod +x nixos-wiki-convert.py
     ```
 
     **Option A: Using Nix (Recommended)**
     This command runs the script in a shell where `pandoc` is available, and `uv` handles the Python dependencies defined in the script header.
     ```bash
-    nix --extra-experimental-features 'nix-command flakes' shell nixpkgs#pandoc -c ./clean_convert.py
+    nix --extra-experimental-features 'nix-command flakes' shell nixpkgs#pandoc -c ./nixos-wiki-convert.py
     ```
 
     **Option B: Using Global Tools**
     If you have `pandoc` and `uv` installed on your system:
     ```bash
-    ./clean_convert.py
+    ./nixos-wiki-convert.py
     ```
 
 ## Output
