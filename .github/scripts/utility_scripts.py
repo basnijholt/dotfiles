@@ -10,10 +10,6 @@ descriptions = {
     "commit.py": "Generate a conventional commit message from staged changes",
     "git-fixup-file.sh": "Remove a file from commits since branching from main",
 
-    # macOS / audio
-    "eqMac.sh": "Keep eqMac running via cron on macOS",
-    "eqMac.py": "Inspect macOS audio devices and defaults",
-
     # Notebooks and uploads
     "nbviewer.sh": "Share a Jupyter notebook via nbviewer (after upload)",
     "upload-file.sh": "Upload files to various paste/file hosts",
@@ -36,7 +32,6 @@ descriptions = {
     "remove-box.py": "Strip box-drawing characters from copied code snippets",
     "run.sh": "Run a command from .dotbins platform bin directory",
     "pypi-sha256.sh": "Print commands to update a conda-forge feedstock checksum",
-    "rpi": "Raspberry Pi helper scripts (mount/unmount LUKS USB)",
 }
 
 if __name__ == "__main__":
