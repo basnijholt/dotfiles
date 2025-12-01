@@ -23,11 +23,24 @@
   # --- Replication Service (Syncoid) ---
   # Pushes snapshots to TrueNAS via SSH
   #
-  # Prerequisites:
-  # 1. SSH Access: The root user on this machine needs passwordless SSH access to the target.
-  #    Run: `sudo ssh-copy-id -i /root/.ssh/id_ed25519.pub root@truenas.local`
-  # 2. Target Dataset: The target parent dataset must exist on TrueNAS.
-  #    Run on TrueNAS: `zfs create tank/backups/<hostname>`
+  # === Setup Instructions ===
+  #
+  # 1. Create Target Datasets on TrueNAS:
+  #    - SSH into TrueNAS or use the Shell in Web UI:
+  #      `zfs create tank/backups/<hostname>` (e.g. tank/backups/nuc)
+  #
+  # 2. Setup SSH Access (Root to Root):
+  #    - On this NixOS machine, get the root public key:
+  #      `sudo cat /root/.ssh/id_ed25519.pub`
+  #      (If file missing: `sudo ssh-keygen -t ed25519`)
+  #    - On TrueNAS Web UI:
+  #      Go to Credentials -> Local Users -> root -> SSH Public Key
+  #      Paste the key and Save.
+  #
+  # 3. Verify Connection:
+  #    - On this NixOS machine:
+  #      `sudo ssh root@truenas.local zfs list`
+  #      (Accept the host key if prompted)
   systemd.services.zfs-replication = {
     description = "ZFS replication to TrueNAS";
     requires = [ "network-online.target" ];
