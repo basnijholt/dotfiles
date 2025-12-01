@@ -48,7 +48,7 @@ We use a Python script `nixos-wiki-convert.py` to extract the relevant content f
     **Option A: Using Nix (Recommended)**
     This command runs the script in a shell where `pandoc` is available, and `uv` handles the Python dependencies defined in the script header.
     ```bash
-    nix --extra-experimental-features 'nix-command flakes' shell nixpkgs#pandoc -c ./nixos-wiki-convert.py
+    nix --extra-experimental-features 'nix-command flakes' shell nixpkgs#pandoc nixpkgs#uv -c ./nixos-wiki-convert.py
     ```
 
     **Option B: Using Global Tools**
