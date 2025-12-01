@@ -259,7 +259,7 @@
           --batch-size 512
           --ubatch-size 512
           --split-mode layer
-          --tensor-split 3,1.3
+          --tensor-split 1.3,3
           --n-cpu-moe 15
           --threads 8
           --chat-template-kwargs '{"reasoning_effort": "high"}'
