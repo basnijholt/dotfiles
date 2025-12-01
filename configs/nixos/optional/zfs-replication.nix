@@ -82,6 +82,8 @@
       # Restart on failure to handle temporary network glitches
       Restart = "on-failure";
       RestartSec = "10m";
+      # Allow initial replication to take as long as needed
+      TimeoutStartSec = "infinity";
     };
   };
 
