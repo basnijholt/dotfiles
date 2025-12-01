@@ -9,6 +9,7 @@
     ../../optional/gui-packages.nix
     ../../optional/power.nix
     ../../optional/iscsi.nix
+    ../../optional/zfs-replication.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
