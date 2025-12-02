@@ -89,6 +89,12 @@
           ./hosts/dev-vm/hardware-configuration.nix
         ];
 
+        # Lightweight development LXC container for Incus
+        dev-lxc = mkHost [
+          ./hosts/dev-lxc/default.nix
+          ./hosts/dev-lxc/hardware-configuration.nix
+        ];
+
         # Nix cache server VM for Incus - builds and caches NixOS configurations
         nix-cache = mkHost [
           ./hosts/nix-cache/default.nix

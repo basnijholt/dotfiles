@@ -22,6 +22,7 @@ configs/nixos/
 | `nuc-incus` | NUC config for Incus VM testing |
 | `pc-incus` | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Lightweight dev VM for Incus x86_64 (familiar env anywhere) |
+| `dev-lxc` | Lightweight dev LXC container for Incus x86_64 (familiar env anywhere) |
 | `nix-cache` | Nix cache server container with Harmonia (for CUDA/large builds) |
 | `installer` | Minimal ISO with SSH enabled |
 
