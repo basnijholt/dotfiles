@@ -84,6 +84,15 @@
         --sshport=22 \
         zroot/root \
         "$TARGET_USER@$TARGET_HOST:$TARGET_PATH/root"
+
+      # Replicate Incus (VMs/Containers) - only if it exists
+      if zfs list zroot/incus >/dev/null 2>&1; then
+        syncoid \
+          --recursive \
+          --sshport=22 \
+          zroot/incus \
+          "$TARGET_USER@$TARGET_HOST:$TARGET_PATH/incus"
+      fi
     '';
 
     serviceConfig = {
