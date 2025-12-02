@@ -70,23 +70,58 @@ sudo launchctl kickstart -k system/systems.determinate.nix-daemon
 - `ssh-ng://builder@localhost:31022` - wrong port syntax
 - `ssh-ng://builder@localhost?ssh-options=-p%2031022` - SSH key mismatch
 
-## Current State (Nov 2025)
+## Current State (Dec 2025)
 
 - `dev-vm-aarch64` configuration exists in `flake.nix`
 - Configuration evaluates correctly (`nix eval` works)
-- Build fails because no Linux builder is available
-- **Waiting for**: Determinate Nix native Linux builder early access
-- **Email sent**: Requested early access from support@determinate.systems
+- **Early access granted**: Emailed support@determinate.systems with FlakeHub username to request native Linux builder access - approved
+- **Issue**: Default builder VM disk space (8GB) is insufficient for large NixOS builds
 
-## When Access is Granted (Resume Here)
+## Builder Memory/Disk Configuration
+
+The native Linux builder's virtual disk is provisioned from the memory pool. To build large NixOS configurations, you need to increase `memoryBytes`.
+
+Create `/etc/determinate/config.json`:
+```bash
+sudo mkdir -p /etc/determinate
+sudo nano /etc/determinate/config.json
+```
+
+Add (adjust based on your Mac's RAM):
+```json
+{
+  "builder": {
+    "state": "enabled",
+    "memoryBytes": 17179869184,
+    "cpuCount": 1
+  }
+}
+```
+
+**Memory values:**
+- 8GB (default): `8589934592`
+- 16GB: `17179869184`
+- 32GB: `34359738368`
+
+**Note:** Keep `cpuCount` at 1 - multiple CPUs with macOS Virtualization framework is typically slower ([source](https://docs.determinate.systems/determinate-nix/)).
+
+Restart daemon after changes:
+```bash
+sudo launchctl kickstart -k system/systems.determinate.nix-daemon
+```
+
+## Build Steps (Resume Here)
 
 ### Step 1: Verify the feature is enabled
 ```bash
 determinate-nixd version
 ```
-Should show `linux-builder` or similar in the enabled features list.
+Should show `linux-builder` in the enabled features list.
 
-### Step 2: Clean up old config (if any)
+### Step 2: Configure builder memory (if needed)
+If builds fail with "no space left on device", increase `memoryBytes` in `/etc/determinate/config.json` (see above).
+
+### Step 3: Clean up old config (if any)
 Remove any manual builder config from `/etc/nix/nix.custom.conf`:
 ```bash
 sudo nano /etc/nix/nix.custom.conf
@@ -94,19 +129,19 @@ sudo nano /etc/nix/nix.custom.conf
 sudo launchctl kickstart -k system/systems.determinate.nix-daemon
 ```
 
-### Step 3: Build the VM
+### Step 4: Build the VM
 ```bash
 cd ~/dotfiles/configs/nixos
 nix build .#nixosConfigurations.dev-vm-aarch64.config.system.build.toplevel
 ```
 
-### Step 4: Create Incus VM from the build
+### Step 5: Create Incus VM from the build
 ```bash
 # The build creates a system closure, you'll need to create a disk image
 # See: hosts/dev-vm/README.md or use nixos-anywhere for deployment
 ```
 
-### Step 5: Merge the branch
+### Step 6: Merge the branch
 Once confirmed working:
 ```bash
 git checkout main
@@ -132,33 +167,12 @@ dev-vm-aarch64 = lib.nixosSystem {
 };
 ```
 
-## Next Steps (Prioritized)
-
-### Option A: Request Determinate Native Builder Access (RECOMMENDED)
-Email **support@determinate.systems** requesting early access to the native Linux builder.
-Include your FlakeHub username. This is the cleanest solution once available.
-
-### Option B: Use OrbStack or UTM
-Run an aarch64-linux VM using [OrbStack](https://orbstack.dev/) or UTM, then configure it as a remote builder:
-```
-builders = ssh-ng://user@localhost aarch64-linux ~/.ssh/id_ed25519
-```
-
-### Option C: Use a pre-existing aarch64-linux machine
-If you have an aarch64-linux machine (Oracle Cloud free ARM tier, Hetzner ARM, etc.), configure it as a remote builder.
-
-### Option D: Switch from Determinate Nix to standard Nix
-Uninstall Determinate Nix, install standard Nix, enable `nix.linux-builder.enable = true` in nix-darwin.
-This loses Determinate's features but enables the linux-builder.
-
-### Option E: Build on x86_64-linux and use different config
-Use HP or another x86_64-linux machine to build `dev-vm` (x86_64 variant) instead of `dev-vm-aarch64`.
-
 ## Key Files
 
+- `/etc/determinate/config.json` - Determinate Nix config (builder memory, cpuCount)
 - `/etc/nix/nix.conf` - Main nix config (managed by Determinate)
-- `/etc/nix/nix.custom.conf` - Custom additions
-- `/etc/nix/builder_ed25519` - SSH key for builder (root:nixbld, 600)
+- `/etc/nix/nix.custom.conf` - Custom nix additions
+- `/nix/var/determinate/darwin-builder/` - Builder VM kernel/initrd
 - `~/dotfiles/configs/nix-darwin/configuration.nix` - nix-darwin config
 
 ## Determinate Nix Service
