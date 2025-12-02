@@ -1,26 +1,71 @@
 # Building aarch64-linux NixOS VM on macOS (ARM)
 
-Run a NixOS development VM (`dev-vm-aarch64`) on an ARM Mac using Incus. This requires building an `aarch64-linux` NixOS configuration on `aarch64-darwin` (macOS).
+Run a NixOS development VM (`dev-vm-aarch64`) on an ARM Mac using Incus.
 
-## Prerequisites
+## Quick Start
 
-macOS cannot natively build Linux packages. We use Determinate Nix's native Linux builder (uses macOS Virtualization framework).
+### 1. Download the installer ISO
 
-**Note:** The native Linux builder requires early access (as of Dec 2025). Email support@determinate.systems with your FlakeHub username to request access.
+```bash
+wget -O /tmp/nixos-installer-aarch64-linux.iso \
+  "https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/nixos-installer-aarch64-linux.iso"
+```
 
-## Setup
+### 2. Create and boot the VM
 
-### 1. Configure builder memory
+```bash
+# Create VM with disk
+incus init dev-vm --empty --vm -c limits.cpu=4 -c limits.memory=8GiB
+incus config device add dev-vm root disk pool=default size=20GiB
 
-The builder's virtual disk is provisioned from memory. For large NixOS builds, increase `memoryBytes`:
+# Attach ISO and boot
+incus config device add dev-vm iso disk source=/tmp/nixos-installer-aarch64-linux.iso boot.priority=10
+incus start dev-vm
+incus console dev-vm
+```
+
+### 3. Install NixOS (inside VM console)
+
+```bash
+# Partition and format with disko
+sudo nix --experimental-features "nix-command flakes" run \
+  github:nix-community/disko -- --mode disko \
+  --flake 'github:basnijholt/dotfiles?dir=configs/nixos#dev-vm-aarch64'
+
+# Install NixOS
+sudo nixos-install --no-root-passwd \
+  --flake 'github:basnijholt/dotfiles?dir=configs/nixos#dev-vm-aarch64'
+
+sudo poweroff
+```
+
+### 4. Boot the installed system
+
+```bash
+incus config device remove dev-vm iso
+incus start dev-vm
+incus console dev-vm
+```
+
+## Why not build disk images directly?
+
+Building disk images with `diskoImages` requires nested virtualization (QEMU inside the Linux builder VM). The Determinate Nix Linux builder lacks KVM support, causing QEMU to fall back to slow software emulation (~10-100x slower), which leads to timeouts and kernel panics.
+
+If you have a Linux machine with KVM (or a remote builder), you can build images directly:
+
+```bash
+nix build .#nixosConfigurations.dev-vm-aarch64.config.system.build.diskoImages
+incus image import result/main.raw.zst --alias nixos-dev-vm
+incus launch nixos-dev-vm dev-vm --vm
+```
+
+## Prerequisites (for building aarch64-linux packages)
+
+To build aarch64-linux packages on macOS, configure Determinate Nix's Linux builder:
 
 ```bash
 sudo mkdir -p /etc/determinate
-sudo nano /etc/determinate/config.json
-```
-
-Add (adjust based on your Mac's RAM):
-```json
+cat <<EOF | sudo tee /etc/determinate/config.json
 {
   "builder": {
     "state": "enabled",
@@ -28,62 +73,24 @@ Add (adjust based on your Mac's RAM):
     "cpuCount": 1
   }
 }
-```
-
-**Memory values:**
-- 8GB (default): `8589934592`
-- 16GB: `17179869184`
-- 32GB: `34359738368`
-
-**Note:** Keep `cpuCount` at 1 - multiple CPUs with macOS Virtualization framework is typically slower ([source](https://docs.determinate.systems/determinate-nix/)).
-
-### 2. Restart the daemon
-
-```bash
+EOF
 sudo launchctl kickstart -k system/systems.determinate.nix-daemon
 ```
 
-### 3. Verify the feature is enabled
-
-```bash
-determinate-nixd version
-```
-
-Should show `linux-builder` in the enabled features list.
-
-## Build and Run
-
-### Build the disk image
-
-```bash
-cd ~/dotfiles/configs/nixos
-nix build .#nixosConfigurations.dev-vm-aarch64.config.system.build.diskoImages --print-out-paths
-```
-
-### Import into Incus and run
-
-```bash
-# Get the output path from the build
-RESULT=$(nix build .#nixosConfigurations.dev-vm-aarch64.config.system.build.diskoImages --print-out-paths)
-
-# Import the disk image into Incus
-incus image import "$RESULT/main.raw.zst" --alias nixos-dev-vm-aarch64
-
-# Create and start the VM
-incus launch nixos-dev-vm-aarch64 dev-vm --vm
-
-# Or with specific resources:
-incus launch nixos-dev-vm-aarch64 dev-vm --vm -c limits.cpu=4 -c limits.memory=8GiB
-```
+Memory values: 8GB=`8589934592`, 16GB=`17179869184`, 32GB=`34359738368`
 
 ## Troubleshooting
 
-### "no space left on device"
+### Kernel panic during disk image build
 
-Increase `memoryBytes` in `/etc/determinate/config.json` and restart the daemon.
+Use the ISO installation method instead. See "Why not build disk images directly?" above.
 
-### Restart Determinate Nix daemon
+### Cannot access VM console
 
 ```bash
-sudo launchctl kickstart -k system/systems.determinate.nix-daemon
+incus console dev-vm --type=vga
 ```
+
+### "no space left on device" during builds
+
+Increase `memoryBytes` in `/etc/determinate/config.json` and restart the daemon.
