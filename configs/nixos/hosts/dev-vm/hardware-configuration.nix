@@ -22,6 +22,4 @@
   # File systems are managed by disko
 
   networking.useDHCP = lib.mkDefault true;
-
-  # hostPlatform is set by the flake's system parameter (x86_64 or aarch64)
 }
