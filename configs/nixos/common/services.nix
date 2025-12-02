@@ -31,4 +31,11 @@
     enableSSHSupport = true;
     # pinentryPackage is set in optional/desktop.nix (requires GUI)
   };
+
+  # --- Known Hosts ---
+  programs.ssh.knownHosts = {
+    "truenas.local" = {
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJBFtTkkcsQ1KKBJ1ne2Q2COhfBSxs3H0ppO/HEirJt4";
+    };
+  };
 }
