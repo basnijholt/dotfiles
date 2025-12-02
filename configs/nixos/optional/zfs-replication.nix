@@ -35,7 +35,10 @@
   #      (If file missing: `sudo ssh-keygen -t ed25519`)
   #    - On TrueNAS Web UI:
   #      Go to Credentials -> Local Users -> root -> SSH Public Key
-  #      Paste the key and Save.
+  #      Paste the key.
+  #      SECURITY TIP: Prepend `from="<NIXOS_IP>"` to the key to restrict usage.
+  #      Example: `from="192.168.1.26" ssh-ed25519 ...`
+  #      (Save changes)
   #
   # 3. Verify Connection:
   #    - On this NixOS machine:
