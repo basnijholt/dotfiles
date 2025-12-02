@@ -66,7 +66,6 @@
       # Replicate Home (Most important)
       # recursive=true includes sub-datasets
       syncoid \
-
         --recursive \
         --sshport=22 \
         zroot/home \
@@ -74,7 +73,6 @@
 
       # Replicate Var (Logs, databases, system state)
       syncoid \
-
         --recursive \
         --sshport=22 \
         zroot/var \
@@ -82,7 +80,6 @@
 
       # Replicate Root (System config, /root, /etc)
       syncoid \
-
         --recursive \
         --sshport=22 \
         zroot/root \
