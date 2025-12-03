@@ -51,7 +51,7 @@
         if [ -d "${config.home.homeDirectory}/dotfiles/submodules/dotbot" ]; then
           # Ensure python3 and zsh are in PATH for dotbot
           export PATH="${pkgs.python3}/bin:${pkgs.zsh}/bin:${pkgs.git}/bin:$PATH"
-          run ${config.home.homeDirectory}/dotfiles/install
+          run ${config.home.homeDirectory}/dotfiles/install || true
         else
           echo "Skipping dotbot: dotfiles not fully cloned"
         fi
