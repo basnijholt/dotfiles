@@ -22,7 +22,7 @@ configs/nixos/
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
-| `dev-vm-aarch64` | Incus VM | Lightweight dev environment (aarch64, for ARM Macs) |
+| `dev-vm-aarch64` | QEMU VM | Lightweight dev environment (aarch64, for ARM Macs via QEMU) |
 | `dev-lxc` | Incus LXC | Lightweight dev environment (x86_64) |
 | `build-vm` | Incus LXC | Build server with Harmonia cache (for CUDA/large builds) |
 | `installer` | ISO | Minimal installer with SSH enabled |
@@ -57,7 +57,8 @@ For Incus VM installation, see the instructions in:
 - `hosts/hp/incus-overrides.nix` (HP VM)
 - `hosts/nuc/incus-overrides.nix` (NUC VM)
 - `hosts/pc/incus-overrides.nix` (PC VM)
-- `scripts/create-dev-vm.sh` (dev-vm helper script)
+
+For dev-vm on macOS (Apple Silicon), see `hosts/dev-vm/README.md`
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
 
