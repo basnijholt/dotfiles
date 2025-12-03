@@ -2,6 +2,7 @@
     link:
       create: true
       relink: true
+      backup: true
 
 - link:
     ~/.autoenv: submodules/autoenv
