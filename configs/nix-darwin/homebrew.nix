@@ -67,6 +67,7 @@
       "pipx" # Python app installer
       "portaudio" # Audio I/O library
       "pwgen" # Password generator
+      "qemu" # Emulator
       "rbenv" # Ruby version manager
       "rclone" # Cloud storage sync
       "rsync" # File sync tool
