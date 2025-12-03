@@ -55,7 +55,7 @@ let
     ripgrep
     starship
     tealdeer
-    # terraform  # Temporarily disabled - requires too much build space for initial VM install
+    terraform
     tmux
     tre-command
     tree
