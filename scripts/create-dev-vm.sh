@@ -17,6 +17,10 @@ DISK_SIZE="${4:-50GiB}"
 FLAKE_REF="${FLAKE_REF:-github:basnijholt/dotfiles?dir=configs/nixos}"
 ISO_PATH="${ISO_PATH:-/tmp/nixos.iso}"
 
+# Nix binary cache configuration
+NIX_SUBSTITUTERS="http://nix-cache.local:5000 https://cache.nixos.org https://nix-community.cachix.org https://cache.nixos-cuda.org"
+NIX_TRUSTED_KEYS="build-vm-1:CQeZikX76TXVMm+EXHMIj26lmmLqfSxv8wxOkwqBb3g= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
+
 # Find the nixos config directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 NIXOS_DIR="$SCRIPT_DIR/../configs/nixos"
@@ -33,7 +37,10 @@ if [[ ! -f "$ISO_PATH" ]]; then
     echo ""
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Building NixOS installer ISO..."
-        nix build "$NIXOS_DIR#nixosConfigurations.installer.config.system.build.isoImage" --out-link /tmp/nixos-iso-result
+        nix build "$NIXOS_DIR#nixosConfigurations.installer.config.system.build.isoImage" \
+            --option substituters "$NIX_SUBSTITUTERS" \
+            --option trusted-public-keys "$NIX_TRUSTED_KEYS" \
+            --out-link /tmp/nixos-iso-result
         cp /tmp/nixos-iso-result/iso/*.iso "$ISO_PATH"
         rm /tmp/nixos-iso-result
         echo "ISO built: $ISO_PATH"
@@ -100,6 +107,8 @@ echo "    --flake '$FLAKE_REF#dev-vm'"
 echo ""
 echo "  # Install NixOS"
 echo "  nixos-install --root /mnt --no-root-passwd \\"
+echo "    --option substituters \"$NIX_SUBSTITUTERS\" \\"
+echo "    --option trusted-public-keys \"$NIX_TRUSTED_KEYS\" \\"
 echo "    --flake '$FLAKE_REF#dev-vm'"
 echo ""
 echo "  # Set user password"
