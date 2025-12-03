@@ -44,6 +44,8 @@
 
       # Run dotbot to symlink dotfiles
       home.activation.runDotbot = lib.hm.dag.entryAfter [ "cloneDotfiles" ] ''
+        # Ensure python3 and zsh are in PATH for dotbot
+        export PATH="${pkgs.python3}/bin:${pkgs.zsh}/bin:${pkgs.git}/bin:$PATH"
         run ${config.home.homeDirectory}/dotfiles/install
       '';
 
