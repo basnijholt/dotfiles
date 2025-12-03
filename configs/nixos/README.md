@@ -6,25 +6,26 @@
 configs/nixos/
 ├── common/           # Tier 1: shared by ALL hosts
 ├── optional/         # Tier 2: opt-in modules (desktop, audio, virtualization, power, etc.)
-├── hosts/            # Tier 3: host-specific (pc, nuc, hp)
+├── hosts/            # Tier 3: host-specific (pc, nuc, hp, dev-vm, build-vm)
 ├── installers/       # ISO builder
 └── archive/          # Old migration scripts/notes
 ```
 
 ## Configurations
 
-| Config | Description |
-|--------|-------------|
-| `nixos` | Desktop/workstation (NVIDIA, Hyprland, AI services) |
-| `nuc` | Media box (Kodi, Btrfs, desktop + power management) |
-| `hp` | Headless server (ZFS, virtualization + power management) |
-| `hp-incus` | HP config for Incus VM testing |
-| `nuc-incus` | NUC config for Incus VM testing |
-| `pc-incus` | PC config for Incus VM testing (GPU services build but won't run) |
-| `dev-vm` | Lightweight dev VM for Incus x86_64 (familiar env anywhere) |
-| `dev-lxc` | Lightweight dev LXC container for Incus x86_64 (familiar env anywhere) |
-| `nix-cache` | Nix cache server container with Harmonia (for CUDA/large builds) |
-| `installer` | Minimal ISO with SSH enabled |
+| Config | Type | Description |
+|--------|------|-------------|
+| `nixos` | Physical | Desktop/workstation (NVIDIA, Hyprland, AI services) |
+| `nuc` | Physical | Media box (Kodi, Btrfs, desktop + power management) |
+| `hp` | Physical | Headless server (ZFS, virtualization + power management) |
+| `hp-incus` | Incus VM | HP config for Incus VM testing |
+| `nuc-incus` | Incus VM | NUC config for Incus VM testing |
+| `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
+| `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
+| `dev-vm-aarch64` | QEMU VM | Lightweight dev environment (aarch64, for ARM Macs via QEMU) |
+| `dev-lxc` | Incus LXC | Lightweight dev environment (x86_64) |
+| `build-vm` | Incus LXC | Build server with Harmonia cache (for CUDA/large builds) |
+| `installer` | ISO | Minimal installer with SSH enabled |
 
 ## Quick Commands
 
@@ -56,7 +57,8 @@ For Incus VM installation, see the instructions in:
 - `hosts/hp/incus-overrides.nix` (HP VM)
 - `hosts/nuc/incus-overrides.nix` (NUC VM)
 - `hosts/pc/incus-overrides.nix` (PC VM)
-- `scripts/create-dev-vm.sh` (dev-vm helper script)
+
+For dev-vm on macOS (Apple Silicon), see `hosts/dev-vm/README.md`
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
 
