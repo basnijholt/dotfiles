@@ -15,6 +15,7 @@
       "atuin" # Shell history sync tool
       "autossh" # Automatically restart SSH sessions
       "azure-cli" # Microsoft Azure CLI
+      "bandwhich" # Per-process network monitor
       "bat" # Better cat with syntax highlighting
       "blueutil" # Bluetooth utility
       "brew-cask-completion" # Completion for brew cask
@@ -39,6 +40,7 @@
       "gnu-sed" # GNU version of sed
       "gnupg" # GnuPG encryption
       "go" # Go programming language
+      "gping" # Ping with graph
       "graphviz" # Graph visualization
       "grep" # GNU grep
       "htop" # Process viewer
@@ -66,6 +68,7 @@
       "parallel" # GNU parallel
       "pipx" # Python app installer
       "portaudio" # Audio I/O library
+      "procs" # Modern ps replacement
       "pwgen" # Password generator
       "qemu" # Emulator
       "rbenv" # Ruby version manager
@@ -81,6 +84,7 @@
       "tealdeer" # Fast alternative to tldr
       "terminal-notifier" # macOS notification tool
       "terraform" # Infrastructure as code
+      "tokei" # Code statistics
       "tmux" # Terminal multiplexer
       "tre-command" # Tree command, improved
       "tree" # Directory listing
