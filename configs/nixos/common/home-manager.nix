@@ -25,7 +25,8 @@
           # Initialize LFS hooks
           run ${pkgs.git-lfs}/bin/git-lfs install
           # Clone without LFS files first (fast), fetch them after
-          run GIT_LFS_SKIP_SMUDGE=1 ${pkgs.git}/bin/git \
+          export GIT_LFS_SKIP_SMUDGE=1
+          run ${pkgs.git}/bin/git \
             -c url."https://github.com/".insteadOf="git@github.com:" \
             clone \
             --depth 1 \
