@@ -63,7 +63,7 @@ let
     sqlite
     starship
     tealdeer
-    # terraform  # Temporarily disabled - requires too much build space for initial VM install
+    terraform
     tmux
     tokei
     tre-command
