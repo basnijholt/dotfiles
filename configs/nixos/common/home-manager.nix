@@ -35,14 +35,14 @@
             --depth 1 \
             https://github.com/basnijholt/dotfiles.git \
             "${config.home.homeDirectory}/dotfiles"
+          # Pull LFS files in main repo first
+          unset GIT_LFS_SKIP_SMUDGE
+          run cd "${config.home.homeDirectory}/dotfiles" && ${pkgs.git-lfs}/bin/git-lfs pull
           # Init submodules excluding 'secrets' (private repo, needs SSH key)
+          # LFS files will be fetched during checkout now that SKIP_SMUDGE is unset
           run cd "${config.home.homeDirectory}/dotfiles" && ${pkgs.git}/bin/git \
             -c url."https://github.com/".insteadOf="git@github.com:" \
             submodule update --init --recursive --depth 1 --jobs=8 -- ':!secrets'
-          # Pull LFS files in main repo (submodule LFS can be fetched manually if needed)
-          run cd "${config.home.homeDirectory}/dotfiles" && ${pkgs.git-lfs}/bin/git-lfs pull
-          # Pull LFS in submodules - pass PATH to the subshell
-          run cd "${config.home.homeDirectory}/dotfiles" && ${pkgs.git}/bin/git submodule foreach --recursive "PATH=${pkgs.git}/bin:${pkgs.git-lfs}/bin:\$PATH ${pkgs.git-lfs}/bin/git-lfs pull || true"
         fi
       '';
 
