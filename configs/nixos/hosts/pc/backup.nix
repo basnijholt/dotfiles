@@ -9,6 +9,7 @@
       "/etc/nixos"
       "/root/.ssh"       # Important: backup SSH keys!
       "/var/lib/qdrant"  # Vector database
+      "/var/lib/incus"   # Virtual machines and containers
     ];
     exclude = [
       "/home/*/.cache"
