@@ -17,5 +17,31 @@
         mkdir -p "${config.home.homeDirectory}/.local/npm"
       '';
 
+      # Clone dotfiles repo if not present (uses HTTPS to avoid SSH key requirement)
+      home.activation.cloneDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        if [ ! -d "${config.home.homeDirectory}/dotfiles" ]; then
+          # Initialize LFS hooks
+          run ${pkgs.git-lfs}/bin/git-lfs install
+          # Clone without LFS files first (fast), fetch them after
+          run GIT_LFS_SKIP_SMUDGE=1 ${pkgs.git}/bin/git \
+            -c url."https://github.com/".insteadOf="git@github.com:" \
+            clone \
+            --depth 1 \
+            --shallow-submodules \
+            --recurse-submodules \
+            --jobs=8 \
+            https://github.com/basnijholt/dotfiles.git \
+            "${config.home.homeDirectory}/dotfiles"
+          # Then pull LFS files (in main repo and all submodules)
+          run cd "${config.home.homeDirectory}/dotfiles" && ${pkgs.git-lfs}/bin/git-lfs pull
+          run cd "${config.home.homeDirectory}/dotfiles" && ${pkgs.git}/bin/git submodule foreach --recursive ${pkgs.git-lfs}/bin/git-lfs pull
+        fi
+      '';
+
+      # Run dotbot to symlink dotfiles
+      home.activation.runDotbot = lib.hm.dag.entryAfter [ "cloneDotfiles" ] ''
+        run ${config.home.homeDirectory}/dotfiles/install
+      '';
+
     };
 }
