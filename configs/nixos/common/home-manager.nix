@@ -20,6 +20,8 @@
       # Clone dotfiles repo if not present (uses HTTPS to avoid SSH key requirement)
       home.activation.cloneDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         if [ ! -d "${config.home.homeDirectory}/dotfiles" ]; then
+          # Ensure git is in PATH (git-lfs needs it)
+          export PATH="${pkgs.git}/bin:$PATH"
           # Initialize LFS hooks
           run ${pkgs.git-lfs}/bin/git-lfs install
           # Clone without LFS files first (fast), fetch them after
