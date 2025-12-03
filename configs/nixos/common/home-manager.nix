@@ -19,7 +19,10 @@
 
       # Clone dotfiles repo if not present (uses HTTPS to avoid SSH key requirement)
       home.activation.cloneDotfiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        if [ ! -d "${config.home.homeDirectory}/dotfiles" ]; then
+        # Check for dotbot submodule to detect incomplete clones
+        if [ ! -d "${config.home.homeDirectory}/dotfiles/submodules/dotbot" ]; then
+          # Remove incomplete clone if it exists
+          run rm -rf "${config.home.homeDirectory}/dotfiles"
           # Ensure git is in PATH (git-lfs needs it)
           export PATH="${pkgs.git}/bin:$PATH"
           # Initialize LFS hooks
@@ -44,9 +47,13 @@
 
       # Run dotbot to symlink dotfiles
       home.activation.runDotbot = lib.hm.dag.entryAfter [ "cloneDotfiles" ] ''
-        # Ensure python3 and zsh are in PATH for dotbot
-        export PATH="${pkgs.python3}/bin:${pkgs.zsh}/bin:${pkgs.git}/bin:$PATH"
-        run ${config.home.homeDirectory}/dotfiles/install
+        if [ -d "${config.home.homeDirectory}/dotfiles/submodules/dotbot" ]; then
+          # Ensure python3 and zsh are in PATH for dotbot
+          export PATH="${pkgs.python3}/bin:${pkgs.zsh}/bin:${pkgs.git}/bin:$PATH"
+          run ${config.home.homeDirectory}/dotfiles/install
+        else
+          echo "Skipping dotbot: dotfiles not fully cloned"
+        fi
       '';
 
     };
