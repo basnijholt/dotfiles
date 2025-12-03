@@ -23,8 +23,8 @@
         if [ ! -d "${config.home.homeDirectory}/dotfiles/submodules/dotbot" ]; then
           # Remove incomplete clone if it exists
           run rm -rf "${config.home.homeDirectory}/dotfiles"
-          # Ensure git is in PATH (git-lfs needs it)
-          export PATH="${pkgs.git}/bin:$PATH"
+          # Ensure git and git-lfs are in PATH
+          export PATH="${pkgs.git}/bin:${pkgs.git-lfs}/bin:$PATH"
           # Initialize LFS hooks
           run ${pkgs.git-lfs}/bin/git-lfs install
           # Clone without LFS files and without submodules first
