@@ -11,9 +11,13 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    comin = {
+      url = "github:nlewo/comin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -21,6 +25,7 @@
       commonModules = [
         ./configuration.nix
         home-manager.nixosModules.home-manager
+        comin.nixosModules.comin
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
