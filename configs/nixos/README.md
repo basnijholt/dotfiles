@@ -67,7 +67,8 @@ For Incus VM installation, see the instructions in:
 - `hosts/hp/incus-overrides.nix` (HP VM)
 - `hosts/nuc/incus-overrides.nix` (NUC VM)
 - `hosts/pc/incus-overrides.nix` (PC VM)
-- `scripts/create-dev-vm.sh` (dev-vm helper script)
+
+For dev-vm on macOS (Apple Silicon), see `hosts/dev-vm/README.md`
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
 
