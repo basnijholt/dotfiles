@@ -9,6 +9,7 @@ let
     asciinema
     atuin
     azure-cli
+    bandwhich
     bat
     btop
     claude-code
@@ -30,6 +31,7 @@ let
     gnugrep
     gnupg
     gnused
+    gping
     hcloud
     htop
     iperf3
@@ -49,6 +51,7 @@ let
     packer
     parallel
     postgresql
+    procs
     psmisc # For killall
     pwgen
     rclone
@@ -56,6 +59,7 @@ let
     starship
     tealdeer
     terraform
+    tokei
     tmux
     tre-command
     tree
