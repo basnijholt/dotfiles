@@ -73,15 +73,22 @@
   # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
+  # Force ZFS to look for pools in /dev directly (VMs don't always have stable by-id)
+  boot.zfs.devNodes = "/dev";
   # Use virtio modules instead of physical hardware modules
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
   # No Intel microcode updates needed in VM
   hardware.cpu.intel.updateMicrocode = lib.mkForce false;
   # Console output for Incus VM (serial + VGA)
   boot.kernelParams = [ "console=tty0" "console=ttyS0,115200" ];
-  
+
   # Disable hardware-specific workaround for physical NIC
   systemd.services.e1000e-workaround.enable = false;
+
+  # Use systemd-boot for VM reliability (GRUB has issues with virtio paths)
+  boot.loader.grub.enable = lib.mkForce false;
+  boot.loader.systemd-boot.enable = lib.mkForce true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
   # --- Networking Overrides for VM ---
   # Match any ethernet interface (VM doesn't have eno1)
