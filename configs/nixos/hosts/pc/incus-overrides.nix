@@ -112,7 +112,7 @@ These hardware features are stubbed:
 
   # --- Networking Overrides for VM ---
   # Use generic interface for NAT (VM doesn't have wlp7s0)
-  networking.nat.externalInterface = lib.mkForce "en*";
+  networking.nat.externalInterface = lib.mkForce "eth0";
 
   # --- Hardware Feature Stubs ---
   # These build fine but won't work at runtime in a VM

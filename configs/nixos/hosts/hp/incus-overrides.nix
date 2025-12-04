@@ -64,6 +64,13 @@
   networking.hostName = lib.mkForce "hp-incus";
   networking.hostId = lib.mkForce "a7d4a137";  # Unique hostId for ZFS
 
+  # --- Incus Guest Support ---
+  virtualisation.incus.guest.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22 ]; # Ensure SSH is open
+  networking.firewall.allowedUDPPortRanges = [
+    { from = 60000; to = 61000; }  # mosh
+  ];
+
   # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
