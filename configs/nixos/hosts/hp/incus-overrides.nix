@@ -31,10 +31,10 @@
 
    nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- \
      --mode destroy,format,mount \
-     --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#hp-incus'
+     --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#hp-incus'
 
    nixos-install --root /mnt --no-root-passwd \
-     --flake 'github:basnijholt/dotfiles/hp?dir=configs/nixos#hp-incus'
+     --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#hp-incus'
 
    nixos-enter --root /mnt -c 'passwd basnijholt' # Set user password
 
