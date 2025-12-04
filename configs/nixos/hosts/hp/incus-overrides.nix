@@ -65,7 +65,7 @@
   networking.hostId = lib.mkForce "a7d4a137";  # Unique hostId for ZFS
 
   # --- Incus Guest Support ---
-  virtualisation.incus.guest.enable = true;
+  virtualisation.incus.agent.enable = true;
   networking.firewall.allowedTCPPorts = [ 22 ]; # Ensure SSH is open
   networking.firewall.allowedUDPPortRanges = [
     { from = 60000; to = 61000; }  # mosh
