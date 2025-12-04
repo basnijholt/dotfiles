@@ -6,12 +6,12 @@ echo "🛠️ Running in ${INSTALL_MODE} mode"
 
 # List of hosts to connect to
 HOSTS=(
-  "ubuntu-proxmox"
+  "ubuntu-incus"
   "ubuntu-hetzner"
   "debian-truenas"
-  "debian-proxmox"
+  "debian-incus"
   "docker-truenas"
-  "docker-proxmox"
+  "docker-incus"
   "pi3"
   "nuc"
   "dietpi"
@@ -19,6 +19,8 @@ HOSTS=(
   "hp"
   "nuc"
 )
+
+# TODO (2025-12-04): Verify docker-incus and pi3
 
 # Arrays to track results
 SUCCESSFUL_HOSTS=()
