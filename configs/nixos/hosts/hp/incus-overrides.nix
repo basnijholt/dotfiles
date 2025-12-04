@@ -76,6 +76,9 @@
   hardware.cpu.intel.updateMicrocode = lib.mkForce false;
   # Console output for Incus VM (serial + VGA)
   boot.kernelParams = [ "console=tty0" "console=ttyS0,115200" ];
+  
+  # Disable hardware-specific workaround for physical NIC
+  systemd.services.e1000e-workaround.enable = false;
 
   # --- Networking Overrides for VM ---
   # Match any ethernet interface (VM doesn't have eno1)
