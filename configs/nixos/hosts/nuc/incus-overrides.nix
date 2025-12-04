@@ -63,6 +63,13 @@
 
   networking.hostName = lib.mkForce "nuc-incus";
 
+  # --- Incus Guest Support ---
+  virtualisation.incus.agent.enable = true;
+  networking.firewall.allowedTCPPorts = [ 22 ]; # Ensure SSH is open
+  networking.firewall.allowedUDPPortRanges = [
+    { from = 60000; to = 61000; }  # mosh
+  ];
+
   # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe by-id
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
