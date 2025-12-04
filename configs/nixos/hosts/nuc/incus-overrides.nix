@@ -31,9 +31,12 @@
 
    nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- \
      --mode destroy,format,mount \
+     --yes-wipe-all-disks \
      --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#nuc-incus'
 
    nixos-install --root /mnt --no-root-passwd \
+     --option substituters "http://nix-cache.local:5000 https://cache.nixos.org https://nix-community.cachix.org https://cache.nixos-cuda.org" \
+     --option trusted-public-keys "build-vm-1:CQeZikX76TXVMm+EXHMIj26lmmLqfSxv8wxOkwqBb3g= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M=" \
      --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#nuc-incus'
 
    nixos-enter --root /mnt -c 'passwd basnijholt' # Set user password
