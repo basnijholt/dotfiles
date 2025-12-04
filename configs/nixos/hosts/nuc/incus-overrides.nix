@@ -63,6 +63,9 @@
 
   networking.hostName = lib.mkForce "nuc-incus";
 
+  # --- Incus Guest Support ---
+  virtualisation.incus.agent.enable = true;
+
   # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe by-id
   disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
@@ -75,7 +78,7 @@
 
   # --- Networking Overrides for VM ---
   # Match any ethernet interface (VM doesn't have eno1)
-  systemd.network.networks."30-eno1".matchConfig.Name = lib.mkForce "en*";
+  systemd.network.networks."30-eno1".matchConfig.Name = lib.mkForce "en* eth*";
   # No hardcoded MAC (real NUC uses MAC for DHCP reservation)
   systemd.network.netdevs."20-br0".netdevConfig = lib.mkForce {
     Kind = "bridge";
