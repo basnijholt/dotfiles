@@ -106,6 +106,15 @@
           ./hosts/nix-cache/hardware-configuration.nix
         ];
 
+        # Raspberry Pi 4 - lightweight headless server (aarch64)
+        dietpi = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = commonModules ++ [
+            ./hosts/dietpi/default.nix
+            ./hosts/dietpi/hardware-configuration.nix
+          ];
+        };
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
