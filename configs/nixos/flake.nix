@@ -128,7 +128,7 @@
             ./common/services.nix
             ./hosts/pi4/networking.nix
             ({ lib, ... }: {
-              networking.hostName = "pi4-bootstrap";
+              networking.hostName = lib.mkForce "pi4-bootstrap";
               # Disable ZFS for bootstrap image (runs on ext4 SD card)
               boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" ];
               # Compress image with zstd for faster flashing
