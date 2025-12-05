@@ -10,7 +10,7 @@ in
     wantedBy = [ "default.target" ];
     path = [ pkgs.ffmpeg pkgs.uv ];
     serviceConfig = {
-      ExecStart = "${pkgs.uv}/bin/uvx agent-cli server";
+      ExecStart = "${pkgs.uv}/bin/uvx --from 'agent-cli[server]' agent-cli server";
       Restart = "always";
       RestartSec = 5;
       WorkingDirectory = homeDir;
