@@ -49,10 +49,6 @@
     30443 # mindroom ingress https (kind)
   ];
 
-  networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; }  # mosh
-  ];
-
   # --- NAT for Incus Containers ---
   networking.nat = {
     enable = true;

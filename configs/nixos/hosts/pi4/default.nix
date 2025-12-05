@@ -4,9 +4,7 @@
 # while respecting RPi4's resource constraints.
 #
 # Excluded optional modules (too heavy for RPi4):
-#   - virtualization.nix (Docker/libvirt/Incus too resource-intensive)
 #   - iscsi.nix (no TrueNAS LUNs needed)
-#   - zfs-replication.nix (no ZFS on SD card)
 #   - desktop.nix, audio.nix, gui-packages.nix (headless)
 { ... }:
 
@@ -14,8 +12,13 @@
   imports = [
     # Optional modules (Tier 2)
     ../../optional/power.nix
+    ../../optional/virtualization.nix
+    ../../optional/zfs-replication.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
   ];
+
+  # Required for ZFS
+  networking.hostId = "dc0bd73a";
 }

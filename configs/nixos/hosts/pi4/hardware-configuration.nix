@@ -1,7 +1,7 @@
 # Raspberry Pi 4 hardware configuration
 #
 # Installation notes:
-#   1. Build SD card image: nix build .#nixosConfigurations.dietpi.config.system.build.sdImage
+#   1. Build SD card image: nix build .#nixosConfigurations.pi4.config.system.build.sdImage
 #   2. Flash to SD card: dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress
 #   3. Boot the Pi and SSH in (user: basnijholt)
 #   4. After first boot, run: nixos-generate-config --show-hardware-config
@@ -25,6 +25,8 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
+
+  boot.supportedFilesystems = [ "zfs" ];
 
   # Required firmware for WiFi, Bluetooth, GPU
   hardware.enableRedistributableFirmware = true;

@@ -107,11 +107,35 @@
         ];
 
         # Raspberry Pi 4 - lightweight headless server (aarch64)
-        dietpi = lib.nixosSystem {
+        pi4 = lib.nixosSystem {
           system = "aarch64-linux";
           modules = commonModules ++ [
-            ./hosts/dietpi/default.nix
-            ./hosts/dietpi/hardware-configuration.nix
+            ./hosts/pi4/default.nix
+            ./hosts/pi4/hardware-configuration.nix
+          ];
+        };
+
+        # Raspberry Pi 4 - Bootstrap SD Image
+        # Clean installer for use with Ethernet + nix-anywhere
+        pi4-bootstrap = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            (nixpkgs + "/nixos/modules/installer/sd-card/sd-image-aarch64.nix")
+            ./common/core.nix
+            ./common/nix.nix
+            ./common/nixpkgs.nix
+            ./common/user.nix
+            ./common/services.nix
+            ./hosts/pi4/networking.nix
+            ({ lib, ... }: {
+              networking.hostName = "pi4-bootstrap";
+              
+              # Disable ZFS for bootstrap image (runs on ext4 SD card)
+              boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" ];
+              
+              # Compress image with zstd for faster flashing
+              sdImage.compressImage = false;
+            })
           ];
         };
 
