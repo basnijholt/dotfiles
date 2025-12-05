@@ -297,7 +297,7 @@
           --ubatch-size 512
           --split-mode layer
           --tensor-split 1.3,3
-          --n-cpu-moe 20
+          --n-cpu-moe 24
           --threads 8
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
