@@ -285,6 +285,23 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
+      # Uploaded 2025-12-05, size 88.4 GB
+      "gpt-oss:120b-derestricted":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf Calandracas/gpt-oss-120b-Derestricted-GGUF
+          --hf-file gpt-oss-120B-Derestricted-Q4_K_M.gguf
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 512
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1.3,3
+          --n-cpu-moe 20
+          --threads 8
+          --chat-template-kwargs '{"reasoning_effort": "high"}'
+          --jinja
+
       # Coding models
       # Uploaded 2025-07-31, size 17.3 GB, max ctx: 262144, layers: 48
       "qwen3-coder:30b":
@@ -402,14 +419,14 @@
   services.wyoming.faster-whisper = {
     servers.english = {
       enable = true;
-      model = "large-v3";
+      model = "large-v3-turbo";
       language = "en";
       device = "cuda";
       uri = "tcp://0.0.0.0:10300";
     };
     servers.dutch = {
       enable = false;
-      model = "large-v3";
+      model = "large-v3-turbo";
       language = "nl";
       device = "cuda";
       uri = "tcp://0.0.0.0:10301";
