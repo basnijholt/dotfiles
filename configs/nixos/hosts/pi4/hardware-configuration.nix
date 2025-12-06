@@ -47,4 +47,39 @@
 
   # Disable firmware updates (RPi firmware is handled differently)
   services.fwupd.enable = lib.mkForce false;
-}
+
+    # --- Firmware Population (The Nix Way) ---
+    # Ensure /boot has the necessary RPi firmware and U-Boot to boot from SSD
+    system.activationScripts.rpi-firmware = {
+      text = ''
+        echo "Populating /boot with RPi firmware..."
+        target=/boot
+        fw=${pkgs.raspberrypifw}/share/raspberrypi/boot
+        uboot=${pkgs.ubootRaspberryPi4_64bit}/u-boot.bin
+  
+        # Copy firmware files (update if newer)
+        cp -u $fw/start*.elf $target/
+        cp -u $fw/fixup*.dat $target/
+        cp -u $fw/bootcode.bin $target/
+        cp -u $fw/*.dtb $target/
+        
+        # Copy overlays
+        mkdir -p $target/overlays
+        cp -u $fw/overlays/*.dtbo $target/overlays/
+        
+        # Copy U-Boot
+        cp -u $uboot $target/u-boot-rpi4.bin
+  
+        # Create basic config.txt if missing to load U-Boot
+        if [ ! -f $target/config.txt ]; then
+          cat > $target/config.txt <<EOF
+        # NixOS Boot Configuration
+        kernel=u-boot-rpi4.bin
+        arm_64bit=1
+        enable_uart=1
+        EOF
+        fi
+      '';
+      deps = [];
+    };
+  }
