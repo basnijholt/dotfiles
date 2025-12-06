@@ -8,12 +8,16 @@
     ../hosts/pi4/networking.nix
   ] ++ lib.optional (builtins.pathExists ../hosts/pi4/wifi.nix) ../hosts/pi4/wifi.nix;
 
-  networking.hostName = lib.mkForce "pi4-bootstrap";
+  networking.hostName = lib.mkForce "pi4-bootstrap-v2";
 
   # --- Minimal System Settings ---
   boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" ];
+  boot.kernelPackages = pkgs.linuxPackages_latest; # Mainline kernel (cacheable + wifi support)
+  boot.initrd.availableKernelModules = [ "brcmfmac" ]; # Force WiFi module into initrd to prevent shrinking
   sdImage.compressImage = false;
   hardware.enableRedistributableFirmware = true; # Required for WiFi
+  hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
+
   system.stateVersion = "25.05";
 
   # --- Nix Configuration (Needed for installation) ---
