@@ -92,6 +92,8 @@ These hardware features are stubbed:
   # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe
   disko.devices.disk.nvme1.device = lib.mkForce "/dev/sda";
+  # Force ZFS to look for pools in /dev directly (VMs don't always have stable by-id)
+  boot.zfs.devNodes = "/dev";
 
   # Use virtio modules instead of physical hardware modules
   boot.initrd.availableKernelModules = lib.mkForce [ "virtio_pci" "virtio_scsi" "virtio_blk" "ahci" "sd_mod" ];
@@ -103,17 +105,10 @@ These hardware features are stubbed:
   boot.kernelParams = lib.mkForce [ "console=tty0" "console=ttyS0,115200" ];
 
   # --- Boot Loader Overrides ---
-  # Real PC uses GRUB with /boot2. VM uses GRUB but with /boot (standard for simple VMs)
-  boot.loader.grub.enable = lib.mkForce true;
-  boot.loader.grub.device = lib.mkForce "nodev";
-  boot.loader.grub.efiSupport = lib.mkForce true;
-  boot.loader.systemd-boot.enable = lib.mkForce false;
-  
-  # Ensure GRUB and EFI system know about the new mount point
-  boot.loader.efi.efiSysMountPoint = lib.mkForce "/boot";
-
-  # Override disko to use /boot instead of /boot2 for EFI partition
-  disko.devices.disk.nvme1.content.partitions.esp.content.mountpoint = lib.mkForce "/boot";
+  # Use systemd-boot for VM reliability (GRUB has issues with virtio paths)
+  boot.loader.grub.enable = lib.mkForce false;
+  boot.loader.systemd-boot.enable = lib.mkForce true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
 
   # --- Networking Overrides for VM ---
   # Use generic interface for NAT (VM doesn't have wlp7s0)
