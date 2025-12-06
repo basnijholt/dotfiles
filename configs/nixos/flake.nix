@@ -120,23 +120,7 @@
         pi4-bootstrap = lib.nixosSystem {
           system = "aarch64-linux";
           modules = [
-            (nixpkgs + "/nixos/modules/installer/sd-card/sd-image-aarch64.nix")
-            ./common/core.nix
-            ./common/nix.nix
-            ./common/nixpkgs.nix
-            ./common/user.nix
-            ./common/services.nix
-            ./hosts/pi4/networking.nix
-            ({ lib, ... }: {
-              # Import wifi.nix to bake credentials into the SD image
-              imports = lib.optional (builtins.pathExists ./hosts/pi4/wifi.nix) ./hosts/pi4/wifi.nix;
-
-              networking.hostName = lib.mkForce "pi4-bootstrap";
-              # Disable ZFS for bootstrap image (runs on ext4 SD card)
-              boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" ];
-              # Compress image with zstd for faster flashing
-              sdImage.compressImage = false;
-            })
+            ./installers/pi4-sd.nix
           ];
         };
 

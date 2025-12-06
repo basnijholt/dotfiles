@@ -80,5 +80,3 @@ nix --extra-experimental-features 'nix-command flakes' run --impure github:nix-c
 ### 5. Finish
 1.  The Pi will reboot into the new ZFS system on the SSD.
 2.  It should reconnect to WiFi automatically (credentials are also in the final system).
-
-```
