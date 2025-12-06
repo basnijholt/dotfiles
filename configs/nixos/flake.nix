@@ -110,6 +110,8 @@
         pi4 = lib.nixosSystem {
           system = "aarch64-linux";
           modules = commonModules ++ [
+            disko.nixosModules.disko
+            ./hosts/pi4/disko.nix
             ./hosts/pi4/default.nix
             ./hosts/pi4/hardware-configuration.nix
           ];
