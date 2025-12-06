@@ -90,13 +90,15 @@ docker run --rm --privileged \
 ### 4. Install to SSD
 Run `nixos-anywhere` from your Mac. It will connect to the running bootstrap system and install the final ZFS configuration to the SSD.
 
+We skip the `kexec` phase because the Pi 4 kernel often hangs during kexec. The bootstrap image is already a capable NixOS environment.
+
 ```bash
 # Replace <PI_IP_ADDRESS> with the actual IP
-# User is 'nixos' (password 'nixos') or 'root' (if you added keys)
-# Note: pi4-bootstrap has your SSH keys from common/user.nix baked in.
+# User is 'root' (configured in bootstrap image)
 nix --extra-experimental-features 'nix-command flakes' run --impure github:nix-community/nixos-anywhere -- \
   --flake .#pi4 \
   --build-on remote \
+  --phases disko,install \
   --ssh-option "LogLevel=ERROR" \
   --ssh-option "WarnWeakCrypto=no" \
   root@<PI_IP_ADDRESS>

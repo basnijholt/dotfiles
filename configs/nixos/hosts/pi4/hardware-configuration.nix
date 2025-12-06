@@ -6,7 +6,7 @@
 #   3. Boot the Pi and SSH in (user: basnijholt)
 #   4. After first boot, run: nixos-generate-config --show-hardware-config
   # Update this file with actual UUIDs from generated config if needed
-{ lib, modulesPath, ... }:
+{ config, lib, pkgs, modulesPath, ... }:
 
 {
   imports = [ ];
