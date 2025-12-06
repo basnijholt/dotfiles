@@ -53,10 +53,33 @@ docker run --rm \
   -v nix-cache:/nix \
   -w /work \
   nixos/nix \
-  cp result/sd-image/*.img pi4-bootstrap.img
+  sh -c "cp result/sd-image/*.img pi4-bootstrap.img"
 ```
 
 You should now have `pi4-bootstrap.img` in your current directory.
+
+### Verify Image Content (Optional)
+To verify that your WiFi credentials (SSID) are correctly baked into the image without flashing it:
+
+```bash
+docker run --rm --privileged \
+  --platform linux/arm64 \
+  -v $(pwd)/pi4-bootstrap.img:/image.img \
+  nixos/nix \
+  sh -c "
+    nix-env -iA nixpkgs.e2fsprogs nixpkgs.util-linux nixpkgs.gnugrep nixpkgs.gawk >/dev/null 2>&1
+    
+    START=\$(fdisk -l /image.img | grep 'image.img2' | awk '{ if (\$2 == \"*\") print \$3; else print \$2 }')
+    OFFSET=\$((START * 512))
+    mkdir -p /mnt
+    mount -o loop,offset=\$OFFSET /image.img /mnt
+    
+    echo '--- Grepping store for ssid= ---'
+    grep -r 'ssid=' /mnt/nix/store 2>/dev/null | head -n 5
+    
+    umount /mnt
+  "
+```
 
 ### 3. Flash & Boot
 1.  Flash `pi4-bootstrap.img` to your MicroSD card (BalenaEtcher or `dd`).
