@@ -107,3 +107,19 @@ nix --extra-experimental-features 'nix-command flakes' run --impure github:nix-c
 ### 5. Finish
 1.  The Pi will reboot into the new ZFS system on the SSD.
 2.  It should reconnect to WiFi automatically (credentials are also in the final system).
+
+## Updating the System
+
+To deploy changes to the Pi in the future, run this from your Mac/PC:
+
+```bash
+# Build on the Pi itself to avoid cross-compilation issues
+nixos-rebuild switch \
+  --flake .#pi4 \
+  --target-host root@pi4.local \
+  --build-host root@pi4.local \
+  --use-remote-sudo
+```
+
+> **Note:** Replace `root@pi4.local` with your actual user/IP if different.
+
