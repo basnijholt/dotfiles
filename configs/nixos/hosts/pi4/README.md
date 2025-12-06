@@ -97,6 +97,8 @@ Run `nixos-anywhere` from your Mac. It will connect to the running bootstrap sys
 nix --extra-experimental-features 'nix-command flakes' run --impure github:nix-community/nixos-anywhere -- \
   --flake .#pi4 \
   --build-on remote \
+  --ssh-option "LogLevel=ERROR" \
+  --ssh-option "WarnWeakCrypto=no" \
   root@<PI_IP_ADDRESS>
 ```
 
