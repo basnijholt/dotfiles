@@ -6,10 +6,7 @@
   imports = [
     (modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
     ../hosts/pi4/networking.nix
-  ];
-
-  # Import wifi.nix to bake credentials into the SD image
-  imports = lib.optional (builtins.pathExists ../hosts/pi4/wifi.nix) ../hosts/pi4/wifi.nix;
+  ] ++ lib.optional (builtins.pathExists ../hosts/pi4/wifi.nix) ../hosts/pi4/wifi.nix;
 
   networking.hostName = lib.mkForce "pi4-bootstrap";
 
