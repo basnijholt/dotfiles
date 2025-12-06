@@ -9,11 +9,12 @@
   ] ++ lib.optional (builtins.pathExists ../hosts/pi4/wifi.nix) ../hosts/pi4/wifi.nix;
 
   networking.hostName = lib.mkForce "pi4-bootstrap-v2";
+  networking.hostId = "8425e349"; # Required for ZFS
 
   # --- Minimal System Settings ---
-  boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" ];
-  boot.kernelPackages = pkgs.linuxPackages_latest; # Mainline kernel (cacheable + wifi support)
-  boot.initrd.availableKernelModules = [ "brcmfmac" ]; # Force WiFi module into initrd to prevent shrinking
+  boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" "zfs" ];
+  boot.kernelPackages = pkgs.linuxPackages; # LTS kernel (ZFS compatible)
+  boot.kernelModules = [ "brcmfmac" ]; # Force WiFi module inclusion
   sdImage.compressImage = false;
   hardware.enableRedistributableFirmware = true; # Required for WiFi
   hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
@@ -40,5 +41,6 @@
     git
     vim
     htop
+    kexec-tools
   ];
 }
