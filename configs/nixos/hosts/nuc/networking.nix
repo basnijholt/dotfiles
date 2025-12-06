@@ -39,7 +39,4 @@
     8080  # Kodi web interface
     8443  # Incus
   ];
-  networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; }  # mosh
-  ];
 }

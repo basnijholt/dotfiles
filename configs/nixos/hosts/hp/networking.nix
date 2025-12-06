@@ -55,7 +55,4 @@
 
   # --- Firewall ---
   networking.firewall.trustedInterfaces = [ "br0" "incusbr0" ];
-  networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; }  # mosh
-  ];
 }

@@ -24,6 +24,7 @@ configs/nixos/
 | `dev-vm` | Lightweight dev VM for Incus x86_64 (familiar env anywhere) |
 | `dev-lxc` | Lightweight dev LXC container for Incus x86_64 (familiar env anywhere) |
 | `nix-cache` | Nix cache server container with Harmonia (for CUDA/large builds) |
+| `pi4` | Raspberry Pi 4 - lightweight headless server (aarch64) |
 | `installer` | Minimal ISO with SSH enabled |
 
 ## Quick Commands

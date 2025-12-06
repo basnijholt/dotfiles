@@ -106,6 +106,24 @@
           ./hosts/nix-cache/hardware-configuration.nix
         ];
 
+        # Raspberry Pi 4 - lightweight headless server (aarch64)
+        pi4 = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = commonModules ++ [
+            ./hosts/pi4/default.nix
+            ./hosts/pi4/hardware-configuration.nix
+          ];
+        };
+
+        # Raspberry Pi 4 - Bootstrap SD Image
+        # Use this to boot the Pi via Ethernet to run the installation
+        pi4-bootstrap = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            ./installers/pi4-sd.nix
+          ];
+        };
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
