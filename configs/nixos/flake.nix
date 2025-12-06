@@ -128,6 +128,9 @@
             ./common/services.nix
             ./hosts/pi4/networking.nix
             ({ lib, ... }: {
+              # Import wifi.nix to bake credentials into the SD image
+              imports = lib.optional (builtins.pathExists ./hosts/pi4/wifi.nix) ./hosts/pi4/wifi.nix;
+
               networking.hostName = lib.mkForce "pi4-bootstrap";
               # Disable ZFS for bootstrap image (runs on ext4 SD card)
               boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" ];

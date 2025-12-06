@@ -5,13 +5,11 @@
 #   2. Flash to SD card: dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress
 #   3. Boot the Pi and SSH in (user: basnijholt)
 #   4. After first boot, run: nixos-generate-config --show-hardware-config
-#   5. Update this file with actual UUIDs from generated config if needed
+  # Update this file with actual UUIDs from generated config if needed
 { lib, modulesPath, ... }:
 
 {
-  imports = [
-    (modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
-  ];
+  imports = [ ];
 
   # Raspberry Pi 4 specific
   nixpkgs.hostPlatform = "aarch64-linux";
