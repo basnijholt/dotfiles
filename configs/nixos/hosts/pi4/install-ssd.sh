@@ -105,8 +105,19 @@ log "Step 5: Setting ZFS bootfs property..."
 sudo zpool set bootfs=zroot/root zroot
 log "ZFS bootfs set to zroot/root"
 
-# --- Step 6: Manual boot population (cross-arch fix) ---
-log "Step 6: Populating boot partition manually (cross-arch workaround)..."
+# --- Step 6: Write hostid for ZFS imports ---
+log "Step 6: Writing hostid for ZFS..."
+HOSTID=$(nix eval --raw "$FLAKE_DIR#nixosConfigurations.${FLAKE_ATTR}.config.networking.hostId" 2>/dev/null || true)
+if [[ -z "$HOSTID" || ! "$HOSTID" =~ ^[0-9a-fA-F]{8}$ ]]; then
+    warn "networking.hostId missing or invalid; skipping /etc/hostid write"
+else
+    sudo mkdir -p /mnt/etc
+    echo -n "$HOSTID" | sudo tee /mnt/etc/hostid >/dev/null
+    log "Hostid written to /mnt/etc/hostid ($HOSTID)"
+fi
+
+# --- Step 7: Manual boot population (cross-arch fix) ---
+log "Step 7: Populating boot partition manually (cross-arch workaround)..."
 
 # nixos-install can't run aarch64 bootloader scripts on x86_64
 # We need to manually install systemd-boot and create boot entries
@@ -187,8 +198,8 @@ options init=$INIT root=ZFS=zroot/root
 EOF
 log "Boot entry created"
 
-# --- Step 7: Verify boot files ---
-log "Step 7: Verifying boot files..."
+# --- Step 8: Verify boot files ---
+log "Step 8: Verifying boot files..."
 if ! sudo test -d /mnt/boot/EFI/systemd; then
     warn "systemd-boot not installed - may need manual installation"
 fi
@@ -200,8 +211,8 @@ if ! sudo test -f /mnt/boot/loader/entries/nixos.conf; then
 fi
 log "Boot files verified."
 
-# --- Step 8: Cleanup ---
-log "Step 8: Cleanup..."
+# --- Step 9: Cleanup ---
+log "Step 9: Cleanup..."
 sudo umount -R /mnt || warn "Some mounts may need manual cleanup"
 sudo zpool export zroot || warn "zpool export failed - may already be exported"
 

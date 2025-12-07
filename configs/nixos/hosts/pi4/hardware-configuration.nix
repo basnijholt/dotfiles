@@ -39,9 +39,18 @@
 
   # ZFS must be in initrd to mount root
   boot.initrd.kernelModules = [ "zfs" ];
+  boot.initrd.postDeviceCommands = lib.mkBefore ''
+    echo "Waiting for USB devices to settle..."
+    sleep 8
+  '';
 
   # WiFi driver
   boot.kernelModules = [ "brcmfmac" ];
+  boot.kernelParams = [
+    "rootdelay=10"          # USB SSD enumeration can be slow on Pi4
+    "console=ttyAMA0,115200"
+    "console=tty1"
+  ];
 
   # --- Filesystem Configuration ---
   # Add zfsutil option for proper ZFS property handling
