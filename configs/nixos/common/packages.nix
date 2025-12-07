@@ -64,6 +64,7 @@ let
     tre-command
     tree
     typst
+    usbutils
     wget
     yazi
     yq-go
