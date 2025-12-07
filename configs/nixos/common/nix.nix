@@ -4,6 +4,7 @@
 {
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
+    trusted-users = [ "root" "basnijholt" ];
     substituters = [
       "https://cache.nixos.org/"
       "http://nix-cache.local:5000"
