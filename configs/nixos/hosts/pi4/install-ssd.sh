@@ -10,7 +10,12 @@ set -e
 # Prerequisites on your Linux PC:
 #   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 #   boot.supportedFilesystems = [ "zfs" ];
+#
+# Usage: ./hosts/pi4/install-ssd.sh (run from configs/nixos directory)
 # =======================================================================================
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FLAKE_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 FLAKE_ATTR="pi4"
 DISK_ID="/dev/disk/by-id/usb-Samsung_Portable_SSD_T5_1234567A666E-0:0"
@@ -52,12 +57,12 @@ echo
 
 # --- Step 1: Partition with Disko ---
 log "Step 1: Partitioning with disko..."
-sudo nix run github:nix-community/disko -- --mode disko ./hosts/pi4/disko.nix
+sudo nix run github:nix-community/disko -- --mode disko "$SCRIPT_DIR/disko.nix"
 
 # --- Step 2: Build the system ---
 log "Step 2: Building NixOS system (aarch64)..."
-nix build ".#nixosConfigurations.${FLAKE_ATTR}.config.system.build.toplevel" --no-link
-SYSTEM_PATH=$(nix path-info ".#nixosConfigurations.${FLAKE_ATTR}.config.system.build.toplevel")
+nix build "$FLAKE_DIR#nixosConfigurations.${FLAKE_ATTR}.config.system.build.toplevel" --no-link
+SYSTEM_PATH=$(nix path-info "$FLAKE_DIR#nixosConfigurations.${FLAKE_ATTR}.config.system.build.toplevel")
 log "Built: $SYSTEM_PATH"
 
 # --- Step 3: Install to /mnt ---
@@ -84,8 +89,8 @@ log "Nix store populated successfully."
 log "Step 4: Populating bootloader (firmware + extlinux)..."
 
 # Get the populate commands from the built system
-FIRMWARE_CMD=$(nix eval --raw ".#nixosConfigurations.${FLAKE_ATTR}.config.boot.loader.raspberryPi.firmwarePopulateCmd")
-BOOT_CMD=$(nix eval --raw ".#nixosConfigurations.${FLAKE_ATTR}.config.boot.loader.raspberryPi.bootPopulateCmd")
+FIRMWARE_CMD=$(nix eval --raw "$FLAKE_DIR#nixosConfigurations.${FLAKE_ATTR}.config.boot.loader.raspberryPi.firmwarePopulateCmd")
+BOOT_CMD=$(nix eval --raw "$FLAKE_DIR#nixosConfigurations.${FLAKE_ATTR}.config.boot.loader.raspberryPi.bootPopulateCmd")
 
 log "Running firmware populate..."
 sudo $FIRMWARE_CMD -c "$SYSTEM_PATH" -f /mnt/boot/firmware

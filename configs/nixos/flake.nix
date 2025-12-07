@@ -136,15 +136,6 @@
           ./hosts/pi4/hardware-configuration.nix
         ];
 
-        # Raspberry Pi 4 - Bootstrap SD Image for initial WiFi access
-        pi4-bootstrap = nixos-raspberrypi.lib.nixosInstaller {
-          specialArgs = { inherit nixos-raspberrypi; };
-          modules = [
-            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
-            ./installers/pi4-sd.nix
-          ];
-        };
-
         installer = lib.nixosSystem {
           inherit system;
           modules = [
