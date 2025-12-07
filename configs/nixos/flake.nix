@@ -118,6 +118,18 @@
           ];
         };
 
+        # Raspberry Pi 3 - debug host for boot troubleshooting (aarch64)
+        # Uses UEFI (pftf/RPi3) with HDMI/ethernet for debugging
+        pi3 = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = commonModules ++ [
+            disko.nixosModules.disko
+            ./hosts/pi3/disko.nix
+            ./hosts/pi3/default.nix
+            ./hosts/pi3/hardware-configuration.nix
+          ];
+        };
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
