@@ -1,6 +1,15 @@
 {
   description = "Bas's NixOS Configuration";
 
+  nixConfig = {
+    extra-substituters = [
+      "https://nixos-raspberrypi.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
+    ];
+  };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
@@ -15,9 +24,13 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+      # Don't follow nixpkgs - use their tested version for kernel/firmware compatibility
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -107,21 +120,35 @@
         ];
 
         # Raspberry Pi 4 - lightweight headless server (aarch64)
-        pi4 = lib.nixosSystem {
-          system = "aarch64-linux";
-          modules = commonModules ++ [
+        # Uses nixos-raspberrypi flake for proper kernel/firmware/bootloader support
+        pi4 = nixos-raspberrypi.lib.nixosSystem {
+          modules = [
+            # RPi4 hardware support (kernel, firmware, bootloader)
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+
+            # Disk layout
             disko.nixosModules.disko
             ./hosts/pi4/disko.nix
+
+            # Common NixOS config
+            ./configuration.nix
+            home-manager.nixosModules.home-manager
+            comin.nixosModules.comin
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+            }
+
+            # Host-specific config
             ./hosts/pi4/default.nix
             ./hosts/pi4/hardware-configuration.nix
           ];
         };
 
-        # Raspberry Pi 4 - Bootstrap SD Image
-        # Use this to boot the Pi via Ethernet to run the installation
-        pi4-bootstrap = lib.nixosSystem {
-          system = "aarch64-linux";
+        # Raspberry Pi 4 - Bootstrap SD Image for initial WiFi access
+        pi4-bootstrap = nixos-raspberrypi.lib.nixosInstaller {
           modules = [
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
             ./installers/pi4-sd.nix
           ];
         };

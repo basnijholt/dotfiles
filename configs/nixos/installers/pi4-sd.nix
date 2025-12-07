@@ -1,31 +1,35 @@
-# SD Card Installer for Raspberry Pi 4 (Minimal)
-# Usage: nix build .#nixosConfigurations.pi4-bootstrap.config.system.build.sdImage --impure
-{ lib, pkgs, modulesPath, ... }:
+# SD Card Installer for Raspberry Pi 4
+# Usage: nix build .#nixosConfigurations.pi4-bootstrap.config.system.build.sdImage
+#
+# This module is used with nixos-raspberrypi.lib.nixosInstaller which provides:
+# - raspberry-pi-4.base (kernel, firmware, bootloader)
+# - sd-image module
+# - installer utilities
+{ lib, pkgs, ... }:
 
 {
   imports = [
-    (modulesPath + "/installer/sd-card/sd-image-aarch64.nix")
     ../hosts/pi4/networking.nix
   ] ++ lib.optional (builtins.pathExists ../hosts/pi4/wifi.nix) ../hosts/pi4/wifi.nix;
 
-  networking.hostName = lib.mkForce "pi4-bootstrap-v2";
+  networking.hostName = lib.mkForce "pi4-bootstrap";
   networking.hostId = "8425e349"; # Required for ZFS
 
-  # --- Minimal System Settings ---
-  boot.supportedFilesystems = lib.mkForce [ "ext4" "vfat" "zfs" ];
-  boot.kernelPackages = pkgs.linuxPackages; # LTS kernel (ZFS compatible)
-  boot.kernelModules = [ "brcmfmac" ]; # Force WiFi module inclusion
+  # ZFS support for installation target
+  boot.supportedFilesystems = [ "zfs" ];
+
+  # Ensure WiFi driver loads (critical for headless)
+  boot.kernelModules = [ "brcmfmac" ];
+
+  # Don't compress for faster flashing
   sdImage.compressImage = false;
-  hardware.enableRedistributableFirmware = true; # Required for WiFi
-  hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
 
   system.stateVersion = "25.05";
 
-  # --- Nix Configuration (Needed for installation) ---
+  # Nix configuration for running nixos-anywhere
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nixpkgs.config.allowUnfree = true; # For WiFi firmware
 
-  # --- User & SSH Access ---
+  # SSH access for installation
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC90KqGLJG4vaYYes3dDwD46Ui3sDiExPTbL7AkYg7i9 bas@nijho.lt"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMRmEP/ZUShYdZj/h3vghnuMNgtWExV+FEZHYyguMkX basnijholt@blink"
@@ -41,6 +45,5 @@
     git
     vim
     htop
-    kexec-tools
   ];
 }

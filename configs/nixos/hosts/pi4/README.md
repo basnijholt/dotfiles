@@ -2,33 +2,117 @@
 
 This configuration sets up a **headless Raspberry Pi 4** booting from an **external SSD** (via USB) using **ZFS**.
 
+Uses the [nixos-raspberrypi](https://github.com/nvmd/nixos-raspberrypi) flake for proper kernel, firmware, and bootloader support.
+
 ## Architecture
-*   **Boot:** SD Card (Bootstrap image with pre-configured WiFi & SSH).
-*   **Root Filesystem:** ZFS on external SSD (`/dev/disk/by-id/usb-Samsung_Portable_SSD_T5_...`).
-*   **Network:** WiFi (Pre-configured) or Ethernet.
+
+- **Firmware Partition:** `/boot/firmware` (FAT32) - RPi firmware, U-Boot, config.txt, DTBs
+- **Boot Partition:** `/boot` (ext4) - kernel, initrd, extlinux.conf (U-Boot can't read ZFS)
+- **Root Filesystem:** ZFS on external SSD
 
 ## Prerequisites
-1.  Raspberry Pi 4.
-2.  MicroSD Card.
-3.  External SSD (target drive).
-4.  Docker (on your Mac).
 
-## Installation Steps
+1. Raspberry Pi 4
+2. MicroSD Card (for bootstrap image)
+3. External SSD (Samsung T5 or similar)
+4. Build machine with:
+   - `boot.binfmt.emulatedSystems = [ "aarch64-linux" ];` (for cross-building)
+   - Or use Docker on macOS
+
+## Installation Methods
+
+Choose one:
+- **Method A: Direct SSD Install** (recommended) - Flash SSD from your Linux PC, then plug into Pi
+- **Method B: Bootstrap + nixos-anywhere** - Boot Pi from SD, then install over network
+
+---
+
+## Method A: Direct SSD Install (Recommended)
+
+This is the fastest approach - install directly to SSD from your Linux PC.
+
+### Prerequisites (Linux PC)
+
+```nix
+# configuration.nix
+boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+boot.supportedFilesystems = [ "zfs" ];
+```
+Reboot after adding these.
 
 ### 1. Configure WiFi
-Ensure `configs/nixos/hosts/pi4/wifi.nix` exists with your real credentials.
-The build process will **bake these credentials into the SD image**, so the Pi connects automatically on first boot.
 
-### 2. Build Bootstrap Image (using Docker)
-Since we are on macOS (aarch64-darwin) and targeting Linux (aarch64-linux), we use Docker to build the image natively.
+Create `configs/nixos/hosts/pi4/wifi.nix` with your credentials:
 
-**Run this command block:**
+```nix
+{
+  networking.networkmanager.ensureProfiles.profiles = {
+    "Home-WiFi" = {
+      connection = {
+        id = "Home-WiFi";
+        type = "wifi";
+      };
+      wifi = {
+        mode = "infrastructure";
+        ssid = "YOUR_SSID";
+      };
+      wifi-security = {
+        key-mgmt = "wpa-psk";
+        psk = "YOUR_PASSWORD";
+      };
+      ipv4 = { method = "auto"; };
+      ipv6 = { method = "auto"; };
+    };
+  };
+}
+```
+
+### 2. Run the Install Script
 
 ```bash
-# 1. Create a persistent volume for the Nix store (avoids re-downloading on every build)
+# Connect SSD to your Linux PC, then:
+cd configs/nixos
+./install_pi4_ssd.sh
+```
+
+The script will:
+1. Partition the SSD (disko)
+2. Build the aarch64 system (using binfmt emulation)
+3. Install NixOS to the SSD
+4. Populate the bootloader (firmware + extlinux)
+
+### 3. Deploy to Pi
+
+1. Unplug SSD from PC
+2. Plug into Pi 4 (blue USB 3.0 port)
+3. Remove any SD card
+4. Power on
+
+The Pi boots directly from SSD and connects to WiFi.
+
+---
+
+## Method B: Bootstrap + nixos-anywhere
+
+Use this if you can't connect the SSD to a Linux PC.
+
+### 1. Configure WiFi
+
+Same as Method A above.
+
+### 2. Build Bootstrap SD Image
+
+#### Option A: Native Linux with binfmt
+
+```bash
+nix build .#nixosConfigurations.pi4-bootstrap.config.system.build.sdImage
+```
+
+#### Option B: Docker on macOS
+
+```bash
 docker volume create nix-cache
 
-# 2. Build the image inside a container
 docker run --rm -it \
   --platform linux/arm64 \
   -v $(pwd):/work \
@@ -36,17 +120,13 @@ docker run --rm -it \
   -w /work \
   nixos/nix \
   sh -c "
-    # Ensure profile dir exists
     mkdir -p /nix/var/nix/profiles/per-user/root
-    
-    # Build the system image (using --impure to read wifi.nix)
     nix --extra-experimental-features 'nix-command flakes' \
       build .#nixosConfigurations.pi4-bootstrap.config.system.build.sdImage \
-      --impure \
       --show-trace
   "
 
-# 3. Copy the image out (workaround for broken symlinks)
+# Copy image out
 docker run --rm \
   --platform linux/arm64 \
   -v $(pwd):/work \
@@ -56,70 +136,71 @@ docker run --rm \
   sh -c "cp result/sd-image/*.img pi4-bootstrap.img"
 ```
 
-You should now have `pi4-bootstrap.img` in your current directory.
-
-### Verify Image Content (Optional)
-To verify that your WiFi credentials (SSID) are correctly baked into the image without flashing it:
-
-```bash
-docker run --rm --privileged \
-  --platform linux/arm64 \
-  -v $(pwd)/pi4-bootstrap.img:/image.img \
-  nixos/nix \
-  sh -c "
-    nix-env -iA nixpkgs.e2fsprogs nixpkgs.util-linux nixpkgs.gnugrep nixpkgs.gawk >/dev/null 2>&1
-    
-    START=\$(fdisk -l /image.img | grep 'image.img2' | awk '{ if (\$2 == \"*\") print \$3; else print \$2 }')
-    OFFSET=\$((START * 512))
-    mkdir -p /mnt
-    mount -o loop,offset=\$OFFSET /image.img /mnt
-    
-    echo '--- Grepping store for ssid= ---'
-    grep -r 'ssid=' /mnt/nix/store 2>/dev/null | head -n 5
-    
-    umount /mnt
-  "
-```
-
 ### 3. Flash & Boot
-1.  Flash `pi4-bootstrap.img` to your MicroSD card (BalenaEtcher or `dd`).
-2.  Insert SD card + SSD into Pi.
-3.  Power on.
-4.  The Pi will boot and connect to your WiFi (check router for IP, hostname `pi4-bootstrap`).
 
-### 4. Install to SSD
-Run `nixos-anywhere` from your Mac. It will connect to the running bootstrap system and install the final ZFS configuration to the SSD.
+1. Flash `result/sd-image/*.img` (or `pi4-bootstrap.img`) to MicroSD card
+2. Insert SD card + SSD into Pi
+3. Power on
+4. Pi connects to WiFi automatically (hostname: `pi4-bootstrap`)
 
-We skip the `kexec` phase because the Pi 4 kernel often hangs during kexec. The bootstrap image is already a capable NixOS environment.
+### 4. Install to SSD with nixos-anywhere
+
+From your build machine:
 
 ```bash
-# Replace <PI_IP_ADDRESS> with the actual IP
-# User is 'root' (configured in bootstrap image)
-nix --extra-experimental-features 'nix-command flakes' run --impure github:nix-community/nixos-anywhere -- \
+# Replace <PI_IP> with actual IP from your router
+nix run github:nix-community/nixos-anywhere -- \
   --flake .#pi4 \
-  --build-on remote \
-  --phases disko,install \
-  --ssh-option "LogLevel=ERROR" \
-  --ssh-option "WarnWeakCrypto=no" \
-  root@<PI_IP_ADDRESS>
+  --build-on-remote \
+  root@<PI_IP>
 ```
 
-### 5. Finish
-1.  The Pi will reboot into the new ZFS system on the SSD.
-2.  It should reconnect to WiFi automatically (credentials are also in the final system).
+### 5. Reboot into Final System
+
+1. Power off Pi
+2. Remove SD card
+3. Power on - Pi boots from SSD
+4. System connects to WiFi (hostname: `pi4`)
 
 ## Updating the System
 
-To deploy changes to the Pi in the future, run this from your Mac/PC:
+Deploy changes remotely:
 
 ```bash
-# Build on the Pi itself to avoid cross-compilation issues
 nixos-rebuild switch \
   --flake .#pi4 \
   --target-host root@pi4.local \
-  --build-host root@pi4.local \
-  --use-remote-sudo
+  --build-host root@pi4.local
 ```
 
-> **Note:** Replace `root@pi4.local` with your actual user/IP if different.
+## Partition Layout
 
+| Partition | Size | Type | Mount | Purpose |
+|-----------|------|------|-------|---------|
+| firmware | 256M | FAT32 | /boot/firmware | RPi firmware, U-Boot, config.txt |
+| boot | 512M | ext4 | /boot | Kernel, initrd, extlinux.conf |
+| zfs | Rest | ZFS | / | Root filesystem with datasets |
+
+## Troubleshooting
+
+### Pi doesn't connect to WiFi
+
+1. Verify `wifi.nix` exists with correct credentials
+2. Check that `brcmfmac` module is loaded: `lsmod | grep brcmfmac`
+3. Check NetworkManager: `nmcli device status`
+
+### Pi doesn't boot from SSD
+
+1. Check LED patterns:
+   - 4 blinks = kernel not found
+   - 7 blinks = kernel image bad
+2. Connect HDMI to see boot messages
+3. Verify U-Boot is loading: check for `u-boot-rpi-arm64.bin` in `/boot/firmware`
+
+### nixos-anywhere fails
+
+The nixos-raspberrypi flake handles bootloader installation properly during NixOS activation.
+If it fails, check:
+1. SSH access works: `ssh root@<PI_IP>`
+2. SSD is detected: `lsblk`
+3. Enough disk space for build
