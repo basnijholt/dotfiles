@@ -15,12 +15,9 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/main";
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";

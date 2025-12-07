@@ -178,12 +178,12 @@ sudo cp "$KERNEL" "/mnt/boot/EFI/nixos/$KERNEL_NAME"
 sudo cp "$INITRD" "/mnt/boot/EFI/nixos/$INITRD_NAME"
 log "Kernel and initrd copied to ESP"
 
-# Create boot entry
+# Create boot entry (root=ZFS= is required for NixOS stage-1 to find the pool)
 sudo tee /mnt/boot/loader/entries/nixos.conf > /dev/null <<EOF
 title NixOS
 linux /EFI/nixos/$KERNEL_NAME
 initrd /EFI/nixos/$INITRD_NAME
-options init=$INIT zfs=zroot/root
+options init=$INIT root=ZFS=zroot/root
 EOF
 log "Boot entry created"
 

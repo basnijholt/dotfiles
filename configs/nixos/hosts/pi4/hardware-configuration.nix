@@ -18,6 +18,13 @@
   boot.zfs.forceImportRoot = true;
   boot.zfs.devNodes = "/dev/disk/by-id";
 
+  # USB storage can be slow to enumerate on Pi; wait for devices
+  boot.initrd.postDeviceCommands = lib.mkAfter ''
+    # Wait for USB devices to settle before ZFS import
+    echo "Waiting for USB devices to settle..."
+    sleep 5
+  '';
+
   # Kernel modules for Pi 4 with UEFI
   # Based on: https://www.eisfunke.com/posts/2023/nixos-on-raspberry-pi-4.html
   boot.initrd.availableKernelModules = [

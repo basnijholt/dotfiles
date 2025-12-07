@@ -76,12 +76,12 @@ cp "$KERNEL" "/mnt/pi4-boot/EFI/nixos/$KERNEL_NAME"
 cp "$INITRD" "/mnt/pi4-boot/EFI/nixos/$INITRD_NAME"
 log "Kernel and initrd copied"
 
-# Create boot entry
+# Create boot entry (root=ZFS= is required for NixOS stage-1 to find the pool)
 cat > /mnt/pi4-boot/loader/entries/nixos.conf <<EOF
 title NixOS
 linux /EFI/nixos/$KERNEL_NAME
 initrd /EFI/nixos/$INITRD_NAME
-options init=$SYSTEM_PATH/init zfs=zroot/root
+options init=$SYSTEM_PATH/init root=ZFS=zroot/root
 EOF
 log "Boot entry created"
 
