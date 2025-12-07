@@ -12,9 +12,10 @@
   '';
 
   # --- Ignore Lid/Power Button ---
-  services.logind.settings.Login = {
-    HandleLidSwitch = "ignore";
-    HandlePowerKey = "ignore";
-    IdleAction = "ignore";
-  };
+  # Using extraConfig for compatibility with older nixpkgs (nixos-raspberrypi)
+  services.logind.extraConfig = ''
+    HandleLidSwitch=ignore
+    HandlePowerKey=ignore
+    IdleAction=ignore
+  '';
 }

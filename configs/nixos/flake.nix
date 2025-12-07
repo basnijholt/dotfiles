@@ -51,6 +51,16 @@
           modules = commonModules ++ extraModules;
         };
 
+      # Raspberry Pi 4 helper - uses nixos-raspberrypi for kernel/firmware/bootloader
+      mkPi4Host = extraModules:
+        nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+            disko.nixosModules.disko
+          ] ++ commonModules ++ extraModules;
+        };
+
     in {
       nixosConfigurations = {
         pc = mkHost [
@@ -120,31 +130,11 @@
         ];
 
         # Raspberry Pi 4 - lightweight headless server (aarch64)
-        # Uses nixos-raspberrypi flake for proper kernel/firmware/bootloader support
-        pi4 = nixos-raspberrypi.lib.nixosSystem {
-          specialArgs = { inherit nixos-raspberrypi; };
-          modules = [
-            # RPi4 hardware support (kernel, firmware, bootloader)
-            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
-
-            # Disk layout
-            disko.nixosModules.disko
-            ./hosts/pi4/disko.nix
-
-            # Common NixOS config
-            ./configuration.nix
-            home-manager.nixosModules.home-manager
-            comin.nixosModules.comin
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-            }
-
-            # Host-specific config
-            ./hosts/pi4/default.nix
-            ./hosts/pi4/hardware-configuration.nix
-          ];
-        };
+        pi4 = mkPi4Host [
+          ./hosts/pi4/disko.nix
+          ./hosts/pi4/default.nix
+          ./hosts/pi4/hardware-configuration.nix
+        ];
 
         # Raspberry Pi 4 - Bootstrap SD Image for initial WiFi access
         pi4-bootstrap = nixos-raspberrypi.lib.nixosInstaller {
