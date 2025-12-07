@@ -26,7 +26,6 @@
     };
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
-      # Don't follow nixpkgs - use their tested version for kernel/firmware compatibility
     };
   };
 
