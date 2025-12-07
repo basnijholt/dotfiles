@@ -98,12 +98,12 @@ sudo $FIRMWARE_CMD -c "$SYSTEM_PATH" -f /mnt/boot/firmware
 log "Running boot populate..."
 sudo $BOOT_CMD -c "$SYSTEM_PATH" -b /mnt/boot
 
-# Verify
+# Verify (use sudo - firmware partition has restrictive permissions)
 log "Verifying bootloader files..."
-if [ ! -f /mnt/boot/firmware/config.txt ]; then
+if ! sudo test -f /mnt/boot/firmware/config.txt; then
     error "config.txt missing from /mnt/boot/firmware"
 fi
-if [ ! -d /mnt/boot/extlinux ]; then
+if ! sudo test -d /mnt/boot/extlinux; then
     error "extlinux directory missing from /mnt/boot"
 fi
 log "Bootloader verified."
