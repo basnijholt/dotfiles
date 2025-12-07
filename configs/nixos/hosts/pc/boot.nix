@@ -18,4 +18,9 @@
     efiSysMountPoint = "/boot2";
   };
 
+  # Enable aarch64 emulation for building Raspberry Pi images
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
+  # Enable ZFS support (needed to provision ZFS-based hosts like pi4)
+  boot.supportedFilesystems = [ "zfs" ];
 }

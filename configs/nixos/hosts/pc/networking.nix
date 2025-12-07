@@ -3,6 +3,7 @@
 
 {
   networking.hostName = lib.mkDefault "pc";
+  networking.hostId = "8425e349"; # Required for ZFS
   networking.networkmanager.enable = true;
   networking.nftables.enable = true;
   networking.firewall.enable = true;
