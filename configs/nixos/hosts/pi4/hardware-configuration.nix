@@ -22,9 +22,10 @@
 
   # Wait for USB devices to enumerate before ZFS import
   # USB SSDs can take a few seconds to appear on RPi
+  # Pi 4's VL805 USB controller can be slow to enumerate devices
   boot.initrd.postDeviceCommands = lib.mkBefore ''
     echo "Waiting for USB devices to settle..."
-    sleep 3
+    sleep 10
   '';
 
   # Ensure WiFi driver loads on boot (critical for headless)

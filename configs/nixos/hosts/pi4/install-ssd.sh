@@ -134,6 +134,8 @@ LABEL nixos-default
   MENU LABEL NixOS - Default
   LINUX ../nixos/${KERNEL_NAME}-Image
   INITRD ../nixos/${INITRD_NAME}-initrd
+  FDT ../nixos/${KERNEL_NAME}-dtbs/broadcom/bcm2711-rpi-4-b.dtb
+  FDTDIR ../nixos/${KERNEL_NAME}-dtbs
   APPEND init=${SYSTEM_PATH}/init console=serial0,115200n8 console=tty1 nohibernate loglevel=7 lsm=landlock,yama,bpf
 EOF
 
@@ -150,8 +152,13 @@ if ! sudo test -f /mnt/boot/nixos/${KERNEL_NAME}-Image; then
 fi
 log "Bootloader verified."
 
-# --- Step 5: Cleanup ---
-log "Step 5: Cleanup..."
+# --- Step 5: Set ZFS bootfs property ---
+log "Step 5: Setting ZFS bootfs property..."
+sudo zpool set bootfs=zroot/root zroot
+log "ZFS bootfs set to zroot/root"
+
+# --- Step 6: Cleanup ---
+log "Step 6: Cleanup..."
 sudo umount -R /mnt || warn "Some mounts may need manual cleanup"
 sudo zpool export zroot || warn "zpool export failed - may already be exported"
 
