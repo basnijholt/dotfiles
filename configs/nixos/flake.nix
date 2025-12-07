@@ -51,16 +51,6 @@
           modules = commonModules ++ extraModules;
         };
 
-      # Raspberry Pi 4 helper - uses nixos-raspberrypi for kernel/firmware/bootloader
-      mkPi4Host = extraModules:
-        nixos-raspberrypi.lib.nixosSystem {
-          specialArgs = { inherit nixos-raspberrypi; };
-          modules = [
-            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
-            disko.nixosModules.disko
-          ] ++ commonModules ++ extraModules;
-        };
-
     in {
       nixosConfigurations = {
         pc = mkHost [
@@ -130,11 +120,17 @@
         ];
 
         # Raspberry Pi 4 - lightweight headless server (aarch64)
-        pi4 = mkPi4Host [
-          ./hosts/pi4/disko.nix
-          ./hosts/pi4/default.nix
-          ./hosts/pi4/hardware-configuration.nix
-        ];
+        pi4 = nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+            disko.nixosModules.disko
+          ] ++ commonModules ++ [
+            ./hosts/pi4/disko.nix
+            ./hosts/pi4/default.nix
+            ./hosts/pi4/hardware-configuration.nix
+          ];
+        };
 
         installer = lib.nixosSystem {
           inherit system;
