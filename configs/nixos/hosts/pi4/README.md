@@ -2,20 +2,19 @@
 
 Headless Raspberry Pi 4 booting from **external SSD** (via USB) with **ZFS** root.
 
-Uses the [nixos-raspberrypi](https://github.com/nvmd/nixos-raspberrypi) flake for kernel, firmware, and bootloader support.
+Uses **UEFI boot** via [pftf/RPi4](https://github.com/pftf/RPi4) firmware - standard NixOS aarch64, no special Pi flake needed.
 
 ## Architecture
 
 | Partition | Size | Type | Mount | Purpose |
 |-----------|------|------|-------|---------|
-| firmware | 256M | FAT32 | /boot/firmware | RPi firmware, U-Boot, config.txt |
-| boot | 512M | ext4 | /boot | Kernel, initrd, extlinux.conf |
+| ESP | 512M | FAT32 | /boot | UEFI firmware, systemd-boot, kernels |
 | zfs | Rest | ZFS | / | Root filesystem with datasets |
 
 ## Prerequisites
 
 **Hardware:**
-- Raspberry Pi 4
+- Raspberry Pi 4 (with updated EEPROM for USB boot)
 - External SSD (Samsung T5 or similar)
 
 **Build machine (Linux PC):**
@@ -64,10 +63,11 @@ cd configs/nixos
 ```
 
 The script will:
-1. Partition the SSD (disko)
-2. Build the aarch64 system (using binfmt emulation)
-3. Install NixOS to the SSD
-4. Populate the bootloader (firmware + extlinux)
+1. Partition the SSD (ESP + ZFS via disko)
+2. Download and install pftf UEFI firmware
+3. Build the aarch64 system (using binfmt emulation)
+4. Install NixOS with systemd-boot
+5. Set ZFS bootfs property
 
 ### 3. Deploy to Pi
 
@@ -76,46 +76,7 @@ The script will:
 3. Remove any SD card
 4. Power on
 
-The Pi boots directly from SSD and connects to WiFi.
-
-## Alternative: Build on Mac, Flash on Linux
-
-For faster builds, use native ARM on Apple Silicon Mac, then flash on Linux.
-
-### Step 1: Build on Mac (Docker)
-
-```bash
-# Start Docker container with nix (from configs/nixos directory)
-docker run --rm -it \
-  --platform linux/arm64 \
-  --dns 192.168.1.66 \
-  -v $(pwd):/work \
-  -v nix-pi4-cache:/nix \
-  -v ~/.ssh:/root/.ssh:ro \
-  -w /work \
-  nixos/nix bash
-
-# Inside container:
-nix --extra-experimental-features 'nix-command flakes' \
-  build .#nixosConfigurations.pi4.config.system.build.toplevel \
-  --substituters 'https://nixos-raspberrypi.cachix.org https://cache.nixos.org' \
-  --trusted-public-keys 'nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY='
-```
-
-### Step 2: Copy to Linux PC
-
-```bash
-# Inside Docker container - copy to Linux PC via SSH
-nix --extra-experimental-features 'nix-command flakes' copy --to 'ssh://basnijholt@pc' --accept-flake-config .#nixosConfigurations.pi4.config.system.build.toplevel
-```
-
-### Step 3: Flash on Linux
-
-```bash
-# On Linux PC with SSD attached
-cd configs/nixos
-./hosts/pi4/install-ssd.sh
-```
+The Pi boots via UEFI and connects to WiFi.
 
 ## Updating the System
 
@@ -128,6 +89,13 @@ nixos-rebuild switch \
   --build-host root@pi4.local
 ```
 
+## UEFI Settings
+
+On first boot, you may need to configure UEFI:
+- Press **Esc** at the Raspberry Pi logo to enter setup
+- Device Manager → Raspberry Pi Configuration → Advanced Settings
+  - Disable "Limit RAM to 3 GB" if you have 4GB+ Pi
+
 ## Troubleshooting
 
 ### Pi doesn't connect to WiFi
@@ -138,8 +106,8 @@ nixos-rebuild switch \
 
 ### Pi doesn't boot from SSD
 
-1. Check LED patterns:
-   - 4 blinks = kernel not found
-   - 7 blinks = kernel image bad
-2. Connect HDMI to see boot messages
-3. Verify U-Boot is loading: check for `u-boot-rpi-arm64.bin` in `/boot/firmware`
+1. Ensure Pi EEPROM supports USB boot (update via Raspberry Pi Imager if needed)
+2. Check LED patterns:
+   - No activity = UEFI firmware not found
+   - Activity then stop = kernel/ZFS issue
+3. Connect HDMI to see UEFI/boot messages

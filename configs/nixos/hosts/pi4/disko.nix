@@ -9,31 +9,21 @@
         content = {
           type = "gpt";
           partitions = {
-            # Partition 1: Firmware (FAT32) - MUST be first for Pi boot ROM!
-            # Pi boot ROM scans for the first FAT32 partition
-            "1-firmware" = {
-              label = "FIRMWARE";
-              size = "256M";
+            # Partition 1: ESP (EFI System Partition)
+            # Contains pftf UEFI firmware + systemd-boot + kernels
+            ESP = {
+              label = "ESP";
+              size = "512M";
               type = "EF00";
               content = {
                 type = "filesystem";
                 format = "vfat";
-                mountpoint = "/boot/firmware";
+                mountpoint = "/boot";
                 mountOptions = [ "umask=0077" ];
               };
             };
-            # Partition 2: Boot (ext4) for kernel, initrd, extlinux.conf
-            # Must be ext4 because U-Boot cannot read ZFS
-            "2-boot" = {
-              label = "BOOT";
-              size = "512M";
-              content = {
-                type = "filesystem";
-                format = "ext4";
-                mountpoint = "/boot";
-              };
-            };
-            "3-zfs" = {
+            # Partition 2: ZFS pool for root
+            zfs = {
               size = "100%";
               content = {
                 type = "zfs";
@@ -58,6 +48,8 @@
           acltype = "posixacl";
           xattr = "sa";
           atime = "off";
+          dnodesize = "auto";
+          normalization = "formD";
         };
 
         datasets = {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pi4 SSD Verify Script
+# Pi4 SSD Verify Script (UEFI)
 # Verifies all boot components are correctly installed
 
 set -e
@@ -7,94 +7,100 @@ set -e
 LOG_FILE="/tmp/pi4-verify.log"
 DISK_DEV="/dev/sda"
 
+# Ensure log is readable by all
+rm -f "$LOG_FILE" 2>/dev/null || sudo rm -f "$LOG_FILE" 2>/dev/null || true
 exec > >(tee "$LOG_FILE") 2>&1
 
 echo "=========================================="
-echo "Pi4 SSD Verify - $(date)"
+echo "Pi4 SSD Verify (UEFI) - $(date)"
 echo "=========================================="
 echo ""
 
-# Mount partitions
-echo "=== Mounting partitions ==="
+# --- Partition Layout ---
+echo "=== PARTITION LAYOUT ==="
+lsblk -f "$DISK_DEV" 2>/dev/null || lsblk -f
+echo ""
+
+# --- Mount partitions ---
+echo "=== MOUNTING PARTITIONS ==="
 sudo mkdir -p /mnt/pi4-boot /mnt/pi4-nix
-sudo mount "${DISK_DEV}2" /mnt/pi4-boot 2>&1 || echo "Already mounted or failed"
+sudo mount "${DISK_DEV}1" /mnt/pi4-boot 2>&1 || echo "Already mounted or failed"
 sudo zpool import -N zroot 2>&1 || echo "Pool already imported"
 sudo mount -t zfs zroot/nix /mnt/pi4-nix 2>&1 || echo "Already mounted or failed"
 echo ""
 
-# Extract system path from extlinux.conf
-echo "=== Extracting system path from extlinux.conf ==="
-SYSTEM_PATH=$(grep -oP 'init=\K[^ ]+' /mnt/pi4-boot/extlinux/extlinux.conf | sed 's|/init$||')
-echo "System path in extlinux.conf: $SYSTEM_PATH"
+# --- ESP Partition (UEFI + systemd-boot) ---
+echo "=========================================="
+echo "=== ESP PARTITION (/boot) ==="
+echo "=========================================="
 echo ""
 
-# Convert to local path
-LOCAL_SYSTEM_PATH="/mnt/pi4-nix/store/$(basename $SYSTEM_PATH)"
-echo "Looking for: $LOCAL_SYSTEM_PATH"
+echo "=== Directory listing ==="
+ls -la /mnt/pi4-boot/ 2>&1 || echo "Cannot list"
 echo ""
 
-# Check if system closure exists
-echo "=== Verifying system closure exists ==="
-if [ -d "$LOCAL_SYSTEM_PATH" ]; then
-    echo "✅ System closure EXISTS"
-    ls -la "$LOCAL_SYSTEM_PATH/" | head -10
+echo "=== UEFI firmware (RPI_EFI.fd) ==="
+if [ -f /mnt/pi4-boot/RPI_EFI.fd ]; then
+    echo "✅ UEFI firmware present"
+    ls -la /mnt/pi4-boot/RPI_EFI.fd
 else
-    echo "❌ System closure MISSING!"
+    echo "❌ UEFI firmware MISSING"
+fi
+echo ""
+
+echo "=== config.txt ==="
+cat /mnt/pi4-boot/config.txt 2>&1 || echo "config.txt not found"
+echo ""
+
+echo "=== systemd-boot installed? ==="
+if [ -f /mnt/pi4-boot/EFI/BOOT/BOOTAA64.EFI ]; then
+    echo "✅ BOOTAA64.EFI present"
+    ls -la /mnt/pi4-boot/EFI/BOOT/BOOTAA64.EFI
+else
+    echo "❌ BOOTAA64.EFI MISSING"
+fi
+if [ -d /mnt/pi4-boot/EFI/systemd ]; then
+    echo "✅ systemd-boot directory exists"
+    ls -la /mnt/pi4-boot/EFI/systemd/
+else
+    echo "❌ systemd-boot directory MISSING"
+fi
+echo ""
+
+echo "=== loader.conf ==="
+if [ -f /mnt/pi4-boot/loader/loader.conf ]; then
+    echo "✅ loader.conf present"
+    cat /mnt/pi4-boot/loader/loader.conf
+else
+    echo "❌ loader.conf MISSING"
+fi
+echo ""
+
+echo "=== Boot entries ==="
+ls -la /mnt/pi4-boot/loader/entries/ 2>&1 || echo "No boot entries"
+if [ -f /mnt/pi4-boot/loader/entries/nixos.conf ]; then
     echo ""
-    echo "Available systems in store:"
-    ls /mnt/pi4-nix/store/ | grep nixos-system | head -10
+    echo "=== nixos.conf contents ==="
+    cat /mnt/pi4-boot/loader/entries/nixos.conf
 fi
 echo ""
 
-# Verify init script exists
-echo "=== Verifying init script ==="
-if [ -f "$LOCAL_SYSTEM_PATH/init" ]; then
-    echo "✅ Init script exists"
-    head -5 "$LOCAL_SYSTEM_PATH/init"
-else
-    echo "❌ Init script MISSING"
-fi
+echo "=== NixOS kernels ==="
+ls -la /mnt/pi4-boot/EFI/nixos/ 2>&1 | head -20 || echo "No NixOS kernels"
 echo ""
 
-# Check kernel referenced in extlinux.conf
-echo "=== Verifying kernel ==="
-KERNEL_FILE=$(grep -oP 'LINUX \K[^ ]+' /mnt/pi4-boot/extlinux/extlinux.conf)
-KERNEL_PATH="/mnt/pi4-boot/${KERNEL_FILE#../}"
-if [ -f "$KERNEL_PATH" ]; then
-    echo "✅ Kernel exists: $KERNEL_PATH"
-    ls -lh "$KERNEL_PATH"
-else
-    echo "❌ Kernel MISSING: $KERNEL_PATH"
-fi
+# --- ZFS Pool ---
+echo "=========================================="
+echo "=== ZFS POOL ==="
+echo "=========================================="
 echo ""
 
-# Check initrd
-echo "=== Verifying initrd ==="
-INITRD_FILE=$(grep -oP 'INITRD \K[^ ]+' /mnt/pi4-boot/extlinux/extlinux.conf)
-INITRD_PATH="/mnt/pi4-boot/${INITRD_FILE#../}"
-if [ -f "$INITRD_PATH" ]; then
-    echo "✅ Initrd exists: $INITRD_PATH"
-    ls -lh "$INITRD_PATH"
-else
-    echo "❌ Initrd MISSING: $INITRD_PATH"
-fi
+echo "=== Pool status ==="
+sudo zpool status zroot 2>&1 || echo "Cannot get pool status"
 echo ""
 
-# Check FDT
-echo "=== Verifying device tree ==="
-FDT_FILE=$(grep -oP 'FDT \K[^ ]+' /mnt/pi4-boot/extlinux/extlinux.conf)
-FDT_PATH="/mnt/pi4-boot/${FDT_FILE#../}"
-if [ -f "$FDT_PATH" ]; then
-    echo "✅ Device tree exists: $FDT_PATH"
-    ls -lh "$FDT_PATH"
-else
-    echo "❌ Device tree MISSING: $FDT_PATH"
-fi
-echo ""
-
-# Verify ZFS bootfs
 echo "=== Verifying ZFS bootfs ==="
-BOOTFS=$(sudo zpool get -H -o value bootfs zroot)
+BOOTFS=$(sudo zpool get -H -o value bootfs zroot 2>/dev/null)
 if [ "$BOOTFS" = "zroot/root" ]; then
     echo "✅ bootfs correctly set to zroot/root"
 else
@@ -103,33 +109,33 @@ fi
 sudo zpool get bootfs zroot
 echo ""
 
-# Check nix profiles
-echo "=== Checking nix profiles ==="
-sudo mkdir -p /mnt/pi4-root
-sudo mount -t zfs zroot/root /mnt/pi4-root 2>&1 || echo "Already mounted"
-
-PROFILES_DIR="/mnt/pi4-root/nix/var/nix/profiles"
-if [ -d "$PROFILES_DIR" ]; then
-    echo "Profiles directory exists:"
-    ls -la "$PROFILES_DIR/"
-else
-    echo "Profiles directory missing, checking zroot/nix..."
-    ls -la /mnt/pi4-nix/var/nix/profiles/ 2>/dev/null || echo "Not in zroot/nix either"
-fi
+echo "=== ZFS datasets ==="
+sudo zfs list -r zroot 2>&1 || echo "Cannot list datasets"
 echo ""
 
-# Show final summary
+# --- Nix Store ---
 echo "=========================================="
-echo "=== SUMMARY ==="
+echo "=== NIX STORE ==="
 echo "=========================================="
 echo ""
-echo "extlinux.conf:"
-cat /mnt/pi4-boot/extlinux/extlinux.conf
+
+echo "=== Package count ==="
+PKGCOUNT=$(ls /mnt/pi4-nix/store/ 2>/dev/null | wc -l)
+echo "Packages in store: $PKGCOUNT"
 echo ""
 
-# Cleanup
-echo "=== Cleanup ==="
-sudo umount /mnt/pi4-root 2>/dev/null || true
+echo "=== System closure ==="
+ls /mnt/pi4-nix/store/ | grep nixos-system-pi4 | head -3 || echo "No system found"
+echo ""
+
+echo "=== Nix profiles ==="
+ls -la /mnt/pi4-nix/var/nix/profiles/ 2>/dev/null || echo "No profiles"
+echo ""
+
+# --- Cleanup ---
+echo "=========================================="
+echo "=== CLEANUP ==="
+echo "=========================================="
 sudo umount /mnt/pi4-nix 2>/dev/null || true
 sudo umount /mnt/pi4-boot 2>/dev/null || true
 sudo zpool export zroot 2>/dev/null || true

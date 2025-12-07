@@ -1,47 +1,79 @@
-# Raspberry Pi 4 hardware configuration
+# Raspberry Pi 4 hardware configuration (UEFI boot)
 #
-# Most hardware config is handled by nixos-raspberrypi.nixosModules.raspberry-pi-4.base
-# This file only contains ZFS-specific and additional customizations.
-{ config, lib, pkgs, ... }:
+# Uses pftf/RPi4 UEFI firmware for standard NixOS boot.
+# No nixos-raspberrypi flake needed - vanilla aarch64 NixOS.
+{ config, lib, pkgs, modulesPath, ... }:
 
 {
-  # ZFS support (not provided by nixos-raspberrypi)
-  boot.supportedFilesystems = [ "zfs" ];
-
-  # CRITICAL: Force ZFS import even if hostId doesn't match
-  # The pool is created on the build PC (different hostId) but boots on Pi
-  boot.zfs.forceImportRoot = true;
-
-  # USB drivers needed in initrd to find root filesystem on USB SSD
-  boot.initrd.availableKernelModules = [
-    "xhci_pci"        # USB 3.0 controller (required for USB boot)
-    "usb_storage"     # USB mass storage
-    "usbhid"          # USB HID (keyboard)
-    "uas"             # USB Attached SCSI (better SSD performance)
+  imports = [
+    (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  # Wait for USB devices to enumerate before ZFS import
-  # USB SSDs can take a few seconds to appear on RPi
-  # Pi 4's VL805 USB controller can be slow to enumerate devices
-  boot.initrd.postDeviceCommands = lib.mkBefore ''
-    echo "Waiting for USB devices to settle..."
-    sleep 10
-  '';
+  # --- Boot Configuration (UEFI with systemd-boot) ---
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
-  # Ensure WiFi driver loads on boot (critical for headless)
+  # ZFS support
+  boot.supportedFilesystems = [ "zfs" ];
+  boot.zfs.forceImportRoot = true;
+  boot.zfs.devNodes = "/dev/disk/by-id";
+
+  # Kernel modules for Pi 4 with UEFI
+  # Based on: https://www.eisfunke.com/posts/2023/nixos-on-raspberry-pi-4.html
+  boot.initrd.availableKernelModules = [
+    "usbhid"        # USB HID devices
+    "usb_storage"   # USB mass storage
+    "vc4"           # VideoCore 4 GPU
+    "pcie_brcmstb"  # Broadcom PCIe controller
+    "reset-raspberrypi"  # Pi reset controller
+    "xhci_pci"      # USB 3.0
+    "uas"           # USB Attached SCSI
+  ];
+
+  # ZFS must be in initrd to mount root
+  boot.initrd.kernelModules = [ "zfs" ];
+
+  # WiFi driver
   boot.kernelModules = [ "brcmfmac" ];
 
-  # Explicit WiFi firmware (safety net for headless)
+  # --- Filesystem Configuration ---
+  # Add zfsutil option for proper ZFS property handling
+  fileSystems."/" = {
+    device = "zroot/root";
+    fsType = "zfs";
+    options = [ "zfsutil" "X-mount.mkdir" ];
+  };
+
+  fileSystems."/nix" = {
+    device = "zroot/nix";
+    fsType = "zfs";
+    options = [ "zfsutil" "X-mount.mkdir" ];
+  };
+
+  fileSystems."/var" = {
+    device = "zroot/var";
+    fsType = "zfs";
+    options = [ "zfsutil" "X-mount.mkdir" ];
+  };
+
+  fileSystems."/home" = {
+    device = "zroot/home";
+    fsType = "zfs";
+    options = [ "zfsutil" "X-mount.mkdir" ];
+  };
+
+  # /boot is defined by disko.nix (ESP partition)
+
+  # --- Hardware ---
+  # WiFi firmware
   hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
+  hardware.enableRedistributableFirmware = true;
 
-  # Note: Swap via zvol is optional - ZFS doesn't support swapfiles
-  # Uncomment below if swap is needed (creates 2GB zvol):
-  # swapDevices = [{ device = "/dev/zvol/zroot/swap"; }];
-  # To create: zfs create -V 2G -b $(getconf PAGESIZE) zroot/swap
-
-  # Power management optimizations for RPi4
+  # Power management
   powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 
-  # Disable firmware updates (RPi firmware is handled by nixos-raspberrypi)
+  # Disable fwupd (not useful for Pi)
   services.fwupd.enable = lib.mkForce false;
+
+  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

@@ -110,12 +110,11 @@
         ];
 
         # Raspberry Pi 4 - lightweight headless server (aarch64)
-        pi4 = nixos-raspberrypi.lib.nixosSystem {
-          specialArgs = { inherit nixos-raspberrypi; };
-          modules = [
-            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+        # Uses UEFI (pftf/RPi4) for standard NixOS boot with ZFS
+        pi4 = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = commonModules ++ [
             disko.nixosModules.disko
-          ] ++ commonModules ++ [
             ./hosts/pi4/disko.nix
             ./hosts/pi4/default.nix
             ./hosts/pi4/hardware-configuration.nix
