@@ -1,13 +1,18 @@
 # Raspberry Pi 4 hardware configuration (UEFI boot)
 #
 # Uses pftf/RPi4 UEFI firmware for standard NixOS boot.
-# No nixos-raspberrypi flake needed - vanilla aarch64 NixOS.
+# Firmware is declared in Nix - no manual downloads needed.
 { config, lib, pkgs, modulesPath, ... }:
 
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
+    ../../modules/pi-uefi.nix
   ];
+
+  # --- UEFI Firmware (declarative) ---
+  hardware.raspberry-pi.uefi.enable = true;
+  hardware.raspberry-pi.uefi.model = "rpi4";
 
   # --- Boot Configuration (UEFI with systemd-boot) ---
   boot.loader.systemd-boot.enable = true;
@@ -18,15 +23,7 @@
   boot.zfs.forceImportRoot = true;
   boot.zfs.devNodes = "/dev/disk/by-id";
 
-  # USB storage can be slow to enumerate on Pi; wait for devices
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
-    # Wait for USB devices to settle before ZFS import
-    echo "Waiting for USB devices to settle..."
-    sleep 5
-  '';
-
   # Kernel modules for Pi 4 with UEFI
-  # Based on: https://www.eisfunke.com/posts/2023/nixos-on-raspberry-pi-4.html
   boot.initrd.availableKernelModules = [
     "usbhid"        # USB HID devices
     "usb_storage"   # USB mass storage
@@ -39,6 +36,8 @@
 
   # ZFS must be in initrd to mount root
   boot.initrd.kernelModules = [ "zfs" ];
+
+  # USB storage can be slow to enumerate on Pi; wait for devices
   boot.initrd.postDeviceCommands = lib.mkBefore ''
     echo "Waiting for USB devices to settle..."
     sleep 8

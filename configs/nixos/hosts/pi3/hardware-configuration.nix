@@ -7,7 +7,12 @@
 {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
+    ../../modules/pi-uefi.nix
   ];
+
+  # --- UEFI Firmware (declarative) ---
+  hardware.raspberry-pi.uefi.enable = true;
+  hardware.raspberry-pi.uefi.model = "rpi3";
 
   # --- Boot Configuration (UEFI with systemd-boot) ---
   boot.loader.systemd-boot.enable = true;
@@ -29,6 +34,8 @@
 
   # ZFS must be in initrd to mount root
   boot.initrd.kernelModules = [ "zfs" ];
+
+  # USB storage can be slow to enumerate on Pi; wait for devices
   boot.initrd.postDeviceCommands = lib.mkBefore ''
     echo "Waiting for USB devices to settle..."
     sleep 8
