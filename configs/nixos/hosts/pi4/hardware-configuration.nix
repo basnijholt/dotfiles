@@ -21,13 +21,14 @@
   # Kernel modules for RPi4
   boot.initrd.availableKernelModules = [ "usbhid" "usb_storage" "vc4" "pcie_brcmstb" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ ];
+  boot.kernelModules = [ "brcmfmac" ]; # WiFi driver - must be explicit for headless boot
   boot.extraModulePackages = [ ];
 
   boot.supportedFilesystems = [ "zfs" ];
 
   # Required firmware for WiFi, Bluetooth, GPU
   hardware.enableRedistributableFirmware = true;
+  hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ]; # Explicit WiFi firmware for headless
 
   # SD card / USB boot filesystem
   # The sd-image module handles this automatically for initial boot
