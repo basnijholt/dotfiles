@@ -11,8 +11,4 @@
   networking.firewall.allowedTCPPorts = [
     5000 # Harmonia binary cache
   ];
-
-  networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; } # mosh
-  ];
 }
