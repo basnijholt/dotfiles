@@ -122,6 +122,7 @@
         # Raspberry Pi 4 - lightweight headless server (aarch64)
         # Uses nixos-raspberrypi flake for proper kernel/firmware/bootloader support
         pi4 = nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = { inherit nixos-raspberrypi; };
           modules = [
             # RPi4 hardware support (kernel, firmware, bootloader)
             nixos-raspberrypi.nixosModules.raspberry-pi-4.base
@@ -147,6 +148,7 @@
 
         # Raspberry Pi 4 - Bootstrap SD Image for initial WiFi access
         pi4-bootstrap = nixos-raspberrypi.lib.nixosInstaller {
+          specialArgs = { inherit nixos-raspberrypi; };
           modules = [
             nixos-raspberrypi.nixosModules.raspberry-pi-4.base
             ./installers/pi4-sd.nix
