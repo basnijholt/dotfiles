@@ -78,6 +78,45 @@ The script will:
 
 The Pi boots directly from SSD and connects to WiFi.
 
+## Alternative: Build on Mac, Flash on Linux
+
+For faster builds, use native ARM on Apple Silicon Mac, then flash on Linux.
+
+### Step 1: Build on Mac (Docker)
+
+```bash
+# Start Docker container with nix (from configs/nixos directory)
+docker run --rm -it \
+  --platform linux/arm64 \
+  --dns 192.168.1.66 \
+  -v $(pwd):/work \
+  -v nix-pi4-cache:/nix \
+  -v ~/.ssh:/root/.ssh:ro \
+  -w /work \
+  nixos/nix bash
+
+# Inside container:
+nix --extra-experimental-features 'nix-command flakes' \
+  build .#nixosConfigurations.pi4.config.system.build.toplevel \
+  --substituters 'https://nixos-raspberrypi.cachix.org https://cache.nixos.org' \
+  --trusted-public-keys 'nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY='
+```
+
+### Step 2: Copy to Linux PC
+
+```bash
+# Inside Docker container - copy to Linux PC via SSH
+nix --extra-experimental-features 'nix-command flakes' copy --to 'ssh://basnijholt@pc' --accept-flake-config .#nixosConfigurations.pi4.config.system.build.toplevel
+```
+
+### Step 3: Flash on Linux
+
+```bash
+# On Linux PC with SSD attached
+cd configs/nixos
+./hosts/pi4/install-ssd.sh
+```
+
 ## Updating the System
 
 Deploy changes remotely:
