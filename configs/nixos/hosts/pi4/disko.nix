@@ -9,9 +9,9 @@
         content = {
           type = "gpt";
           partitions = {
-            # Firmware partition for RPi bootloader, U-Boot, config.txt, DTBs
-            # nixos-raspberrypi expects this at /boot/firmware
-            firmware = {
+            # Partition 1: Firmware (FAT32) - MUST be first for Pi boot ROM!
+            # Pi boot ROM scans for the first FAT32 partition
+            "1-firmware" = {
               label = "FIRMWARE";
               size = "256M";
               type = "EF00";
@@ -22,9 +22,9 @@
                 mountOptions = [ "umask=0077" ];
               };
             };
-            # Boot partition for kernel, initrd, extlinux.conf
+            # Partition 2: Boot (ext4) for kernel, initrd, extlinux.conf
             # Must be ext4 because U-Boot cannot read ZFS
-            boot = {
+            "2-boot" = {
               label = "BOOT";
               size = "512M";
               content = {
@@ -33,7 +33,7 @@
                 mountpoint = "/boot";
               };
             };
-            zfs = {
+            "3-zfs" = {
               size = "100%";
               content = {
                 type = "zfs";
