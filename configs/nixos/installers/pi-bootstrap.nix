@@ -66,9 +66,12 @@
   # Allow passwordless sudo for nixos user
   security.sudo.wheelNeedsPassword = false;
 
-  # NetworkManager for easy WiFi (disable wpa_supplicant)
+  # Minimal NetworkManager for WiFi (no VPN plugins, no GUI)
   networking.wireless.enable = lib.mkForce false;
-  networking.networkmanager.enable = true;
+  networking.networkmanager = {
+    enable = true;
+    plugins = lib.mkForce [];  # No VPN plugins - saves huge build time
+  };
 
   # Essential tools
   environment.systemPackages = with pkgs; [
