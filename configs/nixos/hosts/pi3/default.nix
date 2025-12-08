@@ -1,15 +1,11 @@
-# Raspberry Pi 3 - debug host for Pi boot issues
+# Raspberry Pi 3 - simple SD card setup with WiFi
 #
 # Uses nixos-raspberrypi flake for U-Boot boot with WiFi firmware.
-# Debug host with HDMI/ethernet for troubleshooting boot issues.
 { ... }:
 
 {
   imports = [
-    # Host-specific modules
+    ./hardware-configuration.nix
     ./networking.nix
   ];
-
-  # Required for ZFS (different from pi4)
-  networking.hostId = "a1b2c3d4";
 }

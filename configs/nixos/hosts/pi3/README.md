@@ -1,12 +1,11 @@
 # Raspberry Pi 3 Setup
 
-Pi 3 with SSD root filesystem. SD card provides boot files, SSD provides ZFS root.
+Simple Pi 3 running from SD card with WiFi.
 
 ## Prerequisites
 
 - Raspberry Pi 3
-- External SSD
-- MicroSD card (permanent, for boot files)
+- MicroSD card (8GB+)
 - Build machine: Linux or Mac
 
 ## Installation
@@ -27,7 +26,7 @@ Create `hosts/pi4/wifi.nix` (shared with Pi 4, gitignored):
 }
 ```
 
-### 2. Build and flash bootstrap SD
+### 2. Build and flash SD image
 
 ```bash
 nix build 'path:.#nixosConfigurations.pi3-bootstrap.config.system.build.sdImage' --impure
@@ -36,32 +35,15 @@ sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
 
 ### 3. Boot and SSH in
 
-1. Insert SD card and connect SSD
+1. Insert SD card
 2. Power on, wait ~30 seconds for WiFi
 3. `ssh root@pi-bootstrap.local`
 
-### 4. Install to SSD
+### 4. Switch to full config
 
 ```bash
-git clone https://github.com/basnijholt/dotfiles
-cd dotfiles/configs/nixos
-# from other machine: `scp hosts/pi4/wifi.nix root@pi-bootstrap.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix`
-./hosts/pi3/install-ssd.sh
+sudo nixos-rebuild switch --flake github:basnijholt/dotfiles?dir=configs/nixos#pi3
 ```
-
-### 5. Copy boot files to SD card
-
-The Pi 3 boot ROM can only read from SD, so copy boot files from SSD:
-
-```bash
-sudo mount /dev/mmcblk0p1 /mnt
-sudo cp -r /mnt/boot/* /mnt/   # Copy from SSD ESP to SD
-sudo umount /mnt
-```
-
-### 6. Reboot
-
-System boots from SD card but runs from SSD.
 
 ## Updating
 
@@ -69,10 +51,7 @@ System boots from SD card but runs from SSD.
 nixos-rebuild switch --flake .#pi3 --target-host root@pi3.local --build-host root@pi3.local
 ```
 
-After kernel updates, repeat step 5 to update SD card boot files.
-
 ## Troubleshooting
 
 - **No WiFi**: Check `hosts/pi4/wifi.nix` exists
-- **Won't boot**: Ensure SD card has `bootcode.bin`, `start.elf`, `config.txt`
-- **ZFS errors**: Don't add `zfsutil` to fileSystems options
+- **Can't SSH**: Verify Pi is powered and connected to your network

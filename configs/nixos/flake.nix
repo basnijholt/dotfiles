@@ -122,14 +122,12 @@
           ];
         };
 
-        # Raspberry Pi 3 - debug host with HDMI/ethernet
+        # Raspberry Pi 3 - simple SD card setup with WiFi
         pi3 = nixos-raspberrypi.lib.nixosSystem {
           specialArgs = { inherit nixos-raspberrypi; };
           modules = [
             nixos-raspberrypi.nixosModules.raspberry-pi-3.base
-            disko.nixosModules.disko
           ] ++ commonModules ++ [
-            ./hosts/pi3/disko.nix
             ./hosts/pi3/default.nix
             ./hosts/pi3/hardware-configuration.nix
           ];
