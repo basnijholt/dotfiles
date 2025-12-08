@@ -1,11 +1,6 @@
 # Raspberry Pi 4 - lightweight headless server
 #
 # Uses nixos-raspberrypi flake for U-Boot boot with WiFi firmware.
-#
-# Excluded optional modules (too heavy or incompatible with RPi4):
-#   - iscsi.nix (no TrueNAS LUNs needed)
-#   - desktop.nix, audio.nix, gui-packages.nix (headless)
-#   - power.nix (no lid/power button)
 { ... }:
 
 {

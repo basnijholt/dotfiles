@@ -64,8 +64,11 @@ WiFi credentials are shared with Pi 4. Create `hosts/pi4/wifi.nix`:
 ### 2. Build Bootstrap SD Image
 
 ```bash
-nix build .#nixosConfigurations.pi3-bootstrap.config.system.build.sdImage
+# Use path:. and --impure to include gitignored wifi.nix
+nix build 'path:.#nixosConfigurations.pi3-bootstrap.config.system.build.sdImage' --impure
 ```
+
+> **Note:** `path:.` tells Nix to use all files (not just git-tracked), and `--impure` allows reading gitignored wifi.nix.
 
 ### 3. Flash to SD Card
 
