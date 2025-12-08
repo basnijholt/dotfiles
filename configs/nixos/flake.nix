@@ -135,6 +135,24 @@
           ];
         };
 
+        # Bootstrap SD images - minimal bootable images with WiFi + SSH
+        # After booting: nixos-rebuild switch --flake .#pi3 (or pi4)
+        pi3-bootstrap = nixos-raspberrypi.lib.nixosInstaller {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [
+            nixos-raspberrypi.nixosModules.raspberry-pi-3.base
+            ./installers/pi-bootstrap.nix
+          ];
+        };
+
+        pi4-bootstrap = nixos-raspberrypi.lib.nixosInstaller {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+            ./installers/pi-bootstrap.nix
+          ];
+        };
+
         installer = lib.nixosSystem {
           inherit system;
           modules = [
