@@ -31,30 +31,23 @@ Option B - Mac with Apple Silicon (native aarch64 via Docker):
 # Create persistent Nix store volume (avoids re-downloading)
 docker volume create nix-cache
 
-# Build inside container
+# Build and copy to PC in one go
 docker run --rm -it \
-  --platform linux/arm64 \
-  -v $(pwd):/work \
-  -v nix-cache:/nix \
-  -w /work \
-  nixos/nix \
-  sh -c "
-    mkdir -p /nix/var/nix/profiles/per-user/root
-    nix --extra-experimental-features 'nix-command flakes' \
-      build .#nixosConfigurations.pi4.config.system.build.toplevel \
-      --show-trace
-  "
-
-# Copy closure to PC (mount SSH keys for access)
-docker run --rm \
   --platform linux/arm64 \
   -v $(pwd):/work \
   -v nix-cache:/nix \
   -v ~/.ssh:/root/.ssh:ro \
   -w /work \
   nixos/nix \
-  sh -c "nix --extra-experimental-features 'nix-command flakes' \
-    copy --to ssh://pc ./result"
+  sh -c '
+    mkdir -p /nix/var/nix/profiles/per-user/root
+    STORE_PATH=$(nix --extra-experimental-features "nix-command flakes" \
+      build .#nixosConfigurations.pi4.config.system.build.toplevel \
+      --print-out-paths --no-link)
+    echo "Built: $STORE_PATH"
+    nix --extra-experimental-features "nix-command flakes" \
+      copy --to ssh://pc $STORE_PATH
+  '
 ```
 
 ## Installation
