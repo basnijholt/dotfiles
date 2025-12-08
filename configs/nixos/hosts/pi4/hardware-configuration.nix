@@ -1,94 +1,64 @@
-# Raspberry Pi 4 hardware configuration (UEFI boot)
+# Raspberry Pi 4 hardware configuration
 #
-# Uses pftf/RPi4 UEFI firmware for standard NixOS boot.
-# Firmware is declared in Nix - no manual downloads needed.
-{ config, lib, pkgs, modulesPath, ... }:
+# Most hardware config is handled by nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+# This file adds ZFS-specific configuration and fixes.
+{ config, lib, pkgs, ... }:
 
 {
-  imports = [
-    (modulesPath + "/installer/scan/not-detected.nix")
-    ../../modules/pi-uefi.nix
-  ];
-
-  # --- UEFI Firmware (declarative) ---
-  hardware.raspberry-pi.uefi.enable = true;
-  hardware.raspberry-pi.uefi.model = "rpi4";
-
-  # --- Boot Configuration (UEFI with systemd-boot) ---
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  # ZFS support
+  # ZFS support (not provided by nixos-raspberrypi)
   boot.supportedFilesystems = [ "zfs" ];
-  boot.zfs.forceImportRoot = true;
-  boot.zfs.devNodes = "/dev/disk/by-id";
+  boot.initrd.supportedFilesystems = [ "zfs" ];  # Critical for ZFS root!
 
-  # Kernel modules for Pi 4 with UEFI
+  # CRITICAL: Force ZFS import even if hostId doesn't match
+  boot.zfs.forceImportRoot = true;
+  boot.zfs.devNodes = "/dev/disk/by-partuuid";  # More reliable for USB on Pi
+
+  # USB drivers needed in initrd to find root filesystem on USB SSD
   boot.initrd.availableKernelModules = [
-    "usbhid"        # USB HID devices
-    "usb_storage"   # USB mass storage
-    "vc4"           # VideoCore 4 GPU
-    "pcie_brcmstb"  # Broadcom PCIe controller
-    "reset-raspberrypi"  # Pi reset controller
-    "xhci_pci"      # USB 3.0
-    "uas"           # USB Attached SCSI
+    "xhci_pci"        # USB 3.0 controller
+    "usb_storage"     # USB mass storage
+    "usbhid"          # USB HID
+    "uas"             # USB Attached SCSI
   ];
 
-  # ZFS must be in initrd to mount root
-  boot.initrd.kernelModules = [ "zfs" ];
-
-  # USB storage can be slow to enumerate on Pi; wait for devices
+  # Wait for USB devices to enumerate before ZFS import
   boot.initrd.postDeviceCommands = lib.mkBefore ''
     echo "Waiting for USB devices to settle..."
-    sleep 8
+    sleep 3
   '';
 
-  # WiFi driver
-  boot.kernelModules = [ "brcmfmac" ];
+  # Kernel params for ZFS boot
   boot.kernelParams = [
-    "rootdelay=10"          # USB SSD enumeration can be slow on Pi4
-    "console=ttyAMA0,115200"
-    "console=tty1"
+    "zfs_force=1"           # Force ZFS import regardless of hostid
   ];
 
   # --- Filesystem Configuration ---
-  # Add zfsutil option for proper ZFS property handling
+  # NOTE: Do NOT use zfsutil - it causes "cannot be mounted" errors with legacy mountpoints
   fileSystems."/" = {
     device = "zroot/root";
     fsType = "zfs";
-    options = [ "zfsutil" "X-mount.mkdir" ];
   };
 
   fileSystems."/nix" = {
     device = "zroot/nix";
     fsType = "zfs";
-    options = [ "zfsutil" "X-mount.mkdir" ];
   };
 
   fileSystems."/var" = {
     device = "zroot/var";
     fsType = "zfs";
-    options = [ "zfsutil" "X-mount.mkdir" ];
   };
 
   fileSystems."/home" = {
     device = "zroot/home";
     fsType = "zfs";
-    options = [ "zfsutil" "X-mount.mkdir" ];
   };
 
   # /boot is defined by disko.nix (ESP partition)
 
-  # --- Hardware ---
-  # WiFi firmware
-  hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
-  hardware.enableRedistributableFirmware = true;
-
   # Power management
   powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 
-  # Disable fwupd (not useful for Pi)
+  # Disable fwupd (firmware handled by nixos-raspberrypi)
   services.fwupd.enable = lib.mkForce false;
-
-  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

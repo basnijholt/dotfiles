@@ -15,9 +15,12 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -106,24 +109,26 @@
           ./hosts/nix-cache/hardware-configuration.nix
         ];
 
-        # Raspberry Pi 4 - lightweight headless server (aarch64)
-        # Uses UEFI (pftf/RPi4) for standard NixOS boot with ZFS
-        pi4 = lib.nixosSystem {
-          system = "aarch64-linux";
-          modules = commonModules ++ [
+        # Raspberry Pi 4 - uses nixos-raspberrypi for hardware + ZFS fixes
+        pi4 = nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [
+            nixos-raspberrypi.nixosModules.raspberry-pi-4.base
             disko.nixosModules.disko
+          ] ++ commonModules ++ [
             ./hosts/pi4/disko.nix
             ./hosts/pi4/default.nix
             ./hosts/pi4/hardware-configuration.nix
           ];
         };
 
-        # Raspberry Pi 3 - debug host for boot troubleshooting (aarch64)
-        # Uses UEFI (pftf/RPi3) with HDMI/ethernet for debugging
-        pi3 = lib.nixosSystem {
-          system = "aarch64-linux";
-          modules = commonModules ++ [
+        # Raspberry Pi 3 - debug host with HDMI/ethernet
+        pi3 = nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [
+            nixos-raspberrypi.nixosModules.raspberry-pi-3.base
             disko.nixosModules.disko
+          ] ++ commonModules ++ [
             ./hosts/pi3/disko.nix
             ./hosts/pi3/default.nix
             ./hosts/pi3/hardware-configuration.nix
