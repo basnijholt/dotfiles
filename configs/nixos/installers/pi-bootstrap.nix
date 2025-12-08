@@ -8,9 +8,10 @@
 { lib, pkgs, ... }:
 
 {
-  # Import WiFi config - file must exist (contains credentials, gitignored)
-  # If missing, create hosts/pi4/wifi.nix with your WiFi credentials
-  imports = [ ../hosts/pi4/wifi.nix ];
+  # Import networking.nix (tracked) which conditionally imports wifi.nix (gitignored)
+  imports = [
+    ../hosts/pi4/networking.nix
+  ] ++ lib.optional (builtins.pathExists ../hosts/pi4/wifi.nix) ../hosts/pi4/wifi.nix;
 
   networking.hostName = lib.mkForce "pi-bootstrap";
   networking.hostId = "8425e349"; # Required for ZFS
