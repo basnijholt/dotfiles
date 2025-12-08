@@ -45,6 +45,7 @@ sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```bash
 git clone https://github.com/basnijholt/dotfiles
 cd dotfiles/configs/nixos
+# from other machine: `scp hosts/pi4/wifi.nix root@pi-bootstrap.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix`
 ./hosts/pi4/install-ssd.sh
 ```
 
