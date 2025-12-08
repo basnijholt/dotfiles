@@ -18,24 +18,29 @@ read -p "Press Enter to continue..."
 # Partition + mount
 sudo nix run github:nix-community/disko -- --mode disko "$SCRIPT_DIR/disko.nix"
 
-# Install - use pre-built path if provided, otherwise build locally
+# Build system (separately, because nixos-install --flake uses --store /mnt which breaks binfmt)
 if [[ -n "${1:-}" ]]; then
-    echo "Using pre-built system: $1"
-    sudo nixos-install --system "$1" --root /mnt --no-root-passwd
+    SYSTEM="$1"
+    echo "Using pre-built system: $SYSTEM"
 else
     [[ ! -f /proc/sys/fs/binfmt_misc/aarch64-linux ]] && { echo "Enable aarch64 emulation or provide pre-built path"; exit 1; }
-    sudo nixos-install --flake "$FLAKE_DIR#$FLAKE_ATTR" --root /mnt --no-root-passwd
+    echo "Building NixOS system..."
+    SYSTEM=$(nix build "$FLAKE_DIR#nixosConfigurations.$FLAKE_ATTR.config.system.build.toplevel" --no-link --print-out-paths)
+    echo "Built: $SYSTEM"
 fi
+
+# Install to target
+sudo nixos-install --system "$SYSTEM" --root /mnt --no-root-passwd
 
 # Write hostid for ZFS
 HOSTID=$(nix eval --raw "$FLAKE_DIR#nixosConfigurations.$FLAKE_ATTR.config.networking.hostId" 2>/dev/null || true)
 [[ $HOSTID =~ ^[0-9a-fA-F]{8}$ ]] && printf '%s' "$HOSTID" | xxd -r -p | sudo tee /mnt/etc/hostid >/dev/null
 
-# Pre-create WiFi profile (activation scripts can't run on x86_64)
+# Pre-create WiFi profile (nixos-install --system doesn't run activation scripts)
 WIFI_NIX="$SCRIPT_DIR/../pi4/wifi.nix"
 if [[ -f "$WIFI_NIX" ]]; then
-    SSID=$(grep -oP "ssid = \"\K[^\"]*" "$WIFI_NIX" | head -1)
-    PSK=$(grep -oP "psk = \"\K[^\"]*" "$WIFI_NIX" | head -1)
+    SSID=$(grep -oP 'ssid = "\K[^"]*' "$WIFI_NIX" | head -1)
+    PSK=$(grep -oP 'psk = "\K[^"]*' "$WIFI_NIX" | head -1)
     if [[ -n "$SSID" && -n "$PSK" ]]; then
         echo "Creating WiFi profile for: $SSID"
         sudo mkdir -p /mnt/etc/NetworkManager/system-connections
