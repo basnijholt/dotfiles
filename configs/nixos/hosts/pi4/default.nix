@@ -1,7 +1,6 @@
-# Raspberry Pi 4 - lightweight headless server (UEFI boot)
+# Raspberry Pi 4 - lightweight headless server
 #
-# Uses pftf/RPi4 UEFI firmware for standard NixOS boot with ZFS.
-# Vanilla aarch64 NixOS - no special Pi flake needed.
+# Uses nixos-raspberrypi flake for U-Boot boot with WiFi firmware.
 #
 # Excluded optional modules (too heavy or incompatible with RPi4):
 #   - iscsi.nix (no TrueNAS LUNs needed)

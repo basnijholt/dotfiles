@@ -1,7 +1,7 @@
 # Raspberry Pi 4 hardware configuration
 #
-# Most hardware config is handled by nixos-raspberrypi.nixosModules.raspberry-pi-4.base
-# This file adds ZFS-specific configuration and fixes.
+# Hardware handled by nixos-raspberrypi.nixosModules.raspberry-pi-4.base
+# This file adds ZFS-specific configuration and critical boot fixes.
 { config, lib, pkgs, ... }:
 
 {

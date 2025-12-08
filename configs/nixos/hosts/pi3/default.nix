@@ -1,7 +1,7 @@
-# Raspberry Pi 3 - debug host for Pi boot issues (UEFI boot)
+# Raspberry Pi 3 - debug host for Pi boot issues
 #
-# Uses pftf/RPi3 UEFI firmware for standard NixOS boot with ZFS.
-# Used to debug boot issues with HDMI/ethernet before deploying to Pi 4.
+# Uses nixos-raspberrypi flake for U-Boot boot with WiFi firmware.
+# Debug host with HDMI/ethernet for troubleshooting boot issues.
 { ... }:
 
 {

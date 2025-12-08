@@ -2,13 +2,13 @@
 
 Headless Raspberry Pi 4 booting from **external SSD** (via USB) with **ZFS** root.
 
-Uses **UEFI boot** via [pftf/RPi4](https://github.com/pftf/RPi4) firmware - standard NixOS aarch64, no special Pi flake needed.
+Uses **nixos-raspberrypi** flake for U-Boot boot with WiFi firmware included.
 
 ## Architecture
 
 | Partition | Size | Type | Mount | Purpose |
 |-----------|------|------|-------|---------|
-| ESP | 512M | FAT32 | /boot | UEFI firmware, systemd-boot, kernels |
+| ESP | 512M | FAT32 | /boot | U-Boot, kernels |
 | zfs | Rest | ZFS | / | Root filesystem with datasets |
 
 ## Prerequisites
@@ -17,13 +17,44 @@ Uses **UEFI boot** via [pftf/RPi4](https://github.com/pftf/RPi4) firmware - stan
 - Raspberry Pi 4 (with updated EEPROM for USB boot)
 - External SSD (Samsung T5 or similar)
 
-**Build machine (Linux PC):**
+**Build machine:**
+
+Option A - Linux PC with emulation:
 ```nix
 # configuration.nix
 boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 boot.supportedFilesystems = [ "zfs" ];
 ```
-Reboot after adding these.
+
+Option B - Mac with Apple Silicon (native aarch64 via Docker):
+```bash
+# Create persistent Nix store volume (avoids re-downloading)
+docker volume create nix-cache
+
+# Build inside container
+docker run --rm -it \
+  --platform linux/arm64 \
+  -v $(pwd):/work \
+  -v nix-cache:/nix \
+  -w /work \
+  nixos/nix \
+  sh -c "
+    mkdir -p /nix/var/nix/profiles/per-user/root
+    nix --extra-experimental-features 'nix-command flakes' \
+      build .#nixosConfigurations.pi4.config.system.build.toplevel \
+      --show-trace
+  "
+
+# Copy closure to PC
+docker run --rm \
+  --platform linux/arm64 \
+  -v $(pwd):/work \
+  -v nix-cache:/nix \
+  -w /work \
+  nixos/nix \
+  sh -c "nix --extra-experimental-features 'nix-command flakes' \
+    copy --to ssh://pc ./result"
+```
 
 ## Installation
 
@@ -57,26 +88,25 @@ Create `hosts/pi4/wifi.nix` with your credentials:
 ### 2. Run the Install Script
 
 ```bash
-# Connect SSD to your Linux PC, then:
+# Connect SSD to your build machine, then:
 cd configs/nixos
 ./hosts/pi4/install-ssd.sh
 ```
 
 The script will:
 1. Partition the SSD (ESP + ZFS via disko)
-2. Download and install pftf UEFI firmware
-3. Build the aarch64 system (using binfmt emulation)
-4. Install NixOS with systemd-boot
-5. Set ZFS bootfs property
+2. Build the aarch64 system
+3. Install NixOS
+4. Set ZFS hostid
 
 ### 3. Deploy to Pi
 
-1. Unplug SSD from PC
+1. Unplug SSD from build machine
 2. Plug into Pi 4 (blue USB 3.0 port)
 3. Remove any SD card
 4. Power on
 
-The Pi boots via UEFI and connects to WiFi.
+The Pi boots via U-Boot and connects to WiFi.
 
 ## Updating the System
 
@@ -89,12 +119,14 @@ nixos-rebuild switch \
   --build-host root@pi4.local
 ```
 
-## UEFI Settings
+Or build on Mac and deploy:
 
-On first boot, you may need to configure UEFI:
-- Press **Esc** at the Raspberry Pi logo to enter setup
-- Device Manager → Raspberry Pi Configuration → Advanced Settings
-  - Disable "Limit RAM to 3 GB" if you have 4GB+ Pi
+```bash
+# On Mac
+nix build .#nixosConfigurations.pi4.config.system.build.toplevel
+nix copy --to ssh://pi4.local ./result
+ssh root@pi4.local "nix-env -p /nix/var/nix/profiles/system --set $(readlink ./result) && /nix/var/nix/profiles/system/bin/switch-to-configuration switch"
+```
 
 ## Troubleshooting
 
@@ -108,6 +140,11 @@ On first boot, you may need to configure UEFI:
 
 1. Ensure Pi EEPROM supports USB boot (update via Raspberry Pi Imager if needed)
 2. Check LED patterns:
-   - No activity = UEFI firmware not found
+   - No activity = boot firmware not found
    - Activity then stop = kernel/ZFS issue
-3. Connect HDMI to see UEFI/boot messages
+3. Connect HDMI to see boot messages
+
+### ZFS mount errors
+
+If you see "cannot be mounted" errors, ensure `zfsutil` is NOT in any fileSystems options.
+The hardware-configuration.nix has a warning comment about this.

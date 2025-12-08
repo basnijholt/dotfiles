@@ -9,8 +9,8 @@
         content = {
           type = "gpt";
           partitions = {
-            # Partition 1: ESP (EFI System Partition)
-            # Contains pftf UEFI firmware + systemd-boot + kernels
+            # Partition 1: ESP (boot partition)
+            # Contains U-Boot + kernels
             ESP = {
               label = "ESP";
               size = "512M";
