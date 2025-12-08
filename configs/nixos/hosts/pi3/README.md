@@ -42,7 +42,10 @@ sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
 ### 4. Switch to full config
 
 ```bash
-sudo nixos-rebuild switch --flake github:basnijholt/dotfiles?dir=configs/nixos#pi3
+git clone https://github.com/basnijholt/dotfiles
+cd dotfiles/configs/nixos
+# from other machine: `scp hosts/pi4/wifi.nix root@pi-bootstrap.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix`
+sudo nixos-rebuild switch --flake 'path:.#pi3' --impure
 ```
 
 ## Updating
