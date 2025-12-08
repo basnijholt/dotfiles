@@ -2,6 +2,8 @@
 { config, pkgs, ... }:
 
 {
+  # Allow binfmt emulators inside nix sandbox (for cross-compilation)
+  nix.settings.extra-sandbox-paths = [ "/run/binfmt" ];
   boot.loader.grub = {
     enable = true;
     efiSupport = true;
