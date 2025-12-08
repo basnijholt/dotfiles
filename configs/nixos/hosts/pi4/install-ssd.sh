@@ -31,6 +31,37 @@ fi
 HOSTID=$(nix eval --raw "$FLAKE_DIR#nixosConfigurations.$FLAKE_ATTR.config.networking.hostId" 2>/dev/null || true)
 [[ $HOSTID =~ ^[0-9a-fA-F]{8}$ ]] && printf '%s' "$HOSTID" | xxd -r -p | sudo tee /mnt/etc/hostid >/dev/null
 
+# Pre-create WiFi profile (activation scripts can't run on x86_64)
+if [[ -f "$SCRIPT_DIR/wifi.nix" ]]; then
+    SSID=$(grep -oP "ssid = \"\K[^\"]*" "$SCRIPT_DIR/wifi.nix" | head -1)
+    PSK=$(grep -oP "psk = \"\K[^\"]*" "$SCRIPT_DIR/wifi.nix" | head -1)
+    if [[ -n "$SSID" && -n "$PSK" ]]; then
+        echo "Creating WiFi profile for: $SSID"
+        sudo mkdir -p /mnt/etc/NetworkManager/system-connections
+        sudo tee /mnt/etc/NetworkManager/system-connections/Home-WiFi.nmconnection >/dev/null <<EOF
+[connection]
+id=Home-WiFi
+type=wifi
+autoconnect=true
+
+[wifi]
+mode=infrastructure
+ssid=$SSID
+
+[wifi-security]
+key-mgmt=wpa-psk
+psk=$PSK
+
+[ipv4]
+method=auto
+
+[ipv6]
+method=auto
+EOF
+        sudo chmod 600 /mnt/etc/NetworkManager/system-connections/Home-WiFi.nmconnection
+    fi
+fi
+
 # Cleanup
 sudo umount -R /mnt
 sudo zpool export zroot
