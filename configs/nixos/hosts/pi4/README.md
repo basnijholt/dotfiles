@@ -16,41 +16,14 @@ Uses **nixos-raspberrypi** flake for U-Boot boot with WiFi firmware included.
 **Hardware:**
 - Raspberry Pi 4 (with updated EEPROM for USB boot)
 - External SSD (Samsung T5 or similar)
+- MicroSD card (for bootstrap image)
 
 **Build machine:**
+- Linux PC or Mac (no emulation required for bootstrap image)
 
-Option A - Linux PC with emulation:
-```nix
-# configuration.nix
-boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-boot.supportedFilesystems = [ "zfs" ];
-```
+## Installation (Bootstrap SD Method)
 
-Option B - Mac with Apple Silicon (native aarch64 via Docker):
-```bash
-# Create persistent Nix store volume (avoids re-downloading)
-docker volume create nix-cache
-
-# Build and copy to PC in one go
-docker run --rm -it \
-  --platform linux/arm64 \
-  -v $(pwd):/work \
-  -v nix-cache:/nix \
-  -v ~/.ssh:/root/.ssh:ro \
-  -w /work \
-  nixos/nix \
-  sh -c '
-    mkdir -p /nix/var/nix/profiles/per-user/root
-    STORE_PATH=$(nix --extra-experimental-features "nix-command flakes" \
-      build .#nixosConfigurations.pi4.config.system.build.toplevel \
-      --print-out-paths --no-link)
-    echo "Built: $STORE_PATH"
-    nix --extra-experimental-features "nix-command flakes" \
-      copy --to ssh://pc $STORE_PATH
-  '
-```
-
-## Installation
+This is the recommended method for headless setup.
 
 ### 1. Configure WiFi
 
@@ -63,6 +36,7 @@ Create `hosts/pi4/wifi.nix` with your credentials:
       connection = {
         id = "Home-WiFi";
         type = "wifi";
+        autoconnect = true;
       };
       wifi = {
         mode = "infrastructure";
@@ -79,28 +53,74 @@ Create `hosts/pi4/wifi.nix` with your credentials:
 }
 ```
 
-### 2. Run the Install Script
+### 2. Build Bootstrap SD Image
 
 ```bash
-# Connect SSD to your build machine, then:
-cd configs/nixos
+nix build .#nixosConfigurations.pi4-bootstrap.config.system.build.sdImage
+```
+
+### 3. Flash to SD Card
+
+```bash
+# Find your SD card device
+lsblk
+
+# Flash the image (replace /dev/sdX with your device)
+sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
+```
+
+### 4. Boot and SSH
+
+1. Insert SD card into Pi 4
+2. Connect SSD to blue USB 3.0 port
+3. Power on
+4. Wait for WiFi to connect (~30 seconds)
+5. SSH in:
+   ```bash
+   ssh nixos@pi-bootstrap.local  # password: nixos
+   # or
+   ssh root@pi-bootstrap.local   # uses your SSH key
+   ```
+
+### 5. Install to SSD
+
+On the Pi (via SSH):
+
+```bash
+# Clone your dotfiles (or use the flake URL directly)
+git clone https://github.com/basnijholt/dotfiles
+cd dotfiles/configs/nixos
+
+# Run the install script
 ./hosts/pi4/install-ssd.sh
 ```
 
 The script will:
 1. Partition the SSD (ESP + ZFS via disko)
-2. Build the aarch64 system
+2. Build the aarch64 system (using your local nix-cache)
 3. Install NixOS
 4. Set ZFS hostid
 
-### 3. Deploy to Pi
+### 6. Boot from SSD
 
-1. Unplug SSD from build machine
-2. Plug into Pi 4 (blue USB 3.0 port)
-3. Remove any SD card
-4. Power on
+1. Power off Pi
+2. Remove SD card
+3. Power on - Pi boots from SSD via WiFi
 
-The Pi boots via U-Boot and connects to WiFi.
+## Alternative: Direct Install (requires build machine access to SSD)
+
+If you can connect the SSD directly to your build machine:
+
+```bash
+# On build machine with binfmt emulation enabled:
+boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+boot.supportedFilesystems = [ "zfs" ];
+
+# Connect SSD and run:
+./hosts/pi4/install-ssd.sh
+```
+
+Then move SSD to Pi and boot.
 
 ## Updating the System
 
@@ -113,10 +133,9 @@ nixos-rebuild switch \
   --build-host root@pi4.local
 ```
 
-Or build on Mac and deploy:
+Or build locally and deploy:
 
 ```bash
-# On Mac
 nix build .#nixosConfigurations.pi4.config.system.build.toplevel
 nix copy --to ssh://pi4.local ./result
 ssh root@pi4.local "nix-env -p /nix/var/nix/profiles/system --set $(readlink ./result) && /nix/var/nix/profiles/system/bin/switch-to-configuration switch"
