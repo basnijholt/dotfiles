@@ -45,11 +45,12 @@ docker run --rm -it \
       --show-trace
   "
 
-# Copy closure to PC
+# Copy closure to PC (mount SSH keys for access)
 docker run --rm \
   --platform linux/arm64 \
   -v $(pwd):/work \
   -v nix-cache:/nix \
+  -v ~/.ssh:/root/.ssh:ro \
   -w /work \
   nixos/nix \
   sh -c "nix --extra-experimental-features 'nix-command flakes' \
