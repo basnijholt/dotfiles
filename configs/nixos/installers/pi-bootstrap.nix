@@ -16,8 +16,9 @@
   networking.hostName = lib.mkForce "pi-bootstrap";
   networking.hostId = "8425e349"; # Required for ZFS
 
-  # ZFS support for installation target
-  boot.supportedFilesystems = [ "zfs" ];
+  # Only ZFS and vfat (for boot) - disable others to shrink image
+  # Default SD image enables cifs/ntfs/btrfs etc which pulls in samba (~600MB)
+  boot.supportedFilesystems = lib.mkForce [ "vfat" "zfs" ];
 
   # Ensure WiFi driver loads (critical for headless)
   boot.kernelModules = [ "brcmfmac" ];
