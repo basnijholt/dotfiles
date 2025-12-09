@@ -14,9 +14,4 @@
   # --- WiFi Configuration (Secret) ---
   # Import wifi.nix if it exists (contains networking.networkmanager.ensureProfiles...)
   imports = lib.optional (builtins.pathExists ./wifi.nix) ./wifi.nix;
-
-  # Mosh support for flaky connections
-  networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; }
-  ];
 }

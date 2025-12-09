@@ -13,9 +13,4 @@
   # --- WiFi Configuration (Secret) ---
   # Reuse wifi.nix from pi4 if it exists
   imports = lib.optional (builtins.pathExists ../pi4/wifi.nix) ../pi4/wifi.nix;
-
-  # Mosh support
-  networking.firewall.allowedUDPPortRanges = [
-    { from = 60000; to = 61000; }
-  ];
 }
