@@ -55,6 +55,9 @@
   };
 
   # /boot is defined by disko.nix (ESP partition)
+  # Override firmwarePath to match bootPath since we have a single boot partition
+  # (nixos-raspberrypi defaults to separate /boot and /boot/firmware)
+  boot.loader.raspberryPi.firmwarePath = "/boot";
 
   # Power management
   powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";

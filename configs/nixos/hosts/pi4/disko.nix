@@ -10,7 +10,7 @@
           type = "gpt";
           partitions = {
             # Partition 1: ESP (boot partition)
-            # Contains U-Boot + kernels
+            # Contains U-Boot, kernels, and Pi firmware (all at /boot)
             ESP = {
               label = "ESP";
               size = "512M";
