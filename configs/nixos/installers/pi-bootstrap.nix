@@ -7,9 +7,12 @@
 # After booting, see hosts/pi3/README.md or hosts/pi4/README.md for next steps.
 { lib, pkgs, ... }:
 
+let
+  sshKeys = (import ../common/ssh-keys.nix).sshKeys;
+in
 {
-  # Import networking.nix (tracked) which conditionally imports wifi.nix (gitignored)
   imports = [
+    ../common/nix.nix
     ../hosts/pi4/networking.nix
   ] ++ lib.optional (builtins.pathExists ../hosts/pi4/wifi.nix) ../hosts/pi4/wifi.nix;
 
@@ -26,26 +29,10 @@
   # Don't compress for faster flashing
   sdImage.compressImage = false;
 
-  system.stateVersion = "25.05";
+  system.stateVersion = "25.11";
 
-  # Nix configuration - include local cache for faster installs
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    trusted-users = [ "root" "nixos" ];
-    # Use binary caches to avoid slow ARM compilation
-    substituters = [
-      "https://cache.nixos.org/"
-      "http://nix-cache.local:5000"
-      "https://nix-community.cachix.org"
-      "https://nixos-raspberrypi.cachix.org"
-    ];
-    trusted-public-keys = [
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "build-vm-1:CQeZikX76TXVMm+EXHMIj26lmmLqfSxv8wxOkwqBb3g="
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
-    ];
-  };
+  # Trust nixos user for bootstrap operations
+  nix.settings.trusted-users = [ "root" "nixos" ];
 
   # SSH access for headless setup
   services.openssh = {
@@ -53,20 +40,14 @@
     settings.PermitRootLogin = "yes";
   };
 
-  users.users.root.openssh.authorizedKeys.keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC90KqGLJG4vaYYes3dDwD46Ui3sDiExPTbL7AkYg7i9 bas@nijho.lt"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMRmEP/ZUShYdZj/h3vghnuMNgtWExV+FEZHYyguMkX basnijholt@blink"
-  ];
+  users.users.root.openssh.authorizedKeys.keys = sshKeys;
 
   # nixos user for interactive use
   users.users.nixos = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ];
     initialPassword = "nixos";
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC90KqGLJG4vaYYes3dDwD46Ui3sDiExPTbL7AkYg7i9 bas@nijho.lt"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMRmEP/ZUShYdZj/h3vghnuMNgtWExV+FEZHYyguMkX basnijholt@blink"
-    ];
+    openssh.authorizedKeys.keys = sshKeys;
   };
 
   # Allow passwordless sudo for nixos user
