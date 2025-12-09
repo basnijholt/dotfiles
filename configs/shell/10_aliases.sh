@@ -15,6 +15,9 @@ if [[ $- == *i* ]]; then
     alias gcai="${HOME}/dotfiles/scripts/commit.py --edit "
     alias gcaia="${HOME}/dotfiles/scripts/commit.py --edit --all "
     alias c='code'
+    alias cl='claude --dangerously-skip-permissions '
+    alias co='coder --dangerously-bypass-approvals-and-sandbox '
+    alias ge='gemini --yolo --model gemini-3-pro-preview'
     alias ze='zellij attach --create'
     alias killagent="pkill -9 -f '[a]gent-cli'"
 
