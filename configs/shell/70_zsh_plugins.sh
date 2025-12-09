@@ -48,7 +48,9 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     # -- Custom keybindings (Alt/Option key combinations)
     # Based on oh-my-zsh dirhistory plugin escape sequences
     function _cd_up() { cd ..; zle reset-prompt }
+    function _cd_back() { cd -; zle reset-prompt }
     zle -N _cd_up
+    zle -N _cd_back
 
     # Option+Left/Right: word navigation (both terminals now send ESC b / ESC f)
     bindkey '^[b' backward-word
@@ -57,9 +59,12 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     case "$TERM_PROGRAM" in
     Apple_Terminal)
         bindkey '^[^?' backward-kill-word
+        bindkey '^[^[OA' _cd_up           # Option+Up (cd ..)
+        bindkey '^[^[OB' _cd_back         # Option+Down (cd -)
         ;;
     iTerm.app)
-        bindkey '^[[1;3A' _cd_up          # Option+Up
+        bindkey '^[[1;3A' _cd_up          # Option+Up (cd ..)
+        bindkey '^[[1;3B' _cd_back        # Option+Down (cd -)
         # Alt+Backspace handled in iTerm profile (sends Ctrl+W)
         ;;
     esac
