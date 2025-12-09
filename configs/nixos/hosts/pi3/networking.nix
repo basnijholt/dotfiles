@@ -1,4 +1,4 @@
-# Network configuration for Raspberry Pi 3 (debug host)
+# Network configuration for Raspberry Pi 3
 { lib, ... }:
 
 {
