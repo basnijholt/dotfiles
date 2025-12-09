@@ -39,13 +39,25 @@ sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
 2. Power on, wait ~30 seconds for WiFi
 3. `ssh root@pi-bootstrap.local`
 
-### 4. Switch to full config
+### 4. Switch to full config and activate Home Manager
+
+Clone dotfiles and copy wifi.nix, then rebuild:
 
 ```bash
 git clone https://github.com/basnijholt/dotfiles
+# Copy wifi.nix from another machine:
+# scp hosts/pi4/wifi.nix root@pi-bootstrap.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix
 cd dotfiles/configs/nixos
-# from other machine: `scp hosts/pi4/wifi.nix root@pi-bootstrap.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix`
 sudo nixos-rebuild switch --flake 'path:.#pi3' --impure
+```
+
+**Note**: Using `path:.` ensures the gitignored `wifi.nix` is included.
+
+**Pi 3 has only 1GB RAM** - if the build fails (OOM), build on another machine:
+
+```bash
+# From your PC:
+nixos-rebuild switch --flake 'path:.#pi3' --impure --target-host root@pi3.local --build-host localhost
 ```
 
 ## Updating
