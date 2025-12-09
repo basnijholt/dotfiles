@@ -41,29 +41,24 @@ sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
 
 ### 4. Switch to full config and activate Home Manager
 
-Clone dotfiles and copy wifi.nix, then rebuild:
+**Pi 3 has only 1GB RAM** - builds must run on your PC to avoid OOM.
+
+From your PC:
 
 ```bash
-git clone https://github.com/basnijholt/dotfiles
-# Copy wifi.nix from another machine:
-# scp hosts/pi4/wifi.nix root@pi-bootstrap.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix
-cd dotfiles/configs/nixos
-sudo nixos-rebuild switch --flake 'path:.#pi3' --impure
+cd ~/dotfiles/configs/nixos
+./hosts/pi3/deploy.sh nixos@192.168.1.x
 ```
 
-**Note**: Using `path:.` ensures the gitignored `wifi.nix` is included.
-
-**Pi 3 has only 1GB RAM** - if the build fails (OOM), build on another machine:
-
-```bash
-# From your PC:
-nixos-rebuild switch --flake 'path:.#pi3' --impure --target-host root@pi3.local --build-host localhost
-```
+Then SSH into the Pi and run the activation command printed by the script.
 
 ## Updating
 
+From your PC:
+
 ```bash
-nixos-rebuild switch --flake .#pi3 --target-host root@pi3.local --build-host root@pi3.local
+./hosts/pi3/deploy.sh
+# SSH in and run the printed activation command
 ```
 
 ## Troubleshooting
