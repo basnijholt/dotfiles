@@ -11,5 +11,6 @@
     ./services.nix
     ./packages.nix
     ./home-manager.nix
+    ./comin.nix
   ];
 }

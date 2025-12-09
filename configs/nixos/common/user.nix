@@ -3,6 +3,7 @@
 
 let
   homeDir = config.users.users.basnijholt.home;
+  sshKeys = (import ./ssh-keys.nix).sshKeys;
 in
 {
   users.users.basnijholt = {
@@ -11,10 +12,7 @@ in
     extraGroups = [ "networkmanager" "wheel" "docker" "libvirtd" "incus-admin" ];
     shell = pkgs.zsh;
     hashedPassword = "$6$T/TCI6tBzEsNPNfQ$IKq2xf1/2gFwVyvF65dRFc5Mex60jtoSAcCtm8jFMIUc3R63OLnxMx7j2RMSMrwX7C9Jhth9KyhdEa5RSijGs.";
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC90KqGLJG4vaYYes3dDwD46Ui3sDiExPTbL7AkYg7i9 bas@nijho.lt"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMRmEP/ZUShYdZj/h3vghnuMNgtWExV+FEZHYyguMkX basnijholt@blink"
-    ];
+    openssh.authorizedKeys.keys = sshKeys;
   };
 
   # --- Atuin History Daemon ---

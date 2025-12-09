@@ -2,6 +2,7 @@
     link:
       create: true
       relink: true
+      backup: true
 
 - link:
     ~/.autoenv: submodules/autoenv
@@ -67,7 +68,6 @@
     ~/.config/hypr: configs/hypr
     ~/.config/waybar: submodules/mechabar
     ~/.config/mako/config: configs/mako/config
-    ~/.config/rofi: submodules/mechabar/rofi
 
 # -- Only on MacOS --
 - defaults:

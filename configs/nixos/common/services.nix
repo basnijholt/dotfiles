@@ -25,6 +25,9 @@
     };
   };
 
+  # --- Mosh ---
+  programs.mosh.enable = true;
+
   # --- Security & Authentication ---
   programs.gnupg.agent = {
     enable = true;

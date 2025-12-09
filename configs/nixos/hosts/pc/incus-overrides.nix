@@ -39,6 +39,8 @@
      --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#pc-incus'
 
    nixos-install --root /mnt --no-root-passwd \
+     --option substituters "http://nix-cache.local:5000 https://cache.nixos.org https://nix-community.cachix.org https://cache.nixos-cuda.org" \
+     --option trusted-public-keys "build-vm-1:CQeZikX76TXVMm+EXHMIj26lmmLqfSxv8wxOkwqBb3g= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M=" \
      --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#pc-incus'
 
    nixos-enter --root /mnt -c 'passwd basnijholt' # Set user password
@@ -84,6 +86,9 @@ These hardware features are stubbed:
 
   networking.hostName = lib.mkForce "pc-incus";
 
+  # --- Incus Guest Support ---
+  virtualisation.incus.agent.enable = true;
+
   # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe
   disko.devices.disk.nvme1.device = lib.mkForce "/dev/sda";
@@ -98,9 +103,13 @@ These hardware features are stubbed:
   boot.kernelParams = lib.mkForce [ "console=tty0" "console=ttyS0,115200" ];
 
   # --- Boot Loader Overrides ---
-  # Real PC uses GRUB with /boot2, VM uses simpler systemd-boot with /boot
-  boot.loader.grub.enable = lib.mkForce false;
-  boot.loader.systemd-boot.enable = lib.mkForce true;
+  # Real PC uses GRUB with /boot2. VM uses GRUB but with /boot (standard for simple VMs)
+  boot.loader.grub.enable = lib.mkForce true;
+  boot.loader.grub.device = lib.mkForce "nodev";
+  boot.loader.grub.efiSupport = lib.mkForce true;
+  boot.loader.systemd-boot.enable = lib.mkForce false;
+  
+  # Ensure GRUB and EFI system know about the new mount point
   boot.loader.efi.efiSysMountPoint = lib.mkForce "/boot";
 
   # Override disko to use /boot instead of /boot2 for EFI partition
@@ -108,7 +117,7 @@ These hardware features are stubbed:
 
   # --- Networking Overrides for VM ---
   # Use generic interface for NAT (VM doesn't have wlp7s0)
-  networking.nat.externalInterface = lib.mkForce "en*";
+  networking.nat.externalInterface = lib.mkForce "eth0";
 
   # --- Hardware Feature Stubs ---
   # These build fine but won't work at runtime in a VM
