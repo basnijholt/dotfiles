@@ -1,10 +1,10 @@
 # Bootstrap SD Card Image for Raspberry Pi 3/4
 # Usage:
-#   nix build .#pi3-bootstrap.config.system.build.sdImage
-#   nix build .#pi4-bootstrap.config.system.build.sdImage
+#   nix build 'path:.#pi3-bootstrap.config.system.build.sdImage' --impure
+#   nix build 'path:.#pi4-bootstrap.config.system.build.sdImage' --impure
 #
 # This creates a minimal bootable image with WiFi + SSH.
-# After booting, run: nixos-rebuild switch --flake .#pi3 (or pi4)
+# After booting, see hosts/pi3/README.md or hosts/pi4/README.md for next steps.
 { lib, pkgs, ... }:
 
 {
