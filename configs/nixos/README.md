@@ -27,6 +27,8 @@ configs/nixos/
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
 | `installer` | ISO | Minimal installer with SSH enabled |
+| `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
+| `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap with WiFi + SSH |
 
 ## Quick Commands
 
