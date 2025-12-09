@@ -38,7 +38,7 @@
       COMMIT_ID=$(jq -r .nodes.nixpkgs.locked.rev flake.lock)
 
       # Build all host configurations (--cores 1 to limit memory usage)
-      for host in pc nuc hp; do
+      for host in pc nuc hp pi3 pi4; do
         echo "Building $host..."
         if nix build .#nixosConfigurations.$host.config.system.build.toplevel \
           --out-link "/var/lib/nix-auto-build/result-$host" \
