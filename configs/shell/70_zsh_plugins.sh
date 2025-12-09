@@ -5,7 +5,7 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     [[ -z $STARSHIP_SHELL ]] && export ZSH_THEME="mytheme"
     DEFAULT_USER="basnijholt"
     export DISABLE_AUTO_UPDATE=true  # Speedup of 40%
-    plugins=( git dirhistory history sudo iterm2 uv docker-compose )
+    plugins=( git history sudo iterm2 uv docker-compose )
     command -v eza >/dev/null && zstyle ':omz:lib:directories' aliases no  # Skip aliases in directories.zsh if eza
     export ZSH=~/dotfiles/submodules/oh-my-zsh
     source $ZSH/oh-my-zsh.sh
@@ -44,5 +44,24 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
         bindkey '^H' backward-kill-word
         bindkey '^[[3;5~' kill-word
     fi
+
+    # -- Custom keybindings (Alt/Option key combinations)
+    # Based on oh-my-zsh dirhistory plugin escape sequences
+    function _cd_up() { cd ..; zle reset-prompt }
+    zle -N _cd_up
+
+    # Option+Left/Right: word navigation (both terminals now send ESC b / ESC f)
+    bindkey '^[b' backward-word
+    bindkey '^[f' forward-word
+
+    case "$TERM_PROGRAM" in
+    Apple_Terminal)
+        bindkey '^[^?' backward-kill-word
+        ;;
+    iTerm.app)
+        bindkey '^[[1;3A' _cd_up          # Option+Up
+        # Alt+Backspace handled in iTerm profile (sends Ctrl+W)
+        ;;
+    esac
 
 fi
