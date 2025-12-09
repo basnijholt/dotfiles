@@ -57,17 +57,17 @@ cd dotfiles/configs/nixos
 
 ### 6. Activate Home Manager and dotfiles
 
-After first boot, clone dotfiles and copy wifi.nix, then rebuild:
+After first boot from SSD, copy wifi.nix and rebuild (dotfiles were cloned in step 4 but were on the SD card, not the SSD):
 
 ```bash
 git clone https://github.com/basnijholt/dotfiles
-# Copy wifi.nix from another machine:
-# scp hosts/pi4/wifi.nix basnijholt@pi4.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix
 cd dotfiles/configs/nixos
+# Copy wifi.nix from another machine:
+scp user@other-machine:dotfiles/configs/nixos/hosts/pi4/wifi.nix hosts/pi4/wifi.nix
 sudo nixos-rebuild switch --flake 'path:.#pi4' --impure
 ```
 
-**Note**: Using `path:.` ensures the gitignored `wifi.nix` is included. Using `github:...` would skip it and could break WiFi on future rebuilds.
+**Note**: Using `path:.` ensures the gitignored `wifi.nix` is included.
 
 ## Updating
 
