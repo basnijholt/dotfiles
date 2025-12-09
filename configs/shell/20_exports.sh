@@ -11,3 +11,4 @@ export PATH="$PATH:$HOME/.lmstudio/bin"  # lmstudio
 export PATH="/nix/var/nix/profiles/default/bin:$PATH"  # nix path
 export MY_OLLAMA_HOST=http://pc.local:11434
 export XDG_CONFIG_HOME="$HOME/.config"
+export OLLAMA_KEEP_ALIVE="1h"
