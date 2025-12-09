@@ -7,6 +7,7 @@
     efiSupport = true;
     useOSProber = true;
     device = "nodev";
+    copyKernels = true;
     memtest86.enable = true;
     theme = pkgs.sleek-grub-theme.override {
       withStyle = "orange";
@@ -15,7 +16,7 @@
   };
   boot.loader.efi = {
     canTouchEfiVariables = true;
-    efiSysMountPoint = "/boot2";
+    efiSysMountPoint = "/boot";
   };
 
   # Enable aarch64 emulation for building Raspberry Pi images
