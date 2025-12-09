@@ -15,9 +15,12 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -36,6 +39,18 @@
         lib.nixosSystem {
           inherit system;
           modules = commonModules ++ extraModules;
+        };
+
+      mkPi = piModule: extraModules:
+        nixos-raspberrypi.lib.nixosSystem {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [ piModule ] ++ commonModules ++ extraModules;
+        };
+
+      mkPiInstaller = piModule: extraModules:
+        nixos-raspberrypi.lib.nixosInstaller {
+          specialArgs = { inherit nixos-raspberrypi; };
+          modules = [ piModule ] ++ extraModules;
         };
 
     in {
@@ -104,6 +119,29 @@
         nix-cache = mkHost [
           ./hosts/nix-cache/default.nix
           ./hosts/nix-cache/hardware-configuration.nix
+        ];
+
+        # Raspberry Pi 4 - uses nixos-raspberrypi for hardware + ZFS on SSD
+        pi4 = mkPi nixos-raspberrypi.nixosModules.raspberry-pi-4.base [
+          disko.nixosModules.disko
+          ./hosts/pi4/disko.nix
+          ./hosts/pi4/default.nix
+          ./hosts/pi4/hardware-configuration.nix
+        ];
+
+        # Raspberry Pi 3 - simple SD card setup with WiFi
+        pi3 = mkPi nixos-raspberrypi.nixosModules.raspberry-pi-3.base [
+          ./hosts/pi3/default.nix
+          ./hosts/pi3/hardware-configuration.nix
+        ];
+
+        # Bootstrap SD images - minimal bootable images with WiFi + SSH
+        pi3-bootstrap = mkPiInstaller nixos-raspberrypi.nixosModules.raspberry-pi-3.base [
+          ./installers/pi-bootstrap.nix
+        ];
+
+        pi4-bootstrap = mkPiInstaller nixos-raspberrypi.nixosModules.raspberry-pi-4.base [
+          ./installers/pi-bootstrap.nix
         ];
 
         installer = lib.nixosSystem {
