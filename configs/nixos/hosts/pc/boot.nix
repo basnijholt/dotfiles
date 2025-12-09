@@ -19,4 +19,11 @@
     efiSysMountPoint = "/boot";
   };
 
+  # Enable aarch64 emulation for building Raspberry Pi images
+  # fixBinary preloads qemu into kernel, required for sandboxed builds
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  boot.binfmt.registrations.aarch64-linux.fixBinary = true;
+
+  # Enable ZFS support (needed to provision ZFS-based hosts like pi4)
+  boot.supportedFilesystems = [ "zfs" ];
 }

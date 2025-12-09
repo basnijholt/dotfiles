@@ -10,6 +10,10 @@
     # Disable sandbox (required for Incus containers)
     sandbox = false;
 
+    # Allow trusted users to copy unsigned paths to the store
+    # Harmonia will sign them on-the-fly when serving
+    require-sigs = false;
+
     # Enable big-parallel for memory-intensive builds
     system-features = [ "big-parallel" "kvm" "nixos-test" ];
 

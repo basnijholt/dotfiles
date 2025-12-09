@@ -64,6 +64,7 @@ let
     tre-command
     tree
     typst
+    unzip
     usbutils
     wget
     yazi
