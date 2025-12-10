@@ -40,16 +40,16 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     bindkey '^[[1;3D' backward-word  # Alt+Left
     bindkey '^[[1;3C' forward-word   # Alt+Right
 
+    # Directory navigation: Alt+Up (cd ..) and Alt+Down (cd -)
+    bindkey '^[[1;3A' _cd_up          # Alt+Up - xterm style (iTerm, SSH, Linux)
+    bindkey '^[[1;3B' _cd_back        # Alt+Down - xterm style
+
+    # Terminal-specific bindings
     case "$TERM_PROGRAM" in
     Apple_Terminal)
         bindkey '^[^?' backward-kill-word
-        bindkey '^[^[OA' _cd_up           # Option+Up (cd ..)
+        bindkey '^[^[OA' _cd_up           # Option+Up (cd ..) - Terminal.app style
         bindkey '^[^[OB' _cd_back         # Option+Down (cd -)
-        ;;
-    iTerm.app)
-        bindkey '^[[1;3A' _cd_up          # Option+Up (cd ..)
-        bindkey '^[[1;3B' _cd_back        # Option+Down (cd -)
-        # Alt+Backspace handled in iTerm profile (sends Ctrl+W)
         ;;
     esac
 
