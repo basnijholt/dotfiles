@@ -10,20 +10,19 @@ Simple Pi 3 running from SD card with WiFi.
 
 ## Installation
 
-### 1. Create wifi.nix
+### 1. Configure WiFi
 
-Create `hosts/pi4/wifi.nix` (shared with Pi 4, gitignored):
+Set your SSID in `hosts/pi3/default.nix`:
 
 ```nix
-{
-  networking.networkmanager.ensureProfiles.profiles."Home-WiFi" = {
-    connection = { id = "Home-WiFi"; type = "wifi"; autoconnect = true; };
-    wifi = { mode = "infrastructure"; ssid = "YOUR_SSID"; };
-    wifi-security = { key-mgmt = "wpa-psk"; psk = "YOUR_PASSWORD"; };
-    ipv4.method = "auto";
-    ipv6.method = "auto";
-  };
-}
+my.wifi.ssid = "YourNetworkName";
+```
+
+Encrypt your WiFi password (shared with pi4):
+
+```bash
+cd configs/nixos/secrets
+echo "WIFI_PSK=yourpassword" | agenix -e wifi-psk.age
 ```
 
 ### 2. Build and flash SD image
@@ -39,18 +38,24 @@ sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
 2. Power on, wait ~30 seconds for WiFi
 3. `ssh root@pi-bootstrap.local`
 
-### 4. Switch to full config and activate Home Manager
+### 4. Add host key and deploy
 
 **Pi 3 has only 1GB RAM** - builds must run on your PC to avoid OOM.
 
-From your PC:
+Get the host key and add to `secrets/secrets.nix`:
 
 ```bash
-cd ~/dotfiles/configs/nixos
-./hosts/pi3/deploy.sh nixos@192.168.1.x
+ssh-keyscan -t ed25519 pi-bootstrap.local 2>/dev/null
+# Add key to secrets/secrets.nix, then re-key:
+cd configs/nixos/secrets && agenix -r
 ```
 
-Then SSH into the Pi and run the activation command printed by the script.
+Deploy from your PC:
+
+```bash
+./hosts/pi3/deploy.sh nixos@192.168.1.x
+# SSH in and run the printed activation command
+```
 
 ## Updating
 
@@ -63,5 +68,5 @@ From your PC:
 
 ## Troubleshooting
 
-- **No WiFi**: Check `hosts/pi4/wifi.nix` exists
+- **No WiFi**: Check `my.wifi.ssid` is set in `hosts/pi3/default.nix`
 - **Can't SSH**: Verify Pi is powered and connected to your network

@@ -11,20 +11,19 @@ Headless Pi 4 booting from external SSD with ZFS.
 
 ## Installation
 
-### 1. Create wifi.nix
+### 1. Configure WiFi
 
-Create `hosts/pi4/wifi.nix` (gitignored):
+Set your SSID in `hosts/pi4/default.nix`:
 
 ```nix
-{
-  networking.networkmanager.ensureProfiles.profiles."Home-WiFi" = {
-    connection = { id = "Home-WiFi"; type = "wifi"; autoconnect = true; };
-    wifi = { mode = "infrastructure"; ssid = "YOUR_SSID"; };
-    wifi-security = { key-mgmt = "wpa-psk"; psk = "YOUR_PASSWORD"; };
-    ipv4.method = "auto";
-    ipv6.method = "auto";
-  };
-}
+my.wifi.ssid = "YourNetworkName";
+```
+
+Encrypt your WiFi password (after pi4 host key is in `secrets/secrets.nix`):
+
+```bash
+cd configs/nixos/secrets
+echo "WIFI_PSK=yourpassword" | agenix -e wifi-psk.age
 ```
 
 ### 2. Build and flash bootstrap SD
@@ -45,7 +44,6 @@ sudo dd if=result/sd-image/*.img of=/dev/sdX bs=4M status=progress conv=fsync
 ```bash
 git clone https://github.com/basnijholt/dotfiles
 cd dotfiles/configs/nixos
-# from other machine: `scp hosts/pi4/wifi.nix root@pi-bootstrap.local:dotfiles/configs/nixos/hosts/pi4/wifi.nix`
 ./hosts/pi4/install-ssd.sh
 ```
 
@@ -55,19 +53,21 @@ cd dotfiles/configs/nixos
 2. Remove SD card
 3. Power on — boots from SSD
 
-### 6. Activate Home Manager and dotfiles
+### 6. Add host key to agenix and rebuild
 
-After first boot from SSD, copy wifi.nix and rebuild (dotfiles were cloned in step 4 but were on the SD card, not the SSD):
+After first boot, get the host's SSH key and add it to `secrets/secrets.nix`:
 
 ```bash
-git clone https://github.com/basnijholt/dotfiles
-cd dotfiles/configs/nixos
-# Copy wifi.nix from another machine:
-scp user@other-machine:dotfiles/configs/nixos/hosts/pi4/wifi.nix hosts/pi4/wifi.nix
-sudo nixos-rebuild switch --flake 'path:.#pi4' --impure
+ssh-keyscan -t ed25519 pi4.local 2>/dev/null
+# Add key to secrets/secrets.nix, then re-key:
+cd configs/nixos/secrets && agenix -r
 ```
 
-**Note**: Using `path:.` ensures the gitignored `wifi.nix` is included.
+Then rebuild:
+
+```bash
+nixos-rebuild switch --flake .#pi4 --target-host root@pi4.local
+```
 
 ## Updating
 
@@ -77,6 +77,6 @@ nixos-rebuild switch --flake .#pi4 --target-host root@pi4.local --build-host roo
 
 ## Troubleshooting
 
-- **No WiFi**: Check `wifi.nix` exists, verify with `nmcli device status`
+- **No WiFi**: Check `my.wifi.ssid` is set, verify agenix secret exists
 - **Won't boot from SSD**: Update Pi EEPROM via Raspberry Pi Imager
 - **ZFS errors**: Don't add `zfsutil` to fileSystems options
