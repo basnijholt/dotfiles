@@ -76,55 +76,17 @@ See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on
 
 Three-node high-availability Docker Swarm cluster across hp, nuc, and swarm-vm.
 
-**Managers:** hp (bootstrap), nuc, swarm-vm
+**Configuration:**
+```nix
+my.swarm.bootstrap = "br0";  # hp - first manager, creates cluster
+my.swarm.join = "br0";       # nuc, swarm-vm - join as managers
+```
 
-### Deployment
-
-1. **Deploy HP first** (bootstrap manager):
-   ```bash
-   nixos-rebuild switch --flake .#hp
-   ```
-
-2. **Copy token to joining nodes:**
-   ```bash
-   ssh hp "cat /root/secrets/swarm-manager.token" | \
-     ssh nuc "mkdir -p /root/secrets && cat > /root/secrets/swarm-manager.token && chmod 400 /root/secrets/swarm-manager.token"
-   ```
-
-3. **Deploy NUC and swarm-vm:**
-   ```bash
-   nixos-rebuild switch --flake .#nuc
-   # Create swarm-vm in Incus, then deploy similarly
-   ```
-
-4. **Verify:**
-   ```bash
-   ssh hp "docker node ls"
-   ```
-
-### Using Agenix (recommended)
-
-For encrypted token management, enable agenix:
-
-1. Get host SSH keys:
-   ```bash
-   ssh-keyscan -t ed25519 hp nuc swarm-vm 2>/dev/null
-   ```
-
-2. Add keys to `secrets/secrets.nix`
-
-3. Encrypt tokens after swarm init:
-   ```bash
-   cd secrets
-   scp hp:/root/secrets/swarm-manager.token /tmp/
-   agenix -e swarm-manager.token.age < /tmp/swarm-manager.token
-   rm /tmp/swarm-manager.token
-   ```
-
-4. Enable in host configs:
-   ```nix
-   my.swarm.useAgenix = true;
-   ```
+**Deployment:**
+1. Deploy HP first: `nixos-rebuild switch --flake .#hp`
+2. Encrypt token: `ssh hp "docker swarm join-token manager -q" | agenix -e swarm-manager.token.age`
+3. Deploy others: `nixos-rebuild switch --flake .#nuc`
+4. Verify: `ssh hp "docker node ls"`
 
 ## Secrets (agenix)
 

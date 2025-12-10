@@ -21,12 +21,5 @@
   # Required for ZFS
   networking.hostId = "8a5b2c1f";
 
-  # Swarm configuration - NUC joins HP as a manager
-  my.swarm = {
-    enable = true;
-    role = "manager";
-    advertiseAddr = "br0"; # Use bridge interface
-    managerAddr = "hp.lan"; # Join HP's swarm
-    managerTokenFile = "/root/secrets/swarm-manager.token";
-  };
+  my.swarm.join = "br0";
 }

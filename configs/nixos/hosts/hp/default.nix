@@ -17,11 +17,5 @@
   # Required for ZFS
   networking.hostId = "37a1d4a7";
 
-  # Swarm configuration - HP is the bootstrap manager
-  my.swarm = {
-    enable = true;
-    role = "manager";
-    advertiseAddr = "br0"; # Use bridge interface
-    # No managerAddr = this is the bootstrap node
-  };
+  my.swarm.bootstrap = "br0";
 }
