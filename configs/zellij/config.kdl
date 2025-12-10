@@ -139,7 +139,7 @@ keybinds clear-defaults=true {
         bind "Alt =" { Resize "Increase"; }
         bind "Alt [" { PreviousSwapLayout; }
         bind "Alt ]" { NextSwapLayout; }
-        // bind "Alt f" { ToggleFloatingPanes; }  // Disabled: conflicts with shell forward-word
+        bind "Alt w" { ToggleFloatingPanes; }  // Alt+W for floating Window (Alt+F conflicts with forward-word)
         bind "Ctrl g" { SwitchToMode "locked"; }
         bind "Alt h" { MoveFocusOrTab "left"; }
         bind "Alt i" { MoveTab "left"; }
