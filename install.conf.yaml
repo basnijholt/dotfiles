@@ -5,7 +5,6 @@
       backup: true
 
 - link:
-    ~/.autoenv: submodules/autoenv
     ~/.bash_profile: configs/bash/bash_profile
     ~/.bashrc: configs/bash/bashrc
     ~/.claude/settings.json: configs/claude/settings.json

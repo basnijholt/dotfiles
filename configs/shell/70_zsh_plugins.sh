@@ -26,17 +26,6 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
         source ~/dotfiles/submodules/zsh-z/zsh-z.plugin.zsh
     fi
 
-    # -- autoenv - but only if direnv is not installed
-    if ! command -v direnv &> /dev/null; then
-        # needs to happen after .bash_profile (for conda) which
-        # is why it is not loaded as a plugin
-        export AUTOENV_ASSUME_YES=true
-        export AUTOENV_ENABLE_LEAVE=true
-        export AUTOENV_ENV_FILENAME=".envrc"
-        export AUTOENV_ENV_LEAVE_FILENAME=".envrc.leave"
-        source ~/.autoenv/activate.sh
-    fi
-
     # -- if on Linux
     if [[ "$(uname -s)" == "Linux" ]]; then
         # Provides ctrl+backspace and ctrl+delete
