@@ -72,6 +72,15 @@ let
     zellij
   ];
 
+  # --- Yazi preview dependencies ---
+  yaziPreviewDeps = with pkgs; [
+    chafa              # Image preview in terminal
+    ffmpegthumbnailer  # Video thumbnails
+    file               # MIME type detection
+    glow               # Markdown preview
+    poppler-utils      # PDF preview (pdftoppm)
+  ];
+
   # --- Development Toolchains ---
   developmentToolchains = with pkgs; [
     bun
@@ -93,5 +102,6 @@ in
 {
   environment.systemPackages =
     cliPowerTools
+    ++ yaziPreviewDeps
     ++ developmentToolchains;
 }
