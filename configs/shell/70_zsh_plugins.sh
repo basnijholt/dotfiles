@@ -47,8 +47,8 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
 
     # -- Custom keybindings (Alt/Option key combinations)
     # Based on oh-my-zsh dirhistory plugin escape sequences
-    function _cd_up() { cd ..; zle reset-prompt }
-    function _cd_back() { cd -; zle reset-prompt }
+    function _cd_up() { zle .kill-buffer; cd ..; zle .accept-line }
+    function _cd_back() { zle .kill-buffer; cd - >/dev/null; zle .accept-line }
     zle -N _cd_up
     zle -N _cd_back
 
