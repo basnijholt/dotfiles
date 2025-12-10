@@ -12,15 +12,13 @@ HOSTS=(
   "debian-incus"
   "docker-truenas"
   "docker-incus"
-  "pi3"
   "nuc"
-  "dietpi"
   "pc"
   "hp"
   "nuc"
+  "pi3"
+  "pi4"
 )
-
-# TODO (2025-12-04): Verify docker-incus and pi3
 
 # Arrays to track results
 SUCCESSFUL_HOSTS=()
