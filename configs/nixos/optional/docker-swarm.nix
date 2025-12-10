@@ -22,7 +22,7 @@ in
     join = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      description = "Interface to join swarm on (joins hp.lan as manager).";
+      description = "Interface to join swarm on (joins hp.local as manager).";
       example = "eth0";
     };
   };
@@ -70,7 +70,7 @@ in
           exit 0
         fi
         token="$(cat ${config.age.secrets.swarm-manager-token.path})"
-        docker swarm join --token "$token" --advertise-addr ${advertiseAddr} hp.lan:2377
+        docker swarm join --token "$token" --advertise-addr ${advertiseAddr} hp.local:2377
       '';
     };
   };
