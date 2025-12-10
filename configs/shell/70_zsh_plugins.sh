@@ -34,9 +34,11 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     zle -N _cd_up
     zle -N _cd_back
 
-    # Option+Left/Right: word navigation (both terminals now send ESC b / ESC f)
+    # Word navigation: Alt+B/F (emacs) and Alt+Left/Right (modern)
     bindkey '^[b' backward-word
     bindkey '^[f' forward-word
+    bindkey '^[[1;3D' backward-word  # Alt+Left
+    bindkey '^[[1;3C' forward-word   # Alt+Right
 
     case "$TERM_PROGRAM" in
     Apple_Terminal)
