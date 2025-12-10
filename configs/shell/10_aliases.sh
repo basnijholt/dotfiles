@@ -20,6 +20,7 @@ if [[ $- == *i* ]]; then
     alias ge='gemini --yolo --model gemini-3-pro-preview'
     alias ze='zellij attach --create'
     alias killagent="pkill -9 -f '[a]gent-cli'"
+    alias y='yazi '
 
     if [[ `uname` == 'Darwin' ]]; then
         alias j='jupyter notebook'
