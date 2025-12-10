@@ -3,6 +3,7 @@
     {
       "Scrollback Lines": 0,
       "Unlimited Scrollback": true,
+      "Alternate Scrolling": true,
       "Custom Command": "Yes",
       "Use Separate Colors for Light and Dark Mode": true,
       "Rewritable": false,
