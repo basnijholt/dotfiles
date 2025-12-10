@@ -7,6 +7,7 @@ configs/nixos/
 ├── common/           # Tier 1: shared by ALL hosts
 ├── optional/         # Tier 2: opt-in modules (desktop, audio, virtualization, power, etc.)
 ├── hosts/            # Tier 3: host-specific (pc, nuc, hp)
+├── secrets/          # Agenix encrypted secrets
 ├── installers/       # ISO builder
 └── archive/          # Old migration scripts/notes
 ```
@@ -25,6 +26,7 @@ configs/nixos/
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
+| `swarm-vm` | Incus VM | Docker Swarm manager node (ZFS, part of HA cluster) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
 | `installer` | ISO | Minimal installer with SSH enabled |
 | `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
@@ -69,3 +71,81 @@ For Incus VM installation, see the instructions in:
 ## Nix Cache Server Setup (nix-cache)
 
 See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on setting up the cache server container with Harmonia.
+
+## Docker Swarm HA Cluster
+
+Three-node high-availability Docker Swarm cluster across hp, nuc, and swarm-vm.
+
+**Managers:** hp (bootstrap), nuc, swarm-vm
+
+### Deployment
+
+1. **Deploy HP first** (bootstrap manager):
+   ```bash
+   nixos-rebuild switch --flake .#hp
+   ```
+
+2. **Copy token to joining nodes:**
+   ```bash
+   ssh hp "cat /root/secrets/swarm-manager.token" | \
+     ssh nuc "mkdir -p /root/secrets && cat > /root/secrets/swarm-manager.token && chmod 400 /root/secrets/swarm-manager.token"
+   ```
+
+3. **Deploy NUC and swarm-vm:**
+   ```bash
+   nixos-rebuild switch --flake .#nuc
+   # Create swarm-vm in Incus, then deploy similarly
+   ```
+
+4. **Verify:**
+   ```bash
+   ssh hp "docker node ls"
+   ```
+
+### Using Agenix (recommended)
+
+For encrypted token management, enable agenix:
+
+1. Get host SSH keys:
+   ```bash
+   ssh-keyscan -t ed25519 hp nuc swarm-vm 2>/dev/null
+   ```
+
+2. Add keys to `secrets/secrets.nix`
+
+3. Encrypt tokens after swarm init:
+   ```bash
+   cd secrets
+   scp hp:/root/secrets/swarm-manager.token /tmp/
+   agenix -e swarm-manager.token.age < /tmp/swarm-manager.token
+   rm /tmp/swarm-manager.token
+   ```
+
+4. Enable in host configs:
+   ```nix
+   my.swarm.useAgenix = true;
+   ```
+
+## Secrets Management (agenix)
+
+Secrets are encrypted with [agenix](https://github.com/ryantm/agenix) using host SSH keys.
+
+```
+secrets/
+├── secrets.nix              # Maps host keys to secrets
+├── swarm-manager.token.age  # Encrypted swarm manager token
+└── swarm-worker.token.age   # Encrypted swarm worker token
+```
+
+### Commands
+
+```bash
+# Encrypt a new secret
+cd secrets && agenix -e secret-name.age
+
+# Re-key all secrets after adding/removing hosts
+cd secrets && agenix -r
+
+# Edit an existing secret
+cd secrets && agenix -e secret-name.age
+```

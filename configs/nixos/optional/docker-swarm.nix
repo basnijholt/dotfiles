@@ -4,20 +4,48 @@
 # - Firewall rules for Swarm ports
 # - Idempotent systemd services for init/join
 # - Support for manager and worker roles
+# - Optional agenix integration for secure token management
 #
-# Token handling: Tokens are read from files outside the Nix store.
-# Generate tokens on the bootstrap manager:
-#   docker swarm join-token manager -q > /root/secrets/swarm-manager.token
-#   docker swarm join-token worker -q > /root/secrets/swarm-worker.token
-# Then copy to joining nodes with appropriate permissions (0400 root:root).
+# With agenix (recommended):
+#   1. Add host keys to secrets/secrets.nix
+#   2. Encrypt tokens: cd secrets && agenix -e swarm-manager.token.age
+#   3. Set my.swarm.useAgenix = true
+#
+# Without agenix (manual):
+#   1. Generate tokens on bootstrap manager:
+#      docker swarm join-token manager -q > /root/secrets/swarm-manager.token
+#   2. Copy to joining nodes with permissions (0400 root:root)
+#   3. Set managerTokenFile/workerTokenFile paths
 { config, lib, ... }:
 
 let
   cfg = config.my.swarm;
+
+  # Determine the token file path based on agenix usage
+  managerTokenPath =
+    if cfg.useAgenix
+    then config.age.secrets.swarm-manager-token.path
+    else cfg.managerTokenFile;
+
+  workerTokenPath =
+    if cfg.useAgenix
+    then config.age.secrets.swarm-worker-token.path
+    else cfg.workerTokenFile;
+
+  tokenPath =
+    if cfg.role == "manager"
+    then managerTokenPath
+    else workerTokenPath;
 in
 {
   options.my.swarm = {
     enable = lib.mkEnableOption "Docker Swarm";
+
+    useAgenix = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Use agenix for token management instead of manual files.";
+    };
 
     role = lib.mkOption {
       type = lib.types.enum [ "manager" "worker" ];
@@ -40,13 +68,13 @@ in
     managerTokenFile = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      description = "Path to file containing swarm manager join token.";
+      description = "Path to file containing swarm manager join token (ignored if useAgenix=true).";
     };
 
     workerTokenFile = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      description = "Path to file containing swarm worker join token.";
+      description = "Path to file containing swarm worker join token (ignored if useAgenix=true).";
     };
   };
 
@@ -60,6 +88,22 @@ in
     # - UDP 4789: overlay networking (VXLAN)
     networking.firewall.allowedTCPPorts = [ 2377 7946 ];
     networking.firewall.allowedUDPPorts = [ 7946 4789 ];
+
+    # Agenix secrets for joining nodes (not the bootstrap manager)
+    age.secrets = lib.mkIf (cfg.useAgenix && cfg.managerAddr != null) {
+      swarm-manager-token = lib.mkIf (cfg.role == "manager") {
+        file = ../secrets/swarm-manager.token.age;
+        mode = "0400";
+        owner = "root";
+        group = "root";
+      };
+      swarm-worker-token = lib.mkIf (cfg.role == "worker") {
+        file = ../secrets/swarm-worker.token.age;
+        mode = "0400";
+        owner = "root";
+        group = "root";
+      };
+    };
 
     # Initialize a new swarm (only on the bootstrap manager)
     systemd.services.swarm-init = lib.mkIf (cfg.role == "manager" && cfg.managerAddr == null) {
@@ -96,14 +140,17 @@ in
         docker swarm join-token worker -q > /root/secrets/swarm-worker.token
         chmod 400 /root/secrets/swarm-*.token
 
-        echo "Swarm initialized. Copy tokens to joining nodes."
+        echo "Swarm initialized."
+        echo "To use agenix: encrypt these tokens and add to secrets/"
+        echo "To use manual: copy tokens to joining nodes"
       '';
     };
 
     # Join an existing swarm
     systemd.services.swarm-join = lib.mkIf (cfg.managerAddr != null) {
       description = "Join Docker Swarm";
-      after = [ "docker.service" "network-online.target" ];
+      after = [ "docker.service" "network-online.target" ]
+        ++ lib.optionals cfg.useAgenix [ "agenix.service" ];
       requires = [ "docker.service" ];
       wants = [ "network-online.target" ];
       wantedBy = [ "multi-user.target" ];
@@ -123,11 +170,15 @@ in
           exit 0
         fi
 
-        tokenFile="${if cfg.role == "manager" then cfg.managerTokenFile else cfg.workerTokenFile}"
+        tokenFile="${tokenPath}"
 
         if [ -z "$tokenFile" ] || [ ! -f "$tokenFile" ]; then
           echo "Missing token file for role ${cfg.role}: $tokenFile" >&2
-          echo "Copy the token from the bootstrap manager first." >&2
+          ${if cfg.useAgenix then ''
+            echo "Ensure the agenix secret is configured in secrets/secrets.nix" >&2
+          '' else ''
+            echo "Copy the token from the bootstrap manager first." >&2
+          ''}
           exit 1
         fi
 
