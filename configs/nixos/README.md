@@ -126,26 +126,6 @@ For encrypted token management, enable agenix:
    my.swarm.useAgenix = true;
    ```
 
-## Secrets Management (agenix)
+## Secrets (agenix)
 
-Secrets are encrypted with [agenix](https://github.com/ryantm/agenix) using host SSH keys.
-
-```
-secrets/
-├── secrets.nix              # Maps host keys to secrets
-├── swarm-manager.token.age  # Encrypted swarm manager token
-└── swarm-worker.token.age   # Encrypted swarm worker token
-```
-
-### Commands
-
-```bash
-# Encrypt a new secret
-cd secrets && agenix -e secret-name.age
-
-# Re-key all secrets after adding/removing hosts
-cd secrets && agenix -r
-
-# Edit an existing secret
-cd secrets && agenix -e secret-name.age
-```
+See [secrets/README.md](./secrets/README.md) for setup and usage.

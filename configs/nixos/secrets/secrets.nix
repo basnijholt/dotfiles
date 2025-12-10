@@ -44,9 +44,9 @@ in
 {
   # =============================================================================
   # WiFi credentials
-  # Format: WIFI_PSK=yourpassword
+  # Format: WIFI_SSID=MyNetwork\nWIFI_PSK=yourpassword
   # =============================================================================
-  "wifi-psk.age".publicKeys = piHosts;
+  "wifi.age".publicKeys = piHosts;
 
   # =============================================================================
   # Docker Swarm tokens

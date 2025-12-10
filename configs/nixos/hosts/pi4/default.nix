@@ -17,9 +17,6 @@
   # Required for ZFS
   networking.hostId = "dc0bd73a";
 
-  # WiFi configuration (PSK managed by agenix)
-  my.wifi = {
-    enable = true;
-    ssid = "YOUR_SSID_HERE"; # TODO: Replace with your WiFi SSID
-  };
+  # WiFi (SSID + PSK managed by agenix in secrets/wifi.age)
+  my.wifi.enable = true;
 }
