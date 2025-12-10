@@ -115,6 +115,14 @@
           ./hosts/dev-lxc/hardware-configuration.nix
         ];
 
+        # Docker Swarm manager VM for TrueNAS Incus
+        swarm-vm = mkHost [
+          disko.nixosModules.disko
+          ./hosts/swarm-vm/disko.nix
+          ./hosts/swarm-vm/default.nix
+          ./hosts/swarm-vm/hardware-configuration.nix
+        ];
+
         # Nix cache server VM for Incus - builds and caches NixOS configurations
         nix-cache = mkHost [
           ./hosts/nix-cache/default.nix
@@ -158,6 +166,7 @@
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
+        swarm-vm = (import ./hosts/swarm-vm/disko.nix) { inherit lib; };
       };
 
     };
