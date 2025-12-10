@@ -16,7 +16,7 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
 
     # -- fix Atuin [Ctrl-r] key binding
     if command -v atuin &> /dev/null; then
-        bindkey -M emacs '^r' atuin-search  # This again because `omz/lib/key-bindings.zsh` overwrote it
+        bindkey -M emacs '^r' atuin-search  # Rebind after omz/lib/key-bindings.zsh
     fi
 
     # -- if on Linux
