@@ -8,9 +8,6 @@
 	path = submodules/dotbot
 	url = https://github.com/anishathalye/dotbot
 	ignore = dirty
-[submodule "submodules/zsh-fzf-history-search"]
-	path = submodules/zsh-fzf-history-search
-	url = git@github.com:joshskidmore/zsh-fzf-history-search.git
 [submodule "submodules/truenas-zfs-unlock"]
 	path = submodules/truenas-zfs-unlock
 	url = git@github.com:ThorpeJosh/truenas-zfs-unlock.git

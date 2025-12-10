@@ -13,7 +13,6 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     # -- zsh plugins
     source ~/dotfiles/submodules/zsh-autosuggestions/zsh-autosuggestions.zsh
     source ~/dotfiles/submodules/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-    source ~/dotfiles/submodules/zsh-fzf-history-search/zsh-fzf-history-search.zsh
 
     # -- fix Atuin [Ctrl-r] key binding
     if command -v atuin &> /dev/null; then
