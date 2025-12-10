@@ -5,7 +5,7 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     [[ -z $STARSHIP_SHELL ]] && export ZSH_THEME="mytheme"
     DEFAULT_USER="basnijholt"
     export DISABLE_AUTO_UPDATE=true  # Speedup of 40%
-    plugins=( git history sudo iterm2 uv docker-compose )
+    plugins=( git sudo iterm2 uv docker-compose )
     command -v eza >/dev/null && zstyle ':omz:lib:directories' aliases no  # Skip aliases in directories.zsh if eza
     export ZSH=~/dotfiles/submodules/oh-my-zsh
     source $ZSH/oh-my-zsh.sh
