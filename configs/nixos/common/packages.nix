@@ -16,6 +16,7 @@ let
     codex
     coreutils
     docker
+    devbox
     dnsutils # Provides dig, nslookup, host
     duf
     eza
