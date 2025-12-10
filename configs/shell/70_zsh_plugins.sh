@@ -20,12 +20,6 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
         bindkey -M emacs '^r' atuin-search  # This again because `omz/lib/key-bindings.zsh` overwrote it
     fi
 
-    # -- zsh-z - but only if zoxide is not installed
-    if ! command -v zoxide &> /dev/null; then
-        export ZSHZ_CD=cd
-        source ~/dotfiles/submodules/zsh-z/zsh-z.plugin.zsh
-    fi
-
     # -- if on Linux
     if [[ "$(uname -s)" == "Linux" ]]; then
         # Provides ctrl+backspace and ctrl+delete
