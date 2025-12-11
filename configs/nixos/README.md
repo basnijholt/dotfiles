@@ -78,15 +78,17 @@ Three-node high-availability Docker Swarm cluster across hp, nuc, and swarm-vm.
 
 **Configuration:**
 ```nix
-my.swarm.bootstrap = "br0";  # hp - first manager, creates cluster
+my.swarm.bootstrap = "br0";  # hp - creates cluster
 my.swarm.join = "br0";       # nuc, swarm-vm - join as managers
 ```
 
 **Deployment:**
 1. Deploy HP first: `nixos-rebuild switch --flake .#hp`
-2. Encrypt token: `ssh hp "docker swarm join-token manager -q" | agenix -e swarm-manager.token.age`
+2. Encrypt token: `ssh hp "sudo cat /root/secrets/swarm-manager.token" | agenix -e swarm-manager.token.age`
 3. Deploy others: `nixos-rebuild switch --flake .#nuc`
-4. Verify: `ssh hp "docker node ls"`
+4. Verify: `docker node ls`
+
+See [plan.md](./plan.md) for detailed setup notes and troubleshooting.
 
 ## Secrets (agenix)
 

@@ -24,7 +24,7 @@ my.swarm.bootstrap = "br0";
 my.swarm.join = "br0";  # or "eth0" for swarm-vm
 ```
 
-The module is at `optional/docker-swarm.nix` (42 lines).
+The module is at `optional/docker-swarm.nix` (~90 lines).
 
 ## Secrets (agenix)
 
@@ -107,24 +107,25 @@ Should show 3 managers, all "Ready".
 
 | File | Change |
 |------|--------|
-| `optional/docker-swarm.nix` | New module (42 lines) |
+| `optional/docker-swarm.nix` | New module (~90 lines) |
 | `hosts/hp/default.nix` | Added `my.swarm.bootstrap = "br0";` |
 | `hosts/nuc/default.nix` | Added `my.swarm.join = "br0";` |
 | `hosts/swarm-vm/default.nix` | Added `my.swarm.join = "eth0";` |
-| `secrets/secrets.nix` | Template for host keys |
-| `secrets/swarm-manager.token.age` | Placeholder (needs real token) |
-| `README.md` | Updated swarm docs |
+| `secrets/secrets.nix` | Host keys for hp, nuc, pc, pi3, pi4 |
+| `secrets/swarm-manager.token.age` | Encrypted manager join token |
+| `secrets/wifi.age` | Encrypted WiFi credentials |
+| `flake.nix` | Added agenix CLI to x86_64 hosts |
 
 ## Current State
 
 - [x] Module created and tested (evaluates correctly)
 - [x] HP, NUC, swarm-vm configs updated
 - [x] Commits on `docker-swarm` branch
-- [ ] Deploy to HP (creates swarm, generates tokens)
-- [ ] Encrypt token with agenix
-- [ ] Deploy to NUC
-- [ ] Create and deploy swarm-vm
-- [ ] Verify cluster
+- [x] Deploy to HP (creates swarm, generates tokens)
+- [x] Encrypt token with agenix
+- [x] Deploy to NUC
+- [x] Verify cluster (hp=Leader, nuc=Reachable)
+- [ ] Create and deploy swarm-vm (3rd manager)
 
 ## Git Branch
 
@@ -141,13 +142,21 @@ All changes are on branch `docker-swarm`. Commits:
 
 **Can't reach hp.local**: Check mDNS/Avahi is working, or use IP address instead (would require module change).
 
-## Next Session Commands
+## Bugs Fixed During Setup
 
-On HP, to start the deployment:
+1. **docker not in PATH**: Added `path = [ config.virtualisation.docker.package pkgs.iproute2 pkgs.gawk ]` to systemd service
+2. **grep matched 'inactive' as 'active'**: Changed `grep -qE` to `grep -qxE` (match whole line)
+3. **Multiple IPv6 addresses on interface**: Extract IPv4 dynamically instead of passing interface name to Docker
+4. **Nix `or` operator bug**: `null or "br0"` returns `null` (attribute exists). Fixed with `if/then/else`
+
+## Adding swarm-vm Later
+
+When ready to add the 3rd manager:
 ```bash
-cd ~/dotfiles  # or wherever your dotfiles are
-git checkout docker-swarm
-git pull
-cd configs/nixos
-sudo nixos-rebuild switch --flake .#hp
+# 1. Create VM in Incus on TrueNAS
+# 2. Deploy NixOS to it
+# 3. Get its host key and add to secrets/secrets.nix
+# 4. Re-key secrets: cd secrets && agenix -r
+# 5. Deploy: nixos-rebuild switch --flake .#swarm-vm
+# 6. Verify: docker node ls (should show 3 managers)
 ```

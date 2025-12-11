@@ -23,7 +23,7 @@ Encrypted with host SSH keys. Decrypted at boot to `/run/agenix/`.
 # WiFi
 echo -e "WIFI_SSID=MyNetwork\nWIFI_PSK=secret" | agenix -e wifi.age
 
-# Swarm (after hp init)
-ssh hp "docker swarm join-token manager -q" | agenix -e swarm-manager.token.age
-ssh hp "docker swarm join-token worker -q" | agenix -e swarm-worker.token.age
+# Swarm (after hp init - tokens stored at /root/secrets/)
+ssh hp "sudo cat /root/secrets/swarm-manager.token" | agenix -e swarm-manager.token.age
+ssh hp "sudo cat /root/secrets/swarm-worker.token" | agenix -e swarm-worker.token.age
 ```
