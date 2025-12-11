@@ -11,6 +11,7 @@
 
   # Add system packages
   environment.systemPackages = with pkgs; [
+    devbox
     nixpkgs-fmt
   ];
 

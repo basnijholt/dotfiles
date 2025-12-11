@@ -5,7 +5,7 @@
   # --- Ollama ---
   services.ollama = {
     enable = true;
-    acceleration = "cuda";
+    package = pkgs.ollama-cuda;
     host = "0.0.0.0";
     openFirewall = true;
     environmentVariables = {
@@ -318,6 +318,38 @@
           --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 0
+
+      # Uploaded 2025-12-09, size 13.3 GB, max ctx: 131072, layers: 40
+      "devstral-2:24b-q4":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:UD-Q4_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --jinja
+
+      # Uploaded 2025-12-09, size 24.6 GB, max ctx: 131072, layers: 40
+      "devstral-2:24b-q8":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:UD-Q8_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --jinja
+
+      # Uploaded 2025-12-09, size 53.6 GB, max ctx: 131072, layers: 88
+      "devstral-2:123b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Devstral-2-123B-Instruct-2512-GGUF:UD-Q3_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 512
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1.3,3
+          --threads 8
+          --jinja
 
       # Uploaded 2025-07-07, size 13.3 GB, max ctx: 131072, layers: 40
       "devstral:24b":
