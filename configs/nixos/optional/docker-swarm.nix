@@ -16,13 +16,17 @@ let
     requires = [ "docker.service" ];
     wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
-    path = [ config.virtualisation.docker.package ];
+    path = [
+      config.virtualisation.docker.package
+      pkgs.iproute2
+      pkgs.gawk
+    ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
     };
   };
-  inSwarm = "docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null | grep -qE 'active|pending'";
+  inSwarm = "docker info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null | grep -qxE 'active|pending'";
 in
 {
   options.my.swarm = with lib; {
@@ -60,7 +64,8 @@ in
         script = ''
           set -euo pipefail
           ${inSwarm} && exit 0
-          docker swarm init --advertise-addr ${addr}
+          ADDR=$(ip -4 addr show ${cfg.bootstrap} | awk '/inet / {print $2}' | cut -d/ -f1)
+          docker swarm init --advertise-addr "$ADDR"
           install -d -m700 /root/secrets
           docker swarm join-token manager -q > /root/secrets/swarm-manager.token
           docker swarm join-token worker -q > /root/secrets/swarm-worker.token
@@ -75,8 +80,9 @@ in
         script = ''
           set -euo pipefail
           ${inSwarm} && exit 0
+          ADDR=$(ip -4 addr show ${cfg.join} | awk '/inet / {print $2}' | cut -d/ -f1)
           docker swarm join --token "$(cat ${config.age.secrets.swarm-manager-token.path})" \
-            --advertise-addr ${addr} hp.local:2377
+            --advertise-addr "$ADDR" hp.local:2377
         '';
       }
     );

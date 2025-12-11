@@ -43,7 +43,9 @@
       mkHost = extraModules:
         lib.nixosSystem {
           inherit system;
-          modules = commonModules ++ extraModules;
+          modules = commonModules ++ extraModules ++ [
+            { environment.systemPackages = [ agenix.packages.${system}.default ]; }
+          ];
         };
 
       mkPi = piModule: extraModules:

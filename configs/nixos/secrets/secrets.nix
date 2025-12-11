@@ -24,21 +24,21 @@ let
   # =============================================================================
 
   # Physical hosts
-  hp = "ssh-ed25519 AAAA_REPLACE_WITH_HP_KEY";
-  nuc = "ssh-ed25519 AAAA_REPLACE_WITH_NUC_KEY";
+  hp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM5ZinYz3ul3fbg/+eA95t0dq0yBQw4UxBMyFKUihSTQ";
+  nuc = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRL54JIesy0f1FtG81ABXq/xbNNyUFXTA5qZWNoW097";
   pc = "ssh-ed25519 AAAA_REPLACE_WITH_PC_KEY";
   pi3 = "ssh-ed25519 AAAA_REPLACE_WITH_PI3_KEY";
   pi4 = "ssh-ed25519 AAAA_REPLACE_WITH_PI4_KEY";
 
-  # Virtual machines
-  swarm-vm = "ssh-ed25519 AAAA_REPLACE_WITH_SWARM_VM_KEY";
+  # Virtual machines (add key when VM is created)
+  # swarm-vm = "ssh-ed25519 AAAA_REPLACE_WITH_SWARM_VM_KEY";
 
   # =============================================================================
   # Host groups
   # =============================================================================
-  swarmManagers = [ hp nuc swarm-vm ];
+  swarmManagers = [ hp nuc ]; # Add swarm-vm when created
   piHosts = [ pi3 pi4 ];
-  allHosts = [ hp nuc pc pi3 pi4 swarm-vm ];
+  allHosts = [ hp nuc pc pi3 pi4 ]; # Add swarm-vm when created
 
 in
 {
