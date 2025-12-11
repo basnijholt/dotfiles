@@ -15,12 +15,16 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, agenix, nixos-raspberrypi, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -29,6 +33,7 @@
         ./configuration.nix
         home-manager.nixosModules.home-manager
         comin.nixosModules.comin
+        agenix.nixosModules.default
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
@@ -38,7 +43,9 @@
       mkHost = extraModules:
         lib.nixosSystem {
           inherit system;
-          modules = commonModules ++ extraModules;
+          modules = commonModules ++ extraModules ++ [
+            { environment.systemPackages = [ agenix.packages.${system}.default ]; }
+          ];
         };
 
       mkPi = piModule: extraModules:
@@ -115,6 +122,14 @@
           ./hosts/dev-lxc/hardware-configuration.nix
         ];
 
+        # Docker Swarm manager VM for TrueNAS Incus
+        swarm-vm = mkHost [
+          disko.nixosModules.disko
+          ./hosts/swarm-vm/disko.nix
+          ./hosts/swarm-vm/default.nix
+          ./hosts/swarm-vm/hardware-configuration.nix
+        ];
+
         # Nix cache server VM for Incus - builds and caches NixOS configurations
         nix-cache = mkHost [
           ./hosts/nix-cache/default.nix
@@ -158,6 +173,7 @@
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
+        swarm-vm = (import ./hosts/swarm-vm/disko.nix) { inherit lib; };
       };
 
     };

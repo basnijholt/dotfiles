@@ -5,6 +5,7 @@
     # Optional modules (Tier 2)
     # Note: HP is a headless server, so no desktop/audio/gui-packages
     ../../optional/virtualization.nix
+    ../../optional/docker-swarm.nix
     ../../optional/power.nix
     ../../optional/iscsi.nix
     ../../optional/zfs-replication.nix
@@ -15,4 +16,6 @@
 
   # Required for ZFS
   networking.hostId = "37a1d4a7";
+
+  my.swarm.bootstrap = "br0";
 }

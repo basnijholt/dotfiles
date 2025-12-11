@@ -6,6 +6,7 @@
     ../../optional/desktop.nix
     ../../optional/audio.nix
     ../../optional/virtualization.nix
+    ../../optional/docker-swarm.nix
     ../../optional/gui-packages.nix
     ../../optional/power.nix
     ../../optional/iscsi.nix
@@ -19,4 +20,6 @@
 
   # Required for ZFS
   networking.hostId = "8a5b2c1f";
+
+  my.swarm.join = "br0";
 }

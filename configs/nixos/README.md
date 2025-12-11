@@ -7,6 +7,7 @@ configs/nixos/
 ├── common/           # Tier 1: shared by ALL hosts
 ├── optional/         # Tier 2: opt-in modules (desktop, audio, virtualization, power, etc.)
 ├── hosts/            # Tier 3: host-specific (pc, nuc, hp)
+├── secrets/          # Agenix encrypted secrets
 ├── installers/       # ISO builder
 └── archive/          # Old migration scripts/notes
 ```
@@ -25,6 +26,7 @@ configs/nixos/
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
+| `swarm-vm` | Incus VM | Docker Swarm manager node (ZFS, part of HA cluster) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
 | `installer` | ISO | Minimal installer with SSH enabled |
 | `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
@@ -69,3 +71,25 @@ For Incus VM installation, see the instructions in:
 ## Nix Cache Server Setup (nix-cache)
 
 See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on setting up the cache server container with Harmonia.
+
+## Docker Swarm HA Cluster
+
+Three-node high-availability Docker Swarm cluster across hp, nuc, and swarm-vm.
+
+**Configuration:**
+```nix
+my.swarm.bootstrap = "br0";  # hp - creates cluster
+my.swarm.join = "br0";       # nuc, swarm-vm - join as managers
+```
+
+**Deployment:**
+1. Deploy HP first: `nixos-rebuild switch --flake .#hp`
+2. Encrypt token: `ssh hp "sudo cat /root/secrets/swarm-manager.token" | agenix -e swarm-manager.token.age`
+3. Deploy others: `nixos-rebuild switch --flake .#nuc`
+4. Verify: `docker node ls`
+
+See [plan.md](./plan.md) for detailed setup notes and troubleshooting.
+
+## Secrets (agenix)
+
+See [secrets/README.md](./secrets/README.md) for setup and usage.

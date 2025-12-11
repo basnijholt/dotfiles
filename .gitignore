@@ -45,5 +45,3 @@ Thumbs.db
 scripts/rclone-log.txt
 rclone-log.txt
 
-# WiFi configuration
-configs/nixos/hosts/pi4/wifi.nix
