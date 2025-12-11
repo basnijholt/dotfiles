@@ -26,9 +26,9 @@ let
   # Physical hosts
   hp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM5ZinYz3ul3fbg/+eA95t0dq0yBQw4UxBMyFKUihSTQ";
   nuc = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRL54JIesy0f1FtG81ABXq/xbNNyUFXTA5qZWNoW097";
-  pc = "ssh-ed25519 AAAA_REPLACE_WITH_PC_KEY";
-  pi3 = "ssh-ed25519 AAAA_REPLACE_WITH_PI3_KEY";
-  pi4 = "ssh-ed25519 AAAA_REPLACE_WITH_PI4_KEY";
+  pc = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjiKKO6ajlHe5oZa9fGI1v9yLvjvuBH3ZZlYlCIlREt";
+  pi3 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINGj7EWu8KEtECwOgGnQQg/sLnqpgMQqHu2tNgFEe4oX";
+  pi4 = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINGj7EWu8KEtECwOgGnQQg/sLnqpgMQqHu2tNgFEe4oX";
 
   # Virtual machines (add key when VM is created)
   # swarm-vm = "ssh-ed25519 AAAA_REPLACE_WITH_SWARM_VM_KEY";

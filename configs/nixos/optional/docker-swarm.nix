@@ -7,7 +7,7 @@
 }:
 let
   cfg = config.my.swarm;
-  addr = cfg.bootstrap or cfg.join;
+  addr = if cfg.bootstrap != null then cfg.bootstrap else cfg.join;
   oneshot = {
     after = [
       "docker.service"
