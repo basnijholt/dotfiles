@@ -81,7 +81,7 @@ CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.p
 git clone --depth=1 --branch public --single-branch \
   --recurse-submodules -j8 --shallow-submodules \
   git@github.com:basnijholt/dotfiles.git ~/dotfiles
-cd dotfiles
+cd ~/dotfiles
 ./install
 ```
 
