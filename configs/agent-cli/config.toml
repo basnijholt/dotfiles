@@ -10,7 +10,7 @@ llm-openai-model = "gpt-oss-low:20b"
 openai-base-url = "http://192.168.1.143:9292/v1"
 
 # Other
-asr-wyoming-ip = "192.168.1.143"
+asr-wyoming-ip = "localhost"
 tts-wyoming-ip = "192.168.1.143"
 tts-kokoro-host = "http://192.168.1.143:8880/v1"
 tts-kokoro-voice = "af_bella(1)+af_nicole(1.5)"
