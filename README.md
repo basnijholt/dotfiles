@@ -85,12 +85,13 @@ cd ~/dotfiles
 ./install
 ```
 
-#### macOS Terminal Font
+#### macOS Terminal Font and other programs
 
 If prompt icons show as empty squares, install a Nerd Font and select it in Terminal.app:
 
 ```bash
 brew install --cask font-fira-mono-nerd-font
+brew install zsh git-lfs eza  # General useful tools
 ```
 
 Then in Terminal: Settings → Profiles → Text → Font → choose “FiraMono Nerd Font Mono”.
