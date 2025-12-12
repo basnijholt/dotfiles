@@ -8,6 +8,7 @@ in
 {
   imports = [
     nixos-hardware.nixosModules.apple-t2
+    ../optional/apple-t2.nix
   ] ++ lib.optional (builtins.pathExists ../hosts/macbook-air-intel/wifi.nix) ../hosts/macbook-air-intel/wifi.nix;
 
   # Use NetworkManager for WiFi (allows pre-configuring profiles via wifi.nix)
