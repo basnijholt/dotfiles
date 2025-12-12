@@ -33,4 +33,19 @@ in
     initialPassword = "nixos"; # default console password
     openssh.authorizedKeys.keys = sshKeys;
   };
+
+  # Fix for get-apple-firmware: Make /lib/firmware writable using an overlay
+  # This allows the script to extract drivers into the read-only ISO environment.
+  systemd.services.make-firmware-writable = {
+    description = "Make /lib/firmware writable for WiFi driver extraction";
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      mkdir -p /tmp/fw-upper /tmp/fw-work
+      mount -t overlay overlay -o lowerdir=/lib/firmware,upperdir=/tmp/fw-upper,workdir=/tmp/fw-work /lib/firmware
+    '';
+  };
 }
