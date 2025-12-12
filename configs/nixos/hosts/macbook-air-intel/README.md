@@ -41,6 +41,7 @@ Insert the USB drive and hold the **Option (Alt)** key while powering on. Select
     nmcli device wifi list
     nmcli device wifi connect "YOUR_SSID" password "YOUR_PASSWORD"
     ```
+    *Note: You might see error messages like `failed to update device address ret -52` in the logs. These can be safely ignored if `nmcli` works.*
 
 Verify connection:
 ```bash
