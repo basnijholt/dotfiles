@@ -9,6 +9,7 @@ in
   imports = [
     nixos-hardware.nixosModules.apple-t2
     ../optional/apple-t2.nix
+    ../common/nix.nix
   ] ++ lib.optional (builtins.pathExists ../hosts/macbook-air-intel/wifi.nix) ../hosts/macbook-air-intel/wifi.nix;
 
   # Use NetworkManager for WiFi (allows pre-configuring profiles via wifi.nix)
@@ -20,6 +21,7 @@ in
 
   # Improve WiFi support (Broadcom firmware)
   hardware.enableRedistributableFirmware = true;
+  # Allow unfree packages (Broadcom drivers) - strictly required for T2 WiFi
   nixpkgs.config.allowUnfree = true;
 
   services.openssh.enable = true;
@@ -36,6 +38,7 @@ in
 
   # Dependencies for get-apple-firmware (Option 2/3)
   environment.systemPackages = with pkgs; [
+    git
     python3
     p7zip
     dmg2img
