@@ -13,5 +13,9 @@
   services.logind = {
     lidSwitch = "suspend";
     lidSwitchExternalPower = "ignore";
+    extraConfig = ''
+      IdleAction=suspend
+      IdleActionSec=30m
+    '';
   };
 }
