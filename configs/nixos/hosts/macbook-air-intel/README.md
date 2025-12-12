@@ -47,7 +47,7 @@ cd /tmp/dotfiles/configs/nixos
 ### 5. Partition and Mount (Disko)
 Run Disko to create the partition table and mount the ZFS datasets.
 
-**⚠️ WARNING**: This will format the disk `/dev/nvme0n1`. Verify your disk identifier with `lsblk`.
+**⚠️ WARNING**: This will format the disk `/dev/sda`. Verify your disk identifier with `lsblk`. If your disk is NVMe (e.g., `nvme0n1`), edit `hosts/macbook-air-intel/disko.nix` first.
 
 ```bash
 nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./hosts/macbook-air-intel/disko.nix
