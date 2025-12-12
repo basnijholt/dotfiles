@@ -44,8 +44,6 @@
           acltype = "posixacl";
           xattr = "sa";
           atime = "off";
-          dnodesize = "auto";
-          normalization = "formD";
         };
 
         datasets = {
