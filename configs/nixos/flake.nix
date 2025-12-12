@@ -76,6 +76,13 @@
           ./hosts/hp/hardware-configuration.nix
         ];
 
+        macbook-air-intel = mkHost [
+          disko.nixosModules.disko
+          ./hosts/macbook-air-intel/disko.nix
+          ./hosts/macbook-air-intel/default.nix
+          ./hosts/macbook-air-intel/hardware-configuration.nix
+        ];
+
         # Incus VM version of HP - same services/packages, VM-appropriate hardware
         hp-incus = mkHost [
           disko.nixosModules.disko
@@ -157,6 +164,7 @@
         pc = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
+        macbook-air-intel = (import ./hosts/macbook-air-intel/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
       };
 
