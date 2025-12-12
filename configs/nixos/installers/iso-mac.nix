@@ -8,7 +8,7 @@ in
 {
   imports = [
     nixos-hardware.nixosModules.apple-t2
-    ../optional/apple-t2.nix
+    ../hosts/macbook-air-intel/apple-t2.nix
     ../common/nix.nix
   ];
 

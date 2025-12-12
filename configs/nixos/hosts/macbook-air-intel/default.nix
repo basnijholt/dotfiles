@@ -5,7 +5,7 @@
     # Optional modules (Tier 2)
     # Note: Intel MacBook Air
     ../../optional/virtualization.nix
-    ../../optional/apple-t2.nix
+    ./apple-t2.nix
     ./firmware.nix
 
     # Host-specific modules (Tier 3)
