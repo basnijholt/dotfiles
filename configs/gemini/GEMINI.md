@@ -4,6 +4,7 @@
 - Never change commit history in ANY repository (for example by rebasing or amending commits).
 - When Git state or code suddenly changes without your doing (for example, new commits appear or disappear or code changed), ASSUME it is the user doing it, and do NOT question it or revert it.
 - Commit history should remain unchanged to maintain the integrity of the project history!
+- Never merge ANYTHING into the main branch.
 
 Other important rules:
 

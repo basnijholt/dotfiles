@@ -18,12 +18,10 @@
     ~/.config/codex/config.toml: configs/codex/config.toml
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
-    ~/.config/gemini: configs/gemini
     ~/.config/git/attributes: configs/git/attributes
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin
     ~/.config/nvim: configs/nvim
-    ~/.npmrc: configs/npm/npmrc
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
     ~/.config/starship.toml: configs/starship/starship.toml
     ~/.config/wezterm/wezterm.lua: configs/wezterm/wezterm.lua
@@ -31,11 +29,15 @@
     ~/.config/zellij/config.kdl: configs/zellij/config.kdl
     ~/.direnvrc: configs/direnv/direnvrc
     ~/.dotbins: submodules/mydotbins
+    ~/.gemini/GEMINI.md: configs/gemini/GEMINI.md
+    ~/.gemini/hooks: configs/gemini/hooks
+    ~/.gemini/settings.json: configs/gemini/settings.json
     ~/.gitconfig-personal: configs/git/gitconfig-personal
     ~/.gitconfig: configs/git/gitconfig
     ~/.local/bin/git-fixup-file: scripts/git-fixup-file.sh
     ~/.local/bin/nbviewer: scripts/nbviewer.sh
     ~/.local/bin/pypi-sha256: scripts/pypi-sha256.sh
+    ~/.npmrc: configs/npm/npmrc
     ~/.local/bin/run: scripts/run.sh
     ~/.local/bin/sync-dotfiles: scripts/sync-dotfiles.sh
     ~/.local/bin/sync-local-dotfiles: scripts/sync-local-dotfiles.sh

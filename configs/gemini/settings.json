@@ -1,4 +1,34 @@
 {
-    "general.checkpointing.enabled": true,
-    "security.folderTrust.enabled": true
+  "general": {
+    "checkpointing": {
+      "enabled": true
+    },
+    "previewFeatures": true
+  },
+  "security": {
+    "folderTrust": {
+      "enabled": true
+    },
+    "auth": {
+      "selectedType": "gemini-api-key"
+    }
+  },
+  "tools": {
+    "enableHooks": true
+  },
+  "hooks": {
+    "BeforeTool": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "block-git-rewrites",
+            "type": "command",
+            "command": "sh -c \"$HOME/.gemini/hooks/block-git-rewrites.py\"",
+            "description": "Block git commit --amend and git push --force"
+          }
+        ]
+      }
+    ]
+  }
 }
