@@ -17,6 +17,10 @@ in
     plugins = lib.mkForce []; # Minimal plugins to save space
   };
 
+  # Improve WiFi support (Broadcom firmware)
+  hardware.enableRedistributableFirmware = true;
+  nixpkgs.config.allowUnfree = true;
+
   services.openssh.enable = true;
   services.openssh.settings = {
     PermitRootLogin = "prohibit-password";

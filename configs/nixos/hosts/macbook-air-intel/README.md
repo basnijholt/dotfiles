@@ -15,7 +15,6 @@ Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,
     -   Boot into Recovery Mode (Command + R).
     -   Utilities -> Startup Security Utility.
     -   "No Security" and "Allow booting from external media".
-4.  **Internet**: T2 WiFi might not work in the minimal installer. **Use a USB-to-Ethernet adapter** or Android USB Tethering if the keyboard/trackpad works but WiFi doesn't. (The `nixos-hardware` module included in this config handles drivers for the *installed* system).
 
 ## Installation Steps
 
