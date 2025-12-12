@@ -18,6 +18,28 @@ BLOCKED_REGEX = re.compile(
 PROTECTED_BRANCHES = {"main", "master"}
 
 
+def strip_quoted_strings(command: str) -> str:
+    """Remove quoted strings and heredocs to avoid false positives.
+
+    This prevents matching 'git push' inside commit messages, PR bodies, etc.
+    """
+    # Remove heredocs: $(cat <<'EOF' ... EOF) or $(cat <<EOF ... EOF)
+    result = re.sub(
+        r"\$\(cat\s*<<'?(\w+)'?\s*\n.*?\n\s*\1\s*\)",
+        " ",
+        command,
+        flags=re.DOTALL,
+    )
+
+    # Remove double-quoted strings (handling escaped quotes)
+    result = re.sub(r'"(?:[^"\\]|\\.)*"', " ", result)
+
+    # Remove single-quoted strings (no escaping in single quotes)
+    result = re.sub(r"'[^']*'", " ", result)
+
+    return result
+
+
 def get_current_branch() -> str | None:
     """Get the current git branch name."""
     try:
@@ -95,13 +117,16 @@ def main():
             allow()
             return
 
+        # Strip quoted strings to avoid false positives from text inside messages
+        stripped_command = strip_quoted_strings(command)
+
         # Check for blocked rewrite patterns
-        if BLOCKED_REGEX.search(command):
+        if BLOCKED_REGEX.search(stripped_command):
             deny("Git rewrite history commands (amend, force push) are not allowed")
             return
 
         # Check for push to protected branch
-        push_error = is_push_to_protected_branch(command)
+        push_error = is_push_to_protected_branch(stripped_command)
         if push_error:
             deny(push_error)
             return

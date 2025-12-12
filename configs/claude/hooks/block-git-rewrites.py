@@ -6,7 +6,7 @@ import re
 import subprocess
 import sys
 
-# Patterns to block
+# Patterns to block (applied to stripped command)
 BLOCKED_PATTERNS = [
     (r"\bgit\s+commit\b.*--amend\b", "git commit --amend is not allowed"),
     (r"\bgit\s+push\b.*--force\b", "git push --force is not allowed"),
@@ -18,6 +18,29 @@ BLOCKED_PATTERNS = [
 ]
 
 PROTECTED_BRANCHES = {"main", "master"}
+
+
+def strip_quoted_strings(command: str) -> str:
+    """Remove quoted strings and heredocs to avoid false positives.
+
+    This prevents matching 'git push' inside commit messages, PR bodies, etc.
+    """
+    # Remove heredocs: $(cat <<'EOF' ... EOF) or $(cat <<EOF ... EOF)
+    # Match the heredoc pattern and remove everything until the delimiter
+    result = re.sub(
+        r"\$\(cat\s*<<'?(\w+)'?\s*\n.*?\n\s*\1\s*\)",
+        " ",
+        command,
+        flags=re.DOTALL,
+    )
+
+    # Remove double-quoted strings (handling escaped quotes)
+    result = re.sub(r'"(?:[^"\\]|\\.)*"', " ", result)
+
+    # Remove single-quoted strings (no escaping in single quotes)
+    result = re.sub(r"'[^']*'", " ", result)
+
+    return result
 
 
 def get_current_branch() -> str | None:
@@ -77,14 +100,17 @@ command = tool_input.get("command", "")
 if tool_name != "Bash" or not command:
     sys.exit(0)
 
+# Strip quoted strings to avoid false positives from text inside messages
+stripped_command = strip_quoted_strings(command)
+
 # Check for blocked patterns
 for pattern, message in BLOCKED_PATTERNS:
-    if re.search(pattern, command, re.IGNORECASE):
+    if re.search(pattern, stripped_command, re.IGNORECASE):
         print(f"Blocked: {message}", file=sys.stderr)
         sys.exit(2)
 
 # Check for push to protected branch
-push_error = is_push_to_protected_branch(command)
+push_error = is_push_to_protected_branch(stripped_command)
 if push_error:
     print(f"Blocked: {push_error}", file=sys.stderr)
     sys.exit(2)
