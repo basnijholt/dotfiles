@@ -4,11 +4,13 @@ Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,
 
 ## Prerequisites
 
-1.  **Custom NixOS Installer**: You **should** build a custom ISO that includes T2 drivers (keyboard/trackpad support).
-    ```bash
-    nix build .#nixosConfigurations.installer.config.system.build.isoImage
-    ```
-    Flash the resulting ISO from `result/iso/` to a USB drive.
+1.  **Custom NixOS Installer**: You **should** build a custom ISO that includes T2 drivers (keyboard/trackpad support) and your WiFi credentials.
+    1.  Create `hosts/macbook-air-intel/wifi.nix` from `hosts/macbook-air-intel/wifi.example.nix` and add your SSID/Password.
+    2.  Build the ISO:
+        ```bash
+        nix build .#nixosConfigurations.installer.config.system.build.isoImage --impure
+        ```
+    3.  Flash the resulting ISO from `result/iso/` to a USB drive.
 2.  **T2 Security**: You **must** disable Secure Boot and allow booting from external media.
     -   Boot into Recovery Mode (Command + R).
     -   Utilities -> Startup Security Utility.
