@@ -43,6 +43,8 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     # Directory navigation: Alt+Up (cd ..) and Alt+Down (cd -)
     bindkey '^[[1;3A' _cd_up          # Alt+Up - xterm style (iTerm, SSH, Linux)
     bindkey '^[[1;3B' _cd_back        # Alt+Down - xterm style
+    bindkey '^[[1;5A' _cd_up          # Alt+Up - VS Code terminal (sends Ctrl modifier)
+    bindkey '^[[1;5B' _cd_back        # Alt+Down - VS Code terminal
 
     # Terminal-specific bindings
     case "$TERM_PROGRAM" in
