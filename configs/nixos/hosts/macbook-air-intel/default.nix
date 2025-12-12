@@ -34,6 +34,23 @@
     SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.systemd}/bin/systemctl stop ac-idle-block.service"
   '';
 
+  # Temporary fix: Make /lib/firmware writable to allow manual extraction on each boot
+  # TODO: Replace with permanent hardware.firmware inclusion once files are extracted to repo.
+  systemd.services.make-firmware-writable = {
+    description = "Make /lib/firmware writable for WiFi driver extraction";
+    wantedBy = [ "multi-user.target" ];
+    path = with pkgs; [ util-linux coreutils ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      mkdir -p /tmp/fw-upper /tmp/fw-work
+      mount -t overlay overlay -o lowerdir=/lib/firmware,upperdir=/tmp/fw-upper,workdir=/tmp/fw-work /lib/firmware
+      mkdir -p /lib/firmware/brcm
+    '';
+  };
+
   # --- T2 Hardware Support ---
   # The 'nixos-hardware.nixosModules.apple-t2' module (imported in flake.nix)
   # handles kernel patches for the T2 chip (SSD, Keyboard, etc.).
