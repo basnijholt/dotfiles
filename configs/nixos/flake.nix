@@ -157,10 +157,18 @@
 
         installer = lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit nixos-hardware; };
           modules = [
             (import (nixpkgs + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"))
             ./installers/iso.nix
+          ];
+        };
+
+        installer-mac = lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit nixos-hardware; };
+          modules = [
+            (import (nixpkgs + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"))
+            ./installers/iso-mac.nix
           ];
         };
       };

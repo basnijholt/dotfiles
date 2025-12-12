@@ -8,7 +8,7 @@ Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,
     1.  Create `hosts/macbook-air-intel/wifi.nix` from `hosts/macbook-air-intel/wifi.example.nix` and add your SSID/Password.
     2.  Build the ISO:
         ```bash
-        nix build .#nixosConfigurations.installer.config.system.build.isoImage --impure
+        nix build .#nixosConfigurations.installer-mac.config.system.build.isoImage --impure
         ```
     3.  Flash the resulting ISO from `result/iso/` to a USB drive.
 2.  **T2 Security**: You **must** disable Secure Boot and allow booting from external media.
