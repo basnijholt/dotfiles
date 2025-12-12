@@ -29,4 +29,11 @@
     SUBSYSTEM=="power_supply", ATTR{online}=="1", RUN+="${pkgs.systemd}/bin/systemctl start ac-idle-block.service"
     SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.systemd}/bin/systemctl stop ac-idle-block.service"
   '';
+
+  environment.systemPackages = [
+    (pkgs.writeShellScriptBin "get-apple-firmware" ''
+      echo "Downloading and running firmware extraction script..."
+      ${pkgs.curl}/bin/curl -fsSL https://raw.githubusercontent.com/t2linux/wiki/master/docs/firmware.sh | bash
+    '')
+  ];
 }
