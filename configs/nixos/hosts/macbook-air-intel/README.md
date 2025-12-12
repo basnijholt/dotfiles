@@ -10,7 +10,11 @@ Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,
         ```bash
         nix build .#nixosConfigurations.installer-mac.config.system.build.isoImage --impure
         ```
-    3.  Flash the resulting ISO from `result/iso/` to a USB drive.
+    3.  Flash the resulting ISO from `result/iso/` to a USB drive (e.g., `/dev/sda`):
+        ```bash
+        sudo dd if=result/store/nixos-*.iso of=/dev/sdX bs=4M status=progress conv=fsync
+        ```
+        *⚠️ Replace `/dev/sdX` with your actual USB device identifier (check `lsblk`).*
 2.  **T2 Security**: You **must** disable Secure Boot and allow booting from external media.
     -   Boot into Recovery Mode (Command + R).
     -   Utilities -> Startup Security Utility.
