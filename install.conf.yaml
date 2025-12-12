@@ -14,7 +14,6 @@
     ~/.config/amp/settings.json: configs/amp/settings.json
     ~/.config/atuin: configs/atuin
     ~/.config/bat/config: configs/bat/config
-    ~/.config/claude/settings.json: configs/claude/settings.json
     ~/.config/codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.config/codex/config.toml: configs/codex/config.toml
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
