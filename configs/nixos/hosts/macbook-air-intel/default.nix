@@ -9,4 +9,9 @@
     # Host-specific modules (Tier 3)
     ./networking.nix
   ];
+
+  services.logind = {
+    lidSwitch = "suspend";
+    lidSwitchExternalPower = "ignore";
+  };
 }
