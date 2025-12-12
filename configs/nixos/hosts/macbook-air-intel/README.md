@@ -1,17 +1,21 @@
 # Intel MacBook Air Setup
 
-Configuration for an Intel-based MacBook Air using ZFS and Disko.
+Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,1` (T2 Chip).
 
 ## Prerequisites
 
 1.  **NixOS Installer**: [Download](https://nixos.org/download.html) the Minimal ISO image (x86_64).
 2.  **USB Drive**: Flash the ISO onto a USB drive (e.g., using `dd` or Etcher).
-3.  **T2 Security (If applicable)**: If the MacBook Air has a T2 chip (2018 or later), boot into Recovery Mode (Command + R) -> Utilities -> Startup Security Utility -> Allow booting from external media and Disable Secure Boot.
+3.  **T2 Security**: You **must** disable Secure Boot and allow booting from external media.
+    -   Boot into Recovery Mode (Command + R).
+    -   Utilities -> Startup Security Utility.
+    -   "No Security" and "Allow booting from external media".
+4.  **Internet**: T2 WiFi might not work in the minimal installer. **Use a USB-to-Ethernet adapter** or Android USB Tethering if the keyboard/trackpad works but WiFi doesn't. (The `nixos-hardware` module included in this config handles drivers for the *installed* system).
 
 ## Installation Steps
 
 ### 1. Boot the Installer
-Insert the USB drive and hold the **Option (Alt)** key while powering on. Select "EFI Boot" (or the USB drive).
+Insert the USB drive and hold the **Option (Alt)** key while powering on. Select "EFI Boot".
 
 ### 2. Connect to WiFi
 If using the graphical installer, use the UI. For the minimal installer:
@@ -47,14 +51,14 @@ cd /tmp/dotfiles/configs/nixos
 ### 5. Partition and Mount (Disko)
 Run Disko to create the partition table and mount the ZFS datasets.
 
-**⚠️ WARNING**: This will format the disk `/dev/sda`. Verify your disk identifier with `lsblk`. If your disk is NVMe (e.g., `nvme0n1`), edit `hosts/macbook-air-intel/disko.nix` first.
+**⚠️ WARNING**: This will format the internal T2 NVMe drive `/dev/nvme0n1`. Verify with `lsblk`.
 
 ```bash
 nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko ./hosts/macbook-air-intel/disko.nix
 ```
 
 ### 6. Install NixOS
-Install the system using the flake configuration.
+Install the system using the flake configuration. This will pull in the T2 specific kernel and drivers.
 
 ```bash
 nixos-install --flake .#macbook-air-intel

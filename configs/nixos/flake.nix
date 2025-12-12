@@ -15,12 +15,15 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+    };
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, nixos-hardware, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -77,6 +80,7 @@
         ];
 
         macbook-air-intel = mkHost [
+          nixos-hardware.nixosModules.apple-t2
           disko.nixosModules.disko
           ./hosts/macbook-air-intel/disko.nix
           ./hosts/macbook-air-intel/default.nix
