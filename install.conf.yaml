@@ -45,7 +45,6 @@
     ~/.local/bin/sync-uv-tools: scripts/sync-uv-tools.sh
     ~/.local/bin/upload-file: scripts/upload-file.sh
     ~/.local/bin/zellij-rename-tabs: scripts/zellij-rename-tabs.py
-    ~/.local/bin/keychain: submodules/mydotbins/linux/amd64/bin/keychain
     ~/.mambarc: configs/mamba/mambarc
     ~/.oh-my-zsh: submodules/oh-my-zsh
     ~/.tmux.conf: submodules/tmux/.tmux.conf
