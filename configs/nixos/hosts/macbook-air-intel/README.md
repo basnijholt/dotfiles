@@ -12,11 +12,11 @@ Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,
         ```
     3.  Flash the resulting ISO from `result/iso/` to a USB drive (e.g., `/dev/sda`):
         ```bash
-        sudo dd if=result/store/nixos-*.iso of=/dev/sdX bs=4M status=progress conv=fsync
+        sudo dd if=result/iso/nixos-*.iso of=/dev/sdX bs=4M status=progress conv=fsync
         ```
         *⚠️ Replace `/dev/sdX` with your actual USB device identifier (check `lsblk`).*
 2.  **T2 Security**: You **must** disable Secure Boot and allow booting from external media.
-    -   Boot into Recovery Mode (Command + R).
+    -   Boot into Internet Recovery Mode (**Option + Command + R**).
     -   Utilities -> Startup Security Utility.
     -   "No Security" and "Allow booting from external media".
 
