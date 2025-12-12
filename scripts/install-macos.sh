@@ -60,7 +60,7 @@ fi
 
 log "Updating Homebrew and installing prerequisites..."
 brew update
-brew install git git-lfs zsh eza python
+brew install git git-lfs zsh eza
 brew install --cask font-fira-mono-nerd-font || true
 
 log "Initializing Git LFS..."
@@ -90,35 +90,11 @@ log "Running dotfiles installer..."
   ./install
 )
 
-log "Enabling macOS Dark Mode..."
-osascript -e 'tell application "System Events" to tell appearance preferences to set dark mode to true' \
-  >/dev/null 2>&1 || log "Could not enable Dark Mode automatically; you may need to grant automation permissions."
-
 log "Configuring Terminal.app (dark theme + Nerd Font)..."
-# Set Pro (dark) as default profile
 defaults write com.apple.Terminal "Default Window Settings" -string "Pro"
 defaults write com.apple.Terminal "Startup Window Settings" -string "Pro"
-
-# Set FiraMono Nerd Font in the Pro profile (size 12)
-# The font data is base64-encoded NSFont archive
-FONT_NAME="FiraMono Nerd Font Mono"
-FONT_SIZE="12"
-/usr/libexec/PlistBuddy -c "Set ':Window Settings:Pro:Font' -data '$(
-  printf '<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0"><dict>
-<key>NSFontNameAttribute</key><string>%s</string>
-<key>NSFontSizeAttribute</key><real>%s</real>
-</dict></plist>' "$FONT_NAME" "$FONT_SIZE" | plutil -convert binary1 -o - - | base64
-)'" ~/Library/Preferences/com.apple.Terminal.plist 2>/dev/null || {
-  # Fallback: use osascript to set font
-  osascript -e "
-    tell application \"Terminal\"
-      set font name of settings set \"Pro\" to \"$FONT_NAME\"
-      set font size of settings set \"Pro\" to $FONT_SIZE
-    end tell
-  " 2>/dev/null || log "Could not set Terminal font automatically."
-}
+osascript -e 'tell application "Terminal" to set font name of settings set "Pro" to "FiraMono Nerd Font Mono"' 2>/dev/null || true
+osascript -e 'tell application "Terminal" to set font size of settings set "Pro" to 12' 2>/dev/null || true
 
 log "Setting zsh as default shell..."
 BREW_ZSH="/opt/homebrew/bin/zsh"
