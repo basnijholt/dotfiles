@@ -19,7 +19,10 @@
     '';
   };
 
-  # concise power management: udev triggers inhibitor service when AC connects
+  # --- Power Management for Headless Server ---
+  # Goal: Sleep aggressively on battery, NEVER sleep on AC.
+  # 1. logind (above) handles battery behavior (suspend on lid/idle).
+  # 2. This udev rule + service inhibits sleep whenever AC is connected.
   systemd.services.ac-idle-block = {
     description = "Inhibit idle suspend when on AC";
     serviceConfig.ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=idle --who=ac-udev --mode=block sleep infinity";
@@ -30,6 +33,12 @@
     SUBSYSTEM=="power_supply", ATTR{online}=="0", RUN+="${pkgs.systemd}/bin/systemctl stop ac-idle-block.service"
   '';
 
+  # --- T2 Hardware Support ---
+  # The 'nixos-hardware.nixosModules.apple-t2' module (imported in flake.nix)
+  # handles kernel patches for the T2 chip (SSD, Keyboard, etc.).
+  #
+  # This utility script extracts the REQUIRED proprietary firmware (WiFi/BT)
+  # from the internal macOS partition, as we cannot legally redistribute it.
   environment.systemPackages = [
     (pkgs.stdenvNoCC.mkDerivation {
       pname = "get-apple-firmware";
