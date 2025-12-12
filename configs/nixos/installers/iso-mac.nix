@@ -1,6 +1,6 @@
 # Installer ISO configuration
 # SSH is enabled with key-only auth; root login allowed but NO passwords.
-{ pkgs, lib, nixos-hardware, ... }:
+{ pkgs, nixos-hardware, ... }:
 
 let
   sshKeys = (import ../common/ssh-keys.nix).sshKeys;
@@ -10,9 +10,9 @@ in
     nixos-hardware.nixosModules.apple-t2
     ../optional/apple-t2.nix
     ../common/nix.nix
-  ] ++ lib.optional (builtins.pathExists ../hosts/macbook-air-intel/wifi.nix) ../hosts/macbook-air-intel/wifi.nix;
+  ];
 
-  # Use NetworkManager for WiFi (allows pre-configuring profiles via wifi.nix)
+  # Use NetworkManager for WiFi (allows manual connection)
   networking.wireless.enable = lib.mkForce false;
   networking.networkmanager = {
     enable = true;
