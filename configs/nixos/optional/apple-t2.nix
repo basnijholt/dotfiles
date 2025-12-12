@@ -1,3 +1,6 @@
+# Apple T2 Firmware Extraction Tool
+# Sourced from: https://github.com/t2linux/nixos-t2-iso/blob/main/nix/pkgs/firmware-script.nix
+# This script extracts WiFi/Bluetooth firmware from the macOS partition.
 { pkgs, ... }:
 {
   environment.systemPackages = [
