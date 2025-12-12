@@ -25,10 +25,7 @@ Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,
 Insert the USB drive and hold the **Option (Alt)** key while powering on. Select "EFI Boot".
 
 ### 2. Connect to Internet
-**Option A: USB Tethering (Recommended)**
-Connect an Android phone (USB Tethering) or USB-Ethernet adapter. It should autoconnect.
-
-**Option B: WiFi (Requires Firmware Extraction)**
+**WiFi (Requires Firmware Extraction)**
 1.  Run the firmware extraction tool:
     ```bash
     sudo get-apple-firmware
