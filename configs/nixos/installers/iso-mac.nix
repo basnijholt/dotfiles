@@ -49,6 +49,7 @@ in
   systemd.services.make-firmware-writable = {
     description = "Make /lib/firmware writable for WiFi driver extraction";
     wantedBy = [ "multi-user.target" ];
+    path = with pkgs; [ util-linux coreutils ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
