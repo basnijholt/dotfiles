@@ -6,15 +6,12 @@ import re
 import subprocess
 import sys
 
-# Patterns to block (applied to stripped command)
+# Patterns to block dangerous git commands
 BLOCKED_PATTERNS = [
     (r"\bgit\s+commit\b.*--amend\b", "git commit --amend is not allowed"),
     (r"\bgit\s+push\b.*--force\b", "git push --force is not allowed"),
     (r"\bgit\s+push\b.*-f\b", "git push -f (force) is not allowed"),
-    (
-        r"\bgit\s+push\b.*--force-with-lease\b",
-        "git push --force-with-lease is not allowed",
-    ),
+    (r"\bgit\s+push\b.*--force-with-lease\b", "git push --force-with-lease is not allowed"),
 ]
 
 PROTECTED_BRANCHES = {"main", "master"}
@@ -26,7 +23,6 @@ def strip_quoted_strings(command: str) -> str:
     This prevents matching 'git push' inside commit messages, PR bodies, etc.
     """
     # Remove heredocs: $(cat <<'EOF' ... EOF) or $(cat <<EOF ... EOF)
-    # Match the heredoc pattern and remove everything until the delimiter
     result = re.sub(
         r"\$\(cat\s*<<'?(\w+)'?\s*\n.*?\n\s*\1\s*\)",
         " ",
@@ -57,8 +53,22 @@ def get_current_branch() -> str | None:
         return None
 
 
-def is_push_to_protected_branch(command: str) -> str | None:
-    """Check if command pushes to a protected branch. Returns error message or None."""
+def check_blocked_patterns(command: str) -> str | None:
+    """Check if command matches any blocked pattern.
+
+    Returns error message if blocked, None if allowed.
+    """
+    for pattern, message in BLOCKED_PATTERNS:
+        if re.search(pattern, command, re.IGNORECASE):
+            return message
+    return None
+
+
+def check_push_to_protected_branch(command: str) -> str | None:
+    """Check if command pushes to a protected branch.
+
+    Returns error message if blocked, None if allowed.
+    """
     if not re.search(r"\bgit\s+push\b", command, re.IGNORECASE):
         return None
 
@@ -68,7 +78,6 @@ def is_push_to_protected_branch(command: str) -> str | None:
             return f"git push to {branch} is not allowed - use a PR"
 
     # Check if currently on protected branch and pushing without explicit branch
-    # Pattern: "git push" optionally followed by remote name, but no branch specified
     # This matches: "git push", "git push origin", "git push -u origin"
     # But not: "git push origin feature-branch"
     push_match = re.search(r"\bgit\s+push\b(.*)$", command, re.IGNORECASE)
@@ -76,7 +85,6 @@ def is_push_to_protected_branch(command: str) -> str | None:
         args = push_match.group(1).strip()
         # Remove flags like -u, --set-upstream, etc.
         args_without_flags = re.sub(r"\s*-[a-zA-Z]\b|\s*--[\w-]+", "", args).strip()
-        # Split remaining args - should be at most remote name
         parts = args_without_flags.split()
         # If 0 or 1 parts (no args or just remote), check current branch
         if len(parts) <= 1:
@@ -87,32 +95,47 @@ def is_push_to_protected_branch(command: str) -> str | None:
     return None
 
 
-try:
-    input_data = json.load(sys.stdin)
-except json.JSONDecodeError as e:
-    print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
-    sys.exit(1)
+def check_command(command: str) -> str | None:
+    """Check a shell command for dangerous git operations.
 
-tool_name = input_data.get("tool_name", "")
-tool_input = input_data.get("tool_input", {})
-command = tool_input.get("command", "")
+    Returns error message if blocked, None if allowed.
+    """
+    stripped = strip_quoted_strings(command)
 
-if tool_name != "Bash" or not command:
-    sys.exit(0)
+    error = check_blocked_patterns(stripped)
+    if error:
+        return error
 
-# Strip quoted strings to avoid false positives from text inside messages
-stripped_command = strip_quoted_strings(command)
+    return check_push_to_protected_branch(stripped)
 
-# Check for blocked patterns
-for pattern, message in BLOCKED_PATTERNS:
-    if re.search(pattern, stripped_command, re.IGNORECASE):
-        print(f"Blocked: {message}", file=sys.stderr)
+
+# ============================================================================
+# Claude Code specific: uses exit codes (0 = allow, 2 = block with stderr)
+# ============================================================================
+
+
+def main() -> None:
+    try:
+        input_data = json.load(sys.stdin)
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    tool_name = input_data.get("tool_name", "")
+    tool_input = input_data.get("tool_input", {})
+    command = tool_input.get("command", "")
+
+    # Only check Bash commands
+    if tool_name != "Bash" or not command:
+        sys.exit(0)
+
+    error = check_command(command)
+    if error:
+        print(f"Blocked: {error}", file=sys.stderr)
         sys.exit(2)
 
-# Check for push to protected branch
-push_error = is_push_to_protected_branch(stripped_command)
-if push_error:
-    print(f"Blocked: {push_error}", file=sys.stderr)
-    sys.exit(2)
+    sys.exit(0)
 
-sys.exit(0)
+
+if __name__ == "__main__":
+    main()
