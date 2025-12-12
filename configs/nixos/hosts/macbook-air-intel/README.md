@@ -21,23 +21,13 @@ Configuration for MacBook Air (Retina, 13-inch, 2018/2019) - Model `MacBookAir8,
 ### 1. Boot the Installer
 Insert the USB drive and hold the **Option (Alt)** key while powering on. Select "EFI Boot".
 
-### 2. Connect to WiFi
-If using the graphical installer, use the UI. For the minimal installer:
+### 2. Verify WiFi Connection
+Since the custom ISO was built with your WiFi credentials, it should connect automatically.
 
+Verify connection:
 ```bash
-# Start wpa_supplicant if not running
-systemctl start wpa_supplicant
-wpa_cli
-> scan
-> scan_results
-> add_network
-> 0
-> set_network 0 ssid "YOUR_SSID"
-> set_network 0 psk "YOUR_PASSWORD"
-> enable_network 0
-> quit
+ping google.com
 ```
-Verify connection with `ping google.com`.
 
 ### 3. Prepare the Environment
 Switch to root:
