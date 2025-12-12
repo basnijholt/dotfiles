@@ -14,7 +14,7 @@
   services.logind = {
     lidSwitch = "suspend";
     lidSwitchExternalPower = "ignore";
-    settings = {
+    settings.Login = {
       IdleAction = "suspend";
       IdleActionSec = "30m";
     };
