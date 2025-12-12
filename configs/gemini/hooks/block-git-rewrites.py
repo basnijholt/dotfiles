@@ -11,7 +11,10 @@ BLOCKED_PATTERNS = [
     (r"\bgit\s+commit\b.*--amend\b", "git commit --amend is not allowed"),
     (r"\bgit\s+push\b.*--force\b", "git push --force is not allowed"),
     (r"\bgit\s+push\b.*-f\b", "git push -f (force) is not allowed"),
-    (r"\bgit\s+push\b.*--force-with-lease\b", "git push --force-with-lease is not allowed"),
+    (
+        r"\bgit\s+push\b.*--force-with-lease\b",
+        "git push --force-with-lease is not allowed",
+    ),
 ]
 
 PROTECTED_BRANCHES = {"main", "master"}
