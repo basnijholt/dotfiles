@@ -19,6 +19,7 @@ uv tool install pygount
 uv tool install rsync-time-machine
 uv tool install ruff
 uv tool install smassh
+uv tool install truenas-unlock
 uv tool install tuitorial
 uv tool install "unidep[all]"
 uv tool upgrade --all
