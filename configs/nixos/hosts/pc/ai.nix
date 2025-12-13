@@ -31,6 +31,55 @@
 
     models:  # Ordered from newest to oldest
 
+      # Uploaded 2025-12-09, size 13.3 GB, max ctx: 131072, layers: 40
+      "devstral-2:24b-q4":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:UD-Q4_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --jinja
+
+      # Uploaded 2025-12-09, size 24.6 GB, max ctx: 131072, layers: 40
+      "devstral-2:24b-q8":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:UD-Q8_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --jinja
+
+      # Uploaded 2025-12-09, size 53.6 GB, max ctx: 131072, layers: 88
+      "devstral-2:123b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Devstral-2-123B-Instruct-2512-GGUF:UD-Q3_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 512
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1.3,3
+          --threads 8
+          --jinja
+
+      # Uploaded 2025-12-05, size 88.4 GB
+      "gpt-oss:120b-derestricted":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf Calandracas/gpt-oss-120b-Derestricted-GGUF
+          --hf-file gpt-oss-120B-Derestricted-Q4_K_M.gguf
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 512
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1.3,3
+          --n-cpu-moe 24
+          --threads 8
+          --chat-template-kwargs '{"reasoning_effort": "high"}'
+          --jinja
+
       # Uploaded 2025-11-28, size 45.1 GB, max ctx: 262144, layers: 48
       "qwen3-next-80b-a3b:q4_k_xl":
         cmd: |
@@ -44,38 +93,6 @@
           --tensor-split 1,1
           --n-cpu-moe 10
           --threads 8
-          --jinja
-
-      # Uploaded 2025-08-04, size 68.0 GB, max ctx: 131072, layers: 47
-      "glm-4.5-air:ud-q4_k_xl":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/GLM-4.5-Air-GGUF
-          --hf-file UD-Q4_K_XL/GLM-4.5-Air-UD-Q4_K_XL-00001-of-00002.gguf
-          --port ''${PORT}
-          --ctx-size 131072
-          --batch-size 2048
-          --ubatch-size 512
-          --tensor-split 28,20
-          --n-cpu-moe 20
-          --no-mmap
-          --no-context-shift
-          --swa-full
-          --threads 8
-          --jinja
-
-      # Uploaded 2025-10-23, size 32.4 GB, max ctx: 262144, layers: 64
-      "qwen3-vl-thinking-abliterated:32b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated
-          --hf-file GGUF/ggml-model-q8_0.gguf
-          --mmproj-url https://huggingface.co/huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated/resolve/main/GGUF/mmproj-model-f16.gguf
-          --port ''${PORT}
-          --ctx-size 16384
-          --batch-size 2048
-          --ubatch-size 512
-          --threads 1
           --jinja
 
       # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144, layers: 36
@@ -162,6 +179,20 @@
           --threads 1
           --jinja
 
+      # Uploaded 2025-10-23, size 32.4 GB, max ctx: 262144, layers: 64
+      "qwen3-vl-thinking-abliterated:32b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated
+          --hf-file GGUF/ggml-model-q8_0.gguf
+          --mmproj-url https://huggingface.co/huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated/resolve/main/GGUF/mmproj-model-f16.gguf
+          --port ''${PORT}
+          --ctx-size 16384
+          --batch-size 2048
+          --ubatch-size 512
+          --threads 1
+          --jinja
+
       # Uploaded 2025-10-02, size 14.3 GB, max ctx: 262400, layers: 48
       "apriel-thinker:15b":
         cmd: |
@@ -208,6 +239,52 @@
           --batch-size 2048
           --ubatch-size 2048
           --threads 1
+          --jinja
+
+      # Uploaded 2025-08-06, size 2.3 GB, max ctx: 262144, layers: 36
+      "qwen3-thinking:4b":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF:UD-Q4_K_XL
+          --port ''${PORT}
+          --ctx-size 0
+
+      # Uploaded 2025-08-05, size 59.0 GB, max ctx: 131072, layers: 36
+      "gpt-oss:120b-q8":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/gpt-oss-120b-GGUF:q8_0
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 512
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1.8,1
+          --n-cpu-moe 13
+          --threads 8
+          --chat-template-kwargs '{"reasoning_effort": "high"}'
+          --jinja
+
+      # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
+      # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
+      # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
+
+      # Uploaded 2025-08-04, size 68.0 GB, max ctx: 131072, layers: 47
+      "glm-4.5-air:ud-q4_k_xl":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/GLM-4.5-Air-GGUF
+          --hf-file UD-Q4_K_XL/GLM-4.5-Air-UD-Q4_K_XL-00001-of-00002.gguf
+          --port ''${PORT}
+          --ctx-size 131072
+          --batch-size 2048
+          --ubatch-size 512
+          --tensor-split 28,20
+          --n-cpu-moe 20
+          --no-mmap
+          --no-context-shift
+          --swa-full
+          --threads 8
           --jinja
 
       # Uploaded 2025-08-02, size 11.3 GB, max ctx: 131072, layers: 24
@@ -265,44 +342,6 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
-      # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
-      # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
-
-      # Uploaded 2025-08-05, size 59.0 GB, max ctx: 131072, layers: 36
-      "gpt-oss:120b-q8":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/gpt-oss-120b-GGUF:q8_0
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 512
-          --ubatch-size 512
-          --split-mode layer
-          --tensor-split 1.8,1
-          --n-cpu-moe 13
-          --threads 8
-          --chat-template-kwargs '{"reasoning_effort": "high"}'
-          --jinja
-
-      # Uploaded 2025-12-05, size 88.4 GB
-      "gpt-oss:120b-derestricted":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf Calandracas/gpt-oss-120b-Derestricted-GGUF
-          --hf-file gpt-oss-120B-Derestricted-Q4_K_M.gguf
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 512
-          --ubatch-size 512
-          --split-mode layer
-          --tensor-split 1.3,3
-          --n-cpu-moe 24
-          --threads 8
-          --chat-template-kwargs '{"reasoning_effort": "high"}'
-          --jinja
-
-      # Coding models
       # Uploaded 2025-07-31, size 17.3 GB, max ctx: 262144, layers: 48
       "qwen3-coder:30b":
         cmd: |
@@ -310,46 +349,6 @@
           --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL
           --port ''${PORT}
           --ctx-size 131072
-
-      # Uploaded 2025-08-06, size 2.3 GB, max ctx: 262144, layers: 36
-      "qwen3-thinking:4b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Uploaded 2025-12-09, size 13.3 GB, max ctx: 131072, layers: 40
-      "devstral-2:24b-q4":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 65536
-          --jinja
-
-      # Uploaded 2025-12-09, size 24.6 GB, max ctx: 131072, layers: 40
-      "devstral-2:24b-q8":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Devstral-Small-2-24B-Instruct-2512-GGUF:UD-Q8_K_XL
-          --port ''${PORT}
-          --ctx-size 65536
-          --jinja
-
-      # Uploaded 2025-12-09, size 53.6 GB, max ctx: 131072, layers: 88
-      "devstral-2:123b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Devstral-2-123B-Instruct-2512-GGUF:UD-Q3_K_XL
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 512
-          --ubatch-size 512
-          --split-mode layer
-          --tensor-split 1.3,3
-          --threads 8
-          --jinja
 
       # Uploaded 2025-07-07, size 13.3 GB, max ctx: 131072, layers: 40
       "devstral:24b":
@@ -398,7 +397,6 @@
           --port ''${PORT}
           --ctx-size 0
 
-      # Small models
       # Uploaded 2024-09-17, size 0.4 GB, max ctx: 32768, layers: 24
       "qwen2.5:0.5b":
         cmd: |
