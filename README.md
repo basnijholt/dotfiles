@@ -85,6 +85,15 @@ cd ~/dotfiles
 ./install
 ```
 
+#### One-line macOS installer (Apple Silicon)
+
+If you're on macOS and want a single command that installs Homebrew + prerequisites,
+clones the sanitized branch, initializes submodules and runs `./install`, use:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/basnijholt/dotfiles/public/scripts/install-macos.sh)"
+```
+
 #### macOS Terminal Font and other programs
 
 If prompt icons show as empty squares, install a Nerd Font and select it in Terminal.app:
