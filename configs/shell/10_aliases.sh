@@ -56,7 +56,7 @@ if [[ $- == *i* ]]; then
         cd ~/dotfiles/configs/nixos && nix flake update && sudo nixos-rebuild switch --flake .#$(hostname) "${args[@]}" && cd -
     }
 
-    alias nixcacheupdate="~/dotfiles/configs/nixos/upgrade-from-cache.sh"
+    alias nixcacheupdate="~/dotfiles/configs/nixos/scripts/upgrade-from-cache.sh"
 
     zyolo() {
         export ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic
