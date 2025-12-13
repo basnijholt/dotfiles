@@ -15,12 +15,15 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+    };
     nixos-raspberrypi = {
       url = "github:nvmd/nixos-raspberrypi/main";
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, nixos-hardware, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -74,6 +77,14 @@
           ./hosts/hp/disko.nix
           ./hosts/hp/default.nix
           ./hosts/hp/hardware-configuration.nix
+        ];
+
+        macbook-air-intel = mkHost [
+          nixos-hardware.nixosModules.apple-t2
+          disko.nixosModules.disko
+          ./hosts/macbook-air-intel/disko.nix
+          ./hosts/macbook-air-intel/default.nix
+          ./hosts/macbook-air-intel/hardware-configuration.nix
         ];
 
         # Incus VM version of HP - same services/packages, VM-appropriate hardware
@@ -151,12 +162,22 @@
             ./installers/iso.nix
           ];
         };
+
+        installer-mac = lib.nixosSystem {
+          inherit system;
+          specialArgs = { inherit nixos-hardware; };
+          modules = [
+            (import (nixpkgs + "/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"))
+            ./installers/iso-mac.nix
+          ];
+        };
       };
 
       diskoConfigurations = {
         pc = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
+        macbook-air-intel = (import ./hosts/macbook-air-intel/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
       };
 
