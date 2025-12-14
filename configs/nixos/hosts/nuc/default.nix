@@ -15,6 +15,7 @@
     ./networking.nix
     ./system-packages.nix
     ./kodi.nix
+    ./coredns.nix
   ];
 
   # Required for ZFS
