@@ -23,8 +23,8 @@
     fsType = "nfs";
   };
 
-  fileSystems."/mnt/tank/photos_export" = {
-    device = "truenas.local:/mnt/tank/photos_export";
+  fileSystems."/mnt/tank/photos-export" = {
+    device = "truenas.local:/mnt/tank/photos-export";
     fsType = "nfs";
   };
 
