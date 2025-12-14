@@ -4,12 +4,12 @@
 
 {
   fileSystems."/opt/stacks" = {
-    device = "truenas.local:/mnt/docker/stacks";
+    device = "truenas.local:/mnt/ssd/docker/stacks";
     fsType = "nfs";
   };
 
   fileSystems."/mnt/data" = {
-    device = "truenas.local:/mnt/docker/data";
+    device = "truenas.local:/mnt/ssd/docker/data";
     fsType = "nfs";
   };
 
