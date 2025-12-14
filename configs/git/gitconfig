@@ -48,3 +48,7 @@
 [delta]
 	navigate = true  # use n and N to move between diff sections
 	dark = true  # or light = true, or omit for auto-detection
+[safe]
+	directory = /mnt/data/code/agent-cli
+	directory = /opt/stacks/victory-oops-tracker
+	directory = /opt/stacks/compose-farm
