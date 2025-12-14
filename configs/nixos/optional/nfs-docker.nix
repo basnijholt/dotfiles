@@ -1,6 +1,8 @@
 # NFS mounts for Docker hosts running compose-farm services
 # NAS: truenas.local
 #
+# See: https://github.com/basnijholt/compose-farm/blob/main/docs/truenas-nested-nfs.md
+#
 # Uses systemd automount for resilience:
 # - Mounts on-demand (noauto + x-systemd.automount)
 # - Unmounts after 10 min idle (x-systemd.idle-timeout)
