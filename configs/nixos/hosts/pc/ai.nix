@@ -31,7 +31,19 @@
 
     models:  # Ordered from newest to oldest
 
-      # Uploaded 2025-12-09, size 13.3 GB, max ctx: 131072, layers: 40
+      # TODO: Not in cache yet - run script after downloading
+      "nemotron-3-nano:30b-q4":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Nemotron-3-Nano-30B-A3B-GGUF:UD-Q4_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 2048
+          --ubatch-size 512
+          --threads 1
+          --jinja
+
+      # Uploaded 2025-12-10, size 13.5 GB, max ctx: 393216, layers: 40
       "devstral-2:24b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -40,7 +52,7 @@
           --ctx-size 65536
           --jinja
 
-      # Uploaded 2025-12-09, size 24.6 GB, max ctx: 131072, layers: 40
+      # Uploaded 2025-12-10, size 27.0 GB, max ctx: 393216, layers: 40
       "devstral-2:24b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -49,7 +61,7 @@
           --ctx-size 65536
           --jinja
 
-      # Uploaded 2025-12-09, size 53.6 GB, max ctx: 131072, layers: 88
+      # Uploaded 2025-12-10, size 57.7 GB, max ctx: 262144, layers: 88
       "devstral-2:123b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -63,7 +75,7 @@
           --threads 8
           --jinja
 
-      # Uploaded 2025-12-05, size 88.4 GB
+      # Uploaded 2025-11-30, size 82.3 GB, max ctx: 131072, layers: 36
       "gpt-oss:120b-derestricted":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -80,7 +92,7 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Uploaded 2025-11-28, size 45.1 GB, max ctx: 262144, layers: 48
+      # Uploaded 2025-11-28, size 42.9 GB, max ctx: 262144, layers: 48
       "qwen3-next-80b-a3b:q4_k_xl":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -143,7 +155,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-30, size 18.4 GB, max ctx: 262144, layers: 64
+      # Uploaded 2025-10-30, size 18.6 GB, max ctx: 262144, layers: 64
       "qwen3-vl-thinking:32b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -155,7 +167,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-30, size 18.4 GB, max ctx: 262144, layers: 64
+      # Uploaded 2025-10-30, size 18.7 GB, max ctx: 262144, layers: 64
       "qwen3-vl:32b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -167,7 +179,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-30, size 32.4 GB, max ctx: 262144, layers: 64
+      # Uploaded 2025-10-30, size 36.8 GB, max ctx: 262144, layers: 64
       "qwen3-vl:32b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -193,7 +205,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-10-02, size 14.3 GB, max ctx: 262400, layers: 48
+      # Uploaded 2025-10-02, size 16.8 GB, max ctx: 262400, layers: 48
       "apriel-thinker:15b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -229,7 +241,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-08-24, size 20.3 GB, max ctx: 524288, layers: 64
+      # Uploaded 2025-08-24, size 20.5 GB, max ctx: 524288, layers: 64
       "seed-oss:36b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -241,7 +253,7 @@
           --threads 1
           --jinja
 
-      # Uploaded 2025-08-06, size 2.3 GB, max ctx: 262144, layers: 36
+      # Uploaded 2025-08-06, size 2.4 GB, max ctx: 262144, layers: 36
       "qwen3-thinking:4b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -269,7 +281,7 @@
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
       # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
 
-      # Uploaded 2025-08-04, size 68.0 GB, max ctx: 131072, layers: 47
+      # Uploaded 2025-08-05, size 68.0 GB, max ctx: 131072, layers: 47
       "glm-4.5-air:ud-q4_k_xl":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -342,7 +354,7 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Uploaded 2025-07-31, size 17.3 GB, max ctx: 262144, layers: 48
+      # Uploaded 2025-07-31, size 16.5 GB, max ctx: 262144, layers: 48
       "qwen3-coder:30b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -381,7 +393,7 @@
           --ctx-size 65536
           --jinja
 
-      # Uploaded 2025-04-28, size 4.7 GB, max ctx: 131072, layers: 36
+      # Uploaded 2025-04-28, size 4.8 GB, max ctx: 131072, layers: 36
       "qwen3-thinking:8b":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
