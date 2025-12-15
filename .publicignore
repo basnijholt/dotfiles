@@ -13,6 +13,7 @@ secrets
 configs/nixos
 configs/agent-cli/config.toml
 scripts/rclone.sh
+scripts/rsync-time-machine.sh
 scripts/sync-photos-to-truenas.sh
 scripts/signature.html
 submodules/rsync-time-backup
