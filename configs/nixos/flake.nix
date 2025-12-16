@@ -115,6 +115,11 @@
           ./hosts/dev-lxc/hardware-configuration.nix
         ];
 
+        # Docker-focused LXC container for Incus
+        docker-lxc = mkHost [
+          ./hosts/docker-lxc/default.nix
+        ];
+
         # Nix cache server VM for Incus - builds and caches NixOS configurations
         nix-cache = mkHost [
           ./hosts/nix-cache/default.nix
