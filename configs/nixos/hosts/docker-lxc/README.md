@@ -16,5 +16,18 @@ nixos-rebuild switch \
 
 From TrueNAS shell, I then do:
 ```bash
-incus config device add nixos gpu gpu pci=0000:00:02.0
+# Required for Docker-in-LXC: nesting and privileged mode
+incus config set docker security.nesting=true security.privileged=true
+
+# Workaround for CVE-2025-52881: runc/AppArmor bug causes "open sysctl net.ipv4.ip_unprivileged_port_start: permission denied"
+# See: https://github.com/opencontainers/runc/issues/4968
+# This disables AppArmor for the container (acceptable for a Docker host container)
+incus config set docker raw.lxc 'lxc.apparmor.profile=unconfined'
+
+# Add required devices and mounts
+incus config device add docker disk0 disk source=/mnt/ssd/docker/data path=/mnt/data recursive=true shift=true
+incus config device add docker disk1 disk source=/mnt/ssd/docker/stacks path=/opt/stacks recursive=true shift=true
+incus config device add docker disk2 disk source=/mnt/tank path=/mnt/tank recursive=true
+incus config device add docker gpu gpu pci=0000:00:02.0
+incus restart docker
 ```
