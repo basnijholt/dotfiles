@@ -4,7 +4,7 @@ set -euo pipefail
 # Deploy Pi3 config from PC (avoids OOM on Pi3's 1GB RAM)
 # Usage: ./deploy.sh [user@host]
 
-TARGET="${1:-nixos@192.168.1.118}"
+TARGET="${1:-nixos@pi3.local}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FLAKE_DIR="$SCRIPT_DIR/../.."
 

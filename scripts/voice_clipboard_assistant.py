@@ -76,7 +76,7 @@ from wyoming.audio import AudioChunk, AudioStart, AudioStop
 from wyoming.client import AsyncClient
 
 # --- Configuration ---
-ASR_SERVER_IP = "192.168.1.143"
+ASR_SERVER_IP = "pc.local"
 ASR_SERVER_PORT = 10300
 MY_OLLAMA_HOST = os.getenv("MY_OLLAMA_HOST", "http://localhost:11434")
 DEFAULT_MODEL = "gpt-oss:20b"

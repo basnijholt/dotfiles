@@ -3,8 +3,8 @@
 
 let
   # IP address for this DNS server (must match DHCP reservation)
-  listenIP = "192.168.1.25";
-  wildcardIP = "192.168.1.66";
+  listenIP = "192.168.1.2";
+  wildcardIP = "192.168.1.6";
 
   localZone = pkgs.writeText "local.zone" ''
     $ORIGIN local.
@@ -12,23 +12,25 @@ let
     @               3600  IN  NS    ns
     ns              3600  IN  A     ${listenIP}
     *               3600  IN  A     ${wildcardIP}
-    coredns         3600  IN  A     ${listenIP}
-    dietpi          3600  IN  A     192.168.1.3
-    docker          3600  IN  A     192.168.1.4
-    docker-proxmox  3600  IN  A     192.168.1.4
-    hp              3600  IN  A     192.168.1.26
-    leo             3600  IN  A     192.168.1.6
-    meshcentral     3600  IN  A     192.168.1.15
-    nginx           3600  IN  A     192.168.1.4
-    nix-cache       3600  IN  A     192.168.1.145
+    dns             3600  IN  A     ${listenIP}
     nuc             3600  IN  A     ${listenIP}
-    pc              3600  IN  A     192.168.1.143
-    switch          3600  IN  A     192.168.1.87
-    tom             3600  IN  A     192.168.1.188
-    traefik         3600  IN  CNAME docker
-    truenas         3600  IN  A     192.168.1.214
-    ubuntu          3600  IN  A     192.168.1.102
+    hp              3600  IN  A     192.168.1.3
+    truenas         3600  IN  A     192.168.1.4
+    pc              3600  IN  A     192.168.1.5
+    docker          3600  IN  A     192.168.1.6
+    docker-truenas  3600  IN  A     192.168.1.6
+    pi4             3600  IN  A     192.168.1.7
+    pi3             3600  IN  A     192.168.1.8
     vacuum          3600  IN  A     192.168.1.10
+    tv              3600  IN  A     192.168.1.11
+    leo             3600  IN  A     192.168.1.12
+    tom             3600  IN  A     192.168.1.13
+    switch          3600  IN  A     192.168.1.14
+    meshcentral     3600  IN  A     192.168.1.15
+    nix-cache       3600  IN  A     192.168.1.145
+    traefik         3600  IN  CNAME docker
+    tv              3600  IN  A     192.168.1.11
+
   '';
 
   labNijholtZone = pkgs.writeText "lab.nijho.lt.zone" ''

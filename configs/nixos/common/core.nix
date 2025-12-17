@@ -16,7 +16,7 @@
     domains = [ "~local" ]; # Route .local queries to our DNS
     fallbackDns = [ "1.1.1.1" "8.8.8.8" ]; # Public fallback when local resolvers fail
     extraConfig = ''
-      DNS=192.168.1.66 100.100.100.100
+      DNS=192.168.1.2 100.100.100.100
     '';
   };
 

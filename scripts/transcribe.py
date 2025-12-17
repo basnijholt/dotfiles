@@ -65,7 +65,7 @@ from wyoming.client import AsyncClient
 HERE = Path(__file__).parent
 
 # --- Configuration ---
-SERVER_IP = "192.168.1.143"
+SERVER_IP = "pc.local"
 SERVER_PORT = 10300
 FORMAT = pyaudio.paInt16
 CHANNELS = 1  # mono
