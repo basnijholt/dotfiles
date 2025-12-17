@@ -9,7 +9,7 @@
       url = "https://github.com/basnijholt/dotfiles.git";
       branches.main.name = "main";
     }];
-    flakeSubdirectory = "configs/nixos";
+    repositorySubdir = "configs/nixos";
     hostname = config.networking.hostName;
   };
 }
