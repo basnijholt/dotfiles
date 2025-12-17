@@ -6,7 +6,7 @@ if [[ $- == *i* ]]; then
     alias mm="micromamba"
     alias p="pytest"
     alias py="python"
-    alias pc="pre-commit run --all-files"
+    alias pc="prek run --all-files"
     alias nv="nvim"
     alias ccat='command cat'
     alias last_conda_repodata_update='curl -sI https://conda.anaconda.org/conda-forge/linux-64/repodata.json | grep "last-modified"'  # Also see https://anaconda.statuspage.io/ and https://github.com/conda/infrastructure/issues/892
