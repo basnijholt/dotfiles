@@ -6,15 +6,20 @@ import re
 import subprocess
 import sys
 
+# Regex pattern for git with optional global options before subcommand
+# Matches: git push, git -C /path push, git --git-dir=/path push
+# Does NOT match: git stash push, git log | grep push
+# Options can be: -X, -X value, --long, --long=value
+_GIT_OPT = r"(?:-[a-zA-Z](?:\s+[^-\s]\S*)?|--[\w-]+(?:=\S+)?)"
+_GIT_OPTS = rf"(?:\s+{_GIT_OPT})*"  # zero or more option groups
+_GIT_CMD = rf"\bgit\b{_GIT_OPTS}\s+"  # git followed by options then space
+
 # Patterns to block dangerous git commands
 BLOCKED_PATTERNS = [
-    (r"\bgit\s+commit\b.*--amend\b", "git commit --amend is not allowed"),
-    (r"\bgit\s+push\b.*--force\b", "git push --force is not allowed"),
-    (r"\bgit\s+push\b.*-f\b", "git push -f (force) is not allowed"),
-    (
-        r"\bgit\s+push\b.*--force-with-lease\b",
-        "git push --force-with-lease is not allowed",
-    ),
+    (rf"{_GIT_CMD}commit\b.*--amend\b", "git commit --amend is not allowed"),
+    (rf"{_GIT_CMD}push\b.*--force\b", "git push --force is not allowed"),
+    (rf"{_GIT_CMD}push\b.*-f\b", "git push -f (force) is not allowed"),
+    (rf"{_GIT_CMD}push\b.*--force-with-lease\b", "git push --force-with-lease is not allowed"),
 ]
 
 PROTECTED_BRANCHES = {"main", "master"}
@@ -42,11 +47,34 @@ def strip_quoted_strings(command: str) -> str:
     return result
 
 
-def get_current_branch() -> str | None:
-    """Get the current git branch name."""
+def extract_git_directory(command: str) -> str | None:
+    """Extract the directory from git -C flag if present.
+
+    Handles: git -C /path, git -C"/path", git -C '/path'
+    """
+    # Match -C with optional space, then quoted or unquoted path
+    match = re.search(
+        r"\bgit\s+-C\s*(?:\"([^\"]+)\"|'([^']+)'|(\S+))",
+        command,
+    )
+    if match:
+        return match.group(1) or match.group(2) or match.group(3)
+    return None
+
+
+def get_current_branch(git_dir: str | None = None) -> str | None:
+    """Get the current git branch name.
+
+    Args:
+        git_dir: Optional directory to check (for git -C support)
+    """
     try:
+        cmd = ["git"]
+        if git_dir:
+            cmd.extend(["-C", git_dir])
+        cmd.extend(["branch", "--show-current"])
         result = subprocess.run(
-            ["git", "branch", "--show-current"],
+            cmd,
             capture_output=True,
             text=True,
             timeout=5,
@@ -67,23 +95,31 @@ def check_blocked_patterns(command: str) -> str | None:
     return None
 
 
-def check_push_to_protected_branch(command: str) -> str | None:
+def check_push_to_protected_branch(
+    command: str, original_command: str | None = None
+) -> str | None:
     """Check if command pushes to a protected branch.
+
+    Args:
+        command: The command to check (may have quotes stripped)
+        original_command: Original command with quotes intact (for -C extraction)
 
     Returns error message if blocked, None if allowed.
     """
-    if not re.search(r"\bgit\s+push\b", command, re.IGNORECASE):
+    # Pattern: git (with optional global options) push
+    git_push_pattern = rf"{_GIT_CMD}push\b"
+    if not re.search(git_push_pattern, command, re.IGNORECASE):
         return None
 
     # Check for explicit push to protected branch (e.g., git push origin main)
     for branch in PROTECTED_BRANCHES:
-        if re.search(rf"\bgit\s+push\b.*\b{branch}\b", command, re.IGNORECASE):
+        if re.search(rf"{_GIT_CMD}push\b.*\b{branch}\b", command, re.IGNORECASE):
             return f"git push to {branch} is not allowed - use a PR"
 
     # Check if currently on protected branch and pushing without explicit branch
-    # This matches: "git push", "git push origin", "git push -u origin"
-    # But not: "git push origin feature-branch"
-    push_match = re.search(r"\bgit\s+push\b(.*)$", command, re.IGNORECASE)
+    # This matches: "git push", "git push origin", "git -C /path push"
+    # But not: "git push origin feature-branch", "git stash push"
+    push_match = re.search(rf"{_GIT_CMD}push\b(.*)$", command, re.IGNORECASE)
     if push_match:
         args = push_match.group(1).strip()
         # Remove flags like -u, --set-upstream, etc.
@@ -91,7 +127,9 @@ def check_push_to_protected_branch(command: str) -> str | None:
         parts = args_without_flags.split()
         # If 0 or 1 parts (no args or just remote), check current branch
         if len(parts) <= 1:
-            current_branch = get_current_branch()
+            # Extract -C directory from original command (preserves quoted paths)
+            git_dir = extract_git_directory(original_command or command)
+            current_branch = get_current_branch(git_dir)
             if current_branch in PROTECTED_BRANCHES:
                 return f"git push while on {current_branch} is not allowed - use a PR"
 
@@ -109,7 +147,7 @@ def check_command(command: str) -> str | None:
     if error:
         return error
 
-    return check_push_to_protected_branch(stripped)
+    return check_push_to_protected_branch(stripped, original_command=command)
 
 
 # ============================================================================
