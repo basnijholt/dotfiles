@@ -29,5 +29,11 @@ incus config device add docker disk0 disk source=/mnt/ssd/docker/data path=/mnt/
 incus config device add docker disk1 disk source=/mnt/ssd/docker/stacks path=/opt/stacks recursive=true shift=true
 incus config device add docker disk2 disk source=/mnt/tank path=/mnt/tank recursive=true
 incus config device add docker gpu gpu pci=0000:00:02.0
+
+# Workaround for TrueNAS middleware bug: KeyError 'gputype' when listing devices
+# The middleware expects gputype field but incus doesn't set it by default for PCI passthrough
+# See: https://github.com/truenas/middleware/pull/17862
+incus config device set docker gpu gputype=physical
+
 incus restart docker
 ```
