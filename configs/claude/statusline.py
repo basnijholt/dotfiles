@@ -44,6 +44,11 @@ class Cost:
 
 
 @dataclass
+class OutputStyle:
+    name: str
+
+
+@dataclass
 class StatusInput:
     session_id: str
     transcript_path: str
@@ -51,6 +56,7 @@ class StatusInput:
     model: Model
     workspace: Workspace
     version: str
+    output_style: OutputStyle
     cost: Cost
     exceeds_200k_tokens: bool
     context_window: ContextWindow | None = None
@@ -80,6 +86,7 @@ def parse_input(raw: dict) -> StatusInput:
         model=Model(**raw["model"]),
         workspace=Workspace(**raw["workspace"]),
         version=raw["version"],
+        output_style=OutputStyle(**raw["output_style"]),
         cost=Cost(**raw["cost"]),
         exceeds_200k_tokens=raw["exceeds_200k_tokens"],
         context_window=context_window,
@@ -130,6 +137,7 @@ ICON_GIT = "\uf1d3"
 ICON_SERVER = "\uf233"
 ICON_FOLDER = "\uf07b"
 ICON_CHART = "\uf080"
+ICON_COST = "\uf155"  # dollar sign
 
 # Calculate context usage
 context_info = ""
@@ -146,8 +154,13 @@ if data.context_window and data.context_window.context_window_size > 0:
 
     if tokens > 0:
         pct = tokens * 100 // ctx.context_window_size
-        context_info = f" | {MAGENTA}{ICON_CHART} {pct}%{RESET}"
+        context_info = f" {MAGENTA}{ICON_CHART} {pct}%{RESET}"
+
+# Calculate cost
+cost_info = ""
+if data.cost.total_cost_usd > 0:
+    cost_info = f" {GREEN}{ICON_COST}{data.cost.total_cost_usd:.2f}{RESET}"
 
 print(
-    f"{CYAN}{ICON_GIT} {repo_name}{branch}{RESET} | {GREEN}{ICON_SERVER} {hostname}{RESET} | {YELLOW}{ICON_FOLDER} {folder}{RESET}{context_info}"
+    f"{CYAN}{ICON_GIT} {repo_name}{branch}{RESET} {GREEN}{ICON_SERVER} {hostname}{RESET} {YELLOW}{ICON_FOLDER} {folder}{RESET}{context_info}{cost_info}"
 )
