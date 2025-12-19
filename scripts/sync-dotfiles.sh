@@ -15,7 +15,6 @@ HOSTS=(
   # VM/LXC/systemd-nspawn hosts
   "docker-truenas"
   "nix-cache"
-  "ubuntu-incus"
   "ubuntu-hetzner"
   "debian-truenas"
 )
