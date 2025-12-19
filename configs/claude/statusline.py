@@ -122,9 +122,6 @@ except:
 # Get hostname
 hostname = os.uname().nodename.split(".")[0]
 
-# Get folder name
-folder = os.path.basename(data.workspace.project_dir)
-
 # Colors
 CYAN = "\033[36m"
 GREEN = "\033[32m"
@@ -138,6 +135,12 @@ ICON_SERVER = "\uf233"
 ICON_FOLDER = "\uf07b"
 ICON_CHART = "\uf080"
 ICON_COST = "\uf155"  # dollar sign
+
+# Get folder (only if not at repo root)
+folder_info = ""
+if data.workspace.current_dir != data.workspace.project_dir:
+    relative_path = os.path.relpath(data.workspace.current_dir, data.workspace.project_dir)
+    folder_info = f" {YELLOW}{ICON_FOLDER} {relative_path}{RESET}"
 
 # Calculate context usage
 context_info = ""
@@ -162,5 +165,5 @@ if data.cost.total_cost_usd > 0:
     cost_info = f" {GREEN}{ICON_COST}{data.cost.total_cost_usd:.2f}{RESET}"
 
 print(
-    f"{CYAN}{ICON_GIT} {repo_name}{branch}{RESET} {GREEN}{ICON_SERVER} {hostname}{RESET} {YELLOW}{ICON_FOLDER} {folder}{RESET}{context_info}{cost_info}"
+    f"{GREEN}{ICON_SERVER} {hostname}{RESET} {CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info}{context_info}{cost_info}"
 )
