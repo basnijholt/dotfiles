@@ -9,6 +9,7 @@
     ../../optional/printing.nix
     ../../optional/gui-packages.nix
     ../../optional/power.nix
+    ../../optional/zfs-replication.nix
 
     # Host-specific modules (Tier 3)
     ./boot.nix
@@ -27,4 +28,8 @@
     ./nvidia-undervolt.nix
     ./slurm.nix
   ];
+
+  # ZFS configuration
+  networking.hostId = "c3cce7ce";
+  boot.supportedFilesystems = [ "zfs" ];
 }

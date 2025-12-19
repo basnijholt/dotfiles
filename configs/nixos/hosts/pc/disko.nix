@@ -1,14 +1,5 @@
 { lib, ... }:
 
-let
-  # Shared mount options that balance performance and drive health on NVMe.
-  mountOpts = [
-    "compress=zstd"
-    "noatime"
-    "discard=async"
-    "space_cache=v2"
-  ];
-in
 {
   disko.devices = {
     disk = {
@@ -25,41 +16,58 @@ in
               content = {
                 type = "filesystem";
                 format = "vfat";
-                mountpoint = "/boot2";
+                mountpoint = "/boot";
                 mountOptions = [ "umask=0077" ];
               };
             };
-
             root = {
-              label = "ROOT-NVME1";
               size = "100%";
               content = {
-                type = "btrfs";
-                extraArgs = [ "-f" "-L" "NVME1-BTRFS" ];
-                subvolumes = {
-                  "@root" = {
-                    mountpoint = "/";
-                    mountOptions = mountOpts;
-                  };
-                  "@nix" = {
-                    mountpoint = "/nix";
-                    mountOptions = mountOpts;
-                  };
-                "@var" = {
-                  mountpoint = "/var";
-                  mountOptions = mountOpts;
-                };
-                "@home" = {
-                  mountpoint = "/home";
-                  mountOptions = mountOpts;
-                };
-                "@snapshots" = {
-                  mountpoint = "/.snapshots";
-                  mountOptions = mountOpts;
-                };
-                };
+                type = "zfs";
+                pool = "zroot";
               };
             };
+          };
+        };
+      };
+    };
+
+    zpool = {
+      zroot = {
+        type = "zpool";
+        mode = ""; # Single disk
+        options = {
+          ashift = "12";
+          autotrim = "on";
+        };
+        rootFsOptions = {
+          compression = "zstd";
+          "com.sun:auto-snapshot" = "false";
+          acltype = "posixacl";
+          xattr = "sa";
+          atime = "off";
+        };
+
+        datasets = {
+          root = {
+            type = "zfs_fs";
+            mountpoint = "/";
+            options.mountpoint = "legacy";
+          };
+          nix = {
+            type = "zfs_fs";
+            mountpoint = "/nix";
+            options.mountpoint = "legacy";
+          };
+          var = {
+            type = "zfs_fs";
+            mountpoint = "/var";
+            options.mountpoint = "legacy";
+          };
+          home = {
+            type = "zfs_fs";
+            mountpoint = "/home";
+            options.mountpoint = "legacy";
           };
         };
       };
