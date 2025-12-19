@@ -165,5 +165,5 @@ if data.cost.total_cost_usd > 0:
     cost_info = f" {GREEN}{ICON_COST}{data.cost.total_cost_usd:.2f}{RESET}"
 
 print(
-    f"{GREEN}{ICON_SERVER} {hostname}{RESET} {CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info}{context_info}{cost_info}"
+    f"{CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info} {GREEN}{ICON_SERVER} {hostname}{RESET}{context_info}{cost_info}"
 )
