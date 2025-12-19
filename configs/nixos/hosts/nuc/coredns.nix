@@ -12,7 +12,6 @@ let
     @               3600  IN  NS    ns
     ns              3600  IN  A     ${listenIP}
     *               3600  IN  A     ${wildcardIP}
-    dns             3600  IN  A     ${listenIP}
     nuc             3600  IN  A     ${listenIP}
     hp              3600  IN  A     192.168.1.3
     truenas         3600  IN  A     192.168.1.4
@@ -27,8 +26,10 @@ let
     tom             3600  IN  A     192.168.1.13
     switch          3600  IN  A     192.168.1.14
     meshcentral     3600  IN  A     192.168.1.15
+    debian-truenas  3600  IN  A     192.168.1.62
     nix-cache       3600  IN  A     192.168.1.145
     traefik         3600  IN  CNAME docker
+    dns             3600  IN  CNAME nuc
     tv              3600  IN  A     192.168.1.11
 
   '';
