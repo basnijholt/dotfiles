@@ -136,6 +136,18 @@ def check_push_to_protected_branch(
     return None
 
 
+def split_shell_commands(command: str) -> list[str]:
+    """Split a shell command string on command separators.
+
+    Splits on &&, ||, ;, and | to handle each command individually.
+    This ensures 'git push && other' doesn't treat '&& other' as push args.
+    """
+    # Split on shell command separators, keeping it simple
+    # This handles: cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2, cmd1 | cmd2
+    parts = re.split(r"\s*(?:&&|\|\||[;|])\s*", command)
+    return [p.strip() for p in parts if p.strip()]
+
+
 def check_command(command: str) -> str | None:
     """Check a shell command for dangerous git operations.
 
@@ -143,11 +155,19 @@ def check_command(command: str) -> str | None:
     """
     stripped = strip_quoted_strings(command)
 
-    error = check_blocked_patterns(stripped)
-    if error:
-        return error
+    # Split on shell separators and check each command individually
+    for cmd in split_shell_commands(stripped):
+        error = check_blocked_patterns(cmd)
+        if error:
+            return error
 
-    return check_push_to_protected_branch(stripped, original_command=command)
+        # For branch detection, find corresponding original command segment
+        # Use the full original for -C extraction (it's OK if imprecise)
+        error = check_push_to_protected_branch(cmd, original_command=command)
+        if error:
+            return error
+
+    return None
 
 
 # ============================================================================
