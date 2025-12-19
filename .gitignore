@@ -40,7 +40,7 @@ Thumbs.db
 .stignore
 
 # Other
-.github/scripts/__pycache__/
+__pycache__/
 
 scripts/rclone-log.txt
 rclone-log.txt
