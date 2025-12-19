@@ -93,12 +93,27 @@ def parse_input(raw: dict) -> StatusInput:
     )
 
 
-data = parse_input(json.load(sys.stdin))
+# Save input to temp file for debugging
+raw = sys.stdin.read()
+with open("/tmp/statusline_input.json", "w") as f:
+    f.write(raw)
+data = parse_input(json.loads(raw))
 
-# Get repo name and branch
+# Get git info
 repo_name = os.path.basename(data.workspace.project_dir)
 branch = ""
+git_root = data.workspace.project_dir  # fallback
 try:
+    result = subprocess.run(
+        ["git", "-C", data.workspace.project_dir, "rev-parse", "--show-toplevel"],
+        capture_output=True,
+        text=True,
+        timeout=1,
+    )
+    if result.returncode == 0:
+        git_root = result.stdout.strip()
+        repo_name = os.path.basename(git_root)
+
     result = subprocess.run(
         ["git", "-C", data.workspace.project_dir, "remote", "get-url", "origin"],
         capture_output=True,
@@ -116,11 +131,35 @@ try:
     )
     if result.returncode == 0 and result.stdout.strip():
         branch = "@" + result.stdout.strip()
-except:
+except Exception:
     pass
 
-# Get hostname
+# Get hostname and OS icon
 hostname = os.uname().nodename.split(".")[0]
+if "macbook" in hostname.lower():
+    hostname = "macbook"
+
+# Detect OS
+os_icon = ""
+if sys.platform == "darwin":
+    os_icon = "\uf179"  # Apple
+elif sys.platform == "linux":
+    try:
+        with open("/etc/os-release") as f:
+            os_release = f.read().lower()
+        if "nixos" in os_release:
+            os_icon = "\uf313"  # NixOS
+        elif "debian" in os_release:
+            os_icon = "\uf306"  # Debian
+        else:
+            os_icon = "\uf17c"  # Generic Linux
+    except Exception:
+        os_icon = "\uf17c"  # Generic Linux
+
+# Get start folder (where Claude was started, relative to git root)
+start_folder = ""
+if data.workspace.project_dir != git_root:
+    start_folder = os.path.relpath(data.workspace.project_dir, git_root)
 
 # Colors
 CYAN = "\033[36m"
@@ -135,12 +174,28 @@ ICON_SERVER = "\uf233"
 ICON_FOLDER = "\uf07b"
 ICON_CHART = "\uf080"
 ICON_COST = "\uf155"  # dollar sign
+ICON_GOOGLE = "\uf1a0"
 
-# Get folder (only if not at repo root)
-folder_info = ""
+# Check if using Vertex AI (Google)
+provider_info = ""
+if os.environ.get("CLAUDE_CODE_USE_VERTEX"):
+    provider_info = f"{YELLOW}{ICON_GOOGLE}{RESET} "
+
+# Build folder info
+# start_folder: where Claude was started (relative to git root)
+# current_folder: where Claude cd'd to (relative to project_dir)
+folder_parts = []
+if start_folder:
+    folder_parts.append(start_folder)
 if data.workspace.current_dir != data.workspace.project_dir:
-    relative_path = os.path.relpath(data.workspace.current_dir, data.workspace.project_dir)
-    folder_info = f" {YELLOW}{ICON_FOLDER} {relative_path}{RESET}"
+    current_folder = os.path.relpath(
+        data.workspace.current_dir, data.workspace.project_dir
+    )
+    folder_parts.append(current_folder)
+
+folder_info = ""
+if folder_parts:
+    folder_info = f" {YELLOW}{ICON_FOLDER} {' → '.join(folder_parts)}{RESET}"
 
 # Calculate context usage
 context_info = ""
@@ -162,8 +217,8 @@ if data.context_window and data.context_window.context_window_size > 0:
 # Calculate cost
 cost_info = ""
 if data.cost.total_cost_usd > 0:
-    cost_info = f" {GREEN}{ICON_COST}{data.cost.total_cost_usd:.2f}{RESET}"
+    cost_info = f" {YELLOW}{ICON_COST}{data.cost.total_cost_usd:.2f}{RESET}"
 
 print(
-    f"{CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info} {GREEN}{ICON_SERVER} {hostname}{RESET}{context_info}{cost_info}"
+    f"{provider_info}{CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
 )
