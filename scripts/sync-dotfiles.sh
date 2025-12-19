@@ -6,18 +6,18 @@ echo "🛠️ Running in ${INSTALL_MODE} mode"
 
 # List of hosts to connect to
 HOSTS=(
-  "ubuntu-incus"
-  "ubuntu-hetzner"
-  "debian-truenas"
-  "debian-incus"
-  "docker-truenas"
-  "docker-incus"
+  # Physical hosts
   "nuc"
   "pc"
   "hp"
-  "nuc"
   "pi3"
   "pi4"
+  # VM/LXC/systemd-nspawn hosts
+  "docker-truenas"
+  "nix-cache"
+  "ubuntu-incus"
+  "ubuntu-hetzner"
+  "debian-truenas"
 )
 
 # Arrays to track results
