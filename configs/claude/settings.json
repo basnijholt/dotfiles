@@ -1,6 +1,11 @@
 {
   "includeCoAuthoredBy": false,
   "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "python3 ~/.claude/statusline.py",
+    "padding": 0
+  },
   "hooks": {
     "PreToolUse": [
       {
