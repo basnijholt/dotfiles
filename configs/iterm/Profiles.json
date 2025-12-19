@@ -52,6 +52,8 @@
         "0xf701-0x220000": { "Action": 10, "Text": "[1;2B" },
         "0xf70b-0x20000": { "Action": 10, "Text": "[19;2~" },
         "0xf702-0x240000": { "Action": 10, "Text": "[1;5D" },
+        "0xf702-0x280000": { "Action": 10, "Text": "b" },
+        "0xf703-0x280000": { "Action": 10, "Text": "f" },
         "0xf704-0x20000": { "Action": 10, "Text": "[1;2P" }
       },
       "Name": "MyTerminal",

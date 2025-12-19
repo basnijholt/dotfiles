@@ -1,0 +1,10 @@
+# Word navigation with Alt+b / Alt+f (Emacs-style)
+# Configure iTerm2 to send Esc+b/f for Alt+Arrow:
+# Preferences → Profiles → Keys → Key Mappings → Add:
+#   ⌥← → Send Escape Sequence → b
+#   ⌥→ → Send Escape Sequence → f
+bind M-b prevword main
+bind M-f nextword main
+
+# Delete word backwards
+bind Sh-M-H chopwordleft main

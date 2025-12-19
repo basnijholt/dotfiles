@@ -37,6 +37,7 @@
     ~/.local/bin/git-fixup-file: scripts/git-fixup-file.sh
     ~/.local/bin/nbviewer: scripts/nbviewer.sh
     ~/.local/bin/pypi-sha256: scripts/pypi-sha256.sh
+    ~/.nanorc: configs/nano/nanorc
     ~/.npmrc: configs/npm/npmrc
     ~/.local/bin/run: scripts/run.sh
     ~/.local/bin/sync-dotfiles: scripts/sync-dotfiles.sh
