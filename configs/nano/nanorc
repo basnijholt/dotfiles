@@ -6,5 +6,4 @@
 bind M-b prevword main
 bind M-f nextword main
 
-# Delete word backwards
-bind Sh-M-H chopwordleft main
+# Alt+Backspace works for chopwordleft (terminals must send Option/Alt as Esc+)

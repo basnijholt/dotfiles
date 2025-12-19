@@ -44,7 +44,6 @@
         },
         "0xf70f-0x20000": { "Action": 10, "Text": "[24;2~" },
         "0xf703-0x240000": { "Action": 10, "Text": "[1;5C" },
-        "0x7f-0x80000": { "Action": 11, "Text": "0x17" },
         "0xf701-0x260000": { "Action": 10, "Text": "[1;6B" },
         "0xf72b-0x20000": { "Action": 10, "Text": "[1;2F" },
         "0x36-0x40000": { "Action": 11, "Text": "0x1e" },
@@ -54,6 +53,7 @@
         "0xf702-0x240000": { "Action": 10, "Text": "[1;5D" },
         "0xf702-0x280000": { "Action": 10, "Text": "b" },
         "0xf703-0x280000": { "Action": 10, "Text": "f" },
+        "0x7f-0x280000": { "Action": 11, "Text": "0x17" },
         "0xf704-0x20000": { "Action": 10, "Text": "[1;2P" }
       },
       "Name": "MyTerminal",
