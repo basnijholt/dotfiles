@@ -176,10 +176,22 @@ ICON_CHART = "\uf080"
 ICON_COST = "\uf155"  # dollar sign
 ICON_GOOGLE = "\uf1a0"
 
+# Model icon
+if "opus" in data.model.id.lower():
+    model_icon = f"{MAGENTA}󰘨{RESET}"
+elif "sonnet" in data.model.id.lower():
+    model_icon = f"{CYAN}󰎈{RESET}"
+elif "haiku" in data.model.id.lower():
+    model_icon = f"{GREEN}󰯈{RESET}"
+else:
+    model_icon = ""
+
 # Check if using Vertex AI (Google)
 provider_info = ""
 if os.environ.get("CLAUDE_CODE_USE_VERTEX"):
-    provider_info = f"{YELLOW}{ICON_GOOGLE}{RESET} "
+    provider_info = f"{YELLOW}{ICON_GOOGLE}{RESET}"
+
+model_info = f"{model_icon} {provider_info} " if (model_icon and provider_info) else f"{model_icon or provider_info} " if (model_icon or provider_info) else ""
 
 # Build folder info
 # start_folder: where Claude was started (relative to git root)
@@ -220,5 +232,5 @@ if data.cost.total_cost_usd > 0:
     cost_info = f" {YELLOW}{ICON_COST}{data.cost.total_cost_usd:.2f}{RESET}"
 
 print(
-    f"{provider_info}{CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
+    f"{model_info}{CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
 )
