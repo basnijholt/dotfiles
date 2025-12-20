@@ -4,7 +4,7 @@
   imports = [
     ../dev-lxc/default.nix
     ../dev-lxc/hardware-configuration.nix
-    ./playwright.nix
+    ./packages.nix
   ];
 
   networking.hostName = lib.mkForce "docker-lxc";
