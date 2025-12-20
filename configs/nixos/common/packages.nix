@@ -44,8 +44,8 @@ let
     lazygit
     lm_sensors
     lsof
-    mosh
     micro
+    mosh
     neovim
     nixfmt-rfc-style
     nmap
@@ -60,13 +60,14 @@ let
     starship
     tealdeer
     terraform
-    tokei
     tmux
+    tokei
     tre-command
     tree
     typst
     unzip
     usbutils
+    vhs
     wget
     yazi
     yq-go
