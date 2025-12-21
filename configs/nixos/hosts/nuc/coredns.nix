@@ -1,4 +1,13 @@
 # CoreDNS configuration for local DNS resolution
+#
+# Note: GL.iNet travel routers (OpenWrt) block .local queries by default (rfc6761.conf).
+# To forward .local to this CoreDNS:
+# 1. Open LuCI: http://192.168.8.1:8080/cgi-bin/luci/admin/network/dhcp
+#    (requires LuCI enabled via http://192.168.8.1/#/advanced)
+# 2. Add `/local/192.168.1.2` to "DNS forwardings" in BOTH sections:
+#    - CFG01411C (main): for queries from the router itself
+#    - WGCLIENT1: for queries from LAN clients through WireGuard
+# 3. Save & Apply
 { pkgs, ... }:
 
 let
