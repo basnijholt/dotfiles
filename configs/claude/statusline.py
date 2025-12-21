@@ -103,6 +103,7 @@ data = parse_input(json.loads(raw))
 repo_name = os.path.basename(data.workspace.project_dir)
 branch = ""
 git_root = data.workspace.project_dir  # fallback
+is_git_repo = False
 try:
     result = subprocess.run(
         ["git", "-C", data.workspace.project_dir, "rev-parse", "--show-toplevel"],
@@ -111,17 +112,9 @@ try:
         timeout=1,
     )
     if result.returncode == 0:
+        is_git_repo = True
         git_root = result.stdout.strip()
         repo_name = os.path.basename(git_root)
-
-    result = subprocess.run(
-        ["git", "-C", data.workspace.project_dir, "remote", "get-url", "origin"],
-        capture_output=True,
-        text=True,
-        timeout=1,
-    )
-    if result.returncode == 0:
-        repo_name = result.stdout.strip().split("/")[-1].removesuffix(".git")
 
     result = subprocess.run(
         ["git", "-C", data.workspace.project_dir, "branch", "--show-current"],
@@ -231,6 +224,7 @@ cost_info = ""
 if data.cost.total_cost_usd > 0:
     cost_info = f" {YELLOW}{ICON_COST}{data.cost.total_cost_usd:.2f}{RESET}"
 
+project_icon = ICON_GIT if is_git_repo else ICON_FOLDER
 print(
-    f"{model_info}{CYAN}{ICON_GIT} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
+    f"{model_info}{CYAN}{project_icon} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
 )
