@@ -83,4 +83,12 @@ in
     allowedTCPPorts = [ 53 ];
     allowedUDPPorts = [ 53 ];
   };
+
+  # Route to WireGuard subnet via ASUS router for DNS responses to reach VPN clients
+  systemd.network.networks."40-br0".routes = [
+    {
+      Destination = "10.6.0.0/24";
+      Gateway = "192.168.1.1";
+    }
+  ];
 }
