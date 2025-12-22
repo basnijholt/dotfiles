@@ -12,6 +12,7 @@
 
     # Host-specific modules (Tier 3)
     ./networking.nix
+    ./ups.nix
   ];
 
   # Required for ZFS
