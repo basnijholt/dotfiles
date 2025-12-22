@@ -12,6 +12,7 @@
     ../../optional/zfs-replication.nix
     ../../optional/nfs-docker.nix
     ../../optional/ups-client.nix
+    ../../optional/wake-on-lan.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
@@ -22,4 +23,6 @@
 
   # Required for ZFS
   networking.hostId = "8a5b2c1f";
+
+  local.wakeOnLan.interface = "eno1";
 }

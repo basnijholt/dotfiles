@@ -10,6 +10,7 @@
     ../../optional/gui-packages.nix
     ../../optional/power.nix
     ../../optional/ups-client.nix
+    ../../optional/wake-on-lan.nix
 
     # Host-specific modules (Tier 3)
     ./boot.nix
@@ -28,4 +29,6 @@
     ./nvidia-undervolt.nix
     ./slurm.nix
   ];
+
+  local.wakeOnLan.interface = "enp5s0";
 }
