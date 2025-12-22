@@ -8,7 +8,7 @@
 #    - CFG01411C (main): for queries from the router itself
 #    - WGCLIENT1: for queries from LAN clients through WireGuard
 # 3. Save & Apply
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 let
   # IP address for this DNS server (must match DHCP reservation)
@@ -91,6 +91,18 @@ in
   networking.firewall = {
     allowedTCPPorts = [ 53 ];
     allowedUDPPorts = [ 53 ];
+  };
+
+  # Ensure CoreDNS waits for network and restarts reliably
+  systemd.services.coredns = {
+    after = [ "network-online.target" "sys-subsystem-net-devices-br0.device" ];
+    wants = [ "network-online.target" ];
+    serviceConfig = {
+      Restart = lib.mkForce "always";
+      RestartSec = "5s";
+      # Keep retrying indefinitely - DNS is critical
+      StartLimitIntervalSec = 0;
+    };
   };
 
   # Route to WireGuard subnet via ASUS router for DNS responses to reach VPN clients
