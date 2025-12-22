@@ -11,6 +11,7 @@
 
   # Add system packages
   environment.systemPackages = with pkgs; [
+    cups # lp command for network printing
     devbox
     nixpkgs-fmt
   ];
