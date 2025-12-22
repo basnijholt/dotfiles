@@ -11,6 +11,7 @@
     ../../optional/iscsi.nix
     ../../optional/zfs-replication.nix
     ../../optional/nfs-docker.nix
+    ../../optional/ups-client.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix

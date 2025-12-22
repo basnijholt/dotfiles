@@ -9,6 +9,7 @@
     ../../optional/printing.nix
     ../../optional/gui-packages.nix
     ../../optional/power.nix
+    ../../optional/ups-client.nix
 
     # Host-specific modules (Tier 3)
     ./boot.nix
