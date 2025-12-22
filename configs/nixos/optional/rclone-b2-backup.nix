@@ -8,8 +8,21 @@
     description = "Rclone backup to Backblaze B2 (encrypted)";
     path = [ pkgs.rclone ];
     script = ''
-      rclone sync /opt/stacks b2-encrypted:/stacks --config /home/basnijholt/.config/rclone/rclone.conf --verbose
-      rclone sync /mnt/data b2-encrypted:/data --config /home/basnijholt/.config/rclone/rclone.conf --verbose
+      rclone sync /opt/stacks b2-encrypted:/stacks \
+        --config /home/basnijholt/.config/rclone/rclone.conf \
+        --verbose \
+        --stats 1m \
+        --stats-one-line \
+        --transfers 4 \
+        --fast-list
+
+      rclone sync /mnt/data b2-encrypted:/data \
+        --config /home/basnijholt/.config/rclone/rclone.conf \
+        --verbose \
+        --stats 1m \
+        --stats-one-line \
+        --transfers 4 \
+        --fast-list
     '';
     serviceConfig = {
       Type = "oneshot";
