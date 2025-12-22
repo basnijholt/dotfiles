@@ -68,6 +68,7 @@ let
     unzip
     usbutils
     vhs
+    wakeonlan
     wget
     yazi
     yq-go
