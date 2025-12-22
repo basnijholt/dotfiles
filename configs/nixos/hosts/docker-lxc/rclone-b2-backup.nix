@@ -14,10 +14,7 @@
         --stats 1m \
         --stats-one-line \
         --transfers 4 \
-        --fast-list \
-        --exclude '.venv/**' \
-        --exclude 'node_modules/**' \
-        --exclude '__pycache__/**'
+        --fast-list
 
       rclone sync /mnt/data b2-encrypted:/data \
         --config /home/basnijholt/.config/rclone/rclone.conf \
