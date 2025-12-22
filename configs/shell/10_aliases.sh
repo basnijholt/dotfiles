@@ -79,7 +79,7 @@ if [[ $- == *i* ]]; then
         local -A macs=(
             [nuc]="1C:69:7A:0C:B6:37"
             [hp]="C8:D9:D2:0C:E0:34"
-            [truenas]="E6:A9:EF:92:A4:76"
+            [truenas]="A8:B8:E0:04:49:DE"
             [pc]="24:4B:FE:48:60:2A"
         )
         local host="$1"
