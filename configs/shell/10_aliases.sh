@@ -74,4 +74,26 @@ if [[ $- == *i* ]]; then
         export ANTHROPIC_AUTH_TOKEN="$Z_API_KEY"
         claude --dangerously-skip-permissions "$@"
     }
+
+    wake() {
+        local -A macs=(
+            [nuc]="1C:69:7A:0C:B6:37"
+            [hp]="C8:D9:D2:0C:E0:34"
+            [truenas]="E6:A9:EF:92:A4:76"
+            [pc]="24:4B:FE:48:60:2A"
+        )
+        local host="$1"
+        if [[ -z "$host" ]]; then
+            echo "Usage: wake <host>"
+            echo "Available hosts: ${(k)macs}"
+            return 1
+        fi
+        local mac="${macs[$host]}"
+        if [[ -z "$mac" ]]; then
+            echo "Unknown host: $host"
+            echo "Available hosts: ${(k)macs}"
+            return 1
+        fi
+        wakeonlan "$mac"
+    }
 fi
