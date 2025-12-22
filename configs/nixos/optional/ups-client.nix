@@ -1,32 +1,31 @@
-# apcupsd network client - connects to UPS server on hp
-{ pkgs, ... }:
+# NUT network client - connects to UPS server on hp
+{ ... }:
 
 {
-  services.apcupsd = {
+  power.ups = {
     enable = true;
-    configText = ''
-      UPSNAME apc-ups
-      UPSCABLE ether
-      UPSTYPE net
-      DEVICE hp.local:3551
+    mode = "netclient";
 
-      POLLTIME 60
-
-      # Shutdown when battery <= 20% or <= 30 minutes remaining
-      ONBATTERYDELAY 6
-      BATTERYLEVEL 20
-      MINUTES 30
-    '';
-    hooks = {
-      onbattery = ''
-        echo "Power failure - running on battery" | ${pkgs.systemd}/bin/systemd-cat -t apcupsd
-      '';
-      offbattery = ''
-        echo "Power restored" | ${pkgs.systemd}/bin/systemd-cat -t apcupsd
-      '';
-      doshutdown = ''
-        echo "UPS triggered shutdown" | ${pkgs.systemd}/bin/systemd-cat -t apcupsd
-      '';
+    upsmon = {
+      monitor.cyberpower = {
+        system = "cyberpower@hp.local:3493";
+        user = "upsmon";
+        passwordFile = "/etc/nut/upsmon.password";
+        type = "secondary";
+      };
+      settings = {
+        MINSUPPLIES = 1;
+        SHUTDOWNCMD = "/run/current-system/sw/bin/shutdown -h now";
+        FINALDELAY = 5;
+      };
     };
+  };
+
+  # Same password as server
+  environment.etc."nut/upsmon.password" = {
+    text = "upsmonpass";
+    mode = "0600";
+    user = "nut";
+    group = "nut";
   };
 }

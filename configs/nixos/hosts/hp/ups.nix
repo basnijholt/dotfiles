@@ -1,39 +1,52 @@
-# APC UPS monitoring with apcupsd
-{ pkgs, ... }:
+# CyberPower UPS monitoring with NUT
+{ ... }:
 
 {
-  services.apcupsd = {
+  power.ups = {
     enable = true;
-    configText = ''
-      UPSNAME apc-ups
-      UPSCABLE usb
-      UPSTYPE usb
-      DEVICE
+    mode = "netserver";
 
-      POLLTIME 60
+    ups.cyberpower = {
+      driver = "usbhid-ups";
+      port = "auto";
+      description = "CyberPower CP1500PFCLCD";
+      directives = [
+        "override.battery.charge.low = 20"
+        "override.battery.runtime.low = 1800"  # 30 minutes in seconds
+      ];
+    };
 
-      # Shutdown when battery <= 20% or <= 30 minutes remaining
-      ONBATTERYDELAY 6
-      BATTERYLEVEL 20
-      MINUTES 30
+    users.upsmon = {
+      upsmon = "primary";
+      passwordFile = "/etc/nut/upsmon.password";
+    };
 
-      # Network information server for remote monitoring
-      NETSERVER on
-      NISPORT 3551
-      NISIP 0.0.0.0
-    '';
-    hooks = {
-      onbattery = ''
-        echo "Power failure - running on battery" | ${pkgs.systemd}/bin/systemd-cat -t apcupsd
-      '';
-      offbattery = ''
-        echo "Power restored" | ${pkgs.systemd}/bin/systemd-cat -t apcupsd
-      '';
-      doshutdown = ''
-        echo "UPS triggered shutdown" | ${pkgs.systemd}/bin/systemd-cat -t apcupsd
-      '';
+    upsd.listen = [
+      { address = "0.0.0.0"; port = 3493; }
+    ];
+
+    upsmon = {
+      monitor.cyberpower = {
+        system = "cyberpower@localhost";
+        user = "upsmon";
+        passwordFile = "/etc/nut/upsmon.password";
+        type = "primary";
+      };
+      settings = {
+        MINSUPPLIES = 1;
+        SHUTDOWNCMD = "/run/current-system/sw/bin/shutdown -h now";
+        FINALDELAY = 5;
+      };
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 3551 ];
+  # Create password file
+  environment.etc."nut/upsmon.password" = {
+    text = "upsmonpass";
+    mode = "0600";
+    user = "nut";
+    group = "nut";
+  };
+
+  networking.firewall.allowedTCPPorts = [ 3493 ];
 }
