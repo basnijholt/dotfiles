@@ -35,6 +35,7 @@ let
     tom             3600  IN  A     192.168.1.13
     switch          3600  IN  A     192.168.1.14
     meshcentral     3600  IN  A     192.168.1.15
+    printer         3600  IN  A     192.168.1.234
     debian-truenas  3600  IN  A     192.168.1.62
     nix-cache       3600  IN  A     192.168.1.145
     traefik         3600  IN  CNAME docker
