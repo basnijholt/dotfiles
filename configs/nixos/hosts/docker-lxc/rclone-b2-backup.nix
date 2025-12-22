@@ -25,10 +25,7 @@
         --stats 1m \
         --stats-one-line \
         --transfers 4 \
-        --fast-list \
-        --exclude '.venv/**' \
-        --exclude 'node_modules/**' \
-        --exclude '__pycache__/**'
+        --fast-list
     '';
     serviceConfig = {
       Type = "oneshot";
