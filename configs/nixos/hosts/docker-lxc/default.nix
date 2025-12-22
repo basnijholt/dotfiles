@@ -10,4 +10,5 @@
 
   networking.hostName = lib.mkForce "docker-lxc";
   hardware.graphics.enable = true;
+  services.syncthing.enable = lib.mkForce false;
 }
