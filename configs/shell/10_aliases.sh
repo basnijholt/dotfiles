@@ -75,6 +75,21 @@ if [[ $- == *i* ]]; then
         claude --dangerously-skip-permissions "$@"
     }
 
+    # Print to HP LaserJet M110we via hp print server
+    hpprint() {
+        if [[ -z "$1" ]]; then
+            echo "Usage: hpprint <file> [copies]"
+            echo "       echo 'text' | hpprint -"
+            return 1
+        fi
+        local copies="${2:-1}"
+        if [[ "$1" == "-" ]]; then
+            lp -h hp.local:631 -d HP_LaserJet_M110we -n "$copies"
+        else
+            lp -h hp.local:631 -d HP_LaserJet_M110we -n "$copies" "$1"
+        fi
+    }
+
     wake() {
         local -A macs=(
             [nuc]="1C:69:7A:0C:B6:37"

@@ -15,6 +15,7 @@ let
     claude-code
     codex
     coreutils
+    cups # lp command for network printing
     docker
     devbox
     dnsutils # Provides dig, nslookup, host
