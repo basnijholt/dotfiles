@@ -1,14 +1,13 @@
 # Hetzner Cloud VPS - minimal Docker Compose host
 #
 # A lightweight host for running Docker Compose stacks (websites, services).
-# Excludes large packages from common/packages.nix to minimize closure size.
+# Uses common packages but excludes optional/large-packages.nix.
 { lib, ... }:
 
 {
   imports = [
     # Host-specific modules (Tier 3)
     ./networking.nix
-    ./packages.nix
   ];
 
   # Docker for compose stacks - enabled directly, not via virtualization.nix
