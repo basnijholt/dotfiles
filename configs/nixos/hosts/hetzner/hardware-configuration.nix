@@ -15,10 +15,13 @@
     "virtio_pci"
     "virtio_scsi"
     "virtio_blk"
+    "sd_mod"
+    "sr_mod"
   ];
-  boot.initrd.kernelModules = [ ];
+  boot.initrd.kernelModules = [ "virtio_gpu" ]; # Required for ARM console
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
+  boot.kernelParams = [ "console=tty" ]; # Required for ARM console output
 
   boot.supportedFilesystems = [ "zfs" ];
 
