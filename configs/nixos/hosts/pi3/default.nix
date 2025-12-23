@@ -7,5 +7,6 @@
   imports = [
     ./hardware-configuration.nix
     ./networking.nix
+    ./storage-helper.nix
   ];
 }
