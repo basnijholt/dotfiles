@@ -22,7 +22,7 @@ from rich.table import Table
 from tree_sitter import Language, Parser
 
 SCRIPT_DIR = Path(__file__).parent
-PACKAGES_NIX = SCRIPT_DIR.parent / "common" / "packages.nix"
+PACKAGES_NIX = SCRIPT_DIR.parent.parent / "common" / "packages.nix"
 
 console = Console()
 
