@@ -24,9 +24,9 @@ app = typer.Typer(
 )
 console = Console()
 
-SCRIPT_DIR = Path(__file__).parent
-FLAKE_DIR = SCRIPT_DIR.parent
-ENV_FILE = FLAKE_DIR / ".env"
+HOST_DIR = Path(__file__).parent
+FLAKE_DIR = HOST_DIR.parent.parent
+ENV_FILE = HOST_DIR / ".env"
 
 # Load environment variables from .env file
 if ENV_FILE.exists():
