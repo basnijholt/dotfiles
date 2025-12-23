@@ -17,7 +17,11 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
-app = typer.Typer(help="Deploy NixOS to Hetzner Cloud")
+app = typer.Typer(
+    help="Deploy NixOS to Hetzner Cloud",
+    no_args_is_help=True,
+    context_settings={"help_option_names": ["-h", "--help"]},
+)
 console = Console()
 
 SCRIPT_DIR = Path(__file__).parent
