@@ -168,12 +168,21 @@ def deploy(
 
 
 @app.command()
-def destroy(name: str = typer.Argument("hetzner", help="Server name to delete")):
+def destroy(
+    name: str = typer.Argument("hetzner", help="Server name to delete"),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation"),
+):
     """Delete a Hetzner Cloud server."""
     result = hcloud("server", "describe", name, capture=True, check=False)
     if result.returncode != 0:
         console.print(f"[yellow]Server '{name}' not found[/yellow]")
         raise typer.Exit(0)
+
+    if not force:
+        confirm = typer.confirm(f"Delete server '{name}'?", default=False)
+        if not confirm:
+            console.print("[dim]Aborted[/dim]")
+            raise typer.Exit(0)
 
     console.print(f"[yellow]Deleting server '{name}'...[/yellow]")
     hcloud("server", "delete", name)
