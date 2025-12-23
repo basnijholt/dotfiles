@@ -2,7 +2,7 @@
 #
 # Ampere Altra ARM64 guest configuration for Hetzner Cloud CAX series.
 # Uses UEFI boot with ZFS root.
-{ lib, modulesPath, ... }:
+{ lib, modulesPath, pkgs, ... }:
 
 {
   imports = [
@@ -24,6 +24,9 @@
   boot.kernelParams = [ "console=tty" ]; # Required for ARM console output
 
   boot.supportedFilesystems = [ "zfs" ];
+  # TODO: remove pin when nixpkgs defaults to zfs_2_4
+  # https://github.com/nixos/nixpkgs/blob/master/pkgs/top-level/all-packages.nix#L10124
+  boot.zfs.package = pkgs.zfs_2_4; # 2.4.0 fixes SQLite/ftruncate delays (openzfs/zfs#14290)
 
   # UEFI boot with systemd-boot (ARM requires UEFI)
   boot.loader = {
