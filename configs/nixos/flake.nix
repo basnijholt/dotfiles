@@ -42,6 +42,12 @@
           modules = commonModules ++ extraModules;
         };
 
+      mkHostArm = extraModules:
+        lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = commonModules ++ extraModules;
+        };
+
       mkPi = piModule: extraModules:
         nixos-raspberrypi.lib.nixosSystem {
           specialArgs = { inherit nixos-raspberrypi; };
@@ -127,8 +133,8 @@
           ./hosts/nix-cache/hardware-configuration.nix
         ];
 
-        # Hetzner Cloud VPS - minimal Docker Compose host for websites
-        hetzner = mkHost [
+        # Hetzner Cloud VPS (ARM) - minimal Docker Compose host for websites
+        hetzner = mkHostArm [
           disko.nixosModules.disko
           ./hosts/hetzner/disko.nix
           ./hosts/hetzner/default.nix

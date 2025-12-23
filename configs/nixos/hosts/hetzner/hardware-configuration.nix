@@ -1,7 +1,7 @@
-# Hetzner Cloud VPS hardware configuration
+# Hetzner Cloud VPS hardware configuration (ARM)
 #
-# Generic QEMU/KVM guest configuration for Hetzner Cloud.
-# Uses legacy BIOS boot (not UEFI) with ZFS root.
+# Ampere Altra ARM64 guest configuration for Hetzner Cloud CAX series.
+# Uses UEFI boot with ZFS root.
 { lib, modulesPath, ... }:
 
 {
@@ -11,12 +11,10 @@
 
   # Kernel modules for virtio (Hetzner uses KVM)
   boot.initrd.availableKernelModules = [
-    "ahci"
     "xhci_pci"
     "virtio_pci"
     "virtio_scsi"
     "virtio_blk"
-    "sd_mod"
     "sr_mod"
   ];
   boot.initrd.kernelModules = [ ];
@@ -25,19 +23,13 @@
 
   boot.supportedFilesystems = [ "zfs" ];
 
+  # UEFI boot with systemd-boot (ARM requires UEFI)
   boot.loader = {
-    grub = {
-      enable = true;
-      efiSupport = false;
-      # copyKernels is required for ZFS: GRUB cannot read ZFS datasets directly,
-      # so kernels must be copied to the boot partition where GRUB can access them.
-      copyKernels = true;
-    };
-    systemd-boot.enable = false;
-    efi.canTouchEfiVariables = false;
+    systemd-boot.enable = true;
+    efi.canTouchEfiVariables = true;
   };
 
   # File systems are managed by disko
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+  nixpkgs.hostPlatform = lib.mkDefault "aarch64-linux";
 }

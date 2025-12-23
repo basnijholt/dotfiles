@@ -1,9 +1,8 @@
-# Hetzner Cloud disk configuration with ZFS
+# Hetzner Cloud disk configuration with ZFS (ARM)
 #
-# Hetzner x86_64 uses legacy BIOS boot (not UEFI).
+# Hetzner ARM (CAX series) uses UEFI boot.
 # Uses GPT with:
-# - 1MB BIOS boot partition (for GRUB core.img)
-# - 512MB /boot partition (ext4, since GRUB can't read ZFS on legacy BIOS)
+# - 512MB EFI System Partition (FAT32, for systemd-boot)
 # - Rest as ZFS pool
 #
 # Hetzner exposes the disk as /dev/sda.
@@ -18,20 +17,16 @@
         content = {
           type = "gpt";
           partitions = {
-            # BIOS boot partition for legacy GRUB
-            bios = {
-              size = "1M";
-              type = "EF02";
-              priority = 1;
-            };
-            # Boot partition (ext4 - GRUB can't read ZFS on legacy BIOS)
-            boot = {
-              label = "BOOT-HETZNER";
+            # EFI System Partition for UEFI boot
+            esp = {
+              label = "ESP-HETZNER";
               size = "512M";
+              type = "EF00";
               content = {
                 type = "filesystem";
-                format = "ext4";
+                format = "vfat";
                 mountpoint = "/boot";
+                mountOptions = [ "umask=0077" ];
               };
             };
             # ZFS partition

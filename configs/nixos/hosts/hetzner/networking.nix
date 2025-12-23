@@ -18,7 +18,10 @@
   # Check with 'ip addr' - usually ens3 (amd64) or enp1s0 (arm64)
   systemd.network.networks."30-wan" = {
     matchConfig.Name = "en* eth*"; # Match any ethernet interface
-    networkConfig.DHCP = "ipv4"; # Get IPv4 via DHCP
+    networkConfig = {
+      DHCP = "ipv4"; # Get IPv4 via DHCP
+      DNS = [ "1.1.1.1" "8.8.8.8" ]; # Cloudflare + Google DNS
+    };
 
     # IPv6 must be configured statically
     # Replace with your assigned /64 subnet from Hetzner Console

@@ -17,6 +17,10 @@
   # Disable services that aren't needed on a web host
   services.fwupd.enable = lib.mkForce false; # No firmware updates on VPS
   services.syncthing.enable = lib.mkForce false; # No file sync needed
+  services.tailscale.enable = lib.mkForce false; # Not using Tailscale on VPS
+
+  # Fix SSH hanging - disable reverse DNS lookup
+  services.openssh.settings.UseDns = false;
 
   # Required for ZFS
   networking.hostId = "027a1bbc";
