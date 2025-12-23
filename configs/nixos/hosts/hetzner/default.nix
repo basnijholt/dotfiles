@@ -19,8 +19,8 @@
   services.syncthing.enable = lib.mkForce false; # No file sync needed
   services.tailscale.enable = lib.mkForce false; # Not using Tailscale on VPS
 
-  # Fix SSH hanging - disable reverse DNS lookup
-  services.openssh.settings.UseDns = false;
+  # Fix SSH hanging - disable reverse DNS lookup (override common/services.nix)
+  services.openssh.settings.UseDns = lib.mkForce false;
 
   # Required for ZFS
   networking.hostId = "027a1bbc";

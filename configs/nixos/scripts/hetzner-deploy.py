@@ -2,7 +2,7 @@
 #
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["typer", "rich"]
+# dependencies = ["typer", "rich", "python-dotenv"]
 # ///
 """Deploy NixOS to Hetzner Cloud using nixos-anywhere."""
 
@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 
 import typer
+from dotenv import load_dotenv
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
@@ -21,6 +22,14 @@ console = Console()
 
 SCRIPT_DIR = Path(__file__).parent
 FLAKE_DIR = SCRIPT_DIR.parent
+ENV_FILE = FLAKE_DIR / ".env"
+
+# Load environment variables from .env file
+if ENV_FILE.exists():
+    load_dotenv(ENV_FILE)
+    console.print(f"[dim]Loaded environment from {ENV_FILE}[/dim]")
+else:
+    console.print(f"[yellow]Warning: {ENV_FILE} not found[/yellow]")
 
 
 def run(cmd: list[str], check: bool = True, capture: bool = False) -> subprocess.CompletedProcess:
@@ -34,9 +43,9 @@ def run(cmd: list[str], check: bool = True, capture: bool = False) -> subprocess
     return result
 
 
-def hcloud(*args: str, capture: bool = False) -> subprocess.CompletedProcess:
+def hcloud(*args: str, capture: bool = False, check: bool = True) -> subprocess.CompletedProcess:
     """Run hcloud command."""
-    return run(["hcloud", *args], capture=capture)
+    return run(["hcloud", *args], capture=capture, check=check)
 
 
 def ssh_check(ip: str) -> bool:
@@ -88,7 +97,7 @@ def deploy(
     ))
 
     # Check if server exists
-    result = subprocess.run(["hcloud", "server", "describe", name], capture_output=True)
+    result = hcloud("server", "describe", name, capture=True, check=False)
     if result.returncode == 0:
         if delete_existing:
             console.print(f"[yellow]Deleting existing server '{name}'...[/yellow]")
@@ -100,7 +109,7 @@ def deploy(
 
     # Get or create SSH key
     ssh_key_name = "nixos-deploy"
-    result = subprocess.run(["hcloud", "ssh-key", "describe", ssh_key_name], capture_output=True)
+    result = hcloud("ssh-key", "describe", ssh_key_name, capture=True, check=False)
     if result.returncode != 0:
         console.print("[cyan]Creating SSH key in Hetzner...[/cyan]")
         for key_file in ["~/.ssh/id_ed25519.pub", "~/.ssh/id_rsa.pub"]:
@@ -161,7 +170,7 @@ def deploy(
 @app.command()
 def destroy(name: str = typer.Argument("hetzner", help="Server name to delete")):
     """Delete a Hetzner Cloud server."""
-    result = subprocess.run(["hcloud", "server", "describe", name], capture_output=True)
+    result = hcloud("server", "describe", name, capture=True, check=False)
     if result.returncode != 0:
         console.print(f"[yellow]Server '{name}' not found[/yellow]")
         raise typer.Exit(0)

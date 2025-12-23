@@ -70,14 +70,20 @@ For Incus VM installation, see the instructions in:
 
 ## Hetzner Cloud Installation
 
-Using nixos-anywhere from your local machine:
+Using the deployment script (requires `hcloud` CLI and a Hetzner API token):
 
 ```bash
-# Create a Hetzner Cloud VPS with Ubuntu, then:
-nix run github:nix-community/nixos-anywhere -- \
-  --flake 'github:basnijholt/dotfiles/main?dir=configs/nixos#hetzner' \
-  --target-host root@<HETZNER_IP> \
-  --build-on-remote
+# Create .env file with your Hetzner API token
+echo 'HCLOUD_TOKEN="your-token-here"' > .env
+
+# Deploy (creates CAX11 ARM server at €3.29/mo)
+./scripts/hetzner-deploy.py deploy
+
+# Or with options
+./scripts/hetzner-deploy.py deploy --type cax11 --location fsn1
+
+# Delete server
+./scripts/hetzner-deploy.py destroy
 ```
 
 After installation, SSH in and set your password:
