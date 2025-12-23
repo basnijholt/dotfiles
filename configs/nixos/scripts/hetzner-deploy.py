@@ -166,7 +166,7 @@ def deploy(
     console.print(Panel.fit(
         f"[bold green]Deployment complete![/bold green]\n\n"
         f"IP: [cyan]{server_ip}[/cyan]\n"
-        f"SSH: [cyan]ssh root@{server_ip}[/cyan]",
+        f"SSH: [cyan]ssh basnijholt@{server_ip}[/cyan]",
         border_style="green",
     ))
 
