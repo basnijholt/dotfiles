@@ -2,7 +2,7 @@
 #
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["tree-sitter", "tree-sitter-nix", "rich"]
+# dependencies = ["tree-sitter", "tree-sitter-nix", "rich", "humanize"]
 # ///
 """Calculate marginal closure cost of packages - the REAL size impact.
 
@@ -14,6 +14,7 @@ import json
 import subprocess
 from pathlib import Path
 
+import humanize
 import tree_sitter_nix as tsnix
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
@@ -28,50 +29,47 @@ console = Console()
 
 def parse_packages_from_nix(nix_file: Path) -> list[str]:
     """Parse package names from a Nix file using tree-sitter."""
-    NIX_LANGUAGE = Language(tsnix.language())
-    parser = Parser(NIX_LANGUAGE)
-
+    parser = Parser(Language(tsnix.language()))
     source = nix_file.read_bytes()
     tree = parser.parse(source)
 
-    packages = []
+    def text(node):
+        return source[node.start_byte : node.end_byte].decode()
 
-    def extract_identifiers(node, in_list=False):
-        """Recursively extract package identifiers from list expressions."""
+    def extract_base_pkg(node):
+        """Extract base package name from apply/select expressions like python3.withPackages."""
+        if node.type == "apply_expression" and node.children:
+            sel = node.children[0]
+            if sel.type == "select_expression" and sel.children:
+                var = sel.children[0]
+                if var.type == "variable_expression" and var.children:
+                    ident = var.children[0]
+                    if ident.type == "identifier":
+                        return text(ident)
+        return None
+
+    def collect(node, in_list=False):
+        """Recursively collect package names from list expressions."""
         if node.type == "list_expression":
             for child in node.children:
-                extract_identifiers(child, in_list=True)
-        elif node.type == "parenthesized_expression" and in_list:
-            # Preserve in_list context through parentheses
-            for child in node.children:
-                extract_identifiers(child, in_list=True)
-        elif node.type == "identifier" and in_list:
-            name = source[node.start_byte : node.end_byte].decode()
-            packages.append(name)
-        elif node.type == "apply_expression" and in_list:
-            # Handle things like (python3.withPackages ...)
-            func_node = node.children[0] if node.children else None
-            if func_node and func_node.type == "select_expression":
-                # Get the base identifier (e.g., "python3")
-                # Structure: select_expression -> variable_expression -> identifier
-                if func_node.children:
-                    base = func_node.children[0]
-                    if base.type == "variable_expression" and base.children:
-                        ident = base.children[0]
-                        if ident.type == "identifier":
-                            name = source[ident.start_byte : ident.end_byte].decode()
-                            packages.append(name)
+                yield from collect(child, in_list=True)
+        elif in_list:
+            if node.type == "variable_expression" and node.children:
+                ident = node.children[0]
+                if ident.type == "identifier":
+                    yield text(ident)
+            elif node.type == "parenthesized_expression":
+                for child in node.children:
+                    yield from collect(child, in_list=True)
+            elif node.type == "apply_expression":
+                if pkg := extract_base_pkg(node):
+                    yield pkg
         else:
             for child in node.children:
-                extract_identifiers(child, in_list)
+                yield from collect(child)
 
-    extract_identifiers(tree.root_node)
-
-    # Filter out Nix keywords and common non-package identifiers
-    keywords = {"with", "pkgs", "let", "in", "ps", "rec"}
-    packages = [p for p in packages if p not in keywords]
-
-    return packages
+    skip = {"with", "pkgs", "let", "in", "ps", "rec"}
+    return [p for p in collect(tree.root_node) if p not in skip]
 
 
 def get_closure_paths(expr: str) -> set[str]:
@@ -114,11 +112,7 @@ def format_size(size_bytes: int) -> str:
     """Format bytes to human readable."""
     if size_bytes < 0:
         return "N/A"
-    for unit in ["B", "KB", "MB", "GB"]:
-        if size_bytes < 1024:
-            return f"{size_bytes:.1f} {unit}"
-        size_bytes /= 1024
-    return f"{size_bytes:.1f} TB"
+    return humanize.naturalsize(size_bytes, binary=True)
 
 
 def main():
