@@ -126,11 +126,21 @@ def main():
 
     # Build baseline from must-have packages
     base_pkgs = [
+        # Core system
         "coreutils",
         "bash",
         "glibc",
         "openssl",
         "zlib",
+        "systemd",
+        # Common tools
+        "curl",
+        "wget",
+        "jq",
+        "ripgrep",
+        "gnupg",
+        "openssh",
+        # Dev essentials
         "gcc",
         "docker",
         "python3",
@@ -138,6 +148,9 @@ def main():
         "nodejs_20",
         "neovim",
     ]
+
+    console.print("[bold]📋 Baseline packages:[/bold]")
+    console.print(f"[dim]   {', '.join(base_pkgs)}[/dim]\n")
 
     base_paths = set()
     with Progress(
