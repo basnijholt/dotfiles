@@ -1,6 +1,7 @@
 # System packages shared by all hosts
 #
 # Large packages are in optional/large-packages.nix
+# See scripts/nix/package-marginal-cost.py for analysis of "marginal cost"
 { pkgs, ... }:
 
 let

@@ -1,7 +1,7 @@
 # Large packages - opt-in for hosts that need them
 #
 # These packages have high marginal cost (>50MB unique dependencies).
-# Based on analysis from scripts/package-marginal-cost.py
+# Based on analysis from scripts/nix/package-marginal-cost.py
 { pkgs, ... }:
 
 {

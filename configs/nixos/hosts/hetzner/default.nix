@@ -7,7 +7,6 @@
 {
   imports = [
     # Host-specific modules (Tier 3)
-    ./boot.nix
     ./networking.nix
     ./packages.nix
   ];
