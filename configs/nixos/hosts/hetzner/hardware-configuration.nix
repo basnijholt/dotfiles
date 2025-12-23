@@ -15,7 +15,6 @@
     "virtio_pci"
     "virtio_scsi"
     "virtio_blk"
-    "sr_mod"
   ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];

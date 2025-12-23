@@ -22,6 +22,12 @@
   # Fix SSH hanging - disable reverse DNS lookup (override common/services.nix)
   services.openssh.settings.UseDns = lib.mkForce false;
 
+  # Remove local network cache (not reachable from Hetzner)
+  nix.settings.substituters = lib.mkForce [
+    "https://cache.nixos.org/"
+    "https://nix-community.cachix.org"
+  ];
+
   # Required for ZFS
   networking.hostId = "027a1bbc";
 }
