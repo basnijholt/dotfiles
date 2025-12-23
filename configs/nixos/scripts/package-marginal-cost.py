@@ -132,8 +132,17 @@ def main():
 
     # Build baseline from must-have packages
     base_pkgs = [
-        "coreutils", "bash", "glibc", "openssl", "zlib",
-        "gcc", "docker", "python3", "git", "nodejs_20", "neovim",
+        "coreutils",
+        "bash",
+        "glibc",
+        "openssl",
+        "zlib",
+        "gcc",
+        "docker",
+        "python3",
+        "git",
+        "nodejs_20",
+        "neovim",
     ]
 
     base_paths = set()
@@ -250,8 +259,12 @@ def main():
     # Summary
     console.print("\n[bold]📊 MARGINAL COST SUMMARY[/bold]")
     console.print(f"  🔴 Large (>50MB):   [red]{len(large_marginal)}[/red] packages")
-    console.print(f"  🟡 Medium (10-50MB): [yellow]{len(medium_marginal)}[/yellow] packages")
-    console.print(f"  🟢 Small (<10MB):    [green]{len(small_marginal)}[/green] packages")
+    console.print(
+        f"  🟡 Medium (10-50MB): [yellow]{len(medium_marginal)}[/yellow] packages"
+    )
+    console.print(
+        f"  🟢 Small (<10MB):    [green]{len(small_marginal)}[/green] packages"
+    )
 
     if large_marginal:
         console.print("\n[bold red]🔴 LARGE UNIQUE DEPENDENCIES:[/bold red]")
@@ -263,8 +276,12 @@ def main():
         for pkg, size in sorted(medium_marginal, key=lambda x: -x[1]):
             console.print(f"   {pkg:<25} [yellow]+{format_size(size):>12}[/yellow]")
 
-    console.print("\n[dim]💡 Marginal cost = actual disk impact when adding to a system.[/dim]")
-    console.print("[dim]   Small marginal = shares most deps with the baseline.[/dim]\n")
+    console.print(
+        "\n[dim]💡 Marginal cost = actual disk impact when adding to a system.[/dim]"
+    )
+    console.print(
+        "[dim]   Small marginal = shares most deps with the baseline.[/dim]\n"
+    )
 
 
 if __name__ == "__main__":
