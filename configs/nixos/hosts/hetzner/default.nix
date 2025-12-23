@@ -19,4 +19,7 @@
   # Disable services that aren't needed on a web host
   services.fwupd.enable = lib.mkForce false; # No firmware updates on VPS
   services.syncthing.enable = lib.mkForce false; # No file sync needed
+
+  # Required for ZFS
+  networking.hostId = "027a1bbc";
 }
