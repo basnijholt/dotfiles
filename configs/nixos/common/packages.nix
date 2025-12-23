@@ -22,6 +22,7 @@ let
     dnsutils # Provides dig, nslookup, host
     duf
     eza
+    fd
     fzf
     gh
     git
@@ -70,6 +71,7 @@ let
     yazi-unwrapped
     yq-go
     zellij
+    zoxide
   ];
 
   # --- Yazi preview dependencies ---

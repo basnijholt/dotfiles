@@ -10,6 +10,7 @@ This measures how much each package ACTUALLY adds to a NixOS system,
 accounting for shared dependencies. Parses packages.nix using tree-sitter.
 """
 
+import argparse
 import json
 import subprocess
 from pathlib import Path
@@ -116,12 +117,25 @@ def format_size(size_bytes: int) -> str:
 
 
 def main():
+    parser = argparse.ArgumentParser(
+        description="Calculate marginal closure cost of packages"
+    )
+    parser.add_argument(
+        "nix_file",
+        nargs="?",
+        type=Path,
+        default=PACKAGES_NIX,
+        help=f"Nix file to parse (default: {PACKAGES_NIX})",
+    )
+    args = parser.parse_args()
+    nix_file = args.nix_file.resolve()
+
     console.print("\n[bold blue]📦 Package Marginal Cost Analyzer[/bold blue]")
     console.print("Measures ACTUAL additional size, not misleading closure size\n")
 
     # Parse packages from nix file
-    console.print(f"[dim]Parsing packages from {PACKAGES_NIX}...[/dim]")
-    packages = parse_packages_from_nix(PACKAGES_NIX)
+    console.print(f"[dim]Parsing packages from {nix_file}...[/dim]")
+    packages = parse_packages_from_nix(nix_file)
     console.print(f"[green]Found {len(packages)} packages[/green]\n")
 
     # Build baseline from must-have packages

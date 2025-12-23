@@ -21,7 +21,7 @@
     cmake             # +62 MB marginal
 
     # --- AI/LLM Tools ---
-    codex             # +309 MB marginal
+    codex             # +303 MB marginal
 
     # --- Media/Terminal Recording ---
     vhs               # +1.3 GB marginal (Go + Chromium for terminal recording)
@@ -31,6 +31,7 @@
 
     # --- Yazi preview deps (heavy) ---
     ffmpegthumbnailer # +166 MB marginal (video thumbnails)
+    imagemagick       # +116 MB marginal (image manipulation)
     poppler-utils     # +39 MB marginal (PDF preview)
     glow              # +17 MB marginal (Markdown preview)
     chafa             # +77 MB marginal (image preview)
