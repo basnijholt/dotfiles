@@ -42,6 +42,12 @@
           modules = commonModules ++ extraModules;
         };
 
+      mkHostArm = extraModules:
+        lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = commonModules ++ extraModules;
+        };
+
       mkPi = piModule: extraModules:
         nixos-raspberrypi.lib.nixosSystem {
           specialArgs = { inherit nixos-raspberrypi; };
@@ -127,6 +133,14 @@
           ./hosts/nix-cache/hardware-configuration.nix
         ];
 
+        # Hetzner Cloud VPS (ARM) - minimal Docker Compose host for websites
+        hetzner = mkHostArm [
+          disko.nixosModules.disko
+          ./hosts/hetzner/disko.nix
+          ./hosts/hetzner/default.nix
+          ./hosts/hetzner/hardware-configuration.nix
+        ];
+
         # Raspberry Pi 4 - uses nixos-raspberrypi for hardware + ZFS on SSD
         pi4 = mkPi nixos-raspberrypi.nixosModules.raspberry-pi-4.base [
           disko.nixosModules.disko
@@ -164,6 +178,7 @@
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
+        hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
       };
 
     };

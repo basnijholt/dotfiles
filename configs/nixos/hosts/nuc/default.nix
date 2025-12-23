@@ -7,6 +7,7 @@
     ../../optional/audio.nix
     ../../optional/virtualization.nix
     ../../optional/gui-packages.nix
+    ../../optional/large-packages.nix
     ../../optional/power.nix
     ../../optional/iscsi.nix
     ../../optional/zfs-replication.nix

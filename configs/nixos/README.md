@@ -27,6 +27,7 @@ configs/nixos/
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
+| `hetzner` | Cloud VPS | Minimal Docker Compose host for websites (Hetzner Cloud) |
 | `installer` | ISO | Minimal installer with SSH enabled |
 | `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
 | `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap with WiFi + SSH |
@@ -66,6 +67,15 @@ For Incus VM installation, see the instructions in:
 - `scripts/create-dev-vm.sh` (dev-vm helper script)
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
+
+## Hetzner Cloud Installation
+
+```bash
+echo 'HCLOUD_TOKEN="your-token"' > hosts/hetzner/.env  # Create API token at hetzner.cloud
+./hosts/hetzner/deploy.py deploy                       # Deploys CAX11 ARM server (€3.29/mo)
+```
+
+After deployment, set your password: `ssh basnijholt@<IP>` then `passwd`.
 
 ## Nix Cache Server Setup (nix-cache)
 
