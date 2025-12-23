@@ -1,7 +1,6 @@
 # System packages shared by all hosts
 #
-# Large packages (>50MB marginal) are in optional/large-packages.nix
-# Run scripts/package-marginal-cost.py to analyze package sizes.
+# Large packages are in optional/large-packages.nix
 { pkgs, ... }:
 
 let
@@ -16,10 +15,10 @@ let
     btop
     claude-code
     coreutils
-    cups
+    cups # lp command for network printing
     docker
     devbox
-    dnsutils
+    dnsutils # Provides dig, nslookup, host
     duf
     eza
     fzf
@@ -51,7 +50,7 @@ let
     parallel
     postgresql
     procs
-    psmisc
+    psmisc # For killall
     pwgen
     rclone
     ripgrep
@@ -72,13 +71,12 @@ let
     zellij
   ];
 
-  # --- Yazi preview dependencies (lightweight only) ---
+  # --- Yazi preview dependencies ---
   yaziPreviewDeps = with pkgs; [
-    file
-    # Heavy previewers in optional/large-packages.nix
+    file # MIME type detection
   ];
 
-  # --- Development Toolchains (lightweight only) ---
+  # --- Development Toolchains ---
   developmentToolchains = with pkgs; [
     gcc
     gnumake
@@ -87,7 +85,6 @@ let
     pkg-config
     portaudio
     (python3.withPackages (ps: [ ps.pipx ]))
-    # Heavy toolchains in optional/large-packages.nix
   ];
 in
 {
