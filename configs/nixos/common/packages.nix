@@ -81,6 +81,7 @@ let
 
   # --- Development Toolchains ---
   developmentToolchains = with pkgs; [
+    bun
     gcc
     gnumake
     meson

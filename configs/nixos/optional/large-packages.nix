@@ -15,7 +15,6 @@
     cargo             # +1.5 GB marginal (Rust toolchain)
     go                # +192 MB marginal (Go toolchain)
     openjdk           # +695 MB marginal (JVM)
-    bun               # +100 MB marginal
     pnpm              # +108 MB marginal
     yarn              # +98 MB marginal
     cmake             # +62 MB marginal
