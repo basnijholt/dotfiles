@@ -1,9 +1,10 @@
 # Hetzner Cloud disk configuration
 #
+# Hetzner x86_64 uses legacy BIOS boot (not UEFI).
 # Uses GPT with:
-# - 1MB BIOS boot partition (for legacy GRUB)
-# - 512MB EFI partition (for UEFI, future-proofing)
-# - Rest as ext4 root (simple, reliable for VPS)
+# - 1MB BIOS boot partition (for GRUB core.img)
+# - 512MB /boot partition (ext4)
+# - Rest as ext4 root
 #
 # Hetzner exposes the disk as /dev/sda.
 { ... }:
@@ -17,22 +18,20 @@
         content = {
           type = "gpt";
           partitions = {
-            # BIOS boot partition for legacy GRUB (required for Hetzner x86_64)
-            boot = {
+            # BIOS boot partition for legacy GRUB
+            bios = {
               size = "1M";
-              type = "EF02"; # BIOS boot
+              type = "EF02"; # BIOS boot partition
               priority = 1;
             };
-            # EFI System Partition
-            ESP = {
-              label = "EFI-HETZNER";
+            # Boot partition
+            boot = {
+              label = "BOOT-HETZNER";
               size = "512M";
-              type = "EF00";
               content = {
                 type = "filesystem";
-                format = "vfat";
+                format = "ext4";
                 mountpoint = "/boot";
-                mountOptions = [ "umask=0077" ];
               };
             };
             # Root partition
