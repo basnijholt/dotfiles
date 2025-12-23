@@ -53,8 +53,13 @@ if [[ $- == *i* ]]; then
 
     nixswitch() {
         local args=()
-        if [[ -n "$1" ]]; then
+        if [[ -n "$1" && "$1" =~ ^[0-9]+$ ]]; then
             args=(--option max-jobs "$1" --option cores "$1")
+            shift
+        fi
+        if [[ "$1" == "--no-local" ]]; then
+            args+=(--option substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://cache.nixos-cuda.org https://nixos-raspberrypi.cachix.org")
+            shift
         fi
         sudo nixos-rebuild switch --flake ~/dotfiles/configs/nixos#$(hostname) "${args[@]}"
     }
