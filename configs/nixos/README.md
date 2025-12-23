@@ -70,27 +70,12 @@ For Incus VM installation, see the instructions in:
 
 ## Hetzner Cloud Installation
 
-Using the deployment script (requires `hcloud` CLI and a Hetzner API token):
-
 ```bash
-# Create .env file with your Hetzner API token
-echo 'HCLOUD_TOKEN="your-token-here"' > .env
-
-# Deploy (creates CAX11 ARM server at €3.29/mo)
-./scripts/hetzner-deploy.py deploy
-
-# Or with options
-./scripts/hetzner-deploy.py deploy --type cax11 --location fsn1
-
-# Delete server
-./scripts/hetzner-deploy.py destroy
+echo 'HCLOUD_TOKEN="your-token"' > .env  # Create API token at hetzner.cloud
+./scripts/hetzner-deploy.py deploy       # Deploys CAX11 ARM server (€3.29/mo)
 ```
 
-After installation, SSH in and set your password:
-```bash
-ssh basnijholt@<HETZNER_IP>
-passwd  # Set your password
-```
+After deployment, set your password: `ssh basnijholt@<IP>` then `passwd`.
 
 ## Nix Cache Server Setup (nix-cache)
 
