@@ -149,9 +149,9 @@ def deploy(
     hcloud("server", "enable-rescue", "--ssh-key", ssh_key_name, name)
     hcloud("server", "reset", name)
 
-    # Wait for rescue mode
-    time.sleep(10)
-    wait_for_ssh(server_ip)
+    # Wait for rescue mode (ARM takes longer to boot)
+    time.sleep(30)
+    wait_for_ssh(server_ip, timeout=180)
 
     # Run nixos-anywhere
     console.print("[cyan]Running nixos-anywhere...[/cyan]")
