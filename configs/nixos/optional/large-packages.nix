@@ -25,6 +25,9 @@
     # --- Media/Terminal Recording ---
     vhs               # +1.3 GB marginal (Go + Chromium for terminal recording)
 
+    # --- Browsers ---
+    chromium          # +1.2 GB marginal
+
     # --- Kubernetes ---
     k9s               # +167 MB marginal
 
