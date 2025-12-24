@@ -417,7 +417,7 @@
           --port ''${PORT}
           --ctx-size 0
 
-    healthCheckTimeout: 3600  # 1 hour for large model download + loading
+    healthCheckTimeout: 28800  # 8 hours for large model download + loading
 
     # TTL keeps models in memory for specified seconds after last use
     ttl: 3600  # Keep models loaded for 1 hour (like OLLAMA_KEEP_ALIVE)
