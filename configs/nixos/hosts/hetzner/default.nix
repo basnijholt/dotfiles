@@ -39,7 +39,5 @@
 
   # Required for ZFS
   networking.hostId = "027a1bbc";
-  # TODO: remove pin when nixpkgs defaults to zfs_2_4
-  # https://github.com/nixos/nixpkgs/blob/master/pkgs/top-level/all-packages.nix#L10124
-  boot.zfs.package = pkgs.zfs_2_4; # 2.4.0 fixes SQLite/ftruncate delays (openzfs/zfs#14290)
+  # ZFS 2.4.0 pin is in hardware-configuration.nix
 }
