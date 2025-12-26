@@ -31,6 +31,15 @@
     "https://nix-community.cachix.org"
   ];
 
+  # Zram swap - compressed RAM swap for builds (ZFS doesn't support swapfiles well)
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50; # Use up to 50% of RAM for compressed swap
+  };
+
   # Required for ZFS
   networking.hostId = "027a1bbc";
+  # TODO: remove pin when nixpkgs defaults to zfs_2_4
+  # https://github.com/nixos/nixpkgs/blob/master/pkgs/top-level/all-packages.nix#L10124
+  boot.zfs.package = pkgs.zfs_2_4; # 2.4.0 fixes SQLite/ftruncate delays (openzfs/zfs#14290)
 }
