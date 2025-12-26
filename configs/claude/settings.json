@@ -20,5 +20,7 @@
     "padding": 0
   },
   "alwaysThinkingEnabled": true,
-  "enabledPlugins": {}
+  "enabledPlugins": {
+    "rust-analyzer-lsp@claude-plugins-official": true
+  }
 }
