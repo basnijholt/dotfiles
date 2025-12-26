@@ -3,7 +3,7 @@
 
 {
   services.restic.backups.truenas = {
-    repository = "sftp:restic@truenas.local:/mnt/tank/backups/nixos";
+    repository = "sftp:restic@truenas.local:/mnt/tank/backups/pc";
     paths = [
       "/home"
       "/etc/nixos"

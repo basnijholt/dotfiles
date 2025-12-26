@@ -25,6 +25,13 @@
   # Fix SSH hanging - disable reverse DNS lookup (override common/services.nix)
   services.openssh.settings.UseDns = lib.mkForce false;
 
+  # Allow root SSH for TrueNAS ZFS pull replication
+  services.openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
+  users.users.root.openssh.authorizedKeys.keys = [
+    # TrueNAS-generated key for ZFS pull replication
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDIq7zPtq0+tNrz1xbX+Fo7fVnfMtbmEHeiKclcicK7b0qz/LunbYDA/dfKi2EgrFbbkQuMoUBsb8HcEP+KCuzZqepGl3r0aRL3wC+ZMSMeoVMOrjpoI7NAQtGD5IJ1Aa5jIMi+FWzHydNG7QVMMSA+AiIUIkfQxCqji/xGaDK0HiPu86CGqMsBDLLpAsYmCdoivqkaGYEi9ifZreOO9508gP7ph//7MriKw1A9KOUdOMfJkpGLs69bFz54s7Dl7L5QhxWOPpI3yrJZpP5kM8rW5uc74wdUkhH4x03mU0zUF48H+SdUe4xtVjKc7DAhgERXNVjzmfSY0kD2AjxbEJzfFl2c2s7rd+i9AOUvn7vgRLcbMbFY5O24qFxdPEcynJGAvbTQG388ZACcSBFc/uXZJXMeupzTXjbjBjyL2gODwnMG9r52Wuzs4tuhTPjoCltU67yT5Ya+ZLM20Pp1NpiAZq4Bfp6xIKtnm3tfciaeiOTSaAaOyNc1skDsbjW8Qg0= root@truenas hetzner-key"
+  ];
+
   # Remove local network cache (not reachable from Hetzner)
   nix.settings.substituters = lib.mkForce [
     "https://cache.nixos.org/"
