@@ -20,6 +20,8 @@
   # Firewall - allow essential ports
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 80 443 ];
+    allowedTCPPorts = [ 22 80 443 ]
+      ++ [ 20 21 ] # FTP control and active data
+      ++ (lib.range 21100 21110); # FTP passive data range
   };
 }
