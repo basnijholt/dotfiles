@@ -12,11 +12,15 @@ HOSTS=(
   "hp"
   "pi3"
   "pi4"
-  # VM/LXC/systemd-nspawn hosts
+  # systemd-nspawn hosts
   "docker-truenas"
-  "nix-cache"
-  "ubuntu-hetzner"
   "debian-truenas"
+  # VM/LXC hosts
+  "nix-cache"
+  "docker"
+  # Cloud hosts
+  "ubuntu-hetzner"
+  "nixos-hetzner"
 )
 
 # Arrays to track results
