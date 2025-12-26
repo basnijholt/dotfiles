@@ -2,7 +2,7 @@
 #
 # A lightweight host for running Docker Compose stacks (websites, services).
 # Uses common packages but excludes optional/large-packages.nix.
-{ lib, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
@@ -13,6 +13,9 @@
   # Docker for compose stacks - enabled directly, not via virtualization.nix
   # (which also pulls in libvirt, incus, virt-manager)
   virtualisation.docker.enable = true;
+
+  # Google Cloud SDK for deployments
+  environment.systemPackages = [ pkgs.google-cloud-sdk ];
 
   # Disable services that aren't needed on a web host
   services.fwupd.enable = lib.mkForce false; # No firmware updates on VPS
