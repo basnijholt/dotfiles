@@ -40,4 +40,16 @@
   # Required for ZFS
   networking.hostId = "027a1bbc";
   # ZFS 2.4.0 pin is in hardware-configuration.nix
+
+  # ZFS automated snapshots - local only (no replication for security)
+  # Provides point-in-time recovery for websites data
+  services.zfs.autoSnapshot = {
+    enable = true;
+    flags = "-k -p"; # Keep zero-sized snapshots, use UTC
+    frequent = 4; # Every 15 min, keep 4 (1 hour)
+    hourly = 24; # Keep 24 hours
+    daily = 7; # Keep 7 days
+    weekly = 4; # Keep 4 weeks
+    monthly = 3; # Keep 3 months
+  };
 }
