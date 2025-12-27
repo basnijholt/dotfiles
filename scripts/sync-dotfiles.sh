@@ -18,6 +18,7 @@ HOSTS=(
   # VM/LXC hosts
   "nix-cache"
   "docker"
+  "docker-truenas-2"
   # Cloud hosts
   "ubuntu-hetzner"
   "nixos-hetzner"
