@@ -40,7 +40,7 @@
         };
         rootFsOptions = {
           compression = "zstd";
-          "com.sun:auto-snapshot" = "false";
+          "com.sun:auto-snapshot" = "true";
           acltype = "posixacl";
           xattr = "sa";
           atime = "off";
@@ -56,6 +56,7 @@
             type = "zfs_fs";
             mountpoint = "/nix";
             options.mountpoint = "legacy";
+            options."com.sun:auto-snapshot" = "false";
           };
           var = {
             type = "zfs_fs";
