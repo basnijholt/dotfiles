@@ -18,7 +18,6 @@ in
         mountpoint = "legacy";
         compression = "lz4";
         atime = "off";
-        "com.sun:auto-snapshot" = "true";
       };
     };
   };
