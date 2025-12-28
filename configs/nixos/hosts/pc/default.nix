@@ -25,6 +25,7 @@
     ./ai.nix
     ./agent-cli.nix
     ./backup.nix
+    ./truenas-config-backup.nix
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix
     ./slurm.nix
