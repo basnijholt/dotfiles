@@ -14,7 +14,6 @@ let
     bandwhich
     bat
     btop
-    claude-code
     coreutils
     cups # lp command for network printing
     docker
