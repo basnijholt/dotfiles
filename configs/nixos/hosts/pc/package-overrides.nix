@@ -35,12 +35,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "7508";
+            version = "7601";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-n2xWD+wDj5EI5TnD70C4ipfce7uKHcXw89HsHW7SSrs=";
+              hash = "sha256-0h3/UMPX1RCn21qPIumUzK6vw2XH/evZ8oRzxBpDjRc=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -53,6 +53,7 @@
             # for reproducible builds). We sacrifice portability for faster CPU layers.
             cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [
               "-DGGML_NATIVE=ON"
+              "-DCMAKE_CUDA_ARCHITECTURES=86" # RTX 3090 - needed since sandbox has no GPU
             ];
 
             # Disable Nix's NIX_ENFORCE_NO_NATIVE which strips -march=native flags
@@ -69,8 +70,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v178/llama-swap_178_linux_amd64.tar.gz";
-            hash = "sha256-WhoGaS+m+2Ne+7U5JVvj1Fr5n3xB3ccsTe93slSAhFw=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v180/llama-swap_180_linux_amd64.tar.gz";
+            hash = "sha256-hX6JtdwL6ieWN4GU06mZue2pqj8KSCOKQHTBh/mxatM=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
