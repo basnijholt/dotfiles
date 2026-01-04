@@ -92,10 +92,13 @@ GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --branch "$DOTFILES_BRANCH" --single-b
   "$DOTFILES_REPO" "$DOTFILES_DIR"
 
 log "Configuring Git to use HTTPS for submodules..."
-git -C "$DOTFILES_DIR" config url."https://github.com/".insteadOf git@github.com:
+git config --global url."https://github.com/".insteadOf git@github.com:
 
 log "Initializing submodules..."
 GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8
+
+# Clean up global config
+git config --global --unset url."https://github.com/".insteadOf || true
 
 # --- Fetch platform-specific binaries ---
 if [[ -n "$DOTBINS_ARCH" ]]; then
