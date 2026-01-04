@@ -99,6 +99,15 @@ GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive
   log "Warning: Some submodules failed to clone (private repos?). Continuing anyway..."
 }
 
+# Ensure critical HTTPS submodules are cloned (may be skipped if parallel clone aborts early)
+log "Ensuring critical submodules..."
+for submodule in submodules/dotbot submodules/oh-my-zsh submodules/tmux; do
+  if [[ ! -d "$DOTFILES_DIR/$submodule/.git" ]]; then
+    log "Retrying $submodule..."
+    GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 "$submodule" || true
+  fi
+done
+
 # --- Fetch platform-specific binaries ---
 if [[ -n "$DOTBINS_ARCH" ]]; then
   log "Fetching $DOTBINS_OS/$DOTBINS_ARCH dotbins binaries..."
@@ -106,7 +115,7 @@ if [[ -n "$DOTBINS_ARCH" ]]; then
     cd "$DOTFILES_DIR/submodules/mydotbins"
     git lfs install --local
     git lfs pull --include="$DOTBINS_OS/$DOTBINS_ARCH/**"
-    git lfs checkout --include="$DOTBINS_OS/$DOTBINS_ARCH/**"
+    git lfs checkout "$DOTBINS_OS/$DOTBINS_ARCH/**"
   ) || log "Warning: LFS pull failed (no SSH keys?). Binaries not fetched."
 else
   log "Skipping dotbins binary fetch (unsupported platform)."
