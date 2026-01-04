@@ -85,16 +85,17 @@ cd ~/dotfiles
 ./install
 ```
 
-#### One-line macOS installer (Apple Silicon)
+#### One-line bootstrap (macOS & Linux)
 
-If you're on macOS and want a single command that installs Homebrew + prerequisites,
-clones the sanitized branch, initializes submodules and runs `./install`, use:
+A single command that installs prerequisites, clones the repo, initializes submodules, and runs `./install`:
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/basnijholt/dotfiles/public/scripts/install-macos.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/basnijholt/dotfiles/public/scripts/bootstrap.sh)"
 ```
 
-#### macOS Terminal Font and other programs
+Works on macOS (Apple Silicon) and Linux (Alpine, Debian, Ubuntu, Fedora, Arch).
+
+#### macOS Terminal Font
 
 If prompt icons show as empty squares, install a Nerd Font and select it in Terminal.app:
 
