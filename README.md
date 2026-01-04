@@ -85,7 +85,17 @@ cd ~/dotfiles
 ./install
 ```
 
-#### macOS Terminal Font and other programs
+#### One-line bootstrap (macOS & Linux)
+
+A single command that installs prerequisites, clones the repo, initializes submodules, and runs `./install`:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/basnijholt/dotfiles/public/scripts/bootstrap.sh)"
+```
+
+Works on macOS (Apple Silicon) and Linux (Alpine, Debian, Ubuntu, Fedora, Arch).
+
+#### macOS Terminal Font
 
 If prompt icons show as empty squares, install a Nerd Font and select it in Terminal.app:
 
