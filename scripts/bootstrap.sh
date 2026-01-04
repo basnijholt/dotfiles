@@ -113,6 +113,9 @@ else
   log "Skipping dotbins binary fetch (unsupported platform)."
 fi
 
+# Clean up global config
+git config --global --unset url."https://github.com/".insteadOf || true
+
 # --- Run dotbot installer ---
 log "Running dotfiles installer..."
 (
