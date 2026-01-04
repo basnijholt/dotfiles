@@ -95,10 +95,9 @@ log "Configuring Git to use HTTPS for submodules..."
 git config --global url."https://github.com/".insteadOf git@github.com:
 
 log "Initializing submodules..."
-GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8
-
-# Clean up global config
-git config --global --unset url."https://github.com/".insteadOf || true
+GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8 || {
+  log "Warning: Some submodules failed to clone (private repos?). Continuing anyway..."
+}
 
 # --- Fetch platform-specific binaries ---
 if [[ -n "$DOTBINS_ARCH" ]]; then
@@ -108,7 +107,7 @@ if [[ -n "$DOTBINS_ARCH" ]]; then
     git lfs install --local
     git lfs pull --include="$DOTBINS_OS/$DOTBINS_ARCH/**"
     git lfs checkout --include="$DOTBINS_OS/$DOTBINS_ARCH/**"
-  )
+  ) || log "Warning: LFS pull failed (no SSH keys?). Binaries not fetched."
 else
   log "Skipping dotbins binary fetch (unsupported platform)."
 fi
