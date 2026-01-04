@@ -95,7 +95,9 @@ log "Configuring Git to use HTTPS for submodules..."
 git config --global url."https://github.com/".insteadOf git@github.com:
 
 log "Initializing submodules..."
-GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8
+GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8 || {
+  log "Warning: Some submodules failed to clone (private repos?). Continuing anyway..."
+}
 
 # Clean up global config
 git config --global --unset url."https://github.com/".insteadOf || true
