@@ -4,10 +4,18 @@
 # To forward .local to this CoreDNS:
 # 1. Open LuCI: http://192.168.8.1:8080/cgi-bin/luci/admin/network/dhcp
 #    (requires LuCI enabled via http://192.168.8.1/#/advanced)
-# 2. Add `/local/192.168.1.2` to "DNS forwardings" in BOTH sections:
-#    - CFG01411C (main): for queries from the router itself
-#    - WGCLIENT1: for queries from LAN clients through WireGuard
-# 3. Save & Apply
+# 2. Add `/local/192.168.1.2` to "DNS forwardings" in CFG01411C section, Save & Apply
+# 3. WGCLIENT1 (port 2153) config is recreated on interface up, so create hotplug script:
+#      cat > /etc/hotplug.d/iface/99-local-dns << 'EOF'
+#      #!/bin/sh
+#      [ "$ACTION" = "ifup" ] && [ "$INTERFACE" = "wgclient1" ] && {
+#          uci add_list dhcp.wgclient1.server='/local/192.168.1.2'
+#          uci commit dhcp
+#          /etc/init.d/dnsmasq restart
+#      }
+#      EOF
+#
+# Test: dig @192.168.1.2 nuc.local +short  (should return 192.168.1.2)
 { pkgs, lib, ... }:
 
 let
