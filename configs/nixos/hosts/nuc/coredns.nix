@@ -5,9 +5,10 @@
 # 1. Open LuCI: http://192.168.8.1:8080/cgi-bin/luci/admin/network/dhcp
 #    (requires LuCI enabled via http://192.168.8.1/#/advanced)
 # 2. Add `/local/192.168.1.2` to "DNS forwardings" in BOTH sections:
-#    - CFG01411C (main): for queries from the router itself
-#    - WGCLIENT1: for queries from LAN clients through WireGuard
+#    - CFG01411C (port 53): main, for direct LAN clients
+#    - WGCLIENT1 (port 2153): for clients through WireGuard tunnel
 # 3. Save & Apply
+# Test: dig @192.168.1.2 nuc.local should show 'aa' flag (authoritative), not just 'ra'
 { pkgs, lib, ... }:
 
 let
