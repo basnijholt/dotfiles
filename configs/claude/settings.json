@@ -19,8 +19,9 @@
     "command": "python3 ~/.claude/statusline.py",
     "padding": 0
   },
-  "alwaysThinkingEnabled": true,
   "enabledPlugins": {
-    "rust-analyzer-lsp@claude-plugins-official": true
-  }
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "claude-code-wakatime@wakatime": true
+  },
+  "alwaysThinkingEnabled": true
 }
