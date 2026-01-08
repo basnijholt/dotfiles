@@ -9,6 +9,7 @@ in
     description = "uvx agent-cli server";
     wantedBy = [ "default.target" ];
     path = [ pkgs.ffmpeg pkgs.uv ];
+    environment.UV_PYTHON = "3.13";
     serviceConfig = {
       ExecStart = "${pkgs.uv}/bin/uvx --from 'agent-cli[server]' agent-cli server";
       Restart = "always";
