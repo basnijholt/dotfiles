@@ -3,23 +3,19 @@
 #
 # See: https://github.com/basnijholt/compose-farm/blob/main/docs/truenas-nested-nfs.md
 #
-# Uses systemd automount for resilience:
-# - Mounts on-demand (noauto + x-systemd.automount)
-# - Unmounts after 10 min idle (x-systemd.idle-timeout)
-# - Fails gracefully instead of hanging (soft + timeo + retrans)
-# - Short timeouts prevent system lockups if NAS is down
+# - nofail: Don't block boot if NAS is down
+# - bg: Retry in background if mount fails at boot
+# - soft: Return errors instead of hanging when NAS unreachable
+# - NFSv4 handles reconnection automatically when NAS comes back
 { ... }:
 
 let
   nfsOptions = [
-    "x-systemd.automount"
-    "noauto"
-    "x-systemd.idle-timeout=600"
-    "x-systemd.device-timeout=5s"
-    "x-systemd.mount-timeout=5s"
+    "nfsvers=4"
+    "nofail"
+    "bg"
     "soft"
-    "timeo=30"
-    "retrans=2"
+    "timeo=50"
     "_netdev"
   ];
 in
