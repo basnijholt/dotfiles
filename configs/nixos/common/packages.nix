@@ -45,7 +45,7 @@ let
     micro
     mosh
     neovim
-    nixfmt-rfc-style
+    nixfmt
     nmap
     packer
     parallel
