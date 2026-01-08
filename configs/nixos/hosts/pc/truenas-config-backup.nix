@@ -5,6 +5,7 @@
 {
   systemd.services.truenas-config-backup = {
     description = "Backup TrueNAS configuration";
+    wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     path = with pkgs; [ curl coreutils ];
     script = ''
