@@ -1,14 +1,3 @@
 [user]
-	email = bas@nijho.lt
-	name = Bas Nijholt
-	signingkey = ~/.ssh/id_ed25519.pub
-[maintenance]
-	repo = ~/Code/graphviz-anywidget
-	repo = ~/Code/pipefunc
-	repo = ~/dotfiles/pipefunc/src
-[safe]
-	directory = /opt/stacks
-[include]
-	path = ~/.gitconfig-sign
-[credential "https://git.lab.nijho.lt"]
-	provider = generic
+	email = you@domain.com
+	name = Your Name
