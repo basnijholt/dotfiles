@@ -20,6 +20,7 @@ BLOCKED_PATTERNS = [
     (rf"{_GIT_CMD}push\b.*--force\b", "git push --force is not allowed"),
     (rf"{_GIT_CMD}push\b.*-f\b", "git push -f (force) is not allowed"),
     (rf"{_GIT_CMD}push\b.*--force-with-lease\b", "git push --force-with-lease is not allowed"),
+    (r"\bgh\s+pr\s+merge\b", "gh pr merge is not allowed - the user must merge PRs themselves, never the agent"),
 ]
 
 PROTECTED_BRANCHES = {"main", "master"}
