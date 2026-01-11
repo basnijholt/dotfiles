@@ -502,7 +502,6 @@
   };
 
   # --- Qdrant Vector Database ---
-  # Using 1.16.3 override in package-overrides.nix (PR #465441)
   services.qdrant = {
     enable = true;
     settings = {

@@ -65,26 +65,6 @@
             '';
           });
 
-      # qdrant 1.16.3 - fixes gcc15/rocksdb build failure
-      # PR: https://github.com/NixOS/nixpkgs/pull/465441
-      qdrant =
-        let
-          version = "1.16.3";
-          src = pkgs.fetchFromGitHub {
-            owner = "qdrant";
-            repo = "qdrant";
-            tag = "v${version}";
-            hash = "sha256-p2xQStTwbC6MoEsaM1JXlBHK2CqwIfD7x+WwciuY49s=";
-          };
-        in
-        pkgs.qdrant.overrideAttrs (oldAttrs: {
-          inherit version src;
-          cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
-            inherit src;
-            hash = "sha256-DEOMoG13eDDEadScwQOD6jxuJBxaU2+fUNK/QLXLG8M=";
-          };
-        });
-
       # llama-swap from GitHub releases
       llama-swap = pkgs.runCommand "llama-swap" { } ''
         mkdir -p $out/bin
