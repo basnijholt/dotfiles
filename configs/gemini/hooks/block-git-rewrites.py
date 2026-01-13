@@ -20,6 +20,8 @@ BLOCKED_PATTERNS = [
     (rf"{_GIT_CMD}push\b.*--force\b", "git push --force is not allowed"),
     (rf"{_GIT_CMD}push\b.*-f\b", "git push -f (force) is not allowed"),
     (rf"{_GIT_CMD}push\b.*--force-with-lease\b", "git push --force-with-lease is not allowed"),
+    (rf"{_GIT_CMD}add\b.*-A\b", "git add -A is not allowed - add files explicitly to avoid adding unrelated untracked files"),
+    (rf"{_GIT_CMD}add\b.*--all\b", "git add --all is not allowed - add files explicitly to avoid adding unrelated untracked files"),
     (r"\bgh\s+pr\s+merge\b", "gh pr merge is not allowed - the user must merge PRs themselves, never the agent"),
 ]
 
