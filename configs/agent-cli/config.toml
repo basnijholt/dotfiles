@@ -30,3 +30,11 @@ Other frequent words are `pipefunc` (or `PipeFunc`), IonQ (a quantum computing c
 My name is Bas Nijholt.
 """
 transcription-log = "~/transcription.log"
+
+[dev.agent_args]
+claude = ["--dangerously-skip-permissions"]
+
+[dev.agent_env.claude]
+CLAUDE_CODE_USE_VERTEX = "1"
+ANTHROPIC_MODEL = "claude-opus-4-5"
+ANTHROPIC_SMALL_FAST_MODEL = "claude-haiku-4-5"
