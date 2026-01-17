@@ -19,6 +19,7 @@
     cmake             # +62 MB marginal
 
     # --- Media/Terminal Recording ---
+    ffmpeg            # +634 MB marginal (audio/video conversion)
     vhs               # +1.3 GB marginal (Go + Chromium for terminal recording)
 
     # --- Browsers ---
