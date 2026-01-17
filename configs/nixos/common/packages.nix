@@ -47,6 +47,7 @@ let
     neovim
     nixfmt
     nmap
+    ookla-speedtest
     packer
     parallel
     postgresql
