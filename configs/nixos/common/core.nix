@@ -11,13 +11,13 @@
   boot.kernel.sysctl."kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
 
   # --- DNS Resolver Defaults ---
+  networking.nameservers = [ "192.168.1.2" "100.100.100.100" ];
   services.resolved = {
     enable = true;
-    domains = [ "~local" ]; # Route .local queries to our DNS
-    fallbackDns = [ "1.1.1.1" "8.8.8.8" ]; # Public fallback when local resolvers fail
-    extraConfig = ''
-      DNS=192.168.1.2 100.100.100.100
-    '';
+    settings.Resolve = {
+      Domains = [ "~local" ]; # Route .local queries to our DNS
+      FallbackDNS = [ "1.1.1.1" "8.8.8.8" ]; # Public fallback when local resolvers fail
+    };
   };
 
   # --- Shell & Terminal ---
