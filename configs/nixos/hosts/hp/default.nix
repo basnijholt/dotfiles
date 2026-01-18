@@ -11,7 +11,7 @@
     ../../optional/zfs-replication.nix
     ../../optional/nfs-docker.nix
     ../../optional/print-server.nix
-    ../../optional/coredns.nix
+    (import ../../optional/coredns.nix { listenIP = "192.168.1.3"; })
 
     # Host-specific modules (Tier 3)
     ./networking.nix
@@ -23,10 +23,4 @@
 
   # Required for ZFS
   networking.hostId = "37a1d4a7";
-
-  # Secondary DNS server (primary: nuc)
-  local.coredns = {
-    enable = true;
-    listenIP = "192.168.1.3";
-  };
 }

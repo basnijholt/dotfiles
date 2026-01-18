@@ -21,17 +21,18 @@
 #      EOF
 #
 # Test: dig @192.168.1.2 nuc.local +short  (should return 192.168.1.2)
-{ config, pkgs, lib, ... }:
+{ listenIP }:
+
+{ pkgs, lib, ... }:
 
 let
-  cfg = config.local.coredns;
   wildcardIP = "192.168.1.6";
 
   localZone = pkgs.writeText "local.zone" ''
     $ORIGIN local.
     @               900   IN  SOA   ns hostadmin 1 900 300 604800 900
     @               3600  IN  NS    ns
-    ns              3600  IN  A     ${cfg.listenIP}
+    ns              3600  IN  A     ${listenIP}
     *               3600  IN  A     ${wildcardIP}
     nuc             3600  IN  A     192.168.1.2
     hp              3600  IN  A     192.168.1.3
@@ -58,7 +59,7 @@ let
     $ORIGIN lab.nijho.lt.
     @   900   IN  SOA   ns hostadmin 1 900 300 604800 900
     @   3600  IN  NS    ns
-    ns  3600  IN  A     ${cfg.listenIP}
+    ns  3600  IN  A     ${listenIP}
     @   3600  IN  A     ${wildcardIP}
     *   3600  IN  A     ${wildcardIP}
   '';
@@ -67,70 +68,59 @@ let
     $ORIGIN lab.mindroom.chat.
     @   900   IN  SOA   ns hostadmin 1 900 300 604800 900
     @   3600  IN  NS    ns
-    ns  3600  IN  A     ${cfg.listenIP}
+    ns  3600  IN  A     ${listenIP}
     *   3600  IN  A     ${wildcardIP}
   '';
 in
 {
-  options.local.coredns = {
-    enable = lib.mkEnableOption "CoreDNS local DNS server";
+  services.coredns = {
+    enable = true;
+    config = ''
+      local {
+        bind ${listenIP}
+        file ${localZone}
+      }
 
-    listenIP = lib.mkOption {
-      type = lib.types.str;
-      description = "IP address for CoreDNS to bind to";
-      example = "192.168.1.2";
-    };
+      lab.nijho.lt {
+        bind ${listenIP}
+        file ${labNijholtZone}
+      }
 
-    extraSystemdDeps = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      description = "Extra systemd units to wait for before starting CoreDNS";
-      example = [ "sys-subsystem-net-devices-br0.device" ];
+      lab.mindroom.chat {
+        bind ${listenIP}
+        file ${labMindroomChatZone}
+      }
+
+      . {
+        bind ${listenIP}
+        forward . 1.1.1.1 8.8.8.8
+        cache 300
+        errors
+      }
+    '';
+  };
+
+  networking.firewall = {
+    allowedTCPPorts = [ 53 ];
+    allowedUDPPorts = [ 53 ];
+  };
+
+  # Ensure CoreDNS waits for network and bridge
+  systemd.services.coredns = {
+    after = [ "network-online.target" "sys-subsystem-net-devices-br0.device" ];
+    wants = [ "network-online.target" ];
+    serviceConfig = {
+      Restart = lib.mkForce "always";
+      RestartSec = "5s";
+      StartLimitIntervalSec = 0;
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    services.coredns = {
-      enable = true;
-      config = ''
-        local {
-          bind ${cfg.listenIP}
-          file ${localZone}
-        }
-
-        lab.nijho.lt {
-          bind ${cfg.listenIP}
-          file ${labNijholtZone}
-        }
-
-        lab.mindroom.chat {
-          bind ${cfg.listenIP}
-          file ${labMindroomChatZone}
-        }
-
-        . {
-          bind ${cfg.listenIP}
-          forward . 1.1.1.1 8.8.8.8
-          cache 300
-          errors
-        }
-      '';
-    };
-
-    networking.firewall = {
-      allowedTCPPorts = [ 53 ];
-      allowedUDPPorts = [ 53 ];
-    };
-
-    # Ensure CoreDNS waits for network and restarts reliably
-    systemd.services.coredns = {
-      after = [ "network-online.target" ] ++ cfg.extraSystemdDeps;
-      wants = [ "network-online.target" ];
-      serviceConfig = {
-        Restart = lib.mkForce "always";
-        RestartSec = "5s";
-        StartLimitIntervalSec = 0;
-      };
-    };
-  };
+  # Route to WireGuard subnet via ASUS router for DNS responses to reach VPN clients
+  systemd.network.networks."40-br0".routes = [
+    {
+      Destination = "10.6.0.0/24";
+      Gateway = "192.168.1.1";
+    }
+  ];
 }
