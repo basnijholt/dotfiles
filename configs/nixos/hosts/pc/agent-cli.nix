@@ -11,7 +11,7 @@ in
     path = [ pkgs.ffmpeg pkgs.uv ];
     environment.UV_PYTHON = "3.13";
     serviceConfig = {
-      ExecStart = "${pkgs.uv}/bin/uvx --from 'agent-cli[server]' agent-cli server";
+      ExecStart = "${pkgs.uv}/bin/uvx --from 'agent-cli[server]' agent-cli server transcription-proxy";
       Restart = "always";
       RestartSec = 5;
       WorkingDirectory = homeDir;
