@@ -112,6 +112,7 @@ in
     serviceConfig = {
       Restart = lib.mkForce "always";
       RestartSec = "5s";
+      # Keep retrying indefinitely - DNS is critical
       StartLimitIntervalSec = 0;
     };
   };
