@@ -1,5 +1,5 @@
 # Core system settings shared by all hosts
-{ pkgs, ... }:
+{ pkgs, lib, options, ... }:
 
 {
   # --- Core Settings ---
@@ -14,6 +14,8 @@
   networking.nameservers = [ "192.168.1.2" "100.100.100.100" ];
   services.resolved = {
     enable = true;
+  } // lib.optionalAttrs (options.services.resolved ? settings) {
+    # settings option only available in newer nixpkgs (not in nixos-raspberrypi's fork)
     settings.Resolve = {
       Domains = [ "~local" ]; # Route .local queries to our DNS
       FallbackDNS = [ "1.1.1.1" "8.8.8.8" ]; # Public fallback when local resolvers fail

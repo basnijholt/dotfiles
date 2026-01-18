@@ -15,10 +15,9 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixos-raspberrypi = {
-      url = "github:nvmd/nixos-raspberrypi/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
+    # its own forked nixpkgs with boot.loader.raspberryPi support
+    nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
   outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
