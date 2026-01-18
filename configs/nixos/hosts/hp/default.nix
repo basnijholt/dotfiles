@@ -11,11 +11,11 @@
     ../../optional/zfs-replication.nix
     ../../optional/nfs-docker.nix
     ../../optional/print-server.nix
+    (import ../../optional/coredns.nix { listenIP = "192.168.1.3"; })
 
     # Host-specific modules (Tier 3)
     ./networking.nix
     ./ups.nix
-    ./coredns.nix # Secondary DNS server (primary: nuc)
   ];
 
   # Allow user to manage printers via web UI

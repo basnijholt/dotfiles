@@ -13,12 +13,12 @@
     ../../optional/nfs-docker.nix
     ../../optional/ups-client.nix
     ../../optional/wake-on-lan.nix
+    (import ../../optional/coredns.nix { listenIP = "192.168.1.2"; })
 
     # Host-specific modules (Tier 3)
     ./networking.nix
     ./system-packages.nix
     ./kodi.nix
-    ./coredns.nix
   ];
 
   # Required for ZFS

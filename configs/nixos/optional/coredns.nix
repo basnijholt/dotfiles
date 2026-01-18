@@ -1,14 +1,31 @@
-# CoreDNS configuration - secondary DNS server
+# CoreDNS configuration - shared DNS zone definitions
 #
 # Primary: nuc (192.168.1.2)
 # Secondary: hp (192.168.1.3)
 #
 # Both serve identical zone files for redundancy.
+#
+# Note: GL.iNet travel routers (OpenWrt) block .local queries by default (rfc6761.conf).
+# To forward .local to CoreDNS:
+# 1. Open LuCI: http://192.168.8.1:8080/cgi-bin/luci/admin/network/dhcp
+#    (requires LuCI enabled via http://192.168.8.1/#/advanced)
+# 2. Add `/local/192.168.1.2` to "DNS forwardings" in CFG01411C section, Save & Apply
+# 3. WGCLIENT1 (port 2153) config is recreated on interface up, so create hotplug script:
+#      cat > /etc/hotplug.d/iface/99-local-dns << 'EOF'
+#      #!/bin/sh
+#      [ "$ACTION" = "ifup" ] && [ "$INTERFACE" = "wgclient1" ] && {
+#          uci add_list dhcp.wgclient1.server='/local/192.168.1.2'
+#          uci commit dhcp
+#          /etc/init.d/dnsmasq restart
+#      }
+#      EOF
+#
+# Test: dig @192.168.1.2 nuc.local +short  (should return 192.168.1.2)
+{ listenIP }:
+
 { pkgs, lib, ... }:
 
 let
-  # IP address for this DNS server
-  listenIP = "192.168.1.3";
   wildcardIP = "192.168.1.6";
 
   localZone = pkgs.writeText "local.zone" ''
@@ -88,14 +105,23 @@ in
     allowedUDPPorts = [ 53 ];
   };
 
-  # Ensure CoreDNS waits for network and restarts reliably
+  # Ensure CoreDNS waits for network and bridge
   systemd.services.coredns = {
-    after = [ "network-online.target" ];
+    after = [ "network-online.target" "sys-subsystem-net-devices-br0.device" ];
     wants = [ "network-online.target" ];
     serviceConfig = {
       Restart = lib.mkForce "always";
       RestartSec = "5s";
+      # Keep retrying indefinitely - DNS is critical
       StartLimitIntervalSec = 0;
     };
   };
+
+  # Route to WireGuard subnet via ASUS router for DNS responses to reach VPN clients
+  systemd.network.networks."40-br0".routes = [
+    {
+      Destination = "10.6.0.0/24";
+      Gateway = "192.168.1.1";
+    }
+  ];
 }
