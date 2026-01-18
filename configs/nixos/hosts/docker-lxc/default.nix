@@ -14,8 +14,7 @@
   hardware.graphics.enable = true;
   services.syncthing.enable = lib.mkForce false;
 
-  # Enable resolved for .local DNS resolution (overrides dev-lxc's mkForce false)
-  # Also disable useHostResolvConf which conflicts with resolved
+  # Enable resolved for .local DNS (requires disabling useHostResolvConf in LXC)
   services.resolved.enable = lib.mkOverride 40 true;
   networking.useHostResolvConf = lib.mkForce false;
   virtualisation.docker.daemon.settings.dns = lib.mkForce ["192.168.1.2" "192.168.1.3" "1.1.1.1"];
