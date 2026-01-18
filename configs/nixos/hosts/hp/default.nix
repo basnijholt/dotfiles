@@ -15,6 +15,7 @@
     # Host-specific modules (Tier 3)
     ./networking.nix
     ./ups.nix
+    ./coredns.nix # Secondary DNS server (primary: nuc)
   ];
 
   # Allow user to manage printers via web UI

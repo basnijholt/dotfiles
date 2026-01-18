@@ -11,7 +11,8 @@
   boot.kernel.sysctl."kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
 
   # --- DNS Resolver Defaults ---
-  networking.nameservers = [ "192.168.1.2" "100.100.100.100" ];
+  # Primary: nuc (192.168.1.2), Secondary: hp (192.168.1.3), Fallback: Tailscale
+  networking.nameservers = [ "192.168.1.2" "192.168.1.3" "100.100.100.100" ];
   services.resolved = {
     enable = true;
   } // lib.optionalAttrs (options.services.resolved ? settings) {

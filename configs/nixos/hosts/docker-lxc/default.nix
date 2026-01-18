@@ -13,5 +13,5 @@
   networking.firewall.allowedTCPPorts = [ 9001 ];
   hardware.graphics.enable = true;
   services.syncthing.enable = lib.mkForce false;
-  virtualisation.docker.daemon.settings.dns = lib.mkForce ["192.168.1.2" "1.1.1.1" "1.0.0.1"];
+  virtualisation.docker.daemon.settings.dns = lib.mkForce ["192.168.1.2" "192.168.1.3" "1.1.1.1"];
 }
