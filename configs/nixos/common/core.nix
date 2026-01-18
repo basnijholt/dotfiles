@@ -1,5 +1,5 @@
 # Core system settings shared by all hosts
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   # --- Core Settings ---
@@ -9,9 +9,6 @@
   # --- System Compatibility ---
   programs.nix-ld.enable = true; # Run non-nix executables (e.g., micromamba)
   boot.kernel.sysctl."kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
-
-  # --- Disable wpa_supplicant (not needed except pi4 which uses WiFi) ---
-  networking.wireless.enable = lib.mkDefault false;
 
   # --- DNS Resolver Defaults ---
   networking.nameservers = [ "192.168.1.2" "100.100.100.100" ];

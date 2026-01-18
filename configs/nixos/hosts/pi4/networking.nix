@@ -4,7 +4,6 @@
 {
   networking.hostName = "pi4";
   networking.networkmanager.enable = true;
-  networking.wireless.enable = true; # Pi4 uses WiFi
   networking.nftables.enable = true;
   networking.firewall.enable = true;
 
