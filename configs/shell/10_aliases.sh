@@ -30,7 +30,7 @@ if [[ $- == *i* ]]; then
     alias vcl='CLAUDE_CODE_USE_VERTEX=1 ANTHROPIC_MODEL="claude-opus-4-5" ANTHROPIC_SMALL_FAST_MODEL="claude-haiku-4-5" claude --dangerously-skip-permissions '
     alias co='coder --dangerously-bypass-approvals-and-sandbox '
     alias ge='gemini --yolo --model gemini-3-pro-preview'
-    alias ze='zellij attach --create'
+    alias ze='zellij attach --create $(hostname)'
     alias killagent="pkill -9 -f '[a]gent-cli'"
     alias y='yazi '
 
