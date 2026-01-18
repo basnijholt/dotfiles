@@ -41,6 +41,10 @@
     "https://nix-community.cachix.org"
   ];
 
+  # Limit build parallelism to prevent OOM on small VPS
+  nix.settings.max-jobs = 1;
+  nix.settings.cores = 1;
+
   # Zram swap - compressed RAM swap for builds (ZFS doesn't support swapfiles well)
   zramSwap = {
     enable = true;
