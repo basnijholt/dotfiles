@@ -9,7 +9,6 @@
     ../../optional/gui-packages.nix
     ../../optional/large-packages.nix
     ../../optional/power.nix
-    ../../optional/iscsi.nix
     ../../optional/zfs-replication.nix
     ../../optional/nfs-docker.nix
     ../../optional/ups-client.nix
