@@ -13,5 +13,8 @@
   networking.firewall.allowedTCPPorts = [ 9001 ];
   hardware.graphics.enable = true;
   services.syncthing.enable = lib.mkForce false;
+
+  # Re-enable resolved for .local DNS resolution (overrides dev-lxc's mkForce false)
+  services.resolved.enable = lib.mkOverride 40 true;
   virtualisation.docker.daemon.settings.dns = lib.mkForce ["192.168.1.2" "192.168.1.3" "1.1.1.1"];
 }

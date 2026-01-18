@@ -18,7 +18,7 @@
   } // lib.optionalAttrs (options.services.resolved ? settings) {
     # settings option only available in newer nixpkgs (not in nixos-raspberrypi's fork)
     settings.Resolve = {
-      Domains = [ "~local" ]; # Route .local queries to our DNS
+      Domains = [ "~local" "~lab.nijho.lt" ]; # Route local zones to our DNS
       FallbackDNS = [ "1.1.1.1" "8.8.8.8" ]; # Public fallback when local resolvers fail
     };
   };
