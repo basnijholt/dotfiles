@@ -126,10 +126,9 @@
           ./hosts/docker-lxc/default.nix
         ];
 
-        # Nix cache server VM for Incus - builds and caches NixOS configurations
+        # Nix cache server LXC for Incus - builds and caches NixOS configurations
         nix-cache = mkHost [
           ./hosts/nix-cache/default.nix
-          ./hosts/nix-cache/hardware-configuration.nix
         ];
 
         # Hetzner Cloud VPS (ARM) - minimal Docker Compose host for websites
