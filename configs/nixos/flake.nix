@@ -118,7 +118,7 @@
         # Lightweight development LXC container for Incus
         dev-lxc = mkHost [
           ./hosts/dev-lxc/default.nix
-          ./hosts/dev-lxc/hardware-configuration.nix
+          ./optional/lxc-container.nix
         ];
 
         # Docker-focused LXC container for Incus
