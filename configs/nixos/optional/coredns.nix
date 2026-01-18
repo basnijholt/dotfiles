@@ -25,46 +25,7 @@
 
 let
   cfg = config.local.coredns;
-
-  # Wildcard IP for *.local, *.lab.nijho.lt, *.lab.mindroom.chat
   wildcardIP = "192.168.1.6";
-
-  # DNS zone records - single source of truth
-  dnsRecords = {
-    nuc = "192.168.1.2";
-    hp = "192.168.1.3";
-    truenas = "192.168.1.4";
-    pc = "192.168.1.5";
-    docker = "192.168.1.6";
-    docker-truenas = "192.168.1.6";
-    pi4 = "192.168.1.7";
-    pi3 = "192.168.1.8";
-    vacuum = "192.168.1.10";
-    tv = "192.168.1.11";
-    leo = "192.168.1.12";
-    tom = "192.168.1.13";
-    switch = "192.168.1.14";
-    meshcentral = "192.168.1.15";
-    debian-truenas = "192.168.1.62";
-    nix-cache = "192.168.1.145";
-    printer = "192.168.1.234";
-  };
-
-  # CNAME records
-  cnameRecords = {
-    traefik = "docker";
-    dns = "nuc";
-  };
-
-  # Generate A records from the dnsRecords attrset
-  aRecordLines = lib.concatStringsSep "\n" (
-    lib.mapAttrsToList (name: ip: "    ${name}${lib.fixedWidthString (16 - lib.stringLength name) " " ""}3600  IN  A     ${ip}") dnsRecords
-  );
-
-  # Generate CNAME records
-  cnameRecordLines = lib.concatStringsSep "\n" (
-    lib.mapAttrsToList (name: target: "    ${name}${lib.fixedWidthString (16 - lib.stringLength name) " " ""}3600  IN  CNAME ${target}") cnameRecords
-  );
 
   localZone = pkgs.writeText "local.zone" ''
     $ORIGIN local.
@@ -72,8 +33,25 @@ let
     @               3600  IN  NS    ns
     ns              3600  IN  A     ${cfg.listenIP}
     *               3600  IN  A     ${wildcardIP}
-${aRecordLines}
-${cnameRecordLines}
+    nuc             3600  IN  A     192.168.1.2
+    hp              3600  IN  A     192.168.1.3
+    truenas         3600  IN  A     192.168.1.4
+    pc              3600  IN  A     192.168.1.5
+    docker          3600  IN  A     192.168.1.6
+    docker-truenas  3600  IN  A     192.168.1.6
+    pi4             3600  IN  A     192.168.1.7
+    pi3             3600  IN  A     192.168.1.8
+    vacuum          3600  IN  A     192.168.1.10
+    tv              3600  IN  A     192.168.1.11
+    leo             3600  IN  A     192.168.1.12
+    tom             3600  IN  A     192.168.1.13
+    switch          3600  IN  A     192.168.1.14
+    meshcentral     3600  IN  A     192.168.1.15
+    printer         3600  IN  A     192.168.1.234
+    debian-truenas  3600  IN  A     192.168.1.62
+    nix-cache       3600  IN  A     192.168.1.145
+    traefik         3600  IN  CNAME docker
+    dns             3600  IN  CNAME nuc
   '';
 
   labNijholtZone = pkgs.writeText "lab.nijho.lt.zone" ''
