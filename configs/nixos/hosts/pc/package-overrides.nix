@@ -6,15 +6,18 @@
   nixpkgs.config = {
     cudaSupport = true;
     packageOverrides = pkgs: {
-      ollama = pkgs.ollama.overrideAttrs (oldAttrs: rec {
-        version = "0.13.3";
+      ollama = (pkgs.ollama.override {
+        # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
+        cudaArches = [ "sm_86" ];
+      }).overrideAttrs (oldAttrs: rec {
+        version = "0.14.2";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-DsAgosnvkyGFPKSjjnE9dZ37CfqAIlvodpVjHLihX2A=";
+          hash = "sha256-NDtXMRpglUG0XhkTJrd90kv1utpxXGNppMHOG3Zmt54=";
         };
-        vendorHash = "sha256-rKRRcwmon/3K2bN7iQaMap5yNYKMCZ7P0M1C2hv4IlQ=";
+        vendorHash = "sha256-WdHAjCD20eLj0d9v1K6VYP8vJ+IZ8BEZ3CciYLLMtxc=";
         postFixup = pkgs.lib.replaceStrings [
           ''mv "$out/bin/app" "$out/bin/.ollama-app"''
         ] [
@@ -35,12 +38,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "7687";
+            version = "7770";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-OMFwWzdXNl82Q6mB4fWf2xb5qQHzpCEKGeZCO27hcXA=";
+              hash = "sha256-wzhtPSGc2Ay1UnzzN8wrCfOSnaa9vAXl8wVwvCMcGRg=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -70,8 +73,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v183/llama-swap_183_linux_amd64.tar.gz";
-            hash = "sha256-wC571PepcfO6ZDV1Zdi6s+th1Tn90H06eyLPOqax9Y0=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v185/llama-swap_185_linux_amd64.tar.gz";
+            hash = "sha256-5tDHNVz2XZItX2mSs9QBo2BANgYao+fd8oWW7AS8rso=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
