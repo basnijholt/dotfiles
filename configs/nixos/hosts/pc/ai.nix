@@ -458,26 +458,17 @@
   };
 
   # --- Wyoming Faster Whisper ---
-  services.wyoming.faster-whisper = {
-    servers.english = {
-      enable = true;
-      model = "large-v3-turbo";
-      language = "en";
-      device = "cuda";
-      uri = "tcp://0.0.0.0:10300";
-    };
-    servers.dutch = {
-      enable = false;
-      model = "large-v3-turbo";
-      language = "nl";
-      device = "cuda";
-      uri = "tcp://0.0.0.0:10301";
-    };
+  services.wyoming.faster-whisper.servers.main = {
+    enable = true;
+    model = "large-v3-turbo";
+    language = "auto";
+    device = "cuda";
+    uri = "tcp://0.0.0.0:10300";
   };
 
   # --- Wyoming Faster Whisper Hardening ---
   # Auto-restart on failure (including OOM kills)
-  systemd.services.wyoming-faster-whisper-english = {
+  systemd.services.wyoming-faster-whisper-main = {
     serviceConfig = {
       Restart = "on-failure";
       RestartSec = 10;
