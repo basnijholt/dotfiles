@@ -11,11 +11,11 @@
     ../../optional/zfs-replication.nix
     ../../optional/nfs-docker.nix
     ../../optional/print-server.nix
+    ../../optional/coredns.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
     ./ups.nix
-    ./coredns.nix # Secondary DNS server (primary: nuc)
   ];
 
   # Allow user to manage printers via web UI
@@ -23,4 +23,10 @@
 
   # Required for ZFS
   networking.hostId = "37a1d4a7";
+
+  # Secondary DNS server (primary: nuc)
+  local.coredns = {
+    enable = true;
+    listenIP = "192.168.1.3";
+  };
 }
