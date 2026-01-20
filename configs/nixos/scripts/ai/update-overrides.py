@@ -36,7 +36,7 @@ PACKAGES = [
         repo="ollama",
         tag_prefix="v",
         version_pattern=re.compile(
-            r'(ollama\s*=\s*pkgs\.ollama\.overrideAttrs\s*\(oldAttrs:\s*rec\s*\{\s*version\s*=\s*")(\d+\.\d+\.\d+)(";)',
+            r'(ollama\s*=\s*\(pkgs\.ollama\.override\s*\{[^}]*\}\)\.overrideAttrs\s*\(oldAttrs:\s*rec\s*\{\s*version\s*=\s*")(\d+\.\d+\.\d+)(";)',
             re.DOTALL,
         ),
         semver=True,
