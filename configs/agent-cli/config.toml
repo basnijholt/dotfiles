@@ -11,6 +11,7 @@ openai-base-url = "http://100.64.0.26:9292/v1"
 
 # Other
 asr-wyoming-ip = "localhost"
+# asr-wyoming-port = 10302
 tts-wyoming-ip = "100.64.0.26"
 tts-kokoro-host = "http://100.64.0.26:8880/v1"
 tts-kokoro-voice = "af_bella(1)+af_nicole(1.5)"
@@ -23,11 +24,12 @@ embedding-model = "embeddinggemma:300m"
 
 [transcribe]
 extra-instructions = """
+The speaker is Bas Nijholt (pronounced "boss nigh-holt").
+Proper nouns: Bas Nijholt, pipefunc, agent-cli, IonQ, Claude Code.
 Assume the user is often discussing Python programming.
 Use backticks for variable names, function names, and other code elements.
 Follow PEP8: use `snake_case` for variables, functions, and package names; `CamelCase` for classes.
-Other frequent words are `pipefunc` (a Python package), agent-cli (a Python package), IonQ (a quantum computing company), trapped-ion quantum computer, `pre-commit`, `pytest`, `ruff`, `unidep`, Claude Code.
-My name is Bas Nijholt.
+Other frequent words are `pipefunc` (a Python package), agent-cli (a Python package), IonQ (a quantum computing company), trapped-ion quantum computer, `pre-commit`, `pytest`, `ruff`, `unidep`.
 """
 transcription-log = "~/transcription.log"
 
