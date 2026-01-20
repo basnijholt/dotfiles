@@ -7,22 +7,28 @@
 # Private submodule with secrets
 secrets
 
-# -----------------------------
-# Irrelevant configs/scripts
-# -----------------------------
-configs/nixos
-configs/agent-cli/config.toml
-scripts/rclone.sh
-scripts/rsync-time-machine.sh
-scripts/sync-photos-to-truenas.sh
-scripts/signature.html
-submodules/rsync-time-backup
-scripts/rpi
 .cursorignore
-
-# -----------------------------
-# Mac-only or very personal
-# -----------------------------
+.github
+.gitignore
+configs/agent-cli/config.toml
+configs/atuin/zfs
+configs/hypr
+configs/hyprpanel
 configs/karabiner
-scripts/eqMac.sh
-scripts/eqMac.py
+configs/keyboard-maestro
+configs/mako
+configs/nix-darwin
+configs/nixos
+configs/syncthing
+scripts/rclone.sh
+scripts/rpi
+scripts/rsync-time-machine.sh
+scripts/signature.html
+scripts/sync-dotfiles.sh
+scripts/sync-photos-to-truenas.sh
+scripts/zfs-encrypt-migrate.py
+submodules/dotbins
+submodules/mechabar
+submodules/rsync-time-backup
+submodules/syncthing-resolve-conflicts
+submodules/truenas-zfs-unlock
