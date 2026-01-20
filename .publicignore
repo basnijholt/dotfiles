@@ -29,7 +29,6 @@ scripts/sync-dotfiles.sh
 scripts/sync-photos-to-truenas.sh
 scripts/zfs-encrypt-migrate.py
 submodules/dotbins
-submodules/mechabar
 submodules/rsync-time-backup
 submodules/syncthing-resolve-conflicts
 submodules/truenas-zfs-unlock
