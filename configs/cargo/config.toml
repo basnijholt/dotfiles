@@ -1,2 +1,2 @@
 [build]
-rustc-wrapper = "sccache"
+rustc-wrapper = "rustc-wrapper"
