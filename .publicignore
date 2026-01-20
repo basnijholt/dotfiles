@@ -19,6 +19,7 @@ configs/keyboard-maestro
 configs/mako
 configs/nix-darwin
 configs/nixos
+configs/skhd
 configs/syncthing
 scripts/rclone.sh
 scripts/rpi
