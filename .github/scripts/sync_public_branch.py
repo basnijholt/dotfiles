@@ -60,7 +60,7 @@ def main() -> int:
         # Try to deinit in case it is a submodule; ignore errors
         run(["git", "submodule", "deinit", "-f", "--", rel], check=False)
         # Remove and stage changes (this updates .gitmodules for submodules)
-        run(["git", "rm", "-f", "--", rel], check=False)
+        run(["git", "rm", "-fr", "--", rel], check=False)
 
     # 2) Replace personal gitconfig with example
     example = repo_root / "configs/git/gitconfig-personal.example"
