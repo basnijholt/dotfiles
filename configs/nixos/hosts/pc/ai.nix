@@ -459,7 +459,7 @@
 
   # --- Wyoming Faster Whisper ---
   services.wyoming.faster-whisper.servers.main = {
-    enable = true;
+    enable = false; # Temporarily disabled
     model = "large-v3-turbo";
     language = "auto";
     device = "cuda";
@@ -480,7 +480,7 @@
 
   # --- Wyoming Piper TTS ---
   services.wyoming.piper.servers.yoda = {
-    enable = true;
+    enable = false; # Temporarily disabled
     voice = "en-us-ryan-high";
     uri = "tcp://0.0.0.0:10200";
     useCUDA = true;
@@ -488,7 +488,7 @@
 
   # --- Wyoming OpenWakeWord ---
   services.wyoming.openwakeword = {
-    enable = true;
+    enable = false; # Temporarily disabled
     uri = "tcp://0.0.0.0:10400";
   };
 
