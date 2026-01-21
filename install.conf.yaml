@@ -36,7 +36,6 @@
     ~/.gitconfig-personal: configs/git/gitconfig-personal
     ~/.gitconfig: configs/git/gitconfig
     ~/.local/bin/git-fixup-file: scripts/git-fixup-file.sh
-    ~/.local/bin/nbviewer: scripts/nbviewer.sh
     ~/.local/bin/pypi-sha256: scripts/pypi-sha256.sh
     ~/.nanorc: configs/nano/nanorc
     ~/.cargo/config.toml: configs/cargo/config.toml
@@ -48,7 +47,6 @@
     ~/.local/bin/sync-bun: scripts/sync-bun.sh
     ~/.local/bin/sync-submodules: scripts/sync-submodules.sh
     ~/.local/bin/sync-uv: scripts/sync-uv.sh
-    ~/.local/bin/upload-file: scripts/upload-file.sh
     ~/.local/bin/zellij-rename-tabs: scripts/zellij-rename-tabs.py
     ~/.mambarc: configs/mamba/mambarc
     ~/.oh-my-zsh: submodules/oh-my-zsh
