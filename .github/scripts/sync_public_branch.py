@@ -5,10 +5,12 @@ Steps:
  1) Checkout/reset PUBLIC_BRANCH from origin/BASE_BRANCH
  2) Remove exact paths listed in .publicignore (no globs)
  3) Replace configs/git/gitconfig-personal with example
- 4) Commit and force-push PUBLIC_BRANCH (auto in CI; locally with PUSH=1)
+ 4) Convert submodule SSH URLs to HTTPS for public access
+ 5) Commit and force-push PUBLIC_BRANCH (auto in CI; locally with PUSH=1)
 """
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -104,6 +106,19 @@ def main() -> int:
 
     if new_lines != lines:
         install_conf.write_text("\n".join(new_lines) + "\n")
+
+    # 2c) Convert submodule SSH URLs to HTTPS for public access
+    gitmodules = repo_root / ".gitmodules"
+    if gitmodules.exists():
+        log("Converting submodule URLs from SSH to HTTPS")
+        content = gitmodules.read_text()
+        # Convert git@github.com:user/repo.git to https://github.com/user/repo.git
+        content = re.sub(
+            r"url = git@github\.com:(.+?)\.git",
+            r"url = https://github.com/\1.git",
+            content,
+        )
+        gitmodules.write_text(content)
 
     # 3) Commit and push if there are changes
     run(["git", "add", "-A"]) 
