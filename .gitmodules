@@ -33,6 +33,3 @@
 [submodule "submodules/tmux"]
 	path = submodules/tmux
 	url = https://github.com/gpakosz/.tmux.git
-[submodule "submodules/mechabar"]
-	path = submodules/mechabar
-	url = git@github.com:sejjy/mechabar.git
