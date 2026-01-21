@@ -47,7 +47,7 @@
     ~/.local/bin/sync-local-dotfiles: scripts/sync-local-dotfiles.sh
     ~/.local/bin/sync-bun: scripts/sync-bun.sh
     ~/.local/bin/sync-submodules: scripts/sync-submodules.sh
-    ~/.local/bin/sync-uv-tools: scripts/sync-uv-tools.sh
+    ~/.local/bin/sync-uv: scripts/sync-uv.sh
     ~/.local/bin/upload-file: scripts/upload-file.sh
     ~/.local/bin/zellij-rename-tabs: scripts/zellij-rename-tabs.py
     ~/.mambarc: configs/mamba/mambarc
@@ -58,7 +58,8 @@
     ~/dotfiles/submodules/oh-my-zsh/themes/mytheme.zsh-theme: configs/zsh/mytheme.zsh-theme
 
 - shell:
-  - bash scripts/sync-uv-tools.sh
+  - bash scripts/sync-uv.sh
+  - bash scripts/sync-bun.sh
   - git submodule update --init --recursive
   - command: '[[ "$(uname)" = "Darwin" ]] && [ -f ./secrets/install ] && (echo "SECRETS" && ./secrets/install) || true'
     stdout: true

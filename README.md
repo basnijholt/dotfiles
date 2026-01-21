@@ -342,7 +342,7 @@ scripts
 ├── sync-local-dotfiles.sh        # On a host: pull latest and optionally run ./install
 ├── sync-photos-to-truenas.sh     # Sync photos to TrueNAS server
 ├── sync-submodules.sh
-├── sync-uv-tools.sh              # Globally install uv tools I frequently use
+├── sync-uv.sh              # Globally install uv tools I frequently use
 ├── transcribe.py                 # Stream mic audio to a Wyoming ASR server (clipboard optional)
 ├── upload-file.sh                # Upload files to various paste/file hosts
 ├── voice_clipboard_assistant.py  # Voice command assistant for clipboard text via Ollama
