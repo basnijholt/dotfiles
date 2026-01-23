@@ -33,7 +33,9 @@ def run(args, *, check=True, capture=False):
 
 
 def main() -> int:
-    repo_root = Path(run(["git", "rev-parse", "--show-toplevel"], capture=True).stdout.strip())
+    repo_root = Path(
+        run(["git", "rev-parse", "--show-toplevel"], capture=True).stdout.strip()
+    )
     os.chdir(repo_root)
 
     base = os.getenv("BASE_BRANCH", "main")
@@ -41,7 +43,9 @@ def main() -> int:
 
     # Make sure we have the latest origin state
     run(["git", "fetch", "--prune", "origin"], check=False)
-    short_sha = run(["git", "rev-parse", "--short", f"origin/{base}"], capture=True).stdout.strip()
+    short_sha = run(
+        ["git", "rev-parse", "--short", f"origin/{base}"], capture=True
+    ).stdout.strip()
 
     log(f"Base branch:    {base}")
     log(f"Public branch: {public}")
@@ -87,7 +91,9 @@ def main() -> int:
         if ":" not in line:
             return False
         src = line.split(":", 1)[1].strip()
-        if (src.startswith('"') and src.endswith('"')) or (src.startswith("'") and src.endswith("'")):
+        if (src.startswith('"') and src.endswith('"')) or (
+            src.startswith("'") and src.endswith("'")
+        ):
             src = src[1:-1]
         return any(src == p or src.startswith(p + "/") for p in ignore_paths)
 
@@ -127,31 +133,39 @@ def main() -> int:
     if bootstrap.exists():
         log(f"Pinning bootstrap.sh to commit {full_sha}")
         content = bootstrap.read_text()
+        marker = '"$DOTFILES_REPO" "$DOTFILES_DIR"'
+        if marker not in content:
+            raise RuntimeError(f"Could not find '{marker}' in bootstrap.sh")
         # Add checkout of specific commit after clone
         content = content.replace(
-            '"$DOTFILES_REPO" "$DOTFILES_DIR"',
-            '"$DOTFILES_REPO" "$DOTFILES_DIR"\n'
+            marker,
+            f"{marker}\n"
             f'git -C "$DOTFILES_DIR" fetch --depth=1 origin {full_sha} && '
             'git -C "$DOTFILES_DIR" checkout FETCH_HEAD',
         )
         bootstrap.write_text(content)
 
     # 3) Commit and push if there are changes
-    run(["git", "add", "-A"]) 
+    run(["git", "add", "-A"])
     status = run(["git", "status", "--porcelain"], capture=True).stdout.strip()
     if not status:
         log("No changes after sanitization. Skipping commit/push.")
         return 0
 
     run([
-        "git", "-c", "user.name=github-actions[bot]",
-        "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
-        "commit", "-m", f"chore(public): sync from {base} {short_sha} and sanitize",
+        "git",
+        "-c",
+        "user.name=github-actions[bot]",
+        "-c",
+        "user.email=41898282+github-actions[bot]@users.noreply.github.com",
+        "commit",
+        "-m",
+        f"chore(public): sync from {base} {short_sha} and sanitize",
     ])
 
     if os.getenv("CI") == "true" or os.getenv("PUSH") == "1":
         log(f"Pushing {public} to origin (force)")
-        run(["git", "push", "origin", public, "--force"]) 
+        run(["git", "push", "origin", public, "--force"])
     else:
         log("Local run detected and PUSH!=1; not pushing. Use PUSH=1 to push.")
 
