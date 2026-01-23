@@ -94,6 +94,7 @@ git clone --depth=1 --branch "$DOTFILES_BRANCH" --single-branch "$DOTFILES_REPO"
 log "Initializing submodules..."
 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8 ||
   git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 || true
+unset GIT_LFS_SKIP_SMUDGE
 
 # --- Fetch platform-specific binaries ---
 if [[ -n "$DOTBINS_ARCH" ]]; then
