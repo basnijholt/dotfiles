@@ -86,16 +86,14 @@ fi
 # --- Clone and setup ---
 log "Initializing Git LFS..."
 git lfs install || true
+export GIT_LFS_SKIP_SMUDGE=1
 
 log "Cloning dotfiles ($DOTFILES_BRANCH) into $DOTFILES_DIR..."
-GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --branch "$DOTFILES_BRANCH" --single-branch \
-  "$DOTFILES_REPO" "$DOTFILES_DIR"
+git clone --depth=1 --branch "$DOTFILES_BRANCH" --single-branch "$DOTFILES_REPO" "$DOTFILES_DIR"
 
 log "Initializing submodules..."
-GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8 || {
-  log "Warning: Some submodules failed. Retrying sequentially..."
-  GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 || true
-}
+git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 --jobs 8 ||
+  git -C "$DOTFILES_DIR" submodule update --init --recursive --depth=1 || true
 
 # --- Fetch platform-specific binaries ---
 if [[ -n "$DOTBINS_ARCH" ]]; then

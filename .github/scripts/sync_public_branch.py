@@ -135,12 +135,11 @@ def main() -> int:
         content = bootstrap.read_text()
         # Replace entire clone block with init+fetch of specific commit
         old_clone = '''log "Cloning dotfiles ($DOTFILES_BRANCH) into $DOTFILES_DIR..."
-GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --branch "$DOTFILES_BRANCH" --single-branch \\
-  "$DOTFILES_REPO" "$DOTFILES_DIR"'''
+git clone --depth=1 --branch "$DOTFILES_BRANCH" --single-branch "$DOTFILES_REPO" "$DOTFILES_DIR"'''
         new_clone = f'''log "Cloning dotfiles (commit {full_sha}) into $DOTFILES_DIR..."
 git init "$DOTFILES_DIR"
 git -C "$DOTFILES_DIR" remote add origin "$DOTFILES_REPO"
-GIT_LFS_SKIP_SMUDGE=1 git -C "$DOTFILES_DIR" fetch --depth=1 origin {full_sha}
+git -C "$DOTFILES_DIR" fetch --depth=1 origin {full_sha}
 git -C "$DOTFILES_DIR" checkout FETCH_HEAD'''
         if old_clone not in content:
             raise RuntimeError("Could not find clone block in bootstrap.sh")
