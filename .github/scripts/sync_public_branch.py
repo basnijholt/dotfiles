@@ -6,7 +6,8 @@ Steps:
  2) Remove exact paths listed in .publicignore (no globs)
  3) Replace configs/git/gitconfig-personal with example
  4) Convert submodule SSH URLs to HTTPS for public access
- 5) Commit and force-push PUBLIC_BRANCH (auto in CI; locally with PUSH=1)
+ 5) Pin bootstrap.sh to exact commit SHA for security
+ 6) Commit and force-push PUBLIC_BRANCH (auto in CI; locally with PUSH=1)
 """
 
 import os
@@ -119,6 +120,21 @@ def main() -> int:
             content,
         )
         gitmodules.write_text(content)
+
+    # 2d) Pin bootstrap.sh to exact commit SHA for security
+    full_sha = run(["git", "rev-parse", f"origin/{base}"], capture=True).stdout.strip()
+    bootstrap = repo_root / "scripts/bootstrap.sh"
+    if bootstrap.exists():
+        log(f"Pinning bootstrap.sh to commit {full_sha}")
+        content = bootstrap.read_text()
+        # Add checkout of specific commit after clone
+        content = content.replace(
+            '"$DOTFILES_REPO" "$DOTFILES_DIR"',
+            '"$DOTFILES_REPO" "$DOTFILES_DIR"\n'
+            f'git -C "$DOTFILES_DIR" fetch --depth=1 origin {full_sha} && '
+            'git -C "$DOTFILES_DIR" checkout FETCH_HEAD',
+        )
+        bootstrap.write_text(content)
 
     # 3) Commit and push if there are changes
     run(["git", "add", "-A"]) 
