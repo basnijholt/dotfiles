@@ -1,4 +1,5 @@
 # Agent CLI server daemon (PC-only)
+# Disabled: migrated to Docker in /opt/stacks/agent-cli
 { config, pkgs, ... }:
 
 let
@@ -6,6 +7,7 @@ let
 in
 {
   systemd.user.services."uvx-agent-cli" = {
+    enable = false;
     description = "uvx agent-cli server";
     wantedBy = [ "default.target" ];
     path = [ pkgs.ffmpeg pkgs.uv ];
