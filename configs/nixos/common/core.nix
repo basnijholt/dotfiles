@@ -8,6 +8,10 @@
 
   # --- System Compatibility ---
   programs.nix-ld.enable = true; # Run non-nix executables (e.g., micromamba)
+  programs.nix-ld.libraries = with pkgs; [
+    portaudio # Required for agent-cli transcribe (sounddevice Python package)
+  ];
+
   boot.kernel.sysctl."kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
 
   # --- DNS Resolver Defaults ---
