@@ -12,7 +12,16 @@
     portaudio # Required for agent-cli transcribe (sounddevice Python package)
   ];
 
-  boot.kernel.sysctl."kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
+  boot.kernel.sysctl = {
+    "kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
+
+    # TCP buffer tuning for high-latency, high-bandwidth connections
+    # Default 208KB is too small for transatlantic links (BDP at 300Mbps/263ms = 10MB)
+    "net.core.rmem_max" = 33554432; # 32MB
+    "net.core.wmem_max" = 33554432; # 32MB
+    "net.ipv4.tcp_rmem" = "4096 131072 33554432"; # min default max
+    "net.ipv4.tcp_wmem" = "4096 16384 33554432"; # min default max
+  };
 
   # --- DNS Resolver Defaults ---
   # Primary: nuc (192.168.1.2), Secondary: hp (192.168.1.3), Fallback: Tailscale
