@@ -12,8 +12,14 @@
     portaudio # Required for agent-cli transcribe (sounddevice Python package)
   ];
 
+  # Enable BBR congestion control - better for modern networks, especially high-latency
+  boot.kernelModules = [ "tcp_bbr" ];
+
   boot.kernel.sysctl = {
     "kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
+
+    # BBR congestion control - doesn't back off aggressively on loss like CUBIC
+    "net.ipv4.tcp_congestion_control" = "bbr";
 
     # TCP buffer tuning for high-latency, high-bandwidth connections
     # Default 208KB is too small for transatlantic links (BDP at 300Mbps/263ms = 10MB)
