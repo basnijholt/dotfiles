@@ -12,7 +12,20 @@
     portaudio # Required for agent-cli transcribe (sounddevice Python package)
   ];
 
-  # Enable BBR congestion control - better for modern networks, especially high-latency
+  # --- TCP Performance Tuning ---
+  # BBR + large buffers: enables 300+ Mbps on high-latency links (vs ~8 Mbps with defaults)
+  # Tested on Seattle <-> Germany (263ms RTT) - went from 2 Mbps to 300 Mbps
+  #
+  # For TrueNAS SCALE (which hosts docker-lxc), apply the same settings via CLI:
+  #   ssh root@truenas.local
+  #   midclt call tunable.create '{"var": "net.ipv4.tcp_congestion_control", "value": "bbr", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.core.default_qdisc", "value": "fq", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.core.rmem_max", "value": "33554432", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.core.wmem_max", "value": "33554432", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.ipv4.tcp_rmem", "value": "4096 131072 33554432", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.ipv4.tcp_wmem", "value": "4096 16384 33554432", "type": "SYSCTL", "enabled": true}'
+  # These persist in TrueNAS UI under System Settings -> Advanced -> Sysctl
+
   boot.kernelModules = [ "tcp_bbr" ];
 
   boot.kernel.sysctl = {
