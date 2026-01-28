@@ -91,8 +91,8 @@ in {
           "--crypt" "aes"
           "--mode" "fast3"
           "--mtu" "1200"  # Must be under Tailscale's 1280 MTU
-          "--sndwnd" "8192"  # Large windows for high-latency links (BDP)
-          "--rcvwnd" "8192"
+          "--sndwnd" "16384"  # Very large windows for 263ms RTT (BDP ~16MB)
+          "--rcvwnd" "16384"
           "--nocomp"
         ];
         description = "Additional kcptun server arguments";
@@ -143,8 +143,8 @@ in {
           "--crypt" "aes"
           "--mode" "fast3"
           "--mtu" "1200"  # Must be under Tailscale's 1280 MTU
-          "--sndwnd" "8192"  # Large windows for high-latency links (BDP)
-          "--rcvwnd" "8192"
+          "--sndwnd" "16384"  # Very large windows for 263ms RTT (BDP ~16MB)
+          "--rcvwnd" "16384"
           "--nocomp"
         ];
         description = "Additional kcptun client arguments";
