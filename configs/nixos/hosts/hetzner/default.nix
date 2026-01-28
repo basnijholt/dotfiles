@@ -8,6 +8,7 @@
   imports = [
     # Optional modules
     ../../optional/zfs-auto-snapshot.nix
+    ../../optional/kcptun.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
@@ -53,4 +54,20 @@
   # Required for ZFS
   networking.hostId = "027a1bbc";
   # ZFS 2.4.0 pin is in hardware-configuration.nix
+
+  # Enable Tailscale for Headscale connection (manually configured)
+  services.tailscale.enable = lib.mkForce true;
+
+  # kcptun client for transatlantic streaming with FEC
+  # Connects to NAS in Seattle via Tailscale, provides FEC tunnel
+  # Local apps connect to localhost:12948, traffic goes through FEC-protected UDP
+  services.kcptun.client = {
+    enable = true;
+    localPort = 12948;                    # Local TCP port for apps to connect
+    remoteHost = "100.64.0.28";           # NAS Tailscale IP (Seattle)
+    remotePort = 29900;                   # kcptun server port
+    key = "transatlantic-fec-tunnel-2026";
+    datashard = 10;                       # Must match server
+    parityshard = 3;                      # Must match server
+  };
 }
