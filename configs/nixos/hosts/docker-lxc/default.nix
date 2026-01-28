@@ -18,7 +18,7 @@
 
   # kcptun server for transatlantic streaming with FEC
   # Provides UDP tunnel with Forward Error Correction to handle packet loss
-  # Client on Hetzner connects here, gets ~80 Mbps vs ~35 Mbps without FEC
+  # Client on Hetzner connects here, gets ~200-300 Mbps vs ~2 Mbps raw TCP
   services.kcptun.server = {
     enable = true;
     listenPort = 29900;           # UDP port for kcptun

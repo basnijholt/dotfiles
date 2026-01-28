@@ -2,8 +2,8 @@
 #
 # This module sets up kcptun for improved transatlantic throughput.
 # It uses Forward Error Correction (FEC) to recover from packet loss,
-# enabling ~80 Mbps usable throughput on links that only support ~35 Mbps
-# with standard TCP due to 10% packet loss.
+# enabling ~200-300 Mbps usable throughput on links where TCP collapses
+# to ~2 Mbps due to high latency (263ms) and packet loss (5-11%).
 #
 # Usage:
 #   services.kcptun.server.enable = true;  # On the media server (Seattle)
@@ -90,7 +90,7 @@ in {
         default = [
           "--crypt" "aes"
           "--mode" "fast3"
-          "--mtu" "1350"
+          "--mtu" "1200"  # Must be under Tailscale's 1280 MTU
           "--sndwnd" "1024"
           "--rcvwnd" "1024"
           "--nocomp"
@@ -142,7 +142,7 @@ in {
         default = [
           "--crypt" "aes"
           "--mode" "fast3"
-          "--mtu" "1350"
+          "--mtu" "1200"  # Must be under Tailscale's 1280 MTU
           "--sndwnd" "1024"
           "--rcvwnd" "1024"
           "--nocomp"
