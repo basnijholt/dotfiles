@@ -75,13 +75,13 @@ in {
       # FEC parameters for lossy networks
       datashard = lib.mkOption {
         type = lib.types.int;
-        default = 10;
+        default = 8;  # Benchmarked: 8+2 is 15% faster than 10+3
         description = "FEC data shards (higher = more data per FEC group)";
       };
 
       parityshard = lib.mkOption {
         type = lib.types.int;
-        default = 3;
+        default = 2;  # Benchmarked: 8+2 gives 125 Mbps vs 108 Mbps for 10+3
         description = "FEC parity shards (higher = more redundancy, more overhead)";
       };
 
@@ -128,13 +128,13 @@ in {
 
       datashard = lib.mkOption {
         type = lib.types.int;
-        default = 10;
+        default = 8;  # Benchmarked: 8+2 is 15% faster than 10+3
         description = "FEC data shards (must match server)";
       };
 
       parityshard = lib.mkOption {
         type = lib.types.int;
-        default = 3;
+        default = 2;  # Benchmarked: 8+2 gives 125 Mbps vs 108 Mbps for 10+3
         description = "FEC parity shards (must match server)";
       };
 
