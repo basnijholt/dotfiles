@@ -94,9 +94,6 @@ in {
           "--sndwnd" "8192"  # Large windows for 263ms RTT - 8192 gave best consistency
           "--rcvwnd" "8192"
           "--sockbuf" "16777217"  # 16MB socket buffer - critical for high latency
-          "--smuxbuf" "16777216"  # 16MB smux buffer for HOLB mitigation
-          "--smuxver" "2"  # Use smux v2 for better performance
-          "--streambuf" "2097152"  # 2MB per-stream buffer limit
           "--nocomp"
         ];
         description = "Additional kcptun server arguments";
@@ -150,9 +147,6 @@ in {
           "--sndwnd" "8192"  # Large windows for 263ms RTT - 8192 gave best consistency
           "--rcvwnd" "8192"
           "--sockbuf" "16777217"  # 16MB socket buffer - critical for high latency
-          "--smuxbuf" "16777216"  # 16MB smux buffer for HOLB mitigation
-          "--smuxver" "2"  # Use smux v2 for better performance
-          "--streambuf" "2097152"  # 2MB per-stream buffer limit
           "--nocomp"
         ];
         description = "Additional kcptun client arguments";
