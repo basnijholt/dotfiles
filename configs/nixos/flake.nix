@@ -139,6 +139,14 @@
           ./hosts/hetzner/hardware-configuration.nix
         ];
 
+        # Paul's Wyse 5070 - gateway to home services via Tailscale
+        paul-wyse = mkHost [
+          disko.nixosModules.disko
+          ./hosts/paul-wyse/disko.nix
+          ./hosts/paul-wyse/default.nix
+          ./hosts/paul-wyse/hardware-configuration.nix
+        ];
+
         # Raspberry Pi 4 - uses nixos-raspberrypi for hardware + ZFS on SSD
         pi4 = mkPi nixos-raspberrypi.nixosModules.raspberry-pi-4.base [
           disko.nixosModules.disko
@@ -169,6 +177,14 @@
             ./installers/iso.nix
           ];
         };
+
+        # Paul's Wyse 5070 installer ISO - boots with install script
+        paul-wyse-installer = lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./installers/paul-wyse-installer.nix
+          ];
+        };
       };
 
       diskoConfigurations = {
@@ -177,6 +193,7 @@
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
         hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
+        paul-wyse = (import ./hosts/paul-wyse/disko.nix) { inherit lib; };
       };
 
     };

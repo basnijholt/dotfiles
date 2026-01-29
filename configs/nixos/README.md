@@ -28,6 +28,8 @@ configs/nixos/
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
 | `hetzner` | Cloud VPS | Minimal Docker Compose host for websites (Hetzner Cloud) |
+| `paul-wyse` | Physical | Gateway to home services via Tailscale (Dell Wyse 5070) |
+| `paul-wyse-installer` | ISO | Installer for Paul's Wyse 5070 with auto-install script |
 | `installer` | ISO | Minimal installer with SSH enabled |
 | `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
 | `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap with WiFi + SSH |
@@ -80,3 +82,33 @@ After deployment, set your password: `ssh basnijholt@<IP>` then `passwd`.
 ## Nix Cache Server Setup (nix-cache)
 
 See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on setting up the cache server container with Harmonia.
+
+## Paul's Wyse 5070 Gateway (paul-wyse)
+
+Gateway to home services via Tailscale. Provides DNS resolution for `*.local` domains and reverse proxies to home network.
+
+**Build installer ISO:**
+
+```bash
+nix build .#nixosConfigurations.paul-wyse-installer.config.system.build.isoImage
+cp result/iso/paul-wyse-installer.iso /tmp/
+```
+
+Flash to USB with `dd` or Ventoy, boot the Wyse 5070, then run:
+
+```bash
+install-paul-wyse
+```
+
+The script handles partitioning (disko), installation, and provides post-install instructions.
+
+**Post-install setup:**
+
+1. Reboot and login as `basnijholt` (password: `nixos`)
+2. Change password: `passwd`
+3. Connect to Tailscale: `sudo tailscale up --login-server https://headscale.nijho.lt`
+4. Point router DNS at this machine's IP
+
+**Services:**
+- CoreDNS: Resolves `*.local` → `127.0.0.1`
+- Caddy: Proxies `media.local` → home server via Tailscale
