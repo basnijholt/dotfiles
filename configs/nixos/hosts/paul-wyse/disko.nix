@@ -6,7 +6,7 @@
 let
   common = (import ../../common/disko-zfs.nix) {
     device = "/dev/mmcblk0";
-    espLabel = "ESP-PAULWYSE";
+    espLabel = "ESP-PWYSE";  # vfat max 11 chars
   };
 in
 {
