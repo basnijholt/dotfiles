@@ -4,6 +4,8 @@
 #   nix build .#nixosConfigurations.paul-wyse-installer.config.system.build.isoImage
 #
 # This creates an ISO that boots with SSH enabled and includes an install script.
+# Requires internet connection for installation.
+#
 # After booting:
 #   1. SSH in: ssh root@<ip>  (or use console, password: nixos)
 #   2. Run: install-paul-wyse
@@ -42,22 +44,15 @@ let
     fi
 
     echo ""
-    echo "=== Step 1/3: Partitioning with disko ==="
+    echo "=== Step 1/2: Partitioning with disko ==="
     nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- \
       --mode destroy,format,mount --yes-wipe-all-disks \
-      --flake github:basnijholt/dotfiles/paul-wyse-host?dir=configs/nixos#paul-wyse
+      --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
 
     echo ""
-    echo "=== Step 2/3: Generating hardware config ==="
-    # Generate and capture actual hardware config
-    nixos-generate-config --root /mnt --show-hardware-config > /tmp/hw-config.nix
-    echo "Hardware config generated. Key modules detected:"
-    grep -E "availableKernelModules|kernelModules" /tmp/hw-config.nix || true
-
-    echo ""
-    echo "=== Step 3/3: Installing NixOS ==="
+    echo "=== Step 2/2: Installing NixOS ==="
     nixos-install --root /mnt --no-root-passwd \
-      --flake github:basnijholt/dotfiles/paul-wyse-host?dir=configs/nixos#paul-wyse
+      --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
 
     echo ""
     echo "=== Installation complete! ==="
@@ -86,8 +81,6 @@ in
     git
     vim
     htop
-    parted
-    gptfdisk
   ];
 
   # SSH access
@@ -112,6 +105,8 @@ in
     To install, run:  install-paul-wyse
 
     Or SSH in:  ssh root@<this-ip>  (password: nixos)
+
+    NOTE: Requires internet connection.
 
   '';
 
