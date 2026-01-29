@@ -147,6 +147,14 @@
           ./hosts/paul-wyse/hardware-configuration.nix
         ];
 
+        # Incus VM version of paul-wyse for testing
+        paul-wyse-incus = mkHost [
+          disko.nixosModules.disko
+          ./hosts/paul-wyse/disko.nix
+          ./hosts/paul-wyse/default.nix
+          ./hosts/paul-wyse/incus-overrides.nix
+        ];
+
         # Raspberry Pi 4 - uses nixos-raspberrypi for hardware + ZFS on SSD
         pi4 = mkPi nixos-raspberrypi.nixosModules.raspberry-pi-4.base [
           disko.nixosModules.disko
