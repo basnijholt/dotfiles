@@ -85,30 +85,4 @@ See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on
 
 ## Paul's Wyse 5070 Gateway (paul-wyse)
 
-Gateway to home services via Tailscale. Provides DNS resolution for `*.local` domains and reverse proxies to home network.
-
-**Build installer ISO:**
-
-```bash
-nix build .#nixosConfigurations.paul-wyse-installer.config.system.build.isoImage
-cp result/iso/paul-wyse-installer.iso /tmp/
-```
-
-Flash to USB with `dd` or Ventoy, boot the Wyse 5070, then run:
-
-```bash
-install-paul-wyse
-```
-
-The script handles partitioning (disko), installation, and provides post-install instructions.
-
-**Post-install setup:**
-
-1. Reboot and login as `basnijholt` (password: `nixos`)
-2. Change password: `passwd`
-3. Connect to Tailscale: `sudo tailscale up --login-server https://headscale.nijho.lt`
-4. Point router DNS at this machine's IP
-
-**Services:**
-- CoreDNS: Resolves `*.local` → `127.0.0.1`
-- Caddy: Proxies `media.local` → home server via Tailscale
+See [hosts/paul-wyse/README.md](./hosts/paul-wyse/README.md) for installation and setup instructions.
