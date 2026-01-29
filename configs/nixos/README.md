@@ -29,6 +29,7 @@ configs/nixos/
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
 | `hetzner` | Cloud VPS | Minimal Docker Compose host for websites (Hetzner Cloud) |
 | `paul-wyse` | Physical | Gateway to home services via Tailscale (Dell Wyse 5070) |
+| `paul-wyse-installer` | ISO | Installer for Paul's Wyse 5070 with auto-install script |
 | `installer` | ISO | Minimal installer with SSH enabled |
 | `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
 | `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap with WiFi + SSH |
@@ -86,26 +87,27 @@ See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on
 
 Gateway to home services via Tailscale. Provides DNS resolution for `*.local` domains and reverse proxies to home network.
 
-**Installation:**
-
-Boot from installer ISO, then:
+**Build installer ISO:**
 
 ```bash
-# Partition eMMC and mount (32GB eMMC at /dev/mmcblk0)
-nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- \
-  --mode destroy,format,mount --yes-wipe-all-disks \
-  --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
-
-# Install
-nixos-install --root /mnt --no-root-passwd \
-  --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
+nix build .#nixosConfigurations.paul-wyse-installer.config.system.build.isoImage
+cp result/iso/paul-wyse-installer.iso /tmp/
 ```
+
+Flash to USB with `dd` or Ventoy, boot the Wyse 5070, then run:
+
+```bash
+install-paul-wyse
+```
+
+The script handles partitioning (disko), installation, and provides post-install instructions.
 
 **Post-install setup:**
 
-1. Set password: `passwd basnijholt`
-2. Connect to Tailscale: `sudo tailscale up --login-server https://headscale.nijho.lt`
-3. Point router DNS at this machine's IP
+1. Reboot and login as `basnijholt` (password: `nixos`)
+2. Change password: `passwd`
+3. Connect to Tailscale: `sudo tailscale up --login-server https://headscale.nijho.lt`
+4. Point router DNS at this machine's IP
 
 **Services:**
 - CoreDNS: Resolves `*.local` → `127.0.0.1`

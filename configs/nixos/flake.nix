@@ -177,6 +177,14 @@
             ./installers/iso.nix
           ];
         };
+
+        # Paul's Wyse 5070 installer ISO - boots with install script
+        paul-wyse-installer = lib.nixosSystem {
+          inherit system;
+          modules = [
+            ./installers/paul-wyse-installer.nix
+          ];
+        };
       };
 
       diskoConfigurations = {
