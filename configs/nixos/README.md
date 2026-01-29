@@ -28,6 +28,8 @@ configs/nixos/
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
 | `hetzner` | Cloud VPS | Minimal Docker Compose host for websites (Hetzner Cloud) |
+| `paul-wyse` | Physical | Gateway to home services via Tailscale (Dell Wyse 5070) |
+| `paul-wyse-installer` | ISO | Installer for Paul's Wyse 5070 with auto-install script |
 | `installer` | ISO | Minimal installer with SSH enabled |
 | `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
 | `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap with WiFi + SSH |
@@ -80,3 +82,7 @@ After deployment, set your password: `ssh basnijholt@<IP>` then `passwd`.
 ## Nix Cache Server Setup (nix-cache)
 
 See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on setting up the cache server container with Harmonia.
+
+## Paul's Wyse 5070 Gateway (paul-wyse)
+
+See [hosts/paul-wyse/README.md](./hosts/paul-wyse/README.md) for installation and setup instructions.
