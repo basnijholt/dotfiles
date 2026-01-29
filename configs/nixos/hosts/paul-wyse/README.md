@@ -66,11 +66,3 @@ boot.extraModulePackages = [ config.boot.kernelPackages.r8168 ];
 ```
 
 Then rebuild and reboot.
-
-### Remote changes (transatlantic!)
-
-This machine is 7,000+ miles away with no physical access. For risky changes (kernel modules, networking):
-
-1. **Don't change preemptively** - only fix what's broken
-2. **Use `nixos-rebuild test`** - reverts on reboot (but won't help for driver changes that need reboot)
-3. **Have someone local ready** - to select previous generation from boot menu if needed
