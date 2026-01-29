@@ -1,6 +1,11 @@
 # Hardware configuration for Dell Wyse 5070 thin client
 #
 # Intel Celeron J4105 (Gemini Lake), 4GB DDR4, 32GB eMMC
+#
+# NIC: Realtek RTL8111/8168 uses r8169 by default. If networking is
+# unstable (link drops, poor throughput), switch to r8168 driver:
+#   boot.blacklistedKernelModules = [ "r8169" ];
+#   boot.extraModulePackages = [ config.boot.kernelPackages.r8168 ];
 { config, lib, modulesPath, ... }:
 
 {
