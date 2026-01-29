@@ -193,6 +193,19 @@
             ./installers/paul-wyse-installer.nix
           ];
         };
+
+        # Paul's Wyse 5070 OFFLINE installer ISO - contains full system closure
+        paul-wyse-offline-installer = lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            # Pass the target system so its closure can be included in the ISO
+            targetSystem = self.nixosConfigurations.paul-wyse;
+            diskoModule = disko.packages.${system}.disko;
+          };
+          modules = [
+            ./installers/paul-wyse-offline-installer.nix
+          ];
+        };
       };
 
       diskoConfigurations = {
