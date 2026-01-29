@@ -1,25 +1,31 @@
-# Paul's Wyse 5070 Installer ISO
+# Paul's Wyse 5070 Offline Installer ISO
 #
 # Build:
-#   nix build .#nixosConfigurations.paul-wyse-installer.config.system.build.isoImage
+#   nix build .#nixosConfigurations.paul-wyse-offline-installer.config.system.build.isoImage
 #
-# This creates an ISO that boots with SSH enabled and includes an install script.
-# Requires internet connection for installation.
+# This creates an ISO containing the ENTIRE system closure - no internet needed!
+# The ISO will be larger (~2-3GB) but installation works completely offline.
 #
 # After booting:
 #   1. SSH in: ssh root@<ip>  (or use console, password: nixos)
 #   2. Run: install-paul-wyse
 #   3. Reboot
-{ lib, pkgs, modulesPath, ... }:
+{ lib, pkgs, modulesPath, targetSystem, diskoModule, ... }:
 
 let
   sshKeys = (import ../common/ssh-keys.nix).sshKeys;
 
-  # Install script that does everything
+  # Path to the pre-built target system
+  targetSystemPath = targetSystem.config.system.build.toplevel;
+
+  # Standalone disko config for partitioning
+  diskoConfig = ./paul-wyse-disko-standalone.nix;
+
+  # Install script that uses local closure
   installScript = pkgs.writeShellScriptBin "install-paul-wyse" ''
     set -euo pipefail
 
-    echo "=== Paul's Wyse 5070 NixOS Installer ==="
+    echo "=== Paul's Wyse 5070 NixOS Offline Installer ==="
     echo ""
 
     # Check we're on the right hardware
@@ -45,14 +51,12 @@ let
 
     echo ""
     echo "=== Step 1/2: Partitioning with disko ==="
-    nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- \
-      --mode destroy,format,mount --yes-wipe-all-disks \
-      --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
+    ${diskoModule}/bin/disko --mode destroy,format,mount --yes-wipe-all-disks ${diskoConfig}
 
     echo ""
-    echo "=== Step 2/2: Installing NixOS ==="
-    nixos-install --root /mnt --no-root-passwd \
-      --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
+    echo "=== Step 2/2: Installing NixOS (offline) ==="
+    # Use pre-built system from ISO - no network needed!
+    nixos-install --root /mnt --no-root-passwd --system ${targetSystemPath}
 
     echo ""
     echo "=== Installation complete! ==="
@@ -73,14 +77,16 @@ in
   ];
 
   # Identify this ISO
-  image.baseName = lib.mkForce "paul-wyse-installer";
+  image.baseName = lib.mkForce "paul-wyse-offline-installer";
+
+  # CRITICAL: Include the entire target system closure in the ISO
+  isoImage.storeContents = [ targetSystemPath ];
 
   # Include our install script
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages = [
     installScript
-    git
-    vim
-    htop
+    pkgs.vim
+    pkgs.htop
   ];
 
   # SSH access
@@ -100,17 +106,17 @@ in
   # Show install instructions on console
   services.getty.helpLine = lib.mkForce ''
 
-    === Paul's Wyse 5070 NixOS Installer ===
+    === Paul's Wyse 5070 NixOS OFFLINE Installer ===
 
     To install, run:  install-paul-wyse
 
     Or SSH in:  ssh root@<this-ip>  (password: nixos)
 
-    NOTE: Requires internet connection.
+    NO INTERNET REQUIRED - full system closure included!
 
   '';
 
-  # Nix settings for installation
+  # Nix settings
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     trusted-users = [ "root" ];
