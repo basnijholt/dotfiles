@@ -10,12 +10,12 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.15.1";
+        version = "0.15.2";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-uuv0UMw/8eUcDlyglMxqFWbUlS2OzLEMBNhsbFx8qmg=";
+          hash = "sha256-hfEuVWMmayAO26EV6fu7lRWEL3Es9wyN9sMdm5I+NJE=";
         };
         vendorHash = "sha256-WdHAjCD20eLj0d9v1K6VYP8vJ+IZ8BEZ3CciYLLMtxc=";
         postFixup = pkgs.lib.replaceStrings [
@@ -38,12 +38,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "7836";
+            version = "7885";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-uckbrQ7Fpf5re1oVvnjFUqN7ZtV7pPD0qEZHagRO5Po=";
+              hash = "sha256-ZMWZTVO9QH4oXMkLGvi8XktM/a4as2Cm9g58t7SuWFA=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -73,8 +73,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v186/llama-swap_186_linux_amd64.tar.gz";
-            hash = "sha256-TSJQzB2d8En0C/xbhMOe2o5jO9rYF8f4ugRml0T1DbI=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v187/llama-swap_187_linux_amd64.tar.gz";
+            hash = "sha256-nRpBaLMFqRwhTdpRgzem5JrvsXxVcEfFEC3r7Gceiac=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
