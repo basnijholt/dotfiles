@@ -1,11 +1,60 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "provider": {
+    "llama-cpp": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llama-swap (local)",
+      "options": {
+        "baseURL": "http://llama.local/v1"
+      },
+      "models": {
+        "glm-4.7-flash:q4": {
+          "name": "GLM-4.7 Flash Q4 (local)",
+          "limit": { "context": 131072 }
+        },
+        "devstral-2:24b-q4": {
+          "name": "Devstral-2 24B Q4 (local)",
+          "limit": { "context": 65536 }
+        },
+        "devstral-2:24b-q8": {
+          "name": "Devstral-2 24B Q8 (local)",
+          "limit": { "context": 65536 }
+        },
+        "devstral-2:123b": {
+          "name": "Devstral-2 123B Q3 (local)",
+          "limit": { "context": 65536 }
+        },
+        "gpt-oss-low:20b": {
+          "name": "GPT-OSS 20B Low (local)",
+          "limit": { "context": 131072 }
+        },
+        "gpt-oss-medium:20b": {
+          "name": "GPT-OSS 20B Medium (local)",
+          "limit": { "context": 131072 }
+        },
+        "gpt-oss-high:20b": {
+          "name": "GPT-OSS 20B High (local)",
+          "limit": { "context": 131072 }
+        },
+        "gpt-oss:120b": {
+          "name": "GPT-OSS 120B (local)",
+          "limit": { "context": 65536 }
+        },
+        "gpt-oss:120b-q8": {
+          "name": "GPT-OSS 120B Q8 (local)",
+          "limit": { "context": 65536 }
+        },
+        "gpt-oss:120b-derestricted": {
+          "name": "GPT-OSS 120B Derestricted (local)",
+          "limit": { "context": 65536 }
+        }
+      }
+    },
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "Ollama (local)",
       "options": {
-        "baseURL": "http://localhost:11434/v1",
+        "baseURL": "http://192.168.1.5:11434/v1",
         "apiKey": "ollama" // anything non-empty is fine
       },
       "models": {
