@@ -1,6 +1,9 @@
 # zsh_plugins.sh - meant to be sourced in .zshrc
 
 if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
+    # -- completions (fpath before omz runs compinit)
+    [[ -d ~/.zfunc ]] && fpath+=~/.zfunc
+
     # -- oh-my-zsh
     [[ -z $STARSHIP_SHELL ]] && export ZSH_THEME="mytheme"
     DEFAULT_USER="basnijholt"
