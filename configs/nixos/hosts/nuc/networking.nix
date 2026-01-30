@@ -11,6 +11,13 @@
   ];
 
   networking.hostName = "nuc";
+
+  # Static host entry for NFS mounts - avoids race condition where mounts
+  # try to resolve before CoreDNS is ready at boot
+  networking.extraHosts = ''
+    192.168.1.4 truenas.local
+  '';
+
   networking.nftables.enable = true;
   networking.firewall.enable = true;
   networking.networkmanager.enable = false;
