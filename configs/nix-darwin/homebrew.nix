@@ -173,7 +173,7 @@
       "sloth" # Process monitor
       "spotify" # Music streaming
       "steam" # Game platform
-      "stolendata-mpv" # Media player
+      # "stolendata-mpv" # Media player
       "submariner" # Subsonic music client
       "switchresx" # Display manager
       "syncthing-app" # File synchronization
@@ -194,7 +194,7 @@
           "google-chrome" # Web browser
           "mullvad-vpn" # VPN client
           "nordvpn" # VPN client
-          "tailscale" # VPN service
+          "tailscale-app" # VPN service
           "zoom" # Video conferencing
         ]
       else
