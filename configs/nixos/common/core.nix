@@ -28,6 +28,11 @@
 
   boot.kernelModules = [ "tcp_bbr" ];
 
+  # Don't prompt for ZFS encryption keys at boot
+  # Our root datasets are unencrypted; only replicated backup datasets from TrueNAS are encrypted
+  # Without this, replicated encrypted datasets block boot waiting for a passphrase
+  boot.zfs.requestEncryptionCredentials = false;
+
   boot.kernel.sysctl = {
     "kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
 
