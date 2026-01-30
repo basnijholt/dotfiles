@@ -38,7 +38,7 @@
           ${pkgs.llama-cpp}/bin/llama-server
           -hf unsloth/GLM-4.7-Flash-GGUF:UD-Q4_K_XL
           --port ''${PORT}
-          --ctx-size 131072
+          --ctx-size 200000
           --batch-size 2048
           --ubatch-size 512
           --temp 1.0
