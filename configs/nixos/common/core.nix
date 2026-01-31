@@ -20,10 +20,10 @@
   #   ssh root@truenas.local
   #   midclt call tunable.create '{"var": "net.ipv4.tcp_congestion_control", "value": "bbr", "type": "SYSCTL", "enabled": true}'
   #   midclt call tunable.create '{"var": "net.core.default_qdisc", "value": "fq", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.core.rmem_max", "value": "33554432", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.core.wmem_max", "value": "33554432", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.ipv4.tcp_rmem", "value": "4096 131072 33554432", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.ipv4.tcp_wmem", "value": "4096 16384 33554432", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.core.rmem_max", "value": "67108864", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.core.wmem_max", "value": "67108864", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.ipv4.tcp_rmem", "value": "4096 131072 67108864", "type": "SYSCTL", "enabled": true}'
+  #   midclt call tunable.create '{"var": "net.ipv4.tcp_wmem", "value": "4096 16384 67108864", "type": "SYSCTL", "enabled": true}'
   # These persist in TrueNAS UI under System Settings -> Advanced -> Sysctl
 
   boot.kernelModules = [ "tcp_bbr" ];
@@ -41,10 +41,10 @@
 
     # TCP buffer tuning for high-latency, high-bandwidth connections
     # Default 208KB is too small for transatlantic links (BDP at 300Mbps/263ms = 10MB)
-    "net.core.rmem_max" = 33554432; # 32MB
-    "net.core.wmem_max" = 33554432; # 32MB
-    "net.ipv4.tcp_rmem" = "4096 131072 33554432"; # min default max
-    "net.ipv4.tcp_wmem" = "4096 16384 33554432"; # min default max
+    "net.core.rmem_max" = 67108864; # 64MB
+    "net.core.wmem_max" = 67108864; # 64MB
+    "net.ipv4.tcp_rmem" = "4096 131072 67108864"; # min default max
+    "net.ipv4.tcp_wmem" = "4096 16384 67108864"; # min default max
   };
 
   # --- DNS Resolver Defaults ---
