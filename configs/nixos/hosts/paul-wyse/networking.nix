@@ -42,7 +42,7 @@
   networking.firewall.allowedTCPPorts = [
     53    # DNS (CoreDNS)
     80    # HTTP (Caddy reverse proxy)
-    8096  # Remote media server (Emby via Caddy)
+    8095  # Remote media server (Emby via Caddy)
     8097  # Remote media server 2 (Jellyfin via Caddy)
     8098  # Local media server (Jellyfin with rclone cache via Caddy)
     8880  # Speed test (Caddy proxy)

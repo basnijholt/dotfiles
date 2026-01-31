@@ -22,7 +22,7 @@
           }
         '';
       };
-      ":8096" = {
+      ":8095" = {
         extraConfig = ''
           reverse_proxy 100.64.0.28:8096 {
             flush_interval -1
