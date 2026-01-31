@@ -19,7 +19,7 @@ let
   # Key fixes:
   #   1. Manual partition (avoids flake fetch that fills tiny USB overlay)
   #   2. Set TMPDIR to eMMC (Nix temp files go to 29GB disk, not 2GB overlay)
-  #   3. Create swap before install (prevents OOM during Rust builds)
+  #   3. Create swap before install (prevents OOM during Go builds)
   #   4. Use --max-jobs 1 (limits memory usage for low-RAM system)
   installScript = pkgs.writeShellScriptBin "install-paul-wyse" ''
     set -euo pipefail
