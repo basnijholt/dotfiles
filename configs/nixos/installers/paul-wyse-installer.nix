@@ -15,16 +15,23 @@
 let
   sshKeys = (import ../common/ssh-keys.nix).sshKeys;
 
-  # Install script that does everything
+  # Install script - works reliably on 4GB USB + 4GB RAM systems
+  # Key fixes:
+  #   1. Manual partition (avoids flake fetch that fills tiny USB overlay)
+  #   2. Set TMPDIR to eMMC (Nix temp files go to 29GB disk, not 2GB overlay)
+  #   3. Create swap before install (prevents OOM during Rust builds)
+  #   4. Use --max-jobs 1 (limits memory usage for low-RAM system)
   installScript = pkgs.writeShellScriptBin "install-paul-wyse" ''
     set -euo pipefail
+
+    DISK="/dev/mmcblk0"
 
     echo "=== Paul's Wyse 5070 NixOS Installer ==="
     echo ""
 
     # Check we're on the right hardware
-    if [[ ! -b /dev/mmcblk0 ]]; then
-      echo "ERROR: /dev/mmcblk0 not found!"
+    if [[ ! -b "$DISK" ]]; then
+      echo "ERROR: $DISK not found!"
       echo "This installer is for Dell Wyse 5070 with eMMC storage."
       echo ""
       echo "Available block devices:"
@@ -32,11 +39,11 @@ let
       exit 1
     fi
 
-    echo "Found eMMC at /dev/mmcblk0:"
-    lsblk /dev/mmcblk0
+    echo "Found eMMC at $DISK:"
+    lsblk "$DISK"
     echo ""
 
-    read -p "This will ERASE ALL DATA on /dev/mmcblk0. Continue? [y/N] " -n 1 -r
+    read -p "This will ERASE ALL DATA on $DISK. Continue? [y/N] " -n 1 -r
     echo ""
     if [[ ! $REPLY =~ ^[Yy]$ ]]; then
       echo "Aborted."
@@ -44,15 +51,76 @@ let
     fi
 
     echo ""
-    echo "=== Step 1/2: Partitioning with disko ==="
-    nix --extra-experimental-features 'nix-command flakes' run github:nix-community/disko -- \
-      --mode destroy,format,mount --yes-wipe-all-disks \
-      --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
+    echo "=== Step 1/5: Partitioning ==="
+    # Wipe existing
+    zpool destroy zroot 2>/dev/null || true
+    wipefs -af "$DISK"
+    sgdisk --zap-all "$DISK"
+
+    # Create GPT: 512M ESP + rest for ZFS
+    sgdisk -n1:1M:+512M -t1:EF00 -c1:ESP-PWYSE "$DISK"
+    sgdisk -n2:0:0 -t2:BF00 -c2:zfs "$DISK"
+    partprobe "$DISK"
+    sleep 2
+
+    # Format ESP
+    mkfs.vfat -F32 -n ESP-PWYSE "''${DISK}p1"
+
+    # Create ZFS pool
+    echo ""
+    echo "=== Step 2/5: Creating ZFS pool ==="
+    zpool create -f \
+      -o ashift=12 \
+      -o autotrim=on \
+      -O compression=zstd \
+      -O acltype=posixacl \
+      -O xattr=sa \
+      -O atime=off \
+      -O mountpoint=none \
+      zroot "''${DISK}p2"
+
+    # Create datasets
+    zfs create -o mountpoint=legacy zroot/root
+    zfs create -o mountpoint=legacy -o com.sun:auto-snapshot=false zroot/nix
+    zfs create -o mountpoint=legacy zroot/var
+    zfs create -o mountpoint=legacy zroot/home
+
+    # Create swap zvol (prevents OOM during builds)
+    zfs create -V 4G zroot/swap
 
     echo ""
-    echo "=== Step 2/2: Installing NixOS ==="
+    echo "=== Step 3/5: Mounting filesystems ==="
+    mount -t zfs zroot/root /mnt
+    mkdir -p /mnt/{boot,nix,var,home}
+    mount -t zfs zroot/nix /mnt/nix
+    mount -t zfs zroot/var /mnt/var
+    mount -t zfs zroot/home /mnt/home
+    mount "''${DISK}p1" /mnt/boot
+
+    echo ""
+    echo "=== Step 4/5: Enabling swap ==="
+    # Wait for zvol device to appear
+    udevadm trigger
+    sleep 2
+    mkswap /dev/zvol/zroot/swap
+    swapon /dev/zvol/zroot/swap
+    echo "Swap enabled: $(free -h | grep Swap)"
+
+    # Redirect temp to eMMC (not tiny USB overlay)
+    mkdir -p /mnt/tmp/nix-build
+    export TMPDIR=/mnt/tmp/nix-build
+
+    echo ""
+    echo "=== Step 5/5: Installing NixOS ==="
     nixos-install --root /mnt --no-root-passwd \
+      --max-jobs 1 --cores 2 \
+      --option substituters "https://cache.nixos.org https://nix-community.cachix.org" \
+      --option trusted-public-keys "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" \
       --flake github:basnijholt/dotfiles/main?dir=configs/nixos#paul-wyse
+
+    # Cleanup
+    rm -rf /mnt/tmp/nix-build
+    swapoff /dev/zvol/zroot/swap
 
     echo ""
     echo "=== Installation complete! ==="
@@ -75,7 +143,7 @@ in
   # Identify this ISO
   image.fileName = lib.mkForce "paul-wyse-installer.iso";
 
-  # Include our install script
+  # Include our install script (partitioning tools come from minimal installer)
   environment.systemPackages = with pkgs; [
     installScript
     git
