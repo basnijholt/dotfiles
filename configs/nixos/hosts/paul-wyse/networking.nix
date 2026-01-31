@@ -38,7 +38,7 @@
   };
 
   # --- Firewall ---
-  networking.firewall.trustedInterfaces = [ "br0" "incusbr0" ];
+  networking.firewall.trustedInterfaces = [ "br0" "incusbr0" "tailscale0" ];
   networking.firewall.allowedTCPPorts = [
     53   # DNS (CoreDNS)
     80   # HTTP (Caddy reverse proxy)
