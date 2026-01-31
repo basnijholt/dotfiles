@@ -13,8 +13,8 @@
           reverse_proxy 100.64.0.28:8096 {
             flush_interval -1
             transport http {
-              read_buffer 64MB
-              write_buffer 64MB
+              read_buffer 128MB
+              write_buffer 128MB
             }
           }
         '';
@@ -25,8 +25,8 @@
           reverse_proxy 100.64.0.28:8096 {
             flush_interval -1
             transport http {
-              read_buffer 64MB
-              write_buffer 64MB
+              read_buffer 128MB
+              write_buffer 128MB
             }
           }
         '';
