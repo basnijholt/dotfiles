@@ -14,14 +14,11 @@ in
   # --- rclone configuration ---
   environment.systemPackages = [ pkgs.rclone ];
 
-  # rclone config file (SFTP to home server via Tailscale)
+  # rclone config file (HTTP to home server via Tailscale)
   environment.etc."rclone/rclone.conf".text = ''
     [${rcloneRemote}]
-    type = sftp
-    host = ${mediaServerIp}
-    user = basnijholt
-    key_file = /root/.ssh/id_ed25519
-    shell_type = unix
+    type = http
+    url = http://${mediaServerIp}:8899
   '';
 
   # --- rclone VFS mount service ---
@@ -35,7 +32,7 @@ in
       Type = "simple";
       ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${mediaMount}";
       ExecStart = ''
-        ${pkgs.rclone}/bin/rclone mount ${rcloneRemote}:/mnt/tank/media ${mediaMount} \
+        ${pkgs.rclone}/bin/rclone mount ${rcloneRemote}: ${mediaMount} \
           --config /etc/rclone/rclone.conf \
           --vfs-cache-mode full \
           --vfs-read-ahead 512M \
