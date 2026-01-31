@@ -43,6 +43,8 @@
   networking.firewall.allowedTCPPorts = [
     53   # DNS (CoreDNS)
     80   # HTTP (Caddy reverse proxy)
+    8096 # Media server (Caddy proxy)
+    8880 # Librespeed (Caddy proxy)
   ];
   networking.firewall.allowedUDPPorts = [
     53   # DNS (CoreDNS)
