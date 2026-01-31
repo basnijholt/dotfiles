@@ -36,6 +36,29 @@
           reverse_proxy 100.64.0.28:8880
         '';
       };
+      # Media server 2 (port 8097)
+      "media2.local:80" = {
+        extraConfig = ''
+          reverse_proxy 100.64.0.28:8097 {
+            flush_interval -1
+            transport http {
+              read_buffer 128MB
+              write_buffer 128MB
+            }
+          }
+        '';
+      };
+      ":8097" = {
+        extraConfig = ''
+          reverse_proxy 100.64.0.28:8097 {
+            flush_interval -1
+            transport http {
+              read_buffer 128MB
+              write_buffer 128MB
+            }
+          }
+        '';
+      };
     };
   };
 
