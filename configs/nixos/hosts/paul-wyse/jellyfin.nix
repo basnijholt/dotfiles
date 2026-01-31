@@ -50,6 +50,7 @@ in
           --transfers 4 \
           --dir-cache-time 72h \
           --poll-interval 0 \
+          --read-only \
           --allow-other \
           --uid 1000 \
           --gid 1000
