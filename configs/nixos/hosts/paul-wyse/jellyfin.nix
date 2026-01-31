@@ -32,7 +32,7 @@ in
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {
-      Type = "notify";
+      Type = "simple";
       ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p ${mediaMount}";
       ExecStart = ''
         ${pkgs.rclone}/bin/rclone mount ${rcloneRemote}:/mnt/tank/media ${mediaMount} \
