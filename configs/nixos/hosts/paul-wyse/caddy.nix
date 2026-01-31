@@ -10,13 +10,25 @@
       # DNS-based access (requires CoreDNS)
       "media.local:80" = {
         extraConfig = ''
-          reverse_proxy 100.64.0.28:8096
+          reverse_proxy 100.64.0.28:8096 {
+            flush_interval -1
+            transport http {
+              read_buffer 32MB
+              write_buffer 32MB
+            }
+          }
         '';
       };
       # Direct IP access (no DNS needed)
       ":8096" = {
         extraConfig = ''
-          reverse_proxy 100.64.0.28:8096
+          reverse_proxy 100.64.0.28:8096 {
+            flush_interval -1
+            transport http {
+              read_buffer 32MB
+              write_buffer 32MB
+            }
+          }
         '';
       };
       ":8880" = {
