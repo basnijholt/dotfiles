@@ -22,6 +22,17 @@
           }
         '';
       };
+      ":8096" = {
+        extraConfig = ''
+          reverse_proxy 100.64.0.28:8096 {
+            flush_interval -1
+            transport http {
+              read_buffer 128MB
+              write_buffer 128MB
+            }
+          }
+        '';
+      };
       # Speed test
       ":8880" = {
         extraConfig = ''
@@ -36,8 +47,27 @@
           }
         '';
       };
+      # Direct port access for local Jellyfin
+      ":8098" = {
+        extraConfig = ''
+          reverse_proxy 127.0.0.1:8096 {
+            flush_interval -1
+          }
+        '';
+      };
       # Remote media server (Jellyfin)
       "media3.local:80" = {
+        extraConfig = ''
+          reverse_proxy 100.64.0.28:8097 {
+            flush_interval -1
+            transport http {
+              read_buffer 128MB
+              write_buffer 128MB
+            }
+          }
+        '';
+      };
+      ":8097" = {
         extraConfig = ''
           reverse_proxy 100.64.0.28:8097 {
             flush_interval -1
