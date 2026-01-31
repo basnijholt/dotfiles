@@ -38,12 +38,18 @@ in
         ${pkgs.rclone}/bin/rclone mount ${rcloneRemote}:/mnt/tank/media ${mediaMount} \
           --config /etc/rclone/rclone.conf \
           --vfs-cache-mode full \
-          --vfs-read-ahead 256M \
-          --vfs-cache-max-size 20G \
-          --vfs-cache-max-age 24h \
-          --buffer-size 128M \
-          --dir-cache-time 1h \
-          --poll-interval 1m \
+          --vfs-read-ahead 512M \
+          --vfs-cache-max-size 30G \
+          --vfs-cache-max-age 48h \
+          --buffer-size 256M \
+          --vfs-read-chunk-size 64M \
+          --vfs-read-chunk-size-limit 512M \
+          --vfs-fast-fingerprint \
+          --no-modtime \
+          --no-checksum \
+          --transfers 4 \
+          --dir-cache-time 72h \
+          --poll-interval 0 \
           --allow-other \
           --uid 1000 \
           --gid 1000
