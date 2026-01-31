@@ -16,8 +16,7 @@
     netdevConfig = {
       Kind = "bridge";
       Name = "br0";
-      # TODO: Update with actual MAC after first boot (ip link show)
-      # MACAddress = "xx:xx:xx:xx:xx:xx";
+      MACAddress = "e4:54:e8:4b:f0:ae"; # Match physical NIC for stable DHCP
     };
   };
 
