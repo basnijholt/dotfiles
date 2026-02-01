@@ -36,7 +36,7 @@ in
           --config /etc/rclone/rclone.conf \
           --vfs-cache-mode full \
           --vfs-read-ahead 512M \
-          --vfs-cache-max-size 10G \
+          --vfs-cache-max-size 5G \
           --vfs-cache-max-age 48h \
           --buffer-size 256M \
           --vfs-read-chunk-size 64M \
