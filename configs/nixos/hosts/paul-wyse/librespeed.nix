@@ -24,7 +24,7 @@
       servers = [
         {
           name = "Paul-Wyse";
-          server = "";  # Empty string = same origin
+          server = "/";
           dlURL = "backend/garbage";
           ulURL = "backend/empty";
           pingURL = "backend/empty";
