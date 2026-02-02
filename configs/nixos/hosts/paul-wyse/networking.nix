@@ -45,7 +45,8 @@
     8095  # Remote media server (Emby via Caddy)
     8097  # Remote media server 2 (Jellyfin via Caddy)
     8098  # Local media server (Jellyfin with rclone cache via Caddy)
-    8880  # Speed test (Caddy proxy)
+    8880  # Speed test - local (LibreSpeed)
+    8881  # Speed test - Seattle (Caddy proxy)
   ];
   networking.firewall.allowedUDPPorts = [
     53   # DNS (CoreDNS)
