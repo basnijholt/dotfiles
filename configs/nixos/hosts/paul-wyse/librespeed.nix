@@ -1,25 +1,23 @@
 # LibreSpeed - local speed test server
 #
 # Provides a local speed test endpoint for testing network performance.
-# Uses librespeed-rust which is lightweight and suitable for thin clients.
+# Uses librespeed-rust backend with nginx serving static files.
 #
 # Ports:
-#   8880 - Local speed test (this server)
+#   8880 - Local speed test (nginx → librespeed-rust on 8989)
 #   8881 - Seattle speed test (proxied via Caddy)
 { ... }:
 
 {
   services.librespeed = {
     enable = true;
+    domain = "speed.local";
     settings = {
-      listen_port = 8880;
-      bind_address = "0.0.0.0";
       worker_threads = 1; # Minimal for thin client
       database_type = "none"; # No persistent results needed
     };
     frontend = {
       enable = true;
-      useNginx = false; # Serve assets directly, no nginx needed
       pageTitle = "Paul Speed Test";
       contactEmail = "basnijholt@gmail.com";
       servers = [
@@ -33,5 +31,10 @@
         }
       ];
     };
+  };
+
+  # Override nginx to listen on 8880 instead of 80 (Caddy uses 80)
+  services.nginx.virtualHosts."speed.local" = {
+    listen = [{ addr = "0.0.0.0"; port = 8880; }];
   };
 }
