@@ -33,11 +33,13 @@
     };
   };
 
-  # Enable nginx and override to listen on 8880 instead of 80 (Caddy uses 80)
+  # Enable nginx and override to listen on 8880 without SSL (Caddy uses 80)
   services.nginx = {
     enable = true;
     virtualHosts."speed.local" = {
       listen = [{ addr = "0.0.0.0"; port = 8880; }];
+      forceSSL = false;
+      enableACME = false;
     };
   };
 }
