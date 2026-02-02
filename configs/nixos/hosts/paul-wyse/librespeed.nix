@@ -22,6 +22,16 @@
       useNginx = false; # Serve assets directly, no nginx needed
       pageTitle = "Paul Speed Test";
       contactEmail = "basnijholt@gmail.com";
+      servers = [
+        {
+          name = "Local";
+          server = "/";
+          dlURL = "backend/garbage";
+          ulURL = "backend/empty";
+          pingURL = "backend/empty";
+          getIpURL = "backend/getIP";
+        }
+      ];
     };
   };
 }
