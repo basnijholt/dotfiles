@@ -20,8 +20,17 @@
       enable = true;
       pageTitle = "Paul Speed Test";
       contactEmail = "basnijholt@gmail.com";
-      # Only one server - relative path works from any IP/hostname
-      servers = [ ];
+      # Relative path server works from any IP/hostname
+      servers = [
+        {
+          name = "Paul-Wyse";
+          server = "";  # Empty string = same origin
+          dlURL = "backend/garbage";
+          ulURL = "backend/empty";
+          pingURL = "backend/empty";
+          getIpURL = "backend/getIP";
+        }
+      ];
     };
   };
 
