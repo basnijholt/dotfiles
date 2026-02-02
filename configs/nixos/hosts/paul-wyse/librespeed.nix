@@ -17,6 +17,11 @@
       worker_threads = 1; # Minimal for thin client
       database_type = "none"; # No persistent results needed
     };
+    frontend = {
+      enable = true;
+      useNginx = false; # Serve assets directly, no nginx needed
+      pageTitle = "Paul Speed Test";
+      contactEmail = "basnijholt@gmail.com";
+    };
   };
-
 }
