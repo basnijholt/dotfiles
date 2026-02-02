@@ -20,20 +20,12 @@
       enable = true;
       pageTitle = "Paul Speed Test";
       contactEmail = "basnijholt@gmail.com";
-      servers = [
-        {
-          name = "Local";
-          server = "/";
-          dlURL = "backend/garbage";
-          ulURL = "backend/empty";
-          pingURL = "backend/empty";
-          getIpURL = "backend/getIP";
-        }
-      ];
+      # Only one server - relative path works from any IP/hostname
+      servers = [ ];
     };
   };
 
-  # Enable nginx and override to listen on 8880 without SSL (Caddy uses 80)
+  # Override nginx to listen on 8880 without SSL
   services.nginx = {
     enable = true;
     virtualHosts."speed.local" = {
