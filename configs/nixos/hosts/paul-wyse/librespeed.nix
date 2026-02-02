@@ -6,7 +6,7 @@
 # Ports:
 #   8880 - Local speed test (nginx → librespeed-rust on 8989)
 #   8881 - Seattle speed test (proxied via Caddy)
-{ ... }:
+{ lib, ... }:
 
 {
   services.librespeed = {
@@ -38,8 +38,8 @@
     enable = true;
     virtualHosts."speed.local" = {
       listen = [{ addr = "0.0.0.0"; port = 8880; }];
-      forceSSL = false;
-      enableACME = false;
+      forceSSL = lib.mkForce false;
+      enableACME = lib.mkForce false;
     };
   };
 }
