@@ -1,24 +1,17 @@
-# ZFS automated snapshots and replication to TrueNAS
-{ config, pkgs, lib, ... }:
+# ZFS replication to TrueNAS via syncoid
+# Imports zfs-auto-snapshot.nix for local snapshots (required for syncoid)
+{ config, pkgs, ... }:
 
 {
+  imports = [
+    ./zfs-auto-snapshot.nix
+  ];
+
   environment.systemPackages = with pkgs; [
     lzop
     mbuffer
     sanoid # Provides syncoid command
   ];
-
-  # --- Automated Local Snapshots ---
-  # Keeps a rolling history of snapshots locally for quick recovery
-  services.zfs.autoSnapshot = {
-    enable = true;
-    flags = "-k -p";
-    frequent = 6; # Every 10 minutes (6 per hour)
-    hourly = 24;
-    daily = 7;
-    weekly = 4;
-    monthly = 12;
-  };
 
   # --- Replication Service (Syncoid) ---
   # Pushes snapshots to TrueNAS via SSH

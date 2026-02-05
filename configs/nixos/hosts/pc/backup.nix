@@ -3,12 +3,16 @@
 
 {
   services.restic.backups.truenas = {
-    repository = "sftp:restic@truenas.local:/mnt/tank/backups/nixos";
+    repository = "sftp:restic@truenas.local:/mnt/tank/backups/pc";
     paths = [
       "/home"
       "/etc/nixos"
       "/root/.ssh"       # Important: backup SSH keys!
       "/var/lib/qdrant"  # Vector database
+      "/var/lib/incus"   # Virtual machines and containers
+      "/var/lib/munge"   # Munge authentication
+      "/var/lib/private/ollama" # AI models
+      "/var/lib/libvirt" # Libvirt VMs
     ];
     exclude = [
       "/home/*/.cache"

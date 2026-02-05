@@ -20,7 +20,7 @@ descriptions = {
     "sync-dotfiles.sh": "Push updater to hosts and trigger sync/install",
     "sync-local-dotfiles.sh": "On a host: pull latest and optionally run ./install",
     "sync-photos-to-truenas.sh": "Sync photos to TrueNAS server",
-    "sync-uv-tools.sh": "Globally install uv tools I frequently use",
+    "sync-uv.sh": "Globally install uv tools I frequently use",
 
     # AI / LLM utilities
     "fix_my_text_ollama.py": "Clipboard text grammar fix using a local Ollama model",

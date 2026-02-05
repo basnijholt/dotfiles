@@ -2,28 +2,27 @@
     link:
       create: true
       relink: true
+      backup: true
 
 - link:
-    ~/.autoenv: submodules/autoenv
     ~/.bash_profile: configs/bash/bash_profile
     ~/.bashrc: configs/bash/bashrc
+    ~/.claude/hooks: configs/claude/hooks
     ~/.claude/settings.json: configs/claude/settings.json
+    ~/.claude/statusline.py: configs/claude/statusline.py
     ~/.condarc: configs/conda/condarc
     ~/.config/agent-cli/config.toml: configs/agent-cli/config.toml
     ~/.config/amp/settings.json: configs/amp/settings.json
     ~/.config/atuin: configs/atuin
     ~/.config/bat/config: configs/bat/config
-    ~/.config/claude/settings.json: configs/claude/settings.json
     ~/.config/codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.config/codex/config.toml: configs/codex/config.toml
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
-    ~/.config/gemini: configs/gemini
     ~/.config/git/attributes: configs/git/attributes
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin
     ~/.config/nvim: configs/nvim
-    ~/.npmrc: configs/npm/npmrc
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
     ~/.config/starship.toml: configs/starship/starship.toml
     ~/.config/wezterm/wezterm.lua: configs/wezterm/wezterm.lua
@@ -31,19 +30,24 @@
     ~/.config/zellij/config.kdl: configs/zellij/config.kdl
     ~/.direnvrc: configs/direnv/direnvrc
     ~/.dotbins: submodules/mydotbins
+    ~/.gemini/GEMINI.md: configs/gemini/GEMINI.md
+    ~/.gemini/hooks: configs/gemini/hooks
+    ~/.gemini/settings.json: configs/gemini/settings.json
     ~/.gitconfig-personal: configs/git/gitconfig-personal
     ~/.gitconfig: configs/git/gitconfig
     ~/.local/bin/git-fixup-file: scripts/git-fixup-file.sh
-    ~/.local/bin/nbviewer: scripts/nbviewer.sh
     ~/.local/bin/pypi-sha256: scripts/pypi-sha256.sh
+    ~/.nanorc: configs/nano/nanorc
+    ~/.cargo/config.toml: configs/cargo/config.toml
+    ~/.local/bin/rustc-wrapper: configs/cargo/rustc-wrapper.sh
+    ~/.npmrc: configs/npm/npmrc
     ~/.local/bin/run: scripts/run.sh
     ~/.local/bin/sync-dotfiles: scripts/sync-dotfiles.sh
     ~/.local/bin/sync-local-dotfiles: scripts/sync-local-dotfiles.sh
+    ~/.local/bin/sync-bun: scripts/sync-bun.sh
     ~/.local/bin/sync-submodules: scripts/sync-submodules.sh
-    ~/.local/bin/sync-uv-tools: scripts/sync-uv-tools.sh
-    ~/.local/bin/upload-file: scripts/upload-file.sh
+    ~/.local/bin/sync-uv: scripts/sync-uv.sh
     ~/.local/bin/zellij-rename-tabs: scripts/zellij-rename-tabs.py
-    ~/.local/bin/keychain: submodules/mydotbins/linux/amd64/bin/keychain
     ~/.mambarc: configs/mamba/mambarc
     ~/.oh-my-zsh: submodules/oh-my-zsh
     ~/.tmux.conf: submodules/tmux/.tmux.conf
@@ -52,7 +56,8 @@
     ~/dotfiles/submodules/oh-my-zsh/themes/mytheme.zsh-theme: configs/zsh/mytheme.zsh-theme
 
 - shell:
-  - bash scripts/sync-uv-tools.sh
+  - bash scripts/sync-uv.sh
+  - bash scripts/sync-bun.sh
   - git submodule update --init --recursive
   - command: '[[ "$(uname)" = "Darwin" ]] && [ -f ./secrets/install ] && (echo "SECRETS" && ./secrets/install) || true'
     stdout: true
@@ -67,7 +72,6 @@
     ~/.config/hypr: configs/hypr
     ~/.config/waybar: submodules/mechabar
     ~/.config/mako/config: configs/mako/config
-    ~/.config/rofi: submodules/mechabar/rofi
 
 # -- Only on MacOS --
 - defaults:

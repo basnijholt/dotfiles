@@ -1,4 +1,7 @@
 # System packages shared by all hosts
+#
+# Large packages are in optional/large-packages.nix
+# See scripts/nix/package-marginal-cost.py for analysis of "marginal cost"
 { pkgs, ... }:
 
 let
@@ -8,20 +11,18 @@ let
     act
     asciinema
     atuin
-    azure-cli
+    bandwhich
     bat
     btop
-    claude-code
-    codex
     coreutils
+    cups # lp command for network printing
     docker
+    devbox
     dnsutils # Provides dig, nslookup, host
     duf
     eza
-    fastfetch
+    fd
     fzf
-    gemini-cli
-    google-cloud-sdk
     gh
     git
     git-filter-repo
@@ -30,25 +31,27 @@ let
     gnugrep
     gnupg
     gnused
+    gping
     hcloud
     htop
     iperf3
     jq
     just
-    k9s
     keyd
     lazydocker
     lazygit
     lm_sensors
     lsof
-    mosh
     micro
+    mosh
     neovim
-    nixfmt-rfc-style
+    nixfmt
     nmap
+    ookla-speedtest
     packer
     parallel
     postgresql
+    procs
     psmisc # For killall
     pwgen
     rclone
@@ -57,35 +60,40 @@ let
     tealdeer
     terraform
     tmux
+    tokei
     tre-command
     tree
     typst
+    unzip
+    usbutils
+    wakeonlan
     wget
-    yazi
+    yazi-unwrapped
     yq-go
     zellij
+    zoxide
+  ];
+
+  # --- Yazi preview dependencies ---
+  yaziPreviewDeps = with pkgs; [
+    file # MIME type detection
   ];
 
   # --- Development Toolchains ---
   developmentToolchains = with pkgs; [
     bun
-    cargo
-    cmake
     gcc
-    go
     gnumake
     meson
     nodejs_20
-    openjdk
     pkg-config
-    pnpm
     portaudio
     (python3.withPackages (ps: [ ps.pipx ]))
-    yarn
   ];
 in
 {
   environment.systemPackages =
     cliPowerTools
+    ++ yaziPreviewDeps
     ++ developmentToolchains;
 }

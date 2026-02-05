@@ -6,18 +6,22 @@ echo "🛠️ Running in ${INSTALL_MODE} mode"
 
 # List of hosts to connect to
 HOSTS=(
-  "ubuntu-proxmox"
-  "ubuntu-hetzner"
-  "debian-truenas"
-  "debian-proxmox"
-  "docker-truenas"
-  "docker-proxmox"
-  "pi3"
+  # Physical hosts
   "nuc"
-  "dietpi"
   "pc"
   "hp"
-  "nuc"
+  "pi3"
+  "pi4"
+  # systemd-nspawn hosts
+  "docker-truenas"
+  "debian-truenas"
+  # VM/LXC hosts
+  "nix-cache"
+  "docker"
+  "docker-truenas-2"
+  # Cloud hosts
+  "ubuntu-hetzner"
+  "nixos-hetzner"
 )
 
 # Arrays to track results

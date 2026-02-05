@@ -2,6 +2,9 @@
 # SSH is enabled with key-only auth; root login allowed but NO passwords.
 { pkgs, ... }:
 
+let
+  sshKeys = (import ../common/ssh-keys.nix).sshKeys;
+in
 {
   services.openssh.enable = true;
   services.openssh.settings = {
@@ -12,8 +15,6 @@
 
   users.users.root = {
     initialPassword = "nixos"; # default console password
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC90KqGLJG4vaYYes3dDwD46Ui3sDiExPTbL7AkYg7i9 bas@nijho.lt"
-    ];
+    openssh.authorizedKeys.keys = sshKeys;
   };
 }

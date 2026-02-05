@@ -15,17 +15,25 @@ configs/nixos/
 
 | Config | Type | Description |
 |--------|------|-------------|
-| `nixos` | Physical | Desktop/workstation (NVIDIA, Hyprland, AI services) |
+| `pc` | Physical | Desktop/workstation (NVIDIA, Hyprland, AI services) |
 | `nuc` | Physical | Media box (Kodi, Btrfs, desktop + power management) |
 | `hp` | Physical | Headless server (ZFS, virtualization + power management) |
+| `pi3` | Physical | Raspberry Pi 3 - lightweight headless server (aarch64) |
+| `pi4` | Physical | Raspberry Pi 4 - lightweight headless server (aarch64) |
 | `hp-incus` | Incus VM | HP config for Incus VM testing |
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-vm-aarch64` | QEMU VM | Lightweight dev environment (aarch64, for ARM Macs via QEMU) |
-| `dev-lxc` | Incus LXC | Lightweight dev environment (x86_64) |
-| `build-vm` | Incus LXC | Build server with Harmonia cache (for CUDA/large builds) |
+| `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
+| `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
+| `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
+| `hetzner` | Cloud VPS | Minimal Docker Compose host for websites (Hetzner Cloud) |
+| `paul-wyse` | Physical | Gateway to home services via Tailscale (Dell Wyse 5070) |
+| `paul-wyse-installer` | ISO | Installer for Paul's Wyse 5070 with auto-install script |
 | `installer` | ISO | Minimal installer with SSH enabled |
+| `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
+| `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap with WiFi + SSH |
 
 ## Quick Commands
 
@@ -50,6 +58,8 @@ nix --extra-experimental-features 'nix-command flakes' run github:nix-community/
 
 # Install
 nixos-install --root /mnt --no-root-passwd \
+  --option substituters "http://nix-cache.local:5000 https://cache.nixos.org https://nix-community.cachix.org https://cache.nixos-cuda.org" \
+  --option trusted-public-keys "build-vm-1:CQeZikX76TXVMm+EXHMIj26lmmLqfSxv8wxOkwqBb3g= cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M=" \
   --flake github:basnijholt/dotfiles/main?dir=configs/nixos#hp
 ```
 
@@ -62,6 +72,19 @@ For dev-vm on macOS (Apple Silicon), see `hosts/dev-vm/README.md`
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
 
+## Hetzner Cloud Installation
+
+```bash
+echo 'HCLOUD_TOKEN="your-token"' > hosts/hetzner/.env  # Create API token at hetzner.cloud
+./hosts/hetzner/deploy.py deploy                       # Deploys CAX11 ARM server (€3.29/mo)
+```
+
+After deployment, set your password: `ssh basnijholt@<IP>` then `passwd`.
+
 ## Nix Cache Server Setup (nix-cache)
 
 See [hosts/nix-cache/README.md](./hosts/nix-cache/README.md) for instructions on setting up the cache server container with Harmonia.
+
+## Paul's Wyse 5070 Gateway (paul-wyse)
+
+See [hosts/paul-wyse/README.md](./hosts/paul-wyse/README.md) for installation and setup instructions.

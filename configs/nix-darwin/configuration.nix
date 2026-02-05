@@ -11,6 +11,8 @@
 
   # Add system packages
   environment.systemPackages = with pkgs; [
+    cups # lp command for network printing
+    devbox
     nixpkgs-fmt
   ];
 
@@ -49,8 +51,16 @@
   # Add ability to used TouchID for sudo
   security.pam.services.sudo_local.touchIdAuth = true;
 
+  # Configure Terminal.app to use Option as Meta key (for Alt+Arrow word navigation)
+  system.activationScripts.postActivation.text = ''
+    defaults write com.apple.Terminal useOptionAsMetaKey -bool true
+  '';
+
   # Create /etc/zshrc that loads the nix-darwin environment.
-  programs.zsh.enable = true;
+  programs.zsh = {
+    enable = true;
+    enableCompletion = false; # Let oh-my-zsh handle compinit (saves ~300ms)
+  };
 
   # Auto upgrade nix package and the daemon service.
   nix.package = pkgs.nix;

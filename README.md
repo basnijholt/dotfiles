@@ -81,9 +81,19 @@ CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.p
 git clone --depth=1 --branch public --single-branch \
   --recurse-submodules -j8 --shallow-submodules \
   git@github.com:basnijholt/dotfiles.git ~/dotfiles
-cd dotfiles
+cd ~/dotfiles
 ./install
 ```
+
+#### One-line bootstrap (macOS & Linux)
+
+A single command that installs prerequisites, clones the repo, initializes submodules, and runs `./install`:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/basnijholt/dotfiles/public/scripts/bootstrap.sh)"
+```
+
+Works on macOS (Apple Silicon) and Linux (Alpine, Debian, Ubuntu, Fedora, Arch).
 
 #### macOS Terminal Font
 
@@ -91,6 +101,7 @@ If prompt icons show as empty squares, install a Nerd Font and select it in Term
 
 ```bash
 brew install --cask font-fira-mono-nerd-font
+brew install zsh git-lfs eza  # General useful tools
 ```
 
 Then in Terminal: Settings → Profiles → Text → Font → choose “FiraMono Nerd Font Mono”.
@@ -331,7 +342,7 @@ scripts
 ├── sync-local-dotfiles.sh        # On a host: pull latest and optionally run ./install
 ├── sync-photos-to-truenas.sh     # Sync photos to TrueNAS server
 ├── sync-submodules.sh
-├── sync-uv-tools.sh              # Globally install uv tools I frequently use
+├── sync-uv.sh              # Globally install uv tools I frequently use
 ├── transcribe.py                 # Stream mic audio to a Wyoming ASR server (clipboard optional)
 ├── upload-file.sh                # Upload files to various paste/file hosts
 ├── voice_clipboard_assistant.py  # Voice command assistant for clipboard text via Ollama

@@ -6,15 +6,18 @@
   nixpkgs.config = {
     cudaSupport = true;
     packageOverrides = pkgs: {
-      ollama = pkgs.ollama.overrideAttrs (oldAttrs: rec {
-        version = "0.12.11";
+      ollama = (pkgs.ollama.override {
+        # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
+        cudaArches = [ "sm_86" ];
+      }).overrideAttrs (oldAttrs: rec {
+        version = "0.15.4";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-o6jjn9VyLRwD1wFoUv8nNwf5QC6TOVipmMrcHtikNjI=";
+          hash = "sha256-5dkikrp7jVGnfFwiGkbsGsRnrsS0zcZzWQ7shOn3alw=";
         };
-        vendorHash = "sha256-rKRRcwmon/3K2bN7iQaMap5yNYKMCZ7P0M1C2hv4IlQ=";
+        vendorHash = "sha256-WdHAjCD20eLj0d9v1K6VYP8vJ+IZ8BEZ3CciYLLMtxc=";
         postFixup = pkgs.lib.replaceStrings [
           ''mv "$out/bin/app" "$out/bin/.ollama-app"''
         ] [
@@ -35,12 +38,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "7229";
+            version = "7941";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-H2IKzfD0g/8ECssFoPPkOS6bZc0fGMybPNc3+GwC5qk=";
+              hash = "sha256-o8gSbm67lGk/4j55H0JN1LEfrod1MTaoKIUxcMTN0zo=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -53,6 +56,7 @@
             # for reproducible builds). We sacrifice portability for faster CPU layers.
             cmakeFlags = (oldAttrs.cmakeFlags or []) ++ [
               "-DGGML_NATIVE=ON"
+              "-DCMAKE_CUDA_ARCHITECTURES=86" # RTX 3090 - needed since sandbox has no GPU
             ];
 
             # Disable Nix's NIX_ENFORCE_NO_NATIVE which strips -march=native flags
@@ -69,8 +73,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v176/llama-swap_176_linux_amd64.tar.gz";
-            hash = "sha256-bUn3dpw1pzQnO9BrKm1pRXwxWwxXSOSGznqgCyvpATw=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v189/llama-swap_189_linux_amd64.tar.gz";
+            hash = "sha256-W1614G73DlGJlvgkQAtcI09zprRqDVfe0wjl9T8vGO4=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap

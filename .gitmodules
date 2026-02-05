@@ -8,9 +8,6 @@
 	path = submodules/dotbot
 	url = https://github.com/anishathalye/dotbot
 	ignore = dirty
-[submodule "submodules/zsh-fzf-history-search"]
-	path = submodules/zsh-fzf-history-search
-	url = git@github.com:joshskidmore/zsh-fzf-history-search.git
 [submodule "submodules/truenas-zfs-unlock"]
 	path = submodules/truenas-zfs-unlock
 	url = git@github.com:ThorpeJosh/truenas-zfs-unlock.git
@@ -20,9 +17,6 @@
 [submodule "submodules/mydotbins"]
 	path = submodules/mydotbins
 	url = git@github.com:basnijholt/mydotbins.git
-[submodule "submodules/zsh-z"]
-	path = submodules/zsh-z
-	url = git@github.com:agkozak/zsh-z.git
 [submodule "submodules/oh-my-zsh"]
 	path = submodules/oh-my-zsh
 	url = git@github.com:robbyrussell/oh-my-zsh.git
@@ -39,9 +33,3 @@
 [submodule "submodules/tmux"]
 	path = submodules/tmux
 	url = https://github.com/gpakosz/.tmux.git
-[submodule "submodules/autoenv"]
-	path = submodules/autoenv
-	url = https://github.com/hyperupcall/autoenv
-[submodule "submodules/mechabar"]
-	path = submodules/mechabar
-	url = git@github.com:sejjy/mechabar.git

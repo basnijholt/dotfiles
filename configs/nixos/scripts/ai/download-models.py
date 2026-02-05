@@ -69,11 +69,11 @@ def main():
             print("  Warning: No HuggingFace arguments found in command. Skipping.")
             continue
 
-        # Construct llama-cli command
+        # Construct llama-completion command
         # We use -p "check" -n 1 to just load the model and generate 1 token, ensuring it's downloaded.
-        # We assume llama-cli is in the PATH.
+        # We assume llama-completion is in the PATH.
         cli_cmd = (
-            ["llama-cli"]
+            ["llama-completion"]
             + dl_args
             + [
                 "-p",
@@ -81,7 +81,6 @@ def main():
                 "-n",
                 "1",
                 "--no-display-prompt",
-                "--no-conversation",
             ]
         )
 
@@ -96,7 +95,7 @@ def main():
             print("  -> Failed (or maybe just interrupted).")
         except FileNotFoundError:
             print(
-                "  -> Error: 'llama-cli' not found in PATH. Please run inside a 'nix-shell -p llama-cpp' or similar."
+                "  -> Error: 'llama-completion' not found in PATH. Please run inside a 'nix-shell -p llama-cpp' or similar."
             )
             return
 

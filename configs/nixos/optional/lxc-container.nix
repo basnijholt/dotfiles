@@ -20,8 +20,11 @@
   # See: https://github.com/NixOS/nixpkgs/issues/157449
   boot.specialFileSystems."/run".options = [ "rshared" ];
 
-  # --- Disable systemd-resolved (container uses host DNS) ---
-  services.resolved.enable = lib.mkForce false;
+  # --- Enable systemd-resolved for .local DNS resolution ---
+  # LXC containers default to useHostResolvConf=true which conflicts with
+  # systemd-resolved. We enable resolved and disable host resolv.conf.
+  services.resolved.enable = true;
+  networking.useHostResolvConf = lib.mkForce false;
 
   networking.useDHCP = lib.mkDefault true;
 

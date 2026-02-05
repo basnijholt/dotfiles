@@ -20,10 +20,13 @@
     settings = {
       PasswordAuthentication = false;
       PermitRootLogin = "no";
-      UseDns = true;
+      UseDns = false;
       X11Forwarding = true;
     };
   };
+
+  # --- Mosh ---
+  programs.mosh.enable = true;
 
   # --- Security & Authentication ---
   programs.gnupg.agent = {
