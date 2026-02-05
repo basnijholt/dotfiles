@@ -23,5 +23,7 @@
     "rust-analyzer-lsp@claude-plugins-official": true,
     "claude-code-wakatime@wakatime": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "autoUpdatesChannel": "stable",
+  "minimumVersion": "2.1.19"
 }
