@@ -39,5 +39,5 @@ codex = ["--dangerously-bypass-approvals-and-sandbox"]
 
 [dev.agent_env.claude]
 CLAUDE_CODE_USE_VERTEX = "1"
-ANTHROPIC_MODEL = "claude-opus-4-5"
+ANTHROPIC_MODEL = "claude-opus-4-6"
 ANTHROPIC_SMALL_FAST_MODEL = "claude-haiku-4-5"

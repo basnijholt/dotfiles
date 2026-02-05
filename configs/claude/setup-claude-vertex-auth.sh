@@ -34,6 +34,6 @@ echo "Add these to your shell config:"
 echo ""
 echo 'export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/claude-vertex-key.json"'
 echo "export ANTHROPIC_VERTEX_PROJECT_ID=${PROJECT_ID}"
-echo "export ANTHROPIC_MODEL='claude-opus-4-5'"
+echo "export ANTHROPIC_MODEL='claude-opus-4-6'"
 echo "export ANTHROPIC_SMALL_FAST_MODEL='claude-haiku-4-5@20251001'"
 echo 'export CLAUDE_CODE_USE_VERTEX=1'
