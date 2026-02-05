@@ -110,6 +110,32 @@ else
   log "Skipping dotbins binary fetch (unsupported platform)."
 fi
 
+# --- Preserve existing git identity ---
+PERSONAL_CONFIG="$DOTFILES_DIR/configs/git/gitconfig-personal"
+EXAMPLE_CONFIG="$DOTFILES_DIR/configs/git/gitconfig-personal.example"
+
+# Skip if personal config already exists with real values (not placeholders)
+if [[ -f "$PERSONAL_CONFIG" ]] && ! grep -q "you@domain.com\|Your Name" "$PERSONAL_CONFIG"; then
+  log "Existing gitconfig-personal found with real values. Skipping."
+else
+  # Try to preserve identity from global git config
+  CURRENT_NAME=$(git config --global user.name 2>/dev/null || true)
+  CURRENT_EMAIL=$(git config --global user.email 2>/dev/null || true)
+
+  if [[ -n "$CURRENT_NAME" && -n "$CURRENT_EMAIL" ]]; then
+    log "Preserving existing git identity: $CURRENT_NAME <$CURRENT_EMAIL>"
+    cat > "$PERSONAL_CONFIG" << EOF
+[user]
+	email = $CURRENT_EMAIL
+	name = $CURRENT_NAME
+EOF
+  elif [[ -f "$EXAMPLE_CONFIG" ]]; then
+    log "No existing git identity found. Using example template."
+    log "Edit ~/.gitconfig-personal to set your name and email."
+    cp "$EXAMPLE_CONFIG" "$PERSONAL_CONFIG"
+  fi
+fi
+
 # --- Run dotbot installer ---
 log "Running dotfiles installer..."
 (
