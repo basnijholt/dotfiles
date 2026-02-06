@@ -24,6 +24,7 @@
     ~/.config/nix-darwin: configs/nix-darwin
     ~/.config/nvim: configs/nvim
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
+    ~/.config/opencode/plugins: configs/opencode/plugins
     ~/.config/starship.toml: configs/starship/starship.toml
     ~/.config/wezterm/wezterm.lua: configs/wezterm/wezterm.lua
     ~/.config/yazi: configs/yazi
@@ -41,6 +42,8 @@
     ~/.cargo/config.toml: configs/cargo/config.toml
     ~/.local/bin/rustc-wrapper: configs/cargo/rustc-wrapper.sh
     ~/.npmrc: configs/npm/npmrc
+    ~/.pi/agent/models.json: configs/pi-agent/models.json
+    ~/.pi/agent/settings.json: configs/pi-agent/settings.json
     ~/.local/bin/run: scripts/run.sh
     ~/.local/bin/sync-dotfiles: scripts/sync-dotfiles.sh
     ~/.local/bin/sync-local-dotfiles: scripts/sync-local-dotfiles.sh
