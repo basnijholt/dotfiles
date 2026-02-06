@@ -1,0 +1,118 @@
+{
+  "providers": {
+    "llama-swap": {
+      "baseUrl": "http://llama.local/v1",
+      "api": "openai-completions",
+      "apiKey": "none",
+      "models": [
+        {
+          "id": "glm-4.7-flash:q4",
+          "name": "GLM-4.7 Flash Q4 (local)",
+          "contextWindow": 131072,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "devstral-2:24b-q4",
+          "name": "Devstral-2 24B Q4 (local)",
+          "contextWindow": 65536,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "devstral-2:24b-q8",
+          "name": "Devstral-2 24B Q8 (local)",
+          "contextWindow": 65536,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "devstral-2:123b",
+          "name": "Devstral-2 123B Q3 (local)",
+          "contextWindow": 65536,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "gpt-oss-low:20b",
+          "name": "GPT-OSS 20B Low (local)",
+          "contextWindow": 131072,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "gpt-oss-medium:20b",
+          "name": "GPT-OSS 20B Medium (local)",
+          "contextWindow": 131072,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "gpt-oss-high:20b",
+          "name": "GPT-OSS 20B High (local)",
+          "contextWindow": 131072,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "gpt-oss:120b",
+          "name": "GPT-OSS 120B (local)",
+          "contextWindow": 65536,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "gpt-oss:120b-q8",
+          "name": "GPT-OSS 120B Q8 (local)",
+          "contextWindow": 65536,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        },
+        {
+          "id": "gpt-oss:120b-derestricted",
+          "name": "GPT-OSS 120B Derestricted (local)",
+          "contextWindow": 65536,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
+        }
+      ]
+    },
+    "litellm": {
+      "baseUrl": "http://litellm.local/v1",
+      "api": "openai-completions",
+      "apiKey": "sk-dummy",
+      "models": [
+        {
+          "id": "claude-opus-4-6",
+          "name": "Claude Opus 4.6 (LiteLLM)",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 200000,
+          "maxTokens": 32000
+        },
+        {
+          "id": "claude-opus-4-5",
+          "name": "Claude Opus 4.5 (LiteLLM)",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 200000,
+          "maxTokens": 32000
+        },
+        {
+          "id": "claude-sonnet-4-5",
+          "name": "Claude Sonnet 4.5 (LiteLLM)",
+          "input": ["text", "image"],
+          "contextWindow": 200000,
+          "maxTokens": 16000
+        },
+        {
+          "id": "claude-haiku-4-5",
+          "name": "Claude Haiku 4.5 (LiteLLM)",
+          "input": ["text", "image"],
+          "contextWindow": 200000,
+          "maxTokens": 8000
+        }
+      ]
+    }
+  }
+}
