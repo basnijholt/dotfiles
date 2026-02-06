@@ -8,6 +8,7 @@ packages=(
     @just-every/code@latest
     @openai/codex@latest
     @anthropic-ai/claude-code@latest
+    @mariozechner/pi-coding-agent@latest
     opencode-ai@latest
 )
 bun install -g "${packages[@]}"
