@@ -14,6 +14,7 @@ export PATH="$PNPM_HOME:$PATH"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 export MY_OLLAMA_HOST=http://pc.local:11434
+export OPENAI_BASE_URL=http://llama.local/v1
 export XDG_CONFIG_HOME="$HOME/.config"
 export OLLAMA_KEEP_ALIVE="1h"
 export LESS="-R"  # Enable colors in less (avoid --mouse, breaks text selection)

@@ -30,6 +30,7 @@ from rich.status import Status
 
 # --- Configuration ---
 MY_OLLAMA_HOST = os.getenv("MY_OLLAMA_HOST", "http://localhost:11434")
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL")
 DEFAULT_MODEL = "gpt-oss:20b"
 
 # The agent's core identity and immutable rules.
@@ -208,7 +209,8 @@ def build_agent(model: str, custom_prompt: str | None = None) -> Agent:
             f"\n\nIMPORTANT: You must also follow this instruction: {custom_prompt}"
         )
 
-    ollama_provider = OpenAIProvider(base_url=f"{MY_OLLAMA_HOST}/v1")
+    base_url = OPENAI_BASE_URL or f"{MY_OLLAMA_HOST}/v1"
+    ollama_provider = OpenAIProvider(base_url=base_url)
     ollama_model = OpenAIModel(
         model_name=model,
         provider=ollama_provider,
