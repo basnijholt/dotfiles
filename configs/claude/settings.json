@@ -21,7 +21,8 @@
   },
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
-    "claude-code-wakatime@wakatime": true
+    "claude-code-wakatime@wakatime": true,
+    "agent-cli-dev@agent-cli": true
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "stable",
