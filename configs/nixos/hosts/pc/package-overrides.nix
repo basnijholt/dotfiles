@@ -10,14 +10,14 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.15.4";
+        version = "0.15.5";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-5dkikrp7jVGnfFwiGkbsGsRnrsS0zcZzWQ7shOn3alw=";
+          hash = "sha256-VJrAUHX+BVQXsH34BDI4YqVXEqD14ERnKhSpMByAdrQ=";
         };
-        vendorHash = "sha256-WdHAjCD20eLj0d9v1K6VYP8vJ+IZ8BEZ3CciYLLMtxc=";
+        vendorHash = "sha256-r7bSHOYAB5f3fRz7lKLejx6thPx0dR4UXoXu0XD7kVM=";
         postFixup = pkgs.lib.replaceStrings [
           ''mv "$out/bin/app" "$out/bin/.ollama-app"''
         ] [
@@ -38,12 +38,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "7941";
+            version = "7966";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-o8gSbm67lGk/4j55H0JN1LEfrod1MTaoKIUxcMTN0zo=";
+              hash = "sha256-ivGqCSBVDmDTal4MecJCWoghqEua3WgT4XmUzm7QGIc=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
