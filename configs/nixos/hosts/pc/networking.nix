@@ -46,6 +46,8 @@
     9898 # asr_custom_model = "nvidia/canary-qwen-2.5b"
     11434 # ollama
     8080 # element
+    8765 # MindRoom backend API
+    3003 # MindRoom frontend dev
     30080 # mindroom ingress http (kind)
     30443 # mindroom ingress https (kind)
   ];
