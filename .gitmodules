@@ -1,35 +1,20 @@
-[submodule "submodules/rsync-time-backup"]
-	path = submodules/rsync-time-backup
-	url = git@github.com:basnijholt/backups.git
-[submodule "secrets"]
-	path = secrets
-	url = git@github.com:basnijholt/dotfiles-secrets.git
 [submodule "submodules/dotbot"]
 	path = submodules/dotbot
 	url = https://github.com/anishathalye/dotbot
 	ignore = dirty
-[submodule "submodules/truenas-zfs-unlock"]
-	path = submodules/truenas-zfs-unlock
-	url = git@github.com:ThorpeJosh/truenas-zfs-unlock.git
-[submodule "submodules/dotbins"]
-	path = submodules/dotbins
-	url = git@github.com:basnijholt/dotbins.git
 [submodule "submodules/mydotbins"]
 	path = submodules/mydotbins
-	url = git@github.com:basnijholt/mydotbins.git
+	url = https://github.com/basnijholt/mydotbins.git
 [submodule "submodules/oh-my-zsh"]
 	path = submodules/oh-my-zsh
-	url = git@github.com:robbyrussell/oh-my-zsh.git
+	url = https://github.com/robbyrussell/oh-my-zsh.git
 	ignore = dirty
 [submodule "submodules/zsh-syntax-highlighting"]
 	path = submodules/zsh-syntax-highlighting
-	url = git@github.com:zsh-users/zsh-syntax-highlighting.git
+	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
 [submodule "submodules/zsh-autosuggestions"]
 	path = submodules/zsh-autosuggestions
-	url = git@github.com:zsh-users/zsh-autosuggestions.git
-[submodule "submodules/syncthing-resolve-conflicts"]
-	path = submodules/syncthing-resolve-conflicts
-	url = git@github.com:dschrempf/syncthing-resolve-conflicts.git
+	url = https://github.com/zsh-users/zsh-autosuggestions.git
 [submodule "submodules/tmux"]
 	path = submodules/tmux
 	url = https://github.com/gpakosz/.tmux.git
