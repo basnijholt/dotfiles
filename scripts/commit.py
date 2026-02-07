@@ -30,7 +30,7 @@ from rich.status import Status
 
 # --- Configuration ---
 MY_OLLAMA_HOST = os.getenv("MY_OLLAMA_HOST", "http://localhost:11434")
-OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL")
+OPENAI_BASE_URL = os.getenv("MY_OPENAI_BASE_URL")
 DEFAULT_MODEL = "gpt-oss:20b"
 
 # The agent's core identity and immutable rules.

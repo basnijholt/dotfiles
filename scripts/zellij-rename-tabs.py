@@ -13,7 +13,7 @@ Usage:
     zellij-rename-tab.py --all --debug  # Show full prompt and response
 
 Environment variables:
-    ZELLIJ_NAMER_BASE_URL: API base URL. Default: http://192.168.1.5:9292/v1
+    MY_OPENAI_BASE_URL: API base URL. Default: http://192.168.1.5:9292/v1
     ZELLIJ_NAMER_MODEL: Model name. Default: gpt-oss-low:20b
 """
 
@@ -41,7 +41,7 @@ DEBUG = False
 SESSION: str | None = None  # Target session name
 
 # --- Configuration ---
-BASE_URL = os.getenv("ZELLIJ_NAMER_BASE_URL", "http://192.168.1.5:9292/v1")
+BASE_URL = os.getenv("MY_OPENAI_BASE_URL", "http://192.168.1.5:9292/v1")
 MODEL = os.getenv("ZELLIJ_NAMER_MODEL", "gpt-oss-low:20b")
 
 SYSTEM_PROMPT = """\
