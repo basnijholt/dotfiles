@@ -107,13 +107,25 @@
           ./hosts/pc/incus-overrides.nix
         ];
 
-        # Lightweight development VM for Incus
+        # Lightweight development VM for Incus (x86_64)
         dev-vm = mkHost [
           disko.nixosModules.disko
           ./hosts/dev-vm/disko.nix
           ./hosts/dev-vm/default.nix
           ./hosts/dev-vm/hardware-configuration.nix
         ];
+
+        # Lightweight development VM for Incus (aarch64 - for ARM Macs)
+        dev-vm-aarch64 = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = commonModules ++ [
+            { nixpkgs.hostPlatform = "aarch64-linux"; }
+            disko.nixosModules.disko
+            ./hosts/dev-vm/disko.nix
+            ./hosts/dev-vm/default.nix
+            ./hosts/dev-vm/hardware-configuration.nix
+          ];
+        };
 
         # Lightweight development LXC container for Incus
         dev-lxc = mkHost [
