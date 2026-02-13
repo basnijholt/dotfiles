@@ -11,17 +11,14 @@
     ~/.claude/settings.json: configs/claude/settings.json
     ~/.claude/statusline.py: configs/claude/statusline.py
     ~/.condarc: configs/conda/condarc
-    ~/.config/agent-cli/config.toml: configs/agent-cli/config.toml
     ~/.config/amp/settings.json: configs/amp/settings.json
     ~/.config/atuin: configs/atuin
     ~/.config/bat/config: configs/bat/config
     ~/.config/codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.config/codex/config.toml: configs/codex/config.toml
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
-    ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
     ~/.config/git/attributes: configs/git/attributes
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
-    ~/.config/nix-darwin: configs/nix-darwin
     ~/.config/nvim: configs/nvim
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
     ~/.config/opencode/plugins: configs/opencode/plugins
@@ -45,7 +42,6 @@
     ~/.pi/agent/models.json: configs/pi-agent/models.json
     ~/.pi/agent/settings.json: configs/pi-agent/settings.json
     ~/.local/bin/run: scripts/run.sh
-    ~/.local/bin/sync-dotfiles: scripts/sync-dotfiles.sh
     ~/.local/bin/sync-local-dotfiles: scripts/sync-local-dotfiles.sh
     ~/.local/bin/sync-bun: scripts/sync-bun.sh
     ~/.local/bin/sync-submodules: scripts/sync-submodules.sh
@@ -62,8 +58,6 @@
   - bash scripts/sync-uv.sh
   - bash scripts/sync-bun.sh
   - git submodule update --init --recursive
-  - command: '[[ "$(uname)" = "Darwin" ]] && [ -f ./secrets/install ] && (echo "SECRETS" && ./secrets/install) || true'
-    stdout: true
 
 # -- Only on Linux --
 - defaults:
@@ -72,9 +66,7 @@
       relink: true
       if: '[ "$(uname)" = "Linux" ]'
 - link:
-    ~/.config/hypr: configs/hypr
     ~/.config/waybar: submodules/mechabar
-    ~/.config/mako/config: configs/mako/config
 
 # -- Only on MacOS --
 - defaults:
@@ -84,9 +76,4 @@
       if: '[ "$(uname)" = "Darwin" ]'
 - link:
     ~/.gitconfig-sign: configs/git/gitconfig-sign
-    ~/.config/karabiner/karabiner.json: configs/karabiner/karabiner.json
-    ~/.config/skhd/skhdrc: configs/skhd/skhdrc
-    ~/Work/.stignore: configs/syncthing/stignore
-    ~/Lightroom/.stignore: configs/syncthing/stignore
-    ~/Sync/.stignore: configs/syncthing/stignore
     "~/Library/Application Support/iTerm2/DynamicProfiles/Profiles.json": configs/iterm/Profiles.json
