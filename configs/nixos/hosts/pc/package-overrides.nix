@@ -5,19 +5,43 @@
 {
   nixpkgs.config = {
     cudaSupport = true;
-    packageOverrides = pkgs: {
+    packageOverrides = pkgs:
+      let
+        # tree-sitter C sources needed by ollama 0.16.1+
+        # go mod vendor doesn't copy C files from subdirectories without .go files
+        treeSitterGoSrc = pkgs.fetchFromGitHub {
+          owner = "tree-sitter";
+          repo = "go-tree-sitter";
+          rev = "adc13ffd8b2c0b01b878fda9f7c422ce0df5fad3"; # v0.25.0
+          hash = "sha256-DVVhHQy0AEVyCig18JhlTVgttWaHJWRPdTSfwfFuKAk=";
+        };
+        treeSitterCppSrc = pkgs.fetchFromGitHub {
+          owner = "tree-sitter";
+          repo = "tree-sitter-cpp";
+          rev = "v0.23.4";
+          hash = "sha256-tP5Tu747V8QMCEBYwOEmMQUm8OjojpJdlRmjcJTbe2k=";
+        };
+      in
+      {
       ollama = (pkgs.ollama.override {
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.15.5";
+        version = "0.16.1";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-VJrAUHX+BVQXsH34BDI4YqVXEqD14ERnKhSpMByAdrQ=";
+          hash = "sha256-LdB/p3ZO+WCoU7xQz76suJ6Vc1TFAMGcLvMBib5w5fU=";
         };
-        vendorHash = "sha256-r7bSHOYAB5f3fRz7lKLejx6thPx0dR4UXoXu0XD7kVM=";
+        vendorHash = "sha256-OQOx0G4kxToe8soef4vZDhp1RtTnLkiT2tQBXgB3T5E=";
+        preBuild = oldAttrs.preBuild + ''
+          # Fix tree-sitter vendor: copy C sources that go mod vendor excludes
+          chmod -R u+w vendor/github.com/tree-sitter
+          cp -r ${treeSitterGoSrc}/include vendor/github.com/tree-sitter/go-tree-sitter/
+          cp -r ${treeSitterGoSrc}/src vendor/github.com/tree-sitter/go-tree-sitter/
+          cp -r ${treeSitterCppSrc}/src vendor/github.com/tree-sitter/tree-sitter-cpp/
+        '';
         postFixup = pkgs.lib.replaceStrings [
           ''mv "$out/bin/app" "$out/bin/.ollama-app"''
         ] [
@@ -38,12 +62,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "7966";
+            version = "8027";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-ivGqCSBVDmDTal4MecJCWoghqEua3WgT4XmUzm7QGIc=";
+              hash = "sha256-AEPdDOseqgBCNTzyjkzsJWhCAOX5oA493D6Qz/DOENk=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -73,8 +97,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v189/llama-swap_189_linux_amd64.tar.gz";
-            hash = "sha256-W1614G73DlGJlvgkQAtcI09zprRqDVfe0wjl9T8vGO4=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v190/llama-swap_190_linux_amd64.tar.gz";
+            hash = "sha256-WAfmJ4YiVH/UYq++l2Ut6oLqkd270HgG7eV+6FG/0Oc=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
