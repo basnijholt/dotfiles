@@ -56,6 +56,7 @@ let
     pwgen
     rclone
     ripgrep
+    rsync
     starship
     tealdeer
     terraform
