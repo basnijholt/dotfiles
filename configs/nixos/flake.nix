@@ -121,6 +121,12 @@
           ./optional/lxc-container.nix
         ];
 
+        # Lightweight development LXC container for Incus (on HP)
+        mindroom = mkHost [
+          ./hosts/mindroom/default.nix
+          ./optional/lxc-container.nix
+        ];
+
         # Docker-focused LXC container for Incus
         docker-lxc = mkHost [
           ./hosts/docker-lxc/default.nix
