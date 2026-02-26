@@ -29,5 +29,6 @@
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "stable",
-  "minimumVersion": "2.1.41"
+  "minimumVersion": "2.1.41",
+  "skipDangerousModePermissionPrompt": true
 }
