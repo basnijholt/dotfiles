@@ -23,6 +23,17 @@ let
     bin_path="$(find "$TMPDIR" -maxdepth 2 -type f -name tuwunel | head -n1)"
     install -m 0755 "$bin_path" "$out/bin/tuwunel"
   '';
+  cinnyVersion = "v4.10.3-mindroom.1";
+  cinnyArchive = pkgs.fetchurl {
+    url = "https://github.com/mindroom-ai/mindroom-cinny/releases/download/${cinnyVersion}/mindroom-cinny-dist-${cinnyVersion}.tar.gz";
+    hash = "sha256-GabDDS2i5Xvjq0cWQjaLp2BO/CRw/Np/cUDnsl7hgpA=";
+  };
+  cinnyDist = pkgs.runCommand "mindroom-cinny-dist-${cinnyVersion}" {
+    nativeBuildInputs = with pkgs; [ gnutar gzip ];
+  } ''
+    mkdir -p "$out"
+    tar -xzf "${cinnyArchive}" -C "$out"
+  '';
   tuwunelConfig = pkgs.writeText "tuwunel.toml" ''
     [global]
     server_name = "${siteDomain}"
@@ -113,7 +124,6 @@ in
     "d /var/lib/tuwunel 0750 tuwunel tuwunel -"
     "d /run/tuwunel 0755 tuwunel tuwunel -"
     "d /var/www/mindroom 0755 basnijholt users -"
-    "d /var/www/cinny 0755 basnijholt users -"
   ];
 
   systemd.services.tuwunel = {
@@ -151,13 +161,7 @@ in
 
   # ── Cinny web client ────────────────────────────────────────────────
   #
-  # MindRoom Cinny fork served as static files by Caddy.
-  # Build and deploy:
-  #   ssh basnijholt@<server-ip>
-  #   cd /var/www/cinny
-  #   git clone https://github.com/mindroom-ai/mindroom-cinny .
-  #   npm ci && npm run build
-  #   # Caddy serves dist/ automatically
+  # MindRoom Cinny fork served as static files from a pinned GitHub release artifact.
 
   # ── Caddy reverse proxy + web client ────────────────────────────────
 
@@ -194,7 +198,7 @@ in
     # Cinny web client (SPA)
     virtualHosts."${cinnyDomain}" = {
       extraConfig = ''
-        root * /var/www/cinny/dist
+        root * ${cinnyDist}/dist
         try_files {path} /index.html
         file_server
       '';
@@ -203,8 +207,8 @@ in
 
   # ── General server config ──────────────────────────────────────────
 
-  # Packages needed for Cinny builds and release-based Tuwunel updates.
-  environment.systemPackages = with pkgs; [ nodejs git curl jq ];
+  # Packages needed for release pin updates and operational debugging.
+  environment.systemPackages = with pkgs; [ git curl jq ];
 
   # Disable services not needed on a Matrix server
   services.fwupd.enable = lib.mkForce false;

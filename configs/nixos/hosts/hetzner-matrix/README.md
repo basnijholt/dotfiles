@@ -101,14 +101,25 @@ Provider IDs and callback URLs are in Nix config, while client secrets are read 
 
 ### Cinny web client
 
-Build and deploy the MindRoom Cinny fork:
+Cinny is pinned from a GitHub release `dist` artifact in Nix (`default.nix`):
+
+- `cinnyVersion`
+- `cinnyArchive` URL/hash
+
+To update:
+
+1. Create/upload a new `dist` release asset in `mindroom-ai/mindroom-cinny`.
+2. Update `cinnyVersion`.
+3. Update `hash` with:
 
 ```bash
-cd /var/www/cinny
-git clone https://github.com/mindroom-ai/mindroom-cinny . || true
-git pull --ff-only
-npm ci
-npm run build
+nix store prefetch-file --json "https://github.com/mindroom-ai/mindroom-cinny/releases/download/<tag>/mindroom-cinny-dist-<tag>.tar.gz"
+```
+
+4. Rebuild:
+
+```bash
+nixos-rebuild switch --flake ~/dotfiles/configs/nixos#hetzner-matrix
 ```
 
 ### mindroom.chat website
