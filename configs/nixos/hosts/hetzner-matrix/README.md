@@ -1,4 +1,4 @@
-# hetzner-tuwunel
+# hetzner-matrix
 
 Public Matrix homeserver ([Tuwunel](https://github.com/mindroom-ai/mindroom-tuwunel), MindRoom fork) on Hetzner Cloud ARM VPS with [Cinny](https://github.com/mindroom-ai/mindroom-cinny) web client.
 
@@ -8,10 +8,19 @@ Users run [MindRoom](https://github.com/mindroom-ai/mindroom) locally and connec
 
 ```bash
 # 1. Create .env with your Hetzner Cloud API token
-echo "HCLOUD_TOKEN=your-token" > hosts/hetzner-tuwunel/.env
+echo "HCLOUD_TOKEN=your-token" > hosts/hetzner-matrix/.env
 
-# 2. Deploy (creates server + installs NixOS via nixos-anywhere)
-./hosts/hetzner-tuwunel/deploy.py deploy hetzner-tuwunel --type cax21 --location nbg1
+# 2. Deploy (two-stage: bootstrap first, then full config)
+./hosts/hetzner-matrix/deploy.py deploy hetzner-matrix --bootstrap hetzner-bootstrap --type cax21 --location nbg1
+```
+
+This host is intended to use a two-stage install:
+- Stage 1: `hetzner-bootstrap` (minimal system that fits rescue-mode RAM limits)
+- Stage 2: switch to full `hetzner-matrix` on the installed system (disk-backed `/nix`)
+
+If a previous failed server already exists, recreate it:
+```bash
+./hosts/hetzner-matrix/deploy.py deploy hetzner-matrix --bootstrap hetzner-bootstrap --delete --type cax21 --location nbg1
 ```
 
 ## Post-deploy setup
@@ -96,11 +105,11 @@ head -c4 /dev/urandom | od -A none -t x4 | tr -d ' '
 After config changes:
 
 ```bash
-nixos-rebuild switch --flake .#hetzner-tuwunel --target-host basnijholt@<server-ip>
+nixos-rebuild switch --flake .#hetzner-matrix --target-host basnijholt@<server-ip>
 ```
 
 ## Destroy
 
 ```bash
-./hosts/hetzner-tuwunel/deploy.py destroy hetzner-tuwunel
+./hosts/hetzner-matrix/deploy.py destroy hetzner-matrix
 ```

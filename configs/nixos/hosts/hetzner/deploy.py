@@ -36,9 +36,18 @@ else:
     console.print(f"[yellow]Warning: {ENV_FILE} not found[/yellow]")
 
 
-def run(cmd: list[str], check: bool = True, capture: bool = False) -> subprocess.CompletedProcess:
+def run(
+    cmd: list[str],
+    check: bool = True,
+    capture: bool = False,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess:
     """Run a command."""
-    result = subprocess.run(cmd, capture_output=capture, text=True)
+    full_env = os.environ.copy()
+    if env:
+        full_env.update(env)
+
+    result = subprocess.run(cmd, capture_output=capture, text=True, env=full_env)
     if check and result.returncode != 0:
         console.print(f"[red]Command failed:[/red] {' '.join(cmd)}")
         if result.stderr:
@@ -86,6 +95,12 @@ def deploy(
     server_type: str = typer.Option("cax11", "--type", "-t", help="Server type (cax11=ARM €3.29/mo)"),
     location: str = typer.Option("fsn1", "--location", "-l", help="Datacenter location"),
     delete_existing: bool = typer.Option(False, "--delete", "-d", help="Delete existing server"),
+    bootstrap: str | None = typer.Option(
+        None,
+        "--bootstrap",
+        "-b",
+        help="Optional bootstrap flake host (stage 1) before switching to <name>",
+    ),
 ):
     """Deploy NixOS to a new Hetzner Cloud server."""
     # Check prerequisites
@@ -153,15 +168,51 @@ def deploy(
     time.sleep(30)
     wait_for_ssh(server_ip, timeout=180)
 
-    # Run nixos-anywhere
-    console.print("[cyan]Running nixos-anywhere...[/cyan]")
-    flake_ref = f"{FLAKE_DIR}#{name}"
+    # Optional two-stage deployment:
+    # stage 1 installs a minimal bootstrap host in rescue mode,
+    # stage 2 switches to the final host on disk-backed /nix.
+    use_bootstrap = bootstrap is not None
+    install_name = bootstrap if use_bootstrap else name
+
+    flake_root = f"path:{FLAKE_DIR}"
+    flake_ref = f"{flake_root}#{name}"
+    install_flake_ref = f"{flake_root}#{install_name}"
+
+    if use_bootstrap:
+        console.print(
+            f"[cyan]Using bootstrap config:[/cyan] {install_name}\n"
+            f"[cyan]Stage 1:[/cyan] nixos-anywhere install bootstrap\n"
+            f"[cyan]Stage 2:[/cyan] remote nixos-rebuild to {name}"
+        )
+
+    # Run nixos-anywhere (stage 1)
+    console.print(f"[cyan]Running nixos-anywhere with {install_name}...[/cyan]")
     run([
         "nix", "run", "github:nix-community/nixos-anywhere", "--",
-        "--flake", flake_ref,
+        "--flake", install_flake_ref,
         "--target-host", f"root@{server_ip}",
         "--build-on-remote",
     ])
+
+    # Switch bootstrap install to full host config on disk-backed /nix (stage 2)
+    if use_bootstrap:
+        console.print("[cyan]Waiting for installed system SSH...[/cyan]")
+        wait_for_ssh(server_ip, timeout=300)
+
+        console.print(f"[cyan]Switching to final host config ({name})...[/cyan]")
+        run(
+            [
+                "nix", "run", "nixpkgs#nixos-rebuild", "--",
+                "switch",
+                "--flake", flake_ref,
+                "--target-host", f"basnijholt@{server_ip}",
+                "--build-host", f"basnijholt@{server_ip}",
+                "--use-remote-sudo",
+            ],
+            env={
+                "NIX_SSHOPTS": "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
+            },
+        )
 
     console.print(Panel.fit(
         f"[bold green]Deployment complete![/bold green]\n\n"

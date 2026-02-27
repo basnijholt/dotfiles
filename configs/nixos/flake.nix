@@ -148,11 +148,11 @@
         ];
 
         # Hetzner Cloud VPS (ARM) - Tuwunel Matrix homeserver for MindRoom
-        hetzner-tuwunel = mkHostArm [
+        hetzner-matrix = mkHostArm [
           disko.nixosModules.disko
-          ./hosts/hetzner-tuwunel/disko.nix
-          ./hosts/hetzner-tuwunel/default.nix
-          ./hosts/hetzner-tuwunel/hardware-configuration.nix
+          ./hosts/hetzner-matrix/disko.nix
+          ./hosts/hetzner-matrix/default.nix
+          ./hosts/hetzner-matrix/hardware-configuration.nix
           {
             # Override matrix-tuwunel with the MindRoom fork build
             nixpkgs.overlays = [
@@ -162,6 +162,19 @@
             ];
           }
         ];
+
+        # Minimal first-stage config for nixos-anywhere in rescue mode.
+        # Use with: deploy.py ... --bootstrap hetzner-bootstrap
+        hetzner-bootstrap = lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/hetzner-matrix/disko.nix
+            ./hosts/hetzner-matrix/networking.nix
+            ./hosts/hetzner-matrix/hardware-configuration.nix
+            ./hosts/hetzner/bootstrap.nix
+          ];
+        };
 
         # Hetzner Cloud VPS (ARM) - minimal Docker Compose host for websites
         hetzner = mkHostArm [
@@ -233,7 +246,7 @@
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
         hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
-        hetzner-tuwunel = (import ./hosts/hetzner-tuwunel/disko.nix) { inherit lib; };
+        hetzner-matrix = (import ./hosts/hetzner-matrix/disko.nix) { inherit lib; };
         paul-wyse = (import ./hosts/paul-wyse/disko.nix) { inherit lib; };
       };
 

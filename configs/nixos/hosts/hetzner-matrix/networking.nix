@@ -2,7 +2,7 @@
 { lib, ... }:
 
 {
-  networking.hostName = "hetzner-tuwunel";
+  networking.hostName = "hetzner-matrix";
 
   # systemd-networkd (required for Hetzner)
   systemd.network.enable = true;
