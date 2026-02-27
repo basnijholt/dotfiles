@@ -25,8 +25,8 @@ app = typer.Typer(
 console = Console()
 
 HOST_DIR = Path(__file__).parent
-FLAKE_DIR = HOST_DIR.parent.parent
 ENV_FILE = HOST_DIR / ".env"
+FLAKE_ROOT = "github:basnijholt/dotfiles?dir=configs/nixos"
 
 # Load environment variables from .env file
 if ENV_FILE.exists():
@@ -174,9 +174,8 @@ def deploy(
     use_bootstrap = bootstrap is not None
     install_name = bootstrap if use_bootstrap else name
 
-    flake_root = f"path:{FLAKE_DIR}"
-    flake_ref = f"{flake_root}#{name}"
-    install_flake_ref = f"{flake_root}#{install_name}"
+    flake_ref = f"{FLAKE_ROOT}#{name}"
+    install_flake_ref = f"{FLAKE_ROOT}#{install_name}"
 
     if use_bootstrap:
         console.print(
@@ -199,20 +198,14 @@ def deploy(
         console.print("[cyan]Waiting for installed system SSH...[/cyan]")
         wait_for_ssh(server_ip, timeout=300)
 
-        console.print(f"[cyan]Switching to final host config ({name})...[/cyan]")
-        run(
-            [
-                "nix", "run", "nixpkgs#nixos-rebuild", "--",
-                "switch",
-                "--flake", flake_ref,
-                "--target-host", f"basnijholt@{server_ip}",
-                "--build-host", f"basnijholt@{server_ip}",
-                "--use-remote-sudo",
-            ],
-            env={
-                "NIX_SSHOPTS": "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null",
-            },
-        )
+        console.print(f"[cyan]Switching to final host config ({name}) on remote host...[/cyan]")
+        run([
+            "ssh",
+            "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null",
+            f"basnijholt@{server_ip}",
+            f"sudo nixos-rebuild switch --flake {flake_ref}",
+        ])
 
     console.print(Panel.fit(
         f"[bold green]Deployment complete![/bold green]\n\n"

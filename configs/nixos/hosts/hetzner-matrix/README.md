@@ -10,7 +10,10 @@ Users run [MindRoom](https://github.com/mindroom-ai/mindroom) locally and connec
 # 1. Create .env with your Hetzner Cloud API token
 echo "HCLOUD_TOKEN=your-token" > hosts/hetzner-matrix/.env
 
-# 2. Deploy (two-stage: bootstrap first, then full config)
+# 2. Commit + push config changes (deploy uses GitHub flake)
+git -C ~/dotfiles push
+
+# 3. Deploy (two-stage: bootstrap first, then full config)
 ./hosts/hetzner-matrix/deploy.py deploy hetzner-matrix --bootstrap hetzner-bootstrap --type cax21 --location nbg1
 ```
 
