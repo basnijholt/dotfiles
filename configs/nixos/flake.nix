@@ -15,12 +15,16 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
     # its own forked nixpkgs with boot.loader.raspberryPi support
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, agenix, nixos-raspberrypi, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -145,6 +149,7 @@
 
         # Hetzner Cloud VPS (ARM) - Tuwunel Matrix homeserver for MindRoom
         hetzner-matrix = mkHostArm [
+          agenix.nixosModules.default
           disko.nixosModules.disko
           ./hosts/hetzner-matrix/disko.nix
           ./hosts/hetzner-matrix/default.nix

@@ -26,6 +26,34 @@ in
   };
   users.groups.tuwunel = {};
 
+  age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  age.secrets = {
+    registration-token = {
+      file = ./secrets/registration-token.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
+    sso-google-secret = {
+      file = ./secrets/sso-google-secret.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
+    sso-github-secret = {
+      file = ./secrets/sso-github-secret.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
+    sso-apple-secret = {
+      file = ./secrets/sso-apple-secret.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
+  };
+
   systemd.tmpfiles.rules = [
     "d /var/lib/tuwunel 0750 tuwunel tuwunel -"
     "d /var/lib/tuwunel/bin 0755 tuwunel tuwunel -"
