@@ -1,86 +1,15 @@
 # Hetzner Cloud VPS - MindRoom Tuwunel Matrix homeserver
 #
 # Public Matrix homeserver for MindRoom users. Users run MindRoom locally
-# and connect to this server. Tuwunel is the MindRoom fork with edit
-# compaction and purge features for streaming AI responses.
+# and connect to this server. Tuwunel is installed from GitHub releases
+# on the host and reads /var/lib/tuwunel/tuwunel.toml.
 #
 # Also serves the MindRoom Cinny fork as the web client.
-{ lib, pkgs, config, ... }:
+{ lib, pkgs, ... }:
 
 let
   domain = "matrix.mindroom.chat"; # Cannot change after first run!
   cinnyDomain = "chat.mindroom.chat"; # Web client domain
-
-  tuwunelConfig = pkgs.writeText "tuwunel.toml" ''
-    [global]
-    server_name = "${domain}"
-    database_path = "/var/lib/tuwunel"
-
-    # Listen only on localhost (Caddy handles TLS + public traffic)
-    address = ["127.0.0.1", "::1"]
-    port = 8008
-
-    # Registration: require a token OR SSO (Google/Apple/GitHub)
-    # Token is read from a file on the server, not stored in the repo.
-    # Create it with: echo "your-secret-token" > /var/lib/tuwunel/registration-token
-    allow_registration = true
-    registration_token_file = "/var/lib/tuwunel/registration-token"
-
-    # Federation: let users interact with other Matrix servers
-    allow_federation = true
-
-    # MindRoom fork: collapse superseded m.replace events in /sync responses
-    # This dramatically reduces bandwidth for MindRoom's streaming edits
-    mindroom_compact_edits_enabled = true
-
-    # MindRoom fork: background purge of old superseded edit events
-    mindroom_edit_purge_enabled = true
-    mindroom_edit_purge_min_age_secs = 86400
-    mindroom_edit_purge_interval_secs = 3600
-    mindroom_edit_purge_batch_size = 1000
-
-    # Upload limit (24 MiB default)
-    max_request_size = 25165824
-
-    # Well-known delegation: federation uses port 443 (no need for 8448)
-    [global.well_known]
-    client = "https://${domain}"
-    server = "${domain}:443"
-
-    # ── SSO: Google ───────────────────────────────────────────────────
-    # 1. Create OAuth app: https://console.cloud.google.com/apis/credentials
-    # 2. Set callback URL to: https://${domain}/_matrix/client/unstable/login/sso/callback/<client_id>
-    # 3. Put client_id below, put client_secret in /var/lib/tuwunel/sso-google-secret
-
-    [[global.identity_provider]]
-    brand = "Google"
-    client_id = "CHANGEME"
-    client_secret_file = "/var/lib/tuwunel/sso-google-secret"
-    callback_url = "https://${domain}/_matrix/client/unstable/login/sso/callback/CHANGEME"
-    default = true
-
-    # ── SSO: GitHub ───────────────────────────────────────────────────
-    # 1. Create OAuth app: https://github.com/settings/developers
-    # 2. Set callback URL to: https://${domain}/_matrix/client/unstable/login/sso/callback/<client_id>
-    # 3. Put client_id below, put client_secret in /var/lib/tuwunel/sso-github-secret
-
-    [[global.identity_provider]]
-    brand = "GitHub"
-    client_id = "CHANGEME"
-    client_secret_file = "/var/lib/tuwunel/sso-github-secret"
-    callback_url = "https://${domain}/_matrix/client/unstable/login/sso/callback/CHANGEME"
-
-    # ── SSO: Apple ────────────────────────────────────────────────────
-    # 1. Create Service ID: https://developer.apple.com/account/resources/identifiers/list/serviceId
-    # 2. Set callback URL to: https://${domain}/_matrix/client/unstable/login/sso/callback/<client_id>
-    # 3. Put client_id (Service ID) below, put client_secret in /var/lib/tuwunel/sso-apple-secret
-
-    [[global.identity_provider]]
-    brand = "Apple"
-    client_id = "CHANGEME"
-    client_secret_file = "/var/lib/tuwunel/sso-apple-secret"
-    callback_url = "https://${domain}/_matrix/client/unstable/login/sso/callback/CHANGEME"
-  '';
 in
 {
   imports = [
@@ -114,7 +43,7 @@ in
       Type = "simple";
       User = "tuwunel";
       Group = "tuwunel";
-      ExecStart = "/var/lib/tuwunel/bin/tuwunel";
+      ExecStart = "/var/lib/tuwunel/bin/tuwunel.real";
       Restart = "on-failure";
       RestartSec = "5s";
 
@@ -132,7 +61,8 @@ in
     };
 
     environment = {
-      CONDUWUIT_CONFIG = "${tuwunelConfig}";
+      CONDUWUIT_CONFIG = "/var/lib/tuwunel/tuwunel.toml";
+      LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.liburing ];
     };
   };
 
@@ -176,8 +106,8 @@ in
 
   # ── General server config ──────────────────────────────────────────
 
-  # Packages needed for building Cinny and Tuwunel on the server
-  environment.systemPackages = with pkgs; [ nodejs git rustc cargo ];
+  # Packages needed for Cinny builds and release-based Tuwunel updates.
+  environment.systemPackages = with pkgs; [ nodejs git curl jq ];
 
   # Disable services not needed on a Matrix server
   services.fwupd.enable = lib.mkForce false;

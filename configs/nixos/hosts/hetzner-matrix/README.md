@@ -6,22 +6,21 @@ Users run [MindRoom](https://github.com/mindroom-ai/mindroom) locally and connec
 
 ## Deploy
 
+From `~/dotfiles/configs/nixos`:
+
 ```bash
 # 1. Create .env with your Hetzner Cloud API token
 echo "HCLOUD_TOKEN=your-token" > hosts/hetzner-matrix/.env
 
-# 2. Commit + push config changes (deploy uses GitHub flake)
+# 2. Push config changes (deploy uses GitHub flake)
 git -C ~/dotfiles push
 
-# 3. Deploy (two-stage: bootstrap first, then full config)
+# 3. Deploy (two-stage: bootstrap first, then full host config)
 ./hosts/hetzner-matrix/deploy.py deploy hetzner-matrix --bootstrap hetzner-bootstrap --type cax21 --location nbg1
 ```
 
-This host is intended to use a two-stage install:
-- Stage 1: `hetzner-bootstrap` (minimal system that fits rescue-mode RAM limits)
-- Stage 2: switch to full `hetzner-matrix` on the installed system (disk-backed `/nix`)
-
 If a previous failed server already exists, recreate it:
+
 ```bash
 ./hosts/hetzner-matrix/deploy.py deploy hetzner-matrix --bootstrap hetzner-bootstrap --delete --type cax21 --location nbg1
 ```
@@ -31,37 +30,36 @@ If a previous failed server already exists, recreate it:
 ### DNS
 
 Create A records pointing to the server IP:
-- `matrix.mindroom.chat` — Matrix homeserver API
-- `chat.mindroom.chat` — Cinny web client
+- `matrix.mindroom.chat` - Matrix homeserver API
+- `chat.mindroom.chat` - Cinny web client
 
-### Tuwunel binary
+### Tuwunel config (live file)
 
-Tuwunel is built and updated directly on the server (not via Nix):
+Tuwunel reads runtime config from:
 
-```bash
-ssh basnijholt@<server-ip>
-sudo -u tuwunel -H bash -lc '
-  set -euo pipefail
-  cd /var/lib/tuwunel
-  [ -d src ] || git clone https://github.com/mindroom-ai/mindroom-tuwunel src
-  cd src
-  git pull --ff-only
-  cargo build --release
-  install -m 0755 -o tuwunel -g tuwunel target/release/tuwunel /var/lib/tuwunel/bin/tuwunel
-'
-sudo systemctl restart tuwunel
-```
+`/var/lib/tuwunel/tuwunel.toml`
 
-To update later:
+This file is not generated from Nix. Edit it directly on the server and restart Tuwunel.
+
+### Tuwunel binary (GitHub release)
+
+Update Tuwunel directly on the server from the latest GitHub release:
 
 ```bash
-ssh basnijholt@<server-ip>
 sudo -u tuwunel -H bash -lc '
   set -euo pipefail
-  cd /var/lib/tuwunel/src
-  git pull --ff-only
-  cargo build --release
-  install -m 0755 -o tuwunel -g tuwunel target/release/tuwunel /var/lib/tuwunel/bin/tuwunel
+  repo="mindroom-ai/mindroom-tuwunel"
+  asset_url="$(
+    curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
+      | jq -r ".assets[] | select(.name | test(\"linux-aarch64.tar.gz$\")) | .browser_download_url" \
+      | head -n1
+  )"
+  test -n "$asset_url"
+  tmp="$(mktemp -d)"
+  trap "rm -rf \"$tmp\"" EXIT
+  curl -fsSL "$asset_url" -o "$tmp/tuwunel.tar.gz"
+  tar -xzf "$tmp/tuwunel.tar.gz" -C "$tmp"
+  install -m 0755 -o tuwunel -g tuwunel "$tmp/tuwunel" /var/lib/tuwunel/bin/tuwunel.real
 '
 sudo systemctl restart tuwunel
 ```
@@ -69,7 +67,6 @@ sudo systemctl restart tuwunel
 ### Registration token
 
 ```bash
-ssh basnijholt@<server-ip>
 sudo bash -c '
   echo "your-secret-token" > /var/lib/tuwunel/registration-token
   chown tuwunel:tuwunel /var/lib/tuwunel/registration-token
@@ -82,49 +79,53 @@ sudo systemctl restart tuwunel
 
 For each provider, create an OAuth app and place the client secret on the server:
 
-**Google** ([console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials)):
+Google:
+
 ```bash
 echo "your-google-secret" | sudo tee /var/lib/tuwunel/sso-google-secret
 ```
 
-**GitHub** ([github.com/settings/developers](https://github.com/settings/developers)):
+GitHub:
+
 ```bash
 echo "your-github-secret" | sudo tee /var/lib/tuwunel/sso-github-secret
 ```
 
-**Apple** ([developer.apple.com](https://developer.apple.com/account/resources/identifiers/list/serviceId)):
+Apple:
+
 ```bash
 echo "your-apple-secret" | sudo tee /var/lib/tuwunel/sso-apple-secret
 ```
 
-Then for all secret files:
+Then set ownership/permissions:
+
 ```bash
 sudo chown tuwunel:tuwunel /var/lib/tuwunel/sso-*-secret
 sudo chmod 600 /var/lib/tuwunel/sso-*-secret
 ```
 
-Set the callback URL for each provider to:
-```
+Set callback URLs to:
+
+```text
 https://matrix.mindroom.chat/_matrix/client/unstable/login/sso/callback/<client_id>
 ```
 
-Update the `client_id` and `callback_url` values in `default.nix`, then rebuild.
+Update provider `client_id`, `issuer_url` (for Apple), and `callback_url` in `/var/lib/tuwunel/tuwunel.toml`, then restart:
+
+```bash
+sudo systemctl restart tuwunel
+```
 
 ### Cinny web client
 
 Build and deploy the MindRoom Cinny fork:
 
 ```bash
-ssh basnijholt@<server-ip>
 cd /var/www/cinny
-git clone https://github.com/mindroom-ai/mindroom-cinny .
-npm ci && npm run build
-# Caddy serves dist/ automatically at chat.mindroom.chat
-```
-
-To update Cinny later:
-```bash
-cd /var/www/cinny && git pull && npm ci && npm run build
+git clone https://github.com/mindroom-ai/mindroom-cinny . || true
+git pull --ff-only
+npm ci
+npm run build
 ```
 
 ### ZFS host ID
@@ -132,15 +133,15 @@ cd /var/www/cinny && git pull && npm ci && npm run build
 After first deploy, generate a unique host ID and update `default.nix`:
 
 ```bash
-head -c4 /dev/urandom | od -A none -t x4 | tr -d ' '
+head -c4 /dev/urandom | od -A none -t x4 | tr -d " "
 ```
 
 ## Rebuild
 
-After config changes:
+For NixOS config changes:
 
 ```bash
-nixos-rebuild switch --flake .#hetzner-matrix --target-host basnijholt@<server-ip>
+nixos-rebuild switch --flake ~/dotfiles/configs/nixos#hetzner-matrix
 ```
 
 ## Destroy
