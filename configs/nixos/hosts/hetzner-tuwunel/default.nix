@@ -3,10 +3,13 @@
 # Public Matrix homeserver for MindRoom users. Users run MindRoom locally
 # and connect to this server. Tuwunel is the MindRoom fork with edit
 # compaction and purge features for streaming AI responses.
+#
+# Also serves the MindRoom Cinny fork as the web client.
 { lib, pkgs, config, ... }:
 
 let
   domain = "matrix.mindroom.chat"; # Cannot change after first run!
+  cinnyDomain = "chat.mindroom.chat"; # Web client domain
 
   tuwunelConfig = pkgs.writeText "tuwunel.toml" ''
     [global]
@@ -17,7 +20,7 @@ let
     address = ["127.0.0.1", "::1"]
     port = 8008
 
-    # Registration: require a token (share with users you want to onboard)
+    # Registration: require a token OR SSO (Google/Apple/GitHub)
     # Token is read from a file on the server, not stored in the repo.
     # Create it with: echo "your-secret-token" > /var/lib/tuwunel/registration-token
     allow_registration = true
@@ -43,6 +46,40 @@ let
     [global.well_known]
     client = "https://${domain}"
     server = "${domain}:443"
+
+    # ── SSO: Google ───────────────────────────────────────────────────
+    # 1. Create OAuth app: https://console.cloud.google.com/apis/credentials
+    # 2. Set callback URL to: https://${domain}/_matrix/client/unstable/login/sso/callback/<client_id>
+    # 3. Put client_id below, put client_secret in /var/lib/tuwunel/sso-google-secret
+
+    [[global.identity_provider]]
+    brand = "Google"
+    client_id = "CHANGEME"
+    client_secret_file = "/var/lib/tuwunel/sso-google-secret"
+    callback_url = "https://${domain}/_matrix/client/unstable/login/sso/callback/CHANGEME"
+    default = true
+
+    # ── SSO: GitHub ───────────────────────────────────────────────────
+    # 1. Create OAuth app: https://github.com/settings/developers
+    # 2. Set callback URL to: https://${domain}/_matrix/client/unstable/login/sso/callback/<client_id>
+    # 3. Put client_id below, put client_secret in /var/lib/tuwunel/sso-github-secret
+
+    [[global.identity_provider]]
+    brand = "GitHub"
+    client_id = "CHANGEME"
+    client_secret_file = "/var/lib/tuwunel/sso-github-secret"
+    callback_url = "https://${domain}/_matrix/client/unstable/login/sso/callback/CHANGEME"
+
+    # ── SSO: Apple ────────────────────────────────────────────────────
+    # 1. Create Service ID: https://developer.apple.com/account/resources/identifiers/list/serviceId
+    # 2. Set callback URL to: https://${domain}/_matrix/client/unstable/login/sso/callback/<client_id>
+    # 3. Put client_id (Service ID) below, put client_secret in /var/lib/tuwunel/sso-apple-secret
+
+    [[global.identity_provider]]
+    brand = "Apple"
+    client_id = "CHANGEME"
+    client_secret_file = "/var/lib/tuwunel/sso-apple-secret"
+    callback_url = "https://${domain}/_matrix/client/unstable/login/sso/callback/CHANGEME"
   '';
 in
 {
@@ -63,6 +100,7 @@ in
   systemd.tmpfiles.rules = [
     "d /var/lib/tuwunel 0750 tuwunel tuwunel -"
     "d /run/tuwunel 0755 tuwunel tuwunel -"
+    "d /var/www/cinny 0755 basnijholt users -"
   ];
 
   systemd.services.tuwunel = {
@@ -97,25 +135,48 @@ in
     };
   };
 
-  # ── Caddy reverse proxy ────────────────────────────────────────────
+  # ── Cinny web client ────────────────────────────────────────────────
+  #
+  # MindRoom Cinny fork served as static files by Caddy.
+  # Build and deploy:
+  #   ssh basnijholt@<server-ip>
+  #   cd /var/www/cinny
+  #   git clone https://github.com/mindroom-ai/mindroom-cinny .
+  #   npm ci && npm run build
+  #   # Caddy serves dist/ automatically
+
+  # ── Caddy reverse proxy + web client ────────────────────────────────
 
   services.caddy = {
     enable = true;
+
+    # Matrix homeserver API
     virtualHosts."${domain}" = {
       extraConfig = ''
         reverse_proxy /_matrix/* localhost:8008
         reverse_proxy /.well-known/matrix/* localhost:8008
 
-        # Root path: simple landing page
         respond / 200 {
           body "MindRoom Matrix Server"
           close
         }
       '';
     };
+
+    # Cinny web client (SPA)
+    virtualHosts."${cinnyDomain}" = {
+      extraConfig = ''
+        root * /var/www/cinny/dist
+        try_files {path} /index.html
+        file_server
+      '';
+    };
   };
 
   # ── General server config ──────────────────────────────────────────
+
+  # Packages needed for building Cinny on the server
+  environment.systemPackages = with pkgs; [ nodejs git ];
 
   # Disable services not needed on a Matrix server
   services.fwupd.enable = lib.mkForce false;
