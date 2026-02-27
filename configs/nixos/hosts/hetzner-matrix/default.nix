@@ -5,11 +5,53 @@
 # on the host and reads /var/lib/tuwunel/tuwunel.toml.
 #
 # Also serves the MindRoom Cinny fork as the web client.
-{ lib, pkgs, ... }:
+{ lib, pkgs, config, ... }:
 
 let
   siteDomain = "mindroom.chat"; # Public website + Matrix API + Matrix well-known
   cinnyDomain = "chat.mindroom.chat"; # Web client domain
+  tuwunelConfig = pkgs.writeText "tuwunel.toml" ''
+    [global]
+    server_name = "${siteDomain}"
+    database_path = "/var/lib/tuwunel"
+    address = ["127.0.0.1", "::1"]
+    port = 8008
+    allow_registration = true
+    registration_token_file = "${config.age.secrets.registration-token.path}"
+    allow_federation = true
+    mindroom_compact_edits_enabled = true
+    mindroom_edit_purge_enabled = true
+    mindroom_edit_purge_min_age_secs = 86400
+    mindroom_edit_purge_interval_secs = 3600
+    mindroom_edit_purge_batch_size = 1000
+    max_request_size = 25165824
+
+    [global.well_known]
+    client = "https://${siteDomain}"
+    server = "${siteDomain}:443"
+
+    [[global.identity_provider]]
+    brand = "Google"
+    client_id = "974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com"
+    client_secret_file = "${config.age.secrets.sso-google-secret.path}"
+    callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com"
+    default = true
+
+    [[global.identity_provider]]
+    brand = "GitHub"
+    client_id = "Ov23li6wDSuBsiVjYWar"
+    client_secret_file = "${config.age.secrets.sso-github-secret.path}"
+    callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/Ov23li6wDSuBsiVjYWar"
+
+    [[global.identity_provider]]
+    brand = "AppleOIDC"
+    name = "Apple"
+    client_id = "chat.mindroom.matrix.apple"
+    client_secret_file = "${config.age.secrets.sso-apple-secret.path}"
+    issuer_url = "https://appleid.apple.com"
+    callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/chat.mindroom.matrix.apple"
+    scope = ["openid"]
+  '';
 in
 {
   imports = [
@@ -90,7 +132,7 @@ in
     };
 
     environment = {
-      CONDUWUIT_CONFIG = "/var/lib/tuwunel/tuwunel.toml";
+      CONDUWUIT_CONFIG = tuwunelConfig;
       LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.liburing ];
     };
   };
