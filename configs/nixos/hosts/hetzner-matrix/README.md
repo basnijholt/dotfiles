@@ -30,7 +30,7 @@ If a previous failed server already exists, recreate it:
 ### DNS
 
 Create A records pointing to the server IP:
-- `matrix.mindroom.chat` - Matrix homeserver API
+- `mindroom.chat` - website + Matrix `.well-known` delegation
 - `chat.mindroom.chat` - Cinny web client
 
 ### Tuwunel config (live file)
@@ -40,6 +40,16 @@ Tuwunel reads runtime config from:
 `/var/lib/tuwunel/tuwunel.toml`
 
 This file is not generated from Nix. Edit it directly on the server and restart Tuwunel.
+
+Set the Matrix identity domain to apex:
+
+```toml
+server_name = "mindroom.chat"
+```
+
+With this setup, user IDs are `@user:mindroom.chat`, and client traffic goes directly to `https://mindroom.chat/_matrix/*` (with `.well-known` served by Caddy).
+
+Important: changing `server_name` on an existing Tuwunel database is not supported. Set this before first real use, or wipe/recreate the Matrix database first.
 
 ### Tuwunel binary (GitHub release)
 
@@ -107,7 +117,7 @@ sudo chmod 600 /var/lib/tuwunel/sso-*-secret
 Set callback URLs to:
 
 ```text
-https://matrix.mindroom.chat/_matrix/client/unstable/login/sso/callback/<client_id>
+https://mindroom.chat/_matrix/client/unstable/login/sso/callback/<client_id>
 ```
 
 Update provider `client_id`, `issuer_url` (for Apple), and `callback_url` in `/var/lib/tuwunel/tuwunel.toml`, then restart:
@@ -127,6 +137,14 @@ git pull --ff-only
 npm ci
 npm run build
 ```
+
+### mindroom.chat website
+
+Deploy your apex website to:
+
+`/var/www/mindroom`
+
+Caddy serves this directory for `https://mindroom.chat`, except for `/.well-known/matrix/server` and `/.well-known/matrix/client`, which are handled directly for Matrix delegation.
 
 ### ZFS host ID
 

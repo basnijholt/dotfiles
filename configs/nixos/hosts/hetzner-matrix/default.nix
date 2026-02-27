@@ -8,7 +8,7 @@
 { lib, pkgs, ... }:
 
 let
-  domain = "matrix.mindroom.chat"; # Cannot change after first run!
+  siteDomain = "mindroom.chat"; # Public website + Matrix API + Matrix well-known
   cinnyDomain = "chat.mindroom.chat"; # Web client domain
 in
 {
@@ -30,6 +30,7 @@ in
     "d /var/lib/tuwunel 0750 tuwunel tuwunel -"
     "d /var/lib/tuwunel/bin 0755 tuwunel tuwunel -"
     "d /run/tuwunel 0755 tuwunel tuwunel -"
+    "d /var/www/mindroom 0755 basnijholt users -"
     "d /var/www/cinny 0755 basnijholt users -"
   ];
 
@@ -81,16 +82,30 @@ in
   services.caddy = {
     enable = true;
 
-    # Matrix homeserver API
-    virtualHosts."${domain}" = {
+    # Primary domain website + Matrix API + Matrix well-known
+    virtualHosts."${siteDomain}" = {
       extraConfig = ''
         reverse_proxy /_matrix/* localhost:8008
-        reverse_proxy /.well-known/matrix/* localhost:8008
 
-        respond / 200 {
-          body "MindRoom Matrix Server"
-          close
+        handle /.well-known/matrix/server {
+          header Content-Type application/json
+          respond 200 {
+            body "{\"m.server\":\"${siteDomain}:443\"}"
+            close
+          }
         }
+
+        handle /.well-known/matrix/client {
+          header Content-Type application/json
+          respond 200 {
+            body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"}}"
+            close
+          }
+        }
+
+        root * /var/www/mindroom
+        try_files {path} /index.html
+        file_server
       '';
     };
 
