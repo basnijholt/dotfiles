@@ -15,12 +15,16 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    mindroom-tuwunel = {
+      url = "github:mindroom-ai/mindroom-tuwunel";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
     # its own forked nixpkgs with boot.loader.raspberryPi support
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, mindroom-tuwunel, nixos-raspberrypi, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -143,6 +147,22 @@
           ./hosts/nix-cache/default.nix
         ];
 
+        # Hetzner Cloud VPS (ARM) - Tuwunel Matrix homeserver for MindRoom
+        hetzner-tuwunel = mkHostArm [
+          disko.nixosModules.disko
+          ./hosts/hetzner-tuwunel/disko.nix
+          ./hosts/hetzner-tuwunel/default.nix
+          ./hosts/hetzner-tuwunel/hardware-configuration.nix
+          {
+            # Override matrix-tuwunel with the MindRoom fork build
+            nixpkgs.overlays = [
+              (final: prev: {
+                matrix-tuwunel = mindroom-tuwunel.packages.${final.system}.default;
+              })
+            ];
+          }
+        ];
+
         # Hetzner Cloud VPS (ARM) - minimal Docker Compose host for websites
         hetzner = mkHostArm [
           disko.nixosModules.disko
@@ -213,6 +233,7 @@
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
         hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
+        hetzner-tuwunel = (import ./hosts/hetzner-tuwunel/disko.nix) { inherit lib; };
         paul-wyse = (import ./hosts/paul-wyse/disko.nix) { inherit lib; };
       };
 
