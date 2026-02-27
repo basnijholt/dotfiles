@@ -99,6 +99,7 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/tuwunel 0750 tuwunel tuwunel -"
+    "d /var/lib/tuwunel/bin 0755 tuwunel tuwunel -"
     "d /run/tuwunel 0755 tuwunel tuwunel -"
     "d /var/www/cinny 0755 basnijholt users -"
   ];
@@ -113,7 +114,7 @@ in
       Type = "simple";
       User = "tuwunel";
       Group = "tuwunel";
-      ExecStart = "${pkgs.matrix-tuwunel}/bin/tuwunel";
+      ExecStart = "/var/lib/tuwunel/bin/tuwunel";
       Restart = "on-failure";
       RestartSec = "5s";
 
@@ -175,8 +176,8 @@ in
 
   # ── General server config ──────────────────────────────────────────
 
-  # Packages needed for building Cinny on the server
-  environment.systemPackages = with pkgs; [ nodejs git ];
+  # Packages needed for building Cinny and Tuwunel on the server
+  environment.systemPackages = with pkgs; [ nodejs git rustc cargo ];
 
   # Disable services not needed on a Matrix server
   services.fwupd.enable = lib.mkForce false;

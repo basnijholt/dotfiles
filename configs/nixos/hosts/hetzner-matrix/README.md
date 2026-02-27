@@ -34,6 +34,38 @@ Create A records pointing to the server IP:
 - `matrix.mindroom.chat` — Matrix homeserver API
 - `chat.mindroom.chat` — Cinny web client
 
+### Tuwunel binary
+
+Tuwunel is built and updated directly on the server (not via Nix):
+
+```bash
+ssh basnijholt@<server-ip>
+sudo -u tuwunel -H bash -lc '
+  set -euo pipefail
+  cd /var/lib/tuwunel
+  [ -d src ] || git clone https://github.com/mindroom-ai/mindroom-tuwunel src
+  cd src
+  git pull --ff-only
+  cargo build --release
+  install -m 0755 -o tuwunel -g tuwunel target/release/tuwunel /var/lib/tuwunel/bin/tuwunel
+'
+sudo systemctl restart tuwunel
+```
+
+To update later:
+
+```bash
+ssh basnijholt@<server-ip>
+sudo -u tuwunel -H bash -lc '
+  set -euo pipefail
+  cd /var/lib/tuwunel/src
+  git pull --ff-only
+  cargo build --release
+  install -m 0755 -o tuwunel -g tuwunel target/release/tuwunel /var/lib/tuwunel/bin/tuwunel
+'
+sudo systemctl restart tuwunel
+```
+
 ### Registration token
 
 ```bash

@@ -15,16 +15,12 @@
       url = "github:nlewo/comin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    mindroom-tuwunel = {
-      url = "github:mindroom-ai/mindroom-tuwunel";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
     # its own forked nixpkgs with boot.loader.raspberryPi support
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, mindroom-tuwunel, nixos-raspberrypi, ... }:
+  outputs = { self, nixpkgs, home-manager, disko, comin, nixos-raspberrypi, ... }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -153,14 +149,6 @@
           ./hosts/hetzner-matrix/disko.nix
           ./hosts/hetzner-matrix/default.nix
           ./hosts/hetzner-matrix/hardware-configuration.nix
-          {
-            # Override matrix-tuwunel with the MindRoom fork build
-            nixpkgs.overlays = [
-              (final: prev: {
-                matrix-tuwunel = mindroom-tuwunel.packages.${final.system}.default;
-              })
-            ];
-          }
         ];
 
         # Minimal first-stage config for nixos-anywhere in rescue mode.
