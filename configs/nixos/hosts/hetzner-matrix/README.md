@@ -49,25 +49,24 @@ Important: changing `server_name` on an existing Tuwunel database is not support
 
 ### Tuwunel binary (GitHub release)
 
-Update Tuwunel directly on the server from the latest GitHub release:
+Tuwunel is pinned from a GitHub release asset in Nix (`default.nix`):
+
+- `tuwunelVersion`
+- `tuwunelArchive` URL/hash
+
+To update:
+
+1. Change `tuwunelVersion`.
+2. Update `hash` with:
 
 ```bash
-sudo -u tuwunel -H bash -lc '
-  set -euo pipefail
-  repo="mindroom-ai/mindroom-tuwunel"
-  asset_url="$(
-    curl -fsSL "https://api.github.com/repos/${repo}/releases/latest" \
-      | jq -r ".assets[] | select(.name | test(\"linux-aarch64.tar.gz$\")) | .browser_download_url" \
-      | head -n1
-  )"
-  test -n "$asset_url"
-  tmp="$(mktemp -d)"
-  trap "rm -rf \"$tmp\"" EXIT
-  curl -fsSL "$asset_url" -o "$tmp/tuwunel.tar.gz"
-  tar -xzf "$tmp/tuwunel.tar.gz" -C "$tmp"
-  install -m 0755 -o tuwunel -g tuwunel "$tmp/tuwunel" /var/lib/tuwunel/bin/tuwunel.real
-'
-sudo systemctl restart tuwunel
+nix store prefetch-file --json "https://github.com/mindroom-ai/mindroom-tuwunel/releases/download/<tag>/tuwunel-<tag>-linux-aarch64.tar.gz"
+```
+
+3. Rebuild:
+
+```bash
+nixos-rebuild switch --flake ~/dotfiles/configs/nixos#hetzner-matrix
 ```
 
 ### Registration + SSO secrets (agenix)

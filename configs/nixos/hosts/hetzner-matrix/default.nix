@@ -10,6 +10,19 @@
 let
   siteDomain = "mindroom.chat"; # Public website + Matrix API + Matrix well-known
   cinnyDomain = "chat.mindroom.chat"; # Web client domain
+  tuwunelVersion = "v1.5.0-mindroom.2";
+  tuwunelArchive = pkgs.fetchurl {
+    url = "https://github.com/mindroom-ai/mindroom-tuwunel/releases/download/${tuwunelVersion}/tuwunel-${tuwunelVersion}-linux-aarch64.tar.gz";
+    hash = "sha256-NLgt+LB7NeO/d3deAqf/jx2KhyB34SaFtszFI9X81/8=";
+  };
+  tuwunelPackage = pkgs.runCommand "tuwunel-${tuwunelVersion}-linux-aarch64" {
+    nativeBuildInputs = with pkgs; [ gnutar gzip findutils ];
+  } ''
+    mkdir -p "$out/bin"
+    tar -xzf "${tuwunelArchive}" -C "$TMPDIR"
+    bin_path="$(find "$TMPDIR" -maxdepth 2 -type f -name tuwunel | head -n1)"
+    install -m 0755 "$bin_path" "$out/bin/tuwunel"
+  '';
   tuwunelConfig = pkgs.writeText "tuwunel.toml" ''
     [global]
     server_name = "${siteDomain}"
@@ -98,7 +111,6 @@ in
 
   systemd.tmpfiles.rules = [
     "d /var/lib/tuwunel 0750 tuwunel tuwunel -"
-    "d /var/lib/tuwunel/bin 0755 tuwunel tuwunel -"
     "d /run/tuwunel 0755 tuwunel tuwunel -"
     "d /var/www/mindroom 0755 basnijholt users -"
     "d /var/www/cinny 0755 basnijholt users -"
@@ -114,7 +126,7 @@ in
       Type = "simple";
       User = "tuwunel";
       Group = "tuwunel";
-      ExecStart = "/var/lib/tuwunel/bin/tuwunel.real";
+      ExecStart = "${tuwunelPackage}/bin/tuwunel";
       Restart = "on-failure";
       RestartSec = "5s";
 
