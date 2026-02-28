@@ -40,6 +40,7 @@ let
     database_path = "/var/lib/tuwunel"
     address = ["127.0.0.1", "::1"]
     port = 8008
+    # Token-gated registration; token is loaded from an agenix-managed secret file.
     allow_registration = true
     registration_token_file = "${config.age.secrets.registration-token.path}"
     allow_federation = true
@@ -81,6 +82,7 @@ in
   imports = [
     ../../optional/zfs-auto-snapshot.nix
     ./networking.nix
+    ./local_mindroom_provisioning_service.nix
   ];
 
   # ── Tuwunel Matrix homeserver ───────────────────────────────────────
@@ -98,6 +100,12 @@ in
       file = ./secrets/registration-token.age;
       owner = "tuwunel";
       group = "tuwunel";
+      mode = "0400";
+    };
+    registration-token-provisioning = {
+      file = ./secrets/registration-token.age;
+      owner = "mindroom-local-provisioning";
+      group = "mindroom-local-provisioning";
       mode = "0400";
     };
     sso-google-secret = {
@@ -172,6 +180,7 @@ in
     virtualHosts."${siteDomain}" = {
       extraConfig = ''
         reverse_proxy /_matrix/* localhost:8008
+        reverse_proxy /v1/local-mindroom/* localhost:8776
 
         handle /.well-known/matrix/server {
           header Content-Type application/json
@@ -198,11 +207,22 @@ in
     # Cinny web client (SPA)
     virtualHosts."${cinnyDomain}" = {
       extraConfig = ''
-        root * ${cinnyDist}/dist
+        root * /var/www/cinny/dist
         try_files {path} /index.html
         file_server
       '';
     };
+  };
+
+  services.mindroom-local-provisioning = {
+    enable = true;
+    repoPath = "/srv/mindroom";
+    matrixHomeserver = "https://${siteDomain}";
+    matrixServerName = siteDomain;
+    matrixRegistrationTokenFile = config.age.secrets.registration-token-provisioning.path;
+    listenHost = "127.0.0.1";
+    listenPort = 8776;
+    corsOrigins = [ "https://${cinnyDomain}" ];
   };
 
   # ── General server config ──────────────────────────────────────────
