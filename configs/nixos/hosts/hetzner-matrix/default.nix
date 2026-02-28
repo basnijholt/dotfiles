@@ -2,7 +2,7 @@
 #
 # Public Matrix homeserver for MindRoom users. Users run MindRoom locally
 # and connect to this server. Tuwunel is installed from GitHub releases
-# on the host and reads /var/lib/tuwunel/tuwunel.toml.
+# on the host and uses a Nix-generated TOML passed via CONDUWUIT_CONFIG.
 #
 # Also serves the MindRoom Cinny fork as the web client.
 { lib, pkgs, config, ... }:
@@ -22,17 +22,6 @@ let
     tar -xzf "${tuwunelArchive}" -C "$TMPDIR"
     bin_path="$(find "$TMPDIR" -maxdepth 2 -type f -name tuwunel | head -n1)"
     install -m 0755 "$bin_path" "$out/bin/tuwunel"
-  '';
-  cinnyVersion = "v4.10.3-mindroom.1";
-  cinnyArchive = pkgs.fetchurl {
-    url = "https://github.com/mindroom-ai/mindroom-cinny/releases/download/${cinnyVersion}/mindroom-cinny-dist-${cinnyVersion}.tar.gz";
-    hash = "sha256-GabDDS2i5Xvjq0cWQjaLp2BO/CRw/Np/cUDnsl7hgpA=";
-  };
-  cinnyDist = pkgs.runCommand "mindroom-cinny-dist-${cinnyVersion}" {
-    nativeBuildInputs = with pkgs; [ gnutar gzip ];
-  } ''
-    mkdir -p "$out"
-    tar -xzf "${cinnyArchive}" -C "$out"
   '';
   tuwunelConfig = pkgs.writeText "tuwunel.toml" ''
     [global]
@@ -169,7 +158,8 @@ in
 
   # ── Cinny web client ────────────────────────────────────────────────
   #
-  # MindRoom Cinny fork served as static files from a pinned GitHub release artifact.
+  # MindRoom Cinny fork served as static files from /var/www/cinny/dist.
+  # Build/update is manual on the server checkout in /var/www/cinny.
 
   # ── Caddy reverse proxy + web client ────────────────────────────────
 

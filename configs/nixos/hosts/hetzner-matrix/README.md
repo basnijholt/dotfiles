@@ -4,6 +4,25 @@ Public Matrix homeserver ([Tuwunel](https://github.com/mindroom-ai/mindroom-tuwu
 
 Users run [MindRoom](https://github.com/mindroom-ai/mindroom) locally and connect to this server.
 
+## Management model
+
+This host is intentionally mixed: core infrastructure is Nix-managed, while app checkouts can be updated quickly by hand.
+
+Nix-managed:
+
+- Tuwunel systemd service, binary pin (`tuwunelVersion` + hash), and generated TOML.
+- Caddy routing (`mindroom.chat`, `chat.mindroom.chat`, Matrix API, well-known, provisioning API proxy).
+- Local provisioning service systemd unit, environment, user/group, and state directory.
+- agenix secret decryption and secret file ownership/mode.
+- Host-level config (networking, SSH options, zram, tailscale, etc.).
+
+Manual/runtime-managed:
+
+- Cinny checkout/build in `/var/www/cinny` (served from `/var/www/cinny/dist`).
+- MindRoom checkout for provisioning script in `/srv/mindroom`.
+- Website files in `/var/www/mindroom`.
+- DNS records at your DNS provider.
+
 ## Deploy
 
 From `~/dotfiles/configs/nixos`:
@@ -101,25 +120,36 @@ Provider IDs and callback URLs are in Nix config, while client secrets are read 
 
 ### Cinny web client
 
-Cinny is pinned from a GitHub release `dist` artifact in Nix (`default.nix`):
-
-- `cinnyVersion`
-- `cinnyArchive` URL/hash
-
-To update:
-
-1. Create/upload a new `dist` release asset in `mindroom-ai/mindroom-cinny`.
-2. Update `cinnyVersion`.
-3. Update `hash` with:
+Cinny is not pinned in Nix.
+The live web app comes from a checkout in `/var/www/cinny`, and Caddy serves `/var/www/cinny/dist`.
 
 ```bash
-nix store prefetch-file --json "https://github.com/mindroom-ai/mindroom-cinny/releases/download/<tag>/mindroom-cinny-dist-<tag>.tar.gz"
+ssh basnijholt@<server-ip>
+cd /var/www/cinny
+git fetch origin
+git checkout dev
+git pull --ff-only origin dev
+npm ci
+npm run build
 ```
 
-4. Rebuild:
+No `nixos-rebuild` is needed for Cinny-only updates.
+
+### Local provisioning service code
+
+The service unit is Nix-managed, but it executes:
+
+`/srv/mindroom/scripts/local_mindroom_provisioning_service.py`
+
+To update provisioning behavior:
 
 ```bash
-nixos-rebuild switch --flake ~/dotfiles/configs/nixos#hetzner-matrix
+ssh basnijholt@<server-ip>
+cd /srv/mindroom
+git fetch origin
+git checkout main
+git pull --ff-only origin main
+sudo systemctl restart mindroom-local-provisioning
 ```
 
 ### mindroom.chat website
