@@ -1,6 +1,6 @@
 {
   "defaultProvider": "litellm",
   "defaultModel": "claude-opus-4-6",
-  "lastChangelogVersion": "0.53.0",
+  "lastChangelogVersion": "0.55.3",
   "defaultThinkingLevel": "high"
 }
