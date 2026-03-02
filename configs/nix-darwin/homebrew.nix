@@ -139,7 +139,7 @@
       "istat-menus" # System monitor
       "iterm2" # Terminal emulator
       "jabref" # Reference manager
-      "jordanbaird-ice" # Window manager
+      "thaw" # Menu bar manager
       "karabiner-elements" # Keyboard customizer
       "keepingyouawake" # Prevent sleep
       "keyboard-maestro" # Automation tool
