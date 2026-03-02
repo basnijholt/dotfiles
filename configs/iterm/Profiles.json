@@ -6,6 +6,7 @@
       "Alternate Scrolling": true,
       "Option Key Sends": 2,
       "Right Option Key Sends": 2,
+      "Treat Option as Alt": true,
       "Custom Command": "Yes",
       "Use Separate Colors for Light and Dark Mode": true,
       "Rewritable": false,
