@@ -1,10 +1,11 @@
 {
-  "defaultProvider": "anthropic-vertex",
-  "defaultModel": "claude-opus-4-6@default",
-  "lastChangelogVersion": "0.55.0",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.3-codex",
+  "lastChangelogVersion": "0.55.3",
   "defaultThinkingLevel": "high",
-  "hideThinkingBlock": true,
   "packages": [
-    "git:github.com/basnijholt/pi-anthropic-vertex"
+    "https://github.com/basnijholt/pi-multi-agent-review-loop",
+    "https://github.com/basnijholt/pi-subagents",
+    "https://github.com/basnijholt/pi-anthropic-vertex"
   ]
 }
