@@ -11,6 +11,7 @@ This host is intentionally mixed: core infrastructure is Nix-managed, while app 
 Nix-managed:
 
 - Tuwunel systemd service, binary pin (`tuwunelVersion` + hash), and generated TOML.
+- Matrix bridge services (`mautrix-signal`, `mautrix-whatsapp`) and Tuwunel appservice wiring.
 - Caddy routing (`mindroom.chat`, `chat.mindroom.chat`, Matrix API, well-known, provisioning API proxy).
 - Local provisioning service systemd unit, environment, user/group, and state directory.
 - Runtime Git checkout presence/branch sync for:
@@ -102,6 +103,8 @@ Current managed secrets:
 - `sso-google-secret.age`
 - `sso-github-secret.age`
 - `sso-apple-secret.age`
+- `signal-appservice-env.age`
+- `whatsapp-appservice-env.age`
 
 To edit a secret:
 
@@ -119,6 +122,23 @@ https://mindroom.chat/_matrix/client/unstable/login/sso/callback/<client_id>
 ```
 
 Provider IDs and callback URLs are in Nix config, while client secrets are read from decrypted agenix files at runtime.
+
+### Matrix bridges
+
+Signal and WhatsApp bridges are both loopback-only appservices backed by Tuwunel appservice config in `tuwunel.nix`.
+
+Health checks:
+
+```bash
+systemctl is-active mautrix-signal mautrix-whatsapp tuwunel
+journalctl -u mautrix-signal -n 100 --no-pager
+journalctl -u mautrix-whatsapp -n 100 --no-pager
+```
+
+Onboarding flow:
+
+- DM `Signal Bridge Bot` and send `login`, then scan QR in Signal.
+- DM `WhatsApp Bridge Bot` and send `login`, then scan QR in WhatsApp.
 
 ### Cinny web client
 

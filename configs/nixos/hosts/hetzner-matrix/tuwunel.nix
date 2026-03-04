@@ -76,6 +76,22 @@ let
     [[global.appservice.signal.users]]
     regex = "^@signal_.*:mindroom\\.chat$"
     exclusive = true
+
+    [global.appservice.whatsapp]
+    url = "http://localhost:29318"
+    as_token = "$TUWUNEL_WHATSAPP_AS_TOKEN"
+    hs_token = "$TUWUNEL_WHATSAPP_HS_TOKEN"
+    sender_localpart = "whatsappbot"
+    rate_limited = false
+    receive_ephemeral = true
+
+    [[global.appservice.whatsapp.users]]
+    regex = "^@whatsappbot:mindroom\\.chat$"
+    exclusive = true
+
+    [[global.appservice.whatsapp.users]]
+    regex = "^@whatsapp_.*:mindroom\\.chat$"
+    exclusive = true
   '';
 in
 {
@@ -107,7 +123,10 @@ in
       Type = "simple";
       User = "tuwunel";
       Group = "tuwunel";
-      EnvironmentFile = config.age.secrets.signal-appservice-env-tuwunel.path;
+      EnvironmentFile = [
+        config.age.secrets.signal-appservice-env-tuwunel.path
+        config.age.secrets.whatsapp-appservice-env-tuwunel.path
+      ];
       ExecStart = "${tuwunelPackage}/bin/tuwunel";
       Restart = "on-failure";
       RestartSec = "5s";

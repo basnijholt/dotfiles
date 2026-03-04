@@ -18,12 +18,13 @@
     ./cinny.nix
     ./provisioning.nix
     ./signal.nix
+    ./whatsapp.nix
   ];
 
   # ── General server config ──────────────────────────────────────────
 
   # Packages needed for release pin updates and operational debugging.
-  environment.systemPackages = with pkgs; [ git curl jq ];
+  environment.systemPackages = with pkgs; [ git curl jq ffmpeg-headless ];
 
   # Disable services not needed on a Matrix server
   services.fwupd.enable = lib.mkForce false;

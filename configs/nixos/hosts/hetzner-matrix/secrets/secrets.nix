@@ -9,4 +9,5 @@ in
   "sso-github-secret.age".publicKeys = recipients;
   "sso-apple-secret.age".publicKeys = recipients;
   "signal-appservice-env.age".publicKeys = recipients;
+  "whatsapp-appservice-env.age".publicKeys = recipients;
 }

@@ -45,5 +45,17 @@
       group = "mautrix-signal";
       mode = "0400";
     };
+    whatsapp-appservice-env-tuwunel = {
+      file = ./secrets/whatsapp-appservice-env.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
+    whatsapp-appservice-env-mautrix = {
+      file = ./secrets/whatsapp-appservice-env.age;
+      owner = "mautrix-whatsapp";
+      group = "mautrix-whatsapp";
+      mode = "0400";
+    };
   };
 }
