@@ -9,6 +9,7 @@ let
   cliPowerTools = with pkgs; [
     _1password-cli
     act
+    ragenix
     asciinema
     atuin
     bandwhich
