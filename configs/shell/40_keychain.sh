@@ -1,7 +1,19 @@
 # keychain.sh - meant to be sourced in .bash_profile/.zshrc
 
+# Preserve SSH agent forwarding in remote sessions.
+# If SSH provided a valid forwarded agent socket, keep it instead of overriding
+# SSH_AUTH_SOCK with a local keychain-managed agent.
+use_forwarded_agent=false
+if [[ -n "${SSH_CONNECTION:-}" && -n "${SSH_AUTH_SOCK:-}" && "${SSH_AUTH_SOCK}" == /tmp/ssh-*/agent.* ]]; then
+    ssh-add -l >/dev/null 2>&1
+    agent_status=$?
+    if [[ $agent_status -eq 0 || $agent_status -eq 1 ]]; then
+        use_forwarded_agent=true
+    fi
+fi
+
 # Check if keychain is installed and the key exists
-if command -v keychain &> /dev/null && [[ -f ~/.ssh/id_ed25519 ]]; then
+if [[ "$use_forwarded_agent" != true ]] && command -v keychain &> /dev/null && [[ -f ~/.ssh/id_ed25519 ]]; then
     # On macOS, use 1Password (if available) to provide passphrase for SSH keys
     if [[ `uname` == 'Darwin' ]] && command -v op &> /dev/null; then
         # Set SSH_ASKPASS to use the 1Password helper script for passphrase prompts
