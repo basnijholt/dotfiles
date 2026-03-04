@@ -12,6 +12,7 @@
       user = "basnijholt";
       group = "users";
       updateWhenClean = true;
+      hardResetWhenDiverged = true;
     };
   };
 }

@@ -50,6 +50,15 @@ in
             default = true;
             description = "Run ff-only pull when the working tree has no local changes.";
           };
+
+          hardResetWhenDiverged = lib.mkOption {
+            type = lib.types.bool;
+            default = false;
+            description = ''
+              If true and the working tree is clean, reset hard to origin/<branch>
+              when local and remote branch histories diverge.
+            '';
+          };
         };
       });
     };
@@ -83,6 +92,7 @@ in
               repo_url=${lib.escapeShellArg repo.url}
               repo_branch=${lib.escapeShellArg repo.branch}
               update_when_clean=${if repo.updateWhenClean then "1" else "0"}
+              hard_reset_when_diverged=${if repo.hardResetWhenDiverged then "1" else "0"}
 
               if [ ! -d "$repo_path/.git" ]; then
                 if [ -d "$repo_path" ] && [ -n "$(ls -A "$repo_path")" ]; then
@@ -107,7 +117,22 @@ in
                 if [ -n "$(git -C "$repo_path" status --porcelain)" ]; then
                   echo "Working tree has local changes; skipping pull for $repo_path."
                 else
-                  git -C "$repo_path" pull --ff-only origin "$repo_branch"
+                  local_head="$(git -C "$repo_path" rev-parse HEAD)"
+                  remote_head="$(git -C "$repo_path" rev-parse "origin/$repo_branch")"
+
+                  if [ "$local_head" = "$remote_head" ]; then
+                    exit 0
+                  fi
+
+                  if git -C "$repo_path" merge-base --is-ancestor "$local_head" "$remote_head"; then
+                    git -C "$repo_path" pull --ff-only origin "$repo_branch"
+                  elif [ "$hard_reset_when_diverged" = "1" ]; then
+                    echo "Branch diverged; resetting $repo_path to origin/$repo_branch."
+                    git -C "$repo_path" reset --hard "origin/$repo_branch"
+                  else
+                    echo "Branch diverged for $repo_path; refusing to update without hardResetWhenDiverged." >&2
+                    exit 1
+                  fi
                 fi
               fi
             '';
