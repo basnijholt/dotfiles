@@ -1,6 +1,6 @@
 {
   siteDomain = "mindroom.chat";
   cinnyDomain = "chat.mindroom.chat";
-  tuwunelVersion = "v1.5.0-mindroom.13";
-  tuwunelArchiveHash = "sha256-6ccUOWz4Rti/iFgcm+gx9MxkEc9GBEzMjx7zbPqRqa0=";
+  tuwunelVersion = "v1.5.0-mindroom.15";
+  tuwunelArchiveHash = "sha256-t2BjAAfYcKF2E4wEtoUEFNR7+S1rjrZLBW4HOh/Eg/o=";
 }
