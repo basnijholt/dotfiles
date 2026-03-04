@@ -2,13 +2,14 @@
 #
 # Large packages are in optional/large-packages.nix
 # See scripts/nix/package-marginal-cost.py for analysis of "marginal cost"
-{ pkgs, ... }:
+{ pkgs, agenix, ... }:
 
 let
   # --- CLI Power Tools & Utilities ---
   cliPowerTools = with pkgs; [
     _1password-cli
     act
+    agenix.packages.${pkgs.system}.default
     asciinema
     atuin
     bandwhich

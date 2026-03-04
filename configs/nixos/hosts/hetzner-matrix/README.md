@@ -13,13 +13,15 @@ Nix-managed:
 - Tuwunel systemd service, binary pin (`tuwunelVersion` + hash), and generated TOML.
 - Caddy routing (`mindroom.chat`, `chat.mindroom.chat`, Matrix API, well-known, provisioning API proxy).
 - Local provisioning service systemd unit, environment, user/group, and state directory.
+- Runtime Git checkout presence/branch sync for:
+  - `/srv/mindroom` (branch `main`)
+  - `/var/www/cinny` (branch `dev`)
 - agenix secret decryption and secret file ownership/mode.
 - Host-level config (networking, SSH options, zram, tailscale, etc.).
 
 Manual/runtime-managed:
 
-- Cinny checkout/build in `/var/www/cinny` (served from `/var/www/cinny/dist`).
-- MindRoom checkout for provisioning script in `/srv/mindroom`.
+- Cinny build/deploy from `/var/www/cinny` into `/var/www/cinny/dist`.
 - Website files in `/var/www/mindroom`.
 - DNS records at your DNS provider.
 
@@ -120,15 +122,15 @@ Provider IDs and callback URLs are in Nix config, while client secrets are read 
 
 ### Cinny web client
 
-Cinny is not pinned in Nix.
-The live web app comes from a checkout in `/var/www/cinny`, and Caddy serves `/var/www/cinny/dist`.
+Cinny build artifacts are not pinned in Nix.
+The checkout at `/var/www/cinny` is ensured by the `git-checkout-cinny` systemd service, and Caddy serves `/var/www/cinny/dist`.
 
 ```bash
-ssh basnijholt@<server-ip>
+# Refresh checkout to configured branch tip (skips pull if local changes exist)
+sudo systemctl start git-checkout-cinny
+
+# Build and publish static files
 cd /var/www/cinny
-git fetch origin
-git checkout dev
-git pull --ff-only origin dev
 npm ci
 npm run build
 ```
@@ -137,18 +139,16 @@ No `nixos-rebuild` is needed for Cinny-only updates.
 
 ### Local provisioning service code
 
-The service unit is Nix-managed, but it executes:
+The service unit is Nix-managed and executes:
 
 `/srv/mindroom/scripts/local_mindroom_provisioning_service.py`
 
-To update provisioning behavior:
+The checkout in `/srv/mindroom` is ensured by `git-checkout-mindroom`.
+
+To refresh provisioning code and reload service:
 
 ```bash
-ssh basnijholt@<server-ip>
-cd /srv/mindroom
-git fetch origin
-git checkout main
-git pull --ff-only origin main
+sudo systemctl start git-checkout-mindroom
 sudo systemctl restart mindroom-local-provisioning
 ```
 

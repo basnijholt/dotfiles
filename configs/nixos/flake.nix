@@ -34,6 +34,7 @@
         home-manager.nixosModules.home-manager
         comin.nixosModules.comin
         {
+          _module.args = { inherit agenix; };
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
         }
