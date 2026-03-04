@@ -11,7 +11,7 @@ This host is intentionally mixed: core infrastructure is Nix-managed, while app 
 Nix-managed:
 
 - Tuwunel systemd service, binary pin (`tuwunelVersion` + hash), and generated TOML.
-- Matrix bridge services (`mautrix-signal`, `mautrix-whatsapp`) and Tuwunel appservice wiring.
+- Matrix bridge services (`mautrix-signal`, `mautrix-whatsapp`, `mautrix-telegram`) and Tuwunel appservice wiring.
 - Caddy routing (`mindroom.chat`, `chat.mindroom.chat`, Matrix API, well-known, provisioning API proxy).
 - Local provisioning service systemd unit, environment, user/group, and state directory.
 - Runtime Git checkout presence/branch sync for:
@@ -105,6 +105,7 @@ Current managed secrets:
 - `sso-apple-secret.age`
 - `signal-appservice-env.age`
 - `whatsapp-appservice-env.age`
+- `telegram-appservice-env.age`
 
 To edit a secret:
 
@@ -125,20 +126,22 @@ Provider IDs and callback URLs are in Nix config, while client secrets are read 
 
 ### Matrix bridges
 
-Signal and WhatsApp bridges are both loopback-only appservices backed by Tuwunel appservice config in `tuwunel.nix`.
+Signal, WhatsApp, and Telegram bridges are loopback-only appservices backed by Tuwunel appservice config in `tuwunel.nix`.
 
 Health checks:
 
 ```bash
-systemctl is-active mautrix-signal mautrix-whatsapp tuwunel
+systemctl is-active mautrix-signal mautrix-whatsapp mautrix-telegram tuwunel
 journalctl -u mautrix-signal -n 100 --no-pager
 journalctl -u mautrix-whatsapp -n 100 --no-pager
+journalctl -u mautrix-telegram -n 100 --no-pager
 ```
 
 Onboarding flow:
 
 - DM `Signal Bridge Bot` and send `login`, then scan QR in Signal.
 - DM `WhatsApp Bridge Bot` and send `login`, then scan QR in WhatsApp.
+- For Telegram, first set `MAUTRIX_TELEGRAM_TELEGRAM_API_ID` and `MAUTRIX_TELEGRAM_TELEGRAM_API_HASH` in `telegram-appservice-env.age`, then DM `Telegram Bridge Bot` and send `login`.
 
 ### Cinny web client
 

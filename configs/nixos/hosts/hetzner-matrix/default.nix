@@ -19,6 +19,7 @@
     ./provisioning.nix
     ./signal.nix
     ./whatsapp.nix
+    ./telegram.nix
   ];
 
   # ── General server config ──────────────────────────────────────────

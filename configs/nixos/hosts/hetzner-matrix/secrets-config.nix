@@ -57,5 +57,17 @@
       group = "mautrix-whatsapp";
       mode = "0400";
     };
+    telegram-appservice-env-tuwunel = {
+      file = ./secrets/telegram-appservice-env.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
+    telegram-appservice-env-mautrix = {
+      file = ./secrets/telegram-appservice-env.age;
+      owner = "mautrix-telegram";
+      group = "mautrix-telegram";
+      mode = "0400";
+    };
   };
 }

@@ -92,6 +92,22 @@ let
     [[global.appservice.whatsapp.users]]
     regex = "^@whatsapp_.*:mindroom\\.chat$"
     exclusive = true
+
+    [global.appservice.telegram]
+    url = "http://localhost:29317"
+    as_token = "$TUWUNEL_TELEGRAM_AS_TOKEN"
+    hs_token = "$TUWUNEL_TELEGRAM_HS_TOKEN"
+    sender_localpart = "telegrambot"
+    rate_limited = false
+    receive_ephemeral = true
+
+    [[global.appservice.telegram.users]]
+    regex = "^@telegrambot:mindroom\\.chat$"
+    exclusive = true
+
+    [[global.appservice.telegram.users]]
+    regex = "^@telegram_.*:mindroom\\.chat$"
+    exclusive = true
   '';
 in
 {
@@ -126,6 +142,7 @@ in
       EnvironmentFile = [
         config.age.secrets.signal-appservice-env-tuwunel.path
         config.age.secrets.whatsapp-appservice-env-tuwunel.path
+        config.age.secrets.telegram-appservice-env-tuwunel.path
       ];
       ExecStart = "${tuwunelPackage}/bin/tuwunel";
       Restart = "on-failure";

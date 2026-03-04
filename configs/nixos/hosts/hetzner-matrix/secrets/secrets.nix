@@ -10,4 +10,5 @@ in
   "sso-apple-secret.age".publicKeys = recipients;
   "signal-appservice-env.age".publicKeys = recipients;
   "whatsapp-appservice-env.age".publicKeys = recipients;
+  "telegram-appservice-env.age".publicKeys = recipients;
 }
