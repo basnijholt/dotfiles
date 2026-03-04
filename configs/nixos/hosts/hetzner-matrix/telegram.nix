@@ -32,8 +32,13 @@ in
         hs_token = "$MAUTRIX_TELEGRAM_APPSERVICE_HS_TOKEN";
       };
 
+      telegram = {
+        bot_token = "$MAUTRIX_TELEGRAM_TELEGRAM_BOT_TOKEN";
+      };
+
       bridge = {
         command_prefix = "!tg";
+        encryption.allow = true;
         permissions = {
           "*" = "relaybot";
           "${siteDomain}" = "full";
