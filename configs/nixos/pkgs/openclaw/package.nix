@@ -5,7 +5,9 @@
   pnpmConfigHook,
   pnpm_10,
   nodejs_22,
+  gitMinimal,
   makeWrapper,
+  rolldown,
   src,
   pnpmDepsHash,
   version ? (lib.importJSON "${src}/package.json").version,
@@ -19,7 +21,15 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     pnpm = pnpm_10;
     fetcherVersion = 3;
     hash = pnpmDepsHash;
+    nativeBuildInputs = [ gitMinimal ];
   };
+
+  buildInputs = [ rolldown ];
+
+  postPatch = ''
+    # Avoid pnpm trying to self-manage the version during pnpmConfigHook.
+    sed -i '/"packageManager": "pnpm@.*",/d' package.json
+  '';
 
   nativeBuildInputs = [
     pnpmConfigHook
@@ -28,7 +38,17 @@ stdenvNoCC.mkDerivation (finalAttrs: {
     makeWrapper
   ];
 
+  preBuild = ''
+    rm -rf node_modules/rolldown node_modules/@rolldown/pluginutils
+    mkdir -p node_modules/@rolldown
+    cp -r ${rolldown}/lib/node_modules/rolldown node_modules/rolldown
+    cp -r ${rolldown}/lib/node_modules/@rolldown/pluginutils node_modules/@rolldown/pluginutils
+    chmod -R u+w node_modules/rolldown node_modules/@rolldown/pluginutils
+  '';
+
   buildPhase = ''
+    runHook preBuild
+
     pnpm install --frozen-lockfile
     pnpm build
     pnpm ui:build

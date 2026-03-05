@@ -3,7 +3,7 @@ final: _prev:
 let
   openclaw = final.callPackage ../../pkgs/openclaw/package.nix {
     src = openclaw-patched;
-    pnpmDepsHash = "sha256-TuxMbWgX1iOthVGnXBV4PM7Ci2apFV6UHsqRMvohgVY=";
+    pnpmDepsHash = "sha256-CqudeRT7QT7KslnfPWNFWXvGy2U9AbbahoJJYyUyapU=";
   };
 in
 {
