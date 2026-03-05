@@ -7,6 +7,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    openclaw-patched = {
+      url = "git+https://github.com/basnijholt/openclaw.git?ref=feature/message-enrich-hook";
+      flake = false;
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -24,7 +28,18 @@
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, ragenix, nixos-raspberrypi, ... }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      openclaw-patched,
+      disko,
+      comin,
+      ragenix,
+      nixos-raspberrypi,
+      ...
+    }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -42,12 +57,14 @@
       mkHost = extraModules:
         lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit openclaw-patched; };
           modules = commonModules ++ extraModules;
         };
 
       mkHostArm = extraModules:
         lib.nixosSystem {
           system = "aarch64-linux";
+          specialArgs = { inherit openclaw-patched; };
           modules = commonModules ++ extraModules;
         };
 
@@ -127,12 +144,14 @@
 
         # Companion bot LXC container for Incus
         mindroom-spouse = mkHost [
+          ragenix.nixosModules.default
           ./hosts/mindroom-spouse/default.nix
           ./optional/lxc-container.nix
         ];
 
         # Lightweight development LXC container for Incus (on HP)
         mindroom = mkHost [
+          ragenix.nixosModules.default
           ./hosts/mindroom/default.nix
           ./optional/lxc-container.nix
         ];
