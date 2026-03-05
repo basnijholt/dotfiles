@@ -11,6 +11,7 @@
   ...
 }:
 let
+  homeDir = config.users.users.basnijholt.home;
   openclawGatewayEnvPath = config.age.secrets.openclaw-gateway-env.path;
   openclawIntegrationsEnvPath = config.age.secrets.openclaw-integrations-env.path;
   openclawAgentCliEnvPath = config.age.secrets.openclaw-agent-cli-env.path;
@@ -19,7 +20,7 @@ let
     openclawIntegrationsEnvPath
     openclawAgentCliEnvPath
   ];
-  openclawStateDir = "/home/basnijholt/.openclaw";
+  openclawStateDir = "${homeDir}/.openclaw";
   openclawWorkingDirectory = "${openclawStateDir}/workspace";
   openclawConfigPath = "/etc/openclaw/openclaw.json";
   openclawLogPath = "${openclawStateDir}/logs/gateway.log";
@@ -110,10 +111,10 @@ in
         EnvironmentFile = openclawEnvironmentFiles;
       };
       script = ''
-        export HOME=/home/basnijholt
+        export HOME=${homeDir}
         export OPENCLAW_TOKENS="''$${gatewayTokenEnv}"
-        exec ${pkgs.uv}/bin/uv run "$HOME/.openclaw/workspace/shared/scripts/watcher.py" \
-          "$HOME/.openclaw/workspace/shared/" \
+        exec ${pkgs.uv}/bin/uv run "${openclawWorkingDirectory}/shared/scripts/watcher.py" \
+          "${openclawWorkingDirectory}/shared/" \
           --gateways 127.0.0.1:18789
       '';
       path = with pkgs; [ uv ];
@@ -124,6 +125,7 @@ in
       description = "OpenClaw Gitea webhook listener for auto-pull";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
+      unitConfig.ConditionPathExists = "${openclawWorkingDirectory}/scripts/git-pull-hook.py";
       serviceConfig = {
         Type = "simple";
         User = "basnijholt";
@@ -133,10 +135,10 @@ in
         WorkingDirectory = openclawWorkingDirectory;
         EnvironmentFile = openclawEnvironmentFiles;
         Environment = [
-          "HOME=/home/basnijholt"
+          "HOME=${homeDir}"
           "PATH=${pkgs.git}/bin:${pkgs.openssh}/bin:/run/current-system/sw/bin"
         ];
-        ExecStart = "${pkgs.uv}/bin/uv run /home/basnijholt/.openclaw/workspace/scripts/git-pull-hook.py --port 9876";
+        ExecStart = "${pkgs.uv}/bin/uv run ${openclawWorkingDirectory}/scripts/git-pull-hook.py --port 9876";
       };
     };
   };
