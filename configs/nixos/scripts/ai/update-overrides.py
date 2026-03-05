@@ -50,6 +50,7 @@ PACKAGES = [
         version_pattern=re.compile(
             r'(llama-cpp\s*=\s*.*?version\s*=\s*")(\d+)(";)', re.DOTALL
         ),
+        hash_count=2,  # src hash + npmDepsHash
     ),
     Package(
         name="llama-swap",
@@ -116,7 +117,9 @@ def compare_versions(current: str, latest: str, semver: bool) -> bool:
 
 def replace_hashes_in_block(content: str, start: int, count: int) -> str:
     """Replace `count` hash occurrences after `start` position with dummy hash."""
-    hash_pattern = re.compile(r'((?:vendor)?[Hh]ash\s*=\s*")(sha256-[^"]*)(";)')
+    hash_pattern = re.compile(
+        r'((?:hash|vendorHash|npmDepsHash)\s*=\s*")(sha256-[^"]*)(";)'
+    )
     pos = start
     for _ in range(count):
         match = hash_pattern.search(content, pos)

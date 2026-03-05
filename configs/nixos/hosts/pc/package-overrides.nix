@@ -27,20 +27,23 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.16.1";
+        version = "0.17.6";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-LdB/p3ZO+WCoU7xQz76suJ6Vc1TFAMGcLvMBib5w5fU=";
+          hash = "sha256-Hd2U6FoYwtDPOt+AZhsYloWSF2/QE+fsXRcC6OKKJXA=";
         };
-        vendorHash = "sha256-OQOx0G4kxToe8soef4vZDhp1RtTnLkiT2tQBXgB3T5E=";
+        vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
         preBuild = oldAttrs.preBuild + ''
           # Fix tree-sitter vendor: copy C sources that go mod vendor excludes
-          chmod -R u+w vendor/github.com/tree-sitter
-          cp -r ${treeSitterGoSrc}/include vendor/github.com/tree-sitter/go-tree-sitter/
-          cp -r ${treeSitterGoSrc}/src vendor/github.com/tree-sitter/go-tree-sitter/
-          cp -r ${treeSitterCppSrc}/src vendor/github.com/tree-sitter/tree-sitter-cpp/
+          if [ -d vendor/github.com/tree-sitter ]; then
+            chmod -R u+w vendor/github.com/tree-sitter
+            mkdir -p vendor/github.com/tree-sitter/go-tree-sitter vendor/github.com/tree-sitter/tree-sitter-cpp
+            cp -r ${treeSitterGoSrc}/include vendor/github.com/tree-sitter/go-tree-sitter/
+            cp -r ${treeSitterGoSrc}/src vendor/github.com/tree-sitter/go-tree-sitter/
+            cp -r ${treeSitterCppSrc}/src vendor/github.com/tree-sitter/tree-sitter-cpp/
+          fi
         '';
         postFixup = pkgs.lib.replaceStrings [
           ''mv "$out/bin/app" "$out/bin/.ollama-app"''
@@ -62,18 +65,19 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "8027";
+            version = "8204";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-AEPdDOseqgBCNTzyjkzsJWhCAOX5oA493D6Qz/DOENk=";
+              hash = "sha256-j3RLNiY6u36qdLah4Zcrac804Ub1wnBtv066PtzBvt0=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
                 find "$out" -name .git -print0 | xargs -0 rm -rf
               '';
             };
+            npmDepsHash = "sha256-FKjoZTKm0ddoVdpxzYrRUmTiuafEfbKc4UD2fz2fb8A=";
             # Enable native CPU optimizations for massively better CPU performance
             # This enables AVX, AVX2, AVX-512, FMA, etc. for your specific CPU
             # NOTE: This is intentionally opposite of nixpkgs (which uses -DGGML_NATIVE=off
@@ -97,8 +101,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v190/llama-swap_190_linux_amd64.tar.gz";
-            hash = "sha256-WAfmJ4YiVH/UYq++l2Ut6oLqkd270HgG7eV+6FG/0Oc=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v197/llama-swap_197_linux_amd64.tar.gz";
+            hash = "sha256-GOP31onCrHvwvutsDXJV0uj+EKKaQdmZfiaBS0tX7Co=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
