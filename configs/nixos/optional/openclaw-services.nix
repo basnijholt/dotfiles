@@ -1,10 +1,4 @@
 {
-  gatewayTokenEnv,
-  telegramBotTokenEnv,
-  llmProxyApiKeyEnv,
-  signalAccountEnv,
-}:
-{
   config,
   pkgs,
   openclaw-patched,
@@ -12,25 +6,21 @@
 }:
 let
   homeDir = config.users.users.basnijholt.home;
-  openclawGatewayEnvPath = config.age.secrets.openclaw-gateway-env.path;
+  openclawHostSecretsDir = ../hosts/${config.networking.hostName}/secrets;
+  openclawSharedSecretsDir = ../home/openclaw/secrets;
+  openclawRuntimeEnvPath = config.age.secrets.openclaw-runtime-env.path;
   openclawIntegrationsEnvPath = config.age.secrets.openclaw-integrations-env.path;
-  openclawAgentCliEnvPath = config.age.secrets.openclaw-agent-cli-env.path;
-  openclawEnvironmentFiles = [
-    openclawGatewayEnvPath
+  openclawToolingEnvPath = config.age.secrets.openclaw-tooling-env.path;
+  openclawGatewayEnvironmentFiles = [
+    openclawRuntimeEnvPath
     openclawIntegrationsEnvPath
-    openclawAgentCliEnvPath
+    openclawToolingEnvPath
   ];
   openclawStateDir = "${homeDir}/.openclaw";
   openclawWorkingDirectory = "${openclawStateDir}/workspace";
   openclawConfigPath = "/etc/openclaw/openclaw.json";
   openclawLogPath = "${openclawStateDir}/logs/gateway.log";
-  openclawConfigFile = pkgs.writeText "openclaw.json" (
-    builtins.toJSON (
-      import ../home/openclaw/openclaw-config.nix {
-        inherit gatewayTokenEnv telegramBotTokenEnv llmProxyApiKeyEnv signalAccountEnv;
-      }
-    )
-  );
+  openclawConfigFile = pkgs.writeText "openclaw.json" (builtins.toJSON (import ../home/openclaw/openclaw-config.nix));
 in
 {
   nixpkgs.overlays = [
@@ -41,20 +31,20 @@ in
 
   # Match hetzner-matrix pattern: decrypt at activation with host SSH key.
   age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  age.secrets.openclaw-gateway-env = {
-    file = ../home/openclaw/secrets/openclaw-gateway-env.age;
+  age.secrets.openclaw-runtime-env = {
+    file = openclawHostSecretsDir + "/openclaw-runtime.env.age";
     owner = "basnijholt";
     group = "users";
     mode = "0400";
   };
   age.secrets.openclaw-integrations-env = {
-    file = ../home/openclaw/secrets/openclaw-integrations-env.age;
+    file = openclawSharedSecretsDir + "/openclaw-integrations.env.age";
     owner = "basnijholt";
     group = "users";
     mode = "0400";
   };
-  age.secrets.openclaw-agent-cli-env = {
-    file = ../home/openclaw/secrets/openclaw-agent-cli-env.age;
+  age.secrets.openclaw-tooling-env = {
+    file = openclawSharedSecretsDir + "/openclaw-tooling.env.age";
     owner = "basnijholt";
     group = "users";
     mode = "0400";
@@ -86,7 +76,7 @@ in
         User = "basnijholt";
         Group = "users";
         WorkingDirectory = openclawWorkingDirectory;
-        EnvironmentFile = openclawEnvironmentFiles;
+        EnvironmentFile = openclawGatewayEnvironmentFiles;
         ExecStart = "${pkgs.openclaw}/bin/openclaw gateway --port 18789";
         Restart = "always";
         RestartSec = 5;
@@ -108,11 +98,11 @@ in
         Restart = "always";
         RestartSec = "5s";
         WorkingDirectory = openclawWorkingDirectory;
-        EnvironmentFile = openclawEnvironmentFiles;
+        EnvironmentFile = [ openclawRuntimeEnvPath ];
       };
       script = ''
         export HOME=${homeDir}
-        export OPENCLAW_TOKENS="''$${gatewayTokenEnv}"
+        export OPENCLAW_TOKENS="$OPENCLAW_GATEWAY_TOKEN"
         exec ${pkgs.uv}/bin/uv run "${openclawWorkingDirectory}/shared/scripts/watcher.py" \
           "${openclawWorkingDirectory}/shared/" \
           --gateways 127.0.0.1:18789
@@ -133,7 +123,6 @@ in
         Restart = "always";
         RestartSec = "5s";
         WorkingDirectory = openclawWorkingDirectory;
-        EnvironmentFile = openclawEnvironmentFiles;
         Environment = [
           "HOME=${homeDir}"
           "PATH=${pkgs.git}/bin:${pkgs.openssh}/bin:/run/current-system/sw/bin"

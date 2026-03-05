@@ -3,12 +3,7 @@
 {
   imports = [
     ./networking.nix
-    (import ../../optional/openclaw-gateway.nix {
-      gatewayTokenEnv = "SPOUSE_GATEWAY_TOKEN";
-      telegramBotTokenEnv = "SPOUSE_TELEGRAM_BOT_TOKEN";
-      llmProxyApiKeyEnv = "SPOUSE_LLM_PROXY_API_KEY";
-      signalAccountEnv = "SPOUSE_SIGNAL_ACCOUNT";
-    })
+    ../../optional/openclaw-services.nix
   ];
 
   # Passwordless sudo for OpenClaw agent

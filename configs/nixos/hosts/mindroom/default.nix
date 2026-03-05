@@ -16,12 +16,7 @@
     ./element.nix
     ./tuwunel.nix  # Local Matrix homeserver (MindRoom Tuwunel fork)
     ./caddy.nix
-    (import ../../optional/openclaw-gateway.nix {
-      gatewayTokenEnv = "MINDROOM_GATEWAY_TOKEN";
-      telegramBotTokenEnv = "OPENCLAW_TELEGRAM_BOT_TOKEN";
-      llmProxyApiKeyEnv = "OPENCLAW_LLM_PROXY_API_KEY";
-      signalAccountEnv = "OPENCLAW_SIGNAL_ACCOUNT";
-    })
+    ../../optional/openclaw-services.nix
   ];
 
   # Allow basnijholt passwordless sudo (for mindroom agent)

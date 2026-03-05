@@ -1,12 +1,11 @@
-{ gatewayTokenEnv, telegramBotTokenEnv, llmProxyApiKeyEnv, signalAccountEnv }:
 {
   gateway = {
     mode = "local";
     controlUi.allowInsecureAuth = true;
     auth = {
       mode = "token";
-      # Resolved at runtime from env var via ${VAR} substitution
-      token = "\${${gatewayTokenEnv}}";
+      # Resolved at runtime from the host's runtime env file.
+      token = "\${OPENCLAW_GATEWAY_TOKEN}";
     };
   };
 
@@ -15,8 +14,8 @@
     providers = {
       llm-proxy = {
         baseUrl = "http://192.168.1.6:4000/v1";
-        # Resolved at runtime from env var via ${VAR} substitution
-        apiKey = "\${${llmProxyApiKeyEnv}}";
+        # Resolved at runtime from the host's runtime env file.
+        apiKey = "\${OPENCLAW_LLM_PROXY_API_KEY}";
         api = "openai-completions";
         models = [
           {
@@ -91,16 +90,16 @@
   channels = {
     telegram = {
       enabled = true;
-      # Resolved at runtime from env var via ${VAR} substitution
-      botToken = "\${${telegramBotTokenEnv}}";
+      # Resolved at runtime from the host's runtime env file.
+      botToken = "\${OPENCLAW_TELEGRAM_BOT_TOKEN}";
       dmPolicy = "pairing";
       groupPolicy = "allowlist";
       streamMode = "partial";
     };
     signal = {
       enabled = true;
-      # Resolved at runtime from env var via ${VAR} substitution
-      account = "\${${signalAccountEnv}}";
+      # Resolved at runtime from the host's runtime env file.
+      account = "\${OPENCLAW_SIGNAL_ACCOUNT}";
       cliPath = "/run/current-system/sw/bin/signal-cli";
       dmPolicy = "pairing";
       groupPolicy = "allowlist";
