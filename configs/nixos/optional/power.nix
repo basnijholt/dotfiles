@@ -4,12 +4,12 @@
 {
   # --- Disable Sleep/Hibernation ---
   # Keep SSH available by preventing sleep states
-  systemd.sleep.extraConfig = ''
-    AllowSuspend=no
-    AllowHibernation=no
-    AllowSuspendThenHibernate=no
-    AllowHybridSleep=no
-  '';
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowSuspendThenHibernate = "no";
+    AllowHybridSleep = "no";
+  };
 
   # --- Ignore Lid/Power Button ---
   services.logind.settings.Login = {
