@@ -14,7 +14,6 @@
     cups # lp command for network printing
     devbox
     nixpkgs-fmt
-    cocoapods # required for Capacitor iOS builds (pod install)
   ];
 
   # Configure sudo password timeout (in minutes)
