@@ -1,7 +1,7 @@
 {
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.3-codex",
-  "lastChangelogVersion": "0.55.3",
+  "lastChangelogVersion": "0.56.1",
   "defaultThinkingLevel": "high",
   "packages": [
     "https://github.com/basnijholt/pi-multi-agent-review-loop",
