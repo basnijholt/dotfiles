@@ -5,6 +5,6 @@ let
   recipients = [ bas mindroomHost spouseHost ];
 in
 {
-  "openclaw-integrations.env.age".publicKeys = recipients;
-  "openclaw-tooling.env.age".publicKeys = recipients;
+  "agent-integrations.env.age".publicKeys = recipients;
+  "agent-tooling.env.age".publicKeys = recipients;
 }

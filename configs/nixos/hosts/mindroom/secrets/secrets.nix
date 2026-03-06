@@ -6,5 +6,5 @@ in
 {
   "registration-token.age".publicKeys = recipients;
   "cloudflare-acme-env.age".publicKeys = recipients;
-  "openclaw-runtime.env.age".publicKeys = recipients;
+  "agent-runtime.env.age".publicKeys = recipients;
 }

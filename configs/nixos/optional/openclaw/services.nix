@@ -7,13 +7,13 @@ let
   homeDir = config.users.users.basnijholt.home;
   openclawHostSecretsDir = ../../hosts/${config.networking.hostName}/secrets;
   openclawSharedSecretsDir = ./secrets;
-  openclawRuntimeEnvPath = config.age.secrets.openclaw-runtime-env.path;
-  openclawIntegrationsEnvPath = config.age.secrets.openclaw-integrations-env.path;
-  openclawToolingEnvPath = config.age.secrets.openclaw-tooling-env.path;
+  agentRuntimeEnvPath = config.age.secrets.agent-runtime-env.path;
+  agentIntegrationsEnvPath = config.age.secrets.agent-integrations-env.path;
+  agentToolingEnvPath = config.age.secrets.agent-tooling-env.path;
   openclawGatewayEnvironmentFiles = [
-    openclawRuntimeEnvPath
-    openclawIntegrationsEnvPath
-    openclawToolingEnvPath
+    agentRuntimeEnvPath
+    agentIntegrationsEnvPath
+    agentToolingEnvPath
   ];
   openclawStateDir = "${homeDir}/.openclaw";
   openclawWorkingDirectory = "${openclawStateDir}/workspace";
@@ -29,20 +29,20 @@ in
 
   # Match hetzner-matrix pattern: decrypt at activation with host SSH key.
   age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  age.secrets.openclaw-runtime-env = {
-    file = openclawHostSecretsDir + "/openclaw-runtime.env.age";
+  age.secrets.agent-runtime-env = {
+    file = openclawHostSecretsDir + "/agent-runtime.env.age";
     owner = "basnijholt";
     group = "users";
     mode = "0400";
   };
-  age.secrets.openclaw-integrations-env = {
-    file = openclawSharedSecretsDir + "/openclaw-integrations.env.age";
+  age.secrets.agent-integrations-env = {
+    file = openclawSharedSecretsDir + "/agent-integrations.env.age";
     owner = "basnijholt";
     group = "users";
     mode = "0400";
   };
-  age.secrets.openclaw-tooling-env = {
-    file = openclawSharedSecretsDir + "/openclaw-tooling.env.age";
+  age.secrets.agent-tooling-env = {
+    file = openclawSharedSecretsDir + "/agent-tooling.env.age";
     owner = "basnijholt";
     group = "users";
     mode = "0400";
@@ -93,7 +93,7 @@ in
         Restart = "always";
         RestartSec = "5s";
         WorkingDirectory = openclawWorkingDirectory;
-        EnvironmentFile = [ openclawRuntimeEnvPath ];
+        EnvironmentFile = [ agentRuntimeEnvPath ];
       };
       script = ''
         export HOME=${homeDir}

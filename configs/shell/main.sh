@@ -4,7 +4,7 @@
 [ -n "$ZSH_VERSION" ] && source ~/dotfiles/configs/shell/05_zsh_completions.sh
 source ~/dotfiles/configs/shell/10_aliases.sh
 source ~/dotfiles/configs/shell/20_exports.sh
-source ~/dotfiles/configs/shell/25_openclaw.sh
+source ~/dotfiles/configs/shell/25_agent.sh
 source ~/dotfiles/configs/shell/30_misc.sh
 source ~/dotfiles/configs/shell/40_keychain.sh
 source ~/dotfiles/configs/shell/50_python.sh

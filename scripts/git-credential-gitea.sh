@@ -6,9 +6,9 @@ action="${1:-}"
 input="$(cat)"
 printf '%s\n' "$input" | grep -q '^host=git\.nijho\.lt$' || exit 0
 
-# Load token from the agenix-managed OpenClaw tooling env if not already set.
+# Load token from the agenix-managed agent tooling env if not already set.
 if [ -z "${GITEA_TOKEN:-}" ]; then
-  tooling_env="/run/agenix/openclaw-tooling-env"
+  tooling_env="/run/agenix/agent-tooling-env"
   if [ -r "$tooling_env" ]; then
     token_line="$(grep -m1 '^GITEA_TOKEN=' "$tooling_env" || true)"
     if [ -n "$token_line" ]; then

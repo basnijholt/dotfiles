@@ -1,17 +1,17 @@
-# Load OpenClaw runtime secrets only for commands that actually need them.
+# Load agent runtime secrets only for commands that actually need them.
 
-with_openclaw_env() {
+with_agent_env() {
     if [[ $# -eq 0 ]]; then
-        echo "Usage: with_openclaw_env <command> [args...]" >&2
+        echo "Usage: with_agent_env <command> [args...]" >&2
         return 2
     fi
 
     (
         local env_file
         for env_file in \
-            /run/agenix/openclaw-runtime-env \
-            /run/agenix/openclaw-integrations-env \
-            /run/agenix/openclaw-tooling-env
+            /run/agenix/agent-runtime-env \
+            /run/agenix/agent-integrations-env \
+            /run/agenix/agent-tooling-env
         do
             [[ -r "$env_file" ]] || continue
             set -a
@@ -36,5 +36,5 @@ openclaw() {
         return 127
     fi
 
-    with_openclaw_env "$openclaw_bin" "$@"
+    with_agent_env "$openclaw_bin" "$@"
 }

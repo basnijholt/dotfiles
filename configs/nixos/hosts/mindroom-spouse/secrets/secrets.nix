@@ -4,5 +4,5 @@ let
   recipients = [ bas spouseHost ];
 in
 {
-  "openclaw-runtime.env.age".publicKeys = recipients;
+  "agent-runtime.env.age".publicKeys = recipients;
 }

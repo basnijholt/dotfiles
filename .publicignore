@@ -19,7 +19,7 @@ configs/keyboard-maestro
 configs/mako
 configs/nix-darwin
 configs/nixos
-configs/shell/25_openclaw.sh
+configs/shell/25_agent.sh
 configs/skhd
 configs/syncthing
 scripts/git-credential-gitea.sh
