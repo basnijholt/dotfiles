@@ -17,9 +17,8 @@ let
   ];
   openclawStateDir = "${homeDir}/.openclaw";
   openclawWorkingDirectory = "${openclawStateDir}/workspace";
-  openclawConfigPath = "/etc/openclaw/openclaw.json";
+  openclawConfigPath = "${openclawStateDir}/openclaw.json";
   openclawLogPath = "${openclawStateDir}/logs/gateway.log";
-  openclawConfigFile = pkgs.writeText "openclaw.json" (builtins.toJSON (import ./config.nix));
 in
 {
   nixpkgs.overlays = [
@@ -49,11 +48,6 @@ in
     mode = "0400";
   };
 
-  environment.etc."openclaw/openclaw.json" = {
-    mode = "0644";
-    source = openclawConfigFile;
-  };
-
   systemd.tmpfiles.rules = [
     "d ${openclawStateDir} 0750 basnijholt users - -"
     "d ${openclawStateDir}/logs 0750 basnijholt users - -"
@@ -64,7 +58,9 @@ in
       description = "OpenClaw gateway";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
+      unitConfig.AssertPathExists = openclawConfigPath;
       environment = {
+        HOME = homeDir;
         OPENCLAW_CONFIG_PATH = openclawConfigPath;
         OPENCLAW_STATE_DIR = openclawStateDir;
         CLAWDBOT_CONFIG_PATH = openclawConfigPath;
