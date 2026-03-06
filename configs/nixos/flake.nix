@@ -7,10 +7,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    openclaw-patched = {
-      url = "git+https://github.com/basnijholt/openclaw.git?ref=feature/message-enrich-hook";
-      flake = false;
-    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,7 +29,6 @@
       self,
       nixpkgs,
       home-manager,
-      openclaw-patched,
       disko,
       comin,
       ragenix,
@@ -57,14 +52,12 @@
       mkHost = extraModules:
         lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit openclaw-patched; };
           modules = commonModules ++ extraModules;
         };
 
       mkHostArm = extraModules:
         lib.nixosSystem {
           system = "aarch64-linux";
-          specialArgs = { inherit openclaw-patched; };
           modules = commonModules ++ extraModules;
         };
 

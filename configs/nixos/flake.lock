@@ -307,23 +307,6 @@
         "type": "github"
       }
     },
-    "openclaw-patched": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1772659936,
-        "narHash": "sha256-hiFhf2bn3f5+AluxfU65I89i/ovPN9S7axNHW8VjTkM=",
-        "ref": "feature/message-enrich-hook",
-        "rev": "8245cd260f85a6e772c077bbe95497bf1f9e8cc4",
-        "revCount": 16885,
-        "type": "git",
-        "url": "https://github.com/basnijholt/openclaw.git"
-      },
-      "original": {
-        "ref": "feature/message-enrich-hook",
-        "type": "git",
-        "url": "https://github.com/basnijholt/openclaw.git"
-      }
-    },
     "ragenix": {
       "inputs": {
         "agenix": "agenix",
@@ -355,7 +338,6 @@
         "home-manager": "home-manager",
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_3",
-        "openclaw-patched": "openclaw-patched",
         "ragenix": "ragenix"
       }
     },

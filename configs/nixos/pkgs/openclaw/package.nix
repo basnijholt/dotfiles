@@ -1,6 +1,7 @@
 {
   lib,
   stdenvNoCC,
+  fetchgit,
   fetchPnpmDeps,
   pnpmConfigHook,
   pnpm_10,
@@ -8,13 +9,18 @@
   gitMinimal,
   makeWrapper,
   rolldown,
-  src,
+  openclawSrc ? fetchgit {
+    url = "https://github.com/basnijholt/openclaw.git";
+    rev = "8245cd260f85a6e772c077bbe95497bf1f9e8cc4";
+    hash = "sha256-hiFhf2bn3f5+AluxfU65I89i/ovPN9S7axNHW8VjTkM=";
+  },
   pnpmDepsHash,
-  version ? (lib.importJSON "${src}/package.json").version,
+  version ? (lib.importJSON "${openclawSrc}/package.json").version,
 }:
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "openclaw";
-  inherit version src;
+  inherit version;
+  src = openclawSrc;
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;

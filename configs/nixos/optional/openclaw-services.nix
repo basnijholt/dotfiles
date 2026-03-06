@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  openclaw-patched,
   ...
 }:
 let
@@ -24,7 +23,7 @@ let
 in
 {
   nixpkgs.overlays = [
-    (import ../home/openclaw/overlay.nix { inherit openclaw-patched; })
+    (import ../home/openclaw/overlay.nix)
   ];
 
   environment.systemPackages = [ pkgs.openclaw ];
