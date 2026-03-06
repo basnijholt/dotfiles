@@ -1,5 +1,6 @@
 {
   config,
+  lib,
   pkgs,
   ...
 }:
@@ -19,13 +20,44 @@ let
   openclawWorkingDirectory = "${openclawStateDir}/workspace";
   openclawConfigPath = "${openclawStateDir}/openclaw.json";
   openclawLogPath = "${openclawStateDir}/logs/gateway.log";
+  openclawInteractiveWrapper = pkgs.writeShellScriptBin "openclaw" ''
+    export HOME=${lib.escapeShellArg homeDir}
+    export OPENCLAW_CONFIG_PATH=${lib.escapeShellArg openclawConfigPath}
+    export OPENCLAW_STATE_DIR=${lib.escapeShellArg openclawStateDir}
+    export CLAWDBOT_CONFIG_PATH=${lib.escapeShellArg openclawConfigPath}
+    export CLAWDBOT_STATE_DIR=${lib.escapeShellArg openclawStateDir}
+
+    for env_file in \
+      ${lib.escapeShellArg agentRuntimeEnvPath} \
+      ${lib.escapeShellArg agentIntegrationsEnvPath} \
+      ${lib.escapeShellArg agentToolingEnvPath}
+    do
+      [ -r "$env_file" ] || continue
+      set -a
+      . "$env_file"
+      set +a
+    done
+
+    exec ${pkgs.openclaw}/bin/openclaw "$@"
+  '';
+  openclawCliPackage = pkgs.symlinkJoin {
+    name = "openclaw-cli";
+    paths = [
+      pkgs.openclaw
+      openclawInteractiveWrapper
+    ];
+    postBuild = ''
+      rm -f $out/bin/openclaw
+      ln -s ${openclawInteractiveWrapper}/bin/openclaw $out/bin/openclaw
+    '';
+  };
 in
 {
   nixpkgs.overlays = [
     (import ./overlay.nix)
   ];
 
-  environment.systemPackages = [ pkgs.openclaw ];
+  environment.systemPackages = [ openclawCliPackage ];
 
   # Match hetzner-matrix pattern: decrypt at activation with host SSH key.
   age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
