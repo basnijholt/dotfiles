@@ -107,6 +107,41 @@ def main() -> int:
     if new_lines != lines:
         install_conf.write_text("\n".join(new_lines) + "\n")
 
+    # 2d) Drop shell snippets and helper config that now point at removed files
+    main_sh = repo_root / "configs/shell/main.sh"
+    if main_sh.exists():
+        log("Patching configs/shell/main.sh based on .publicignore")
+        lines = main_sh.read_text().splitlines()
+        new_lines = [
+            ln
+            for ln in lines
+            if not (
+                "source ~/dotfiles/" in ln
+                and any(p in ln for p in ignore_paths)
+            )
+        ]
+        if new_lines != lines:
+            main_sh.write_text("\n".join(new_lines) + "\n")
+
+    if "scripts/git-credential-gitea.sh" in ignore_paths:
+        gitconfig = repo_root / "configs/git/gitconfig"
+        if gitconfig.exists():
+            log("Patching configs/git/gitconfig to drop private Gitea helper")
+            lines = gitconfig.read_text().splitlines()
+            new_lines: list[str] = []
+            skip_block = False
+            for ln in lines:
+                stripped = ln.strip()
+                if stripped.startswith("[") and stripped.endswith("]"):
+                    skip_block = stripped == '[credential "https://git.nijho.lt"]'
+                    if skip_block:
+                        continue
+                if skip_block:
+                    continue
+                new_lines.append(ln)
+            if new_lines != lines:
+                gitconfig.write_text("\n".join(new_lines) + "\n")
+
     # 2c) Convert submodule SSH URLs to HTTPS for public access
     gitmodules = repo_root / ".gitmodules"
     if gitmodules.exists():

@@ -19,8 +19,10 @@ configs/keyboard-maestro
 configs/mako
 configs/nix-darwin
 configs/nixos
+configs/shell/25_openclaw.sh
 configs/skhd
 configs/syncthing
+scripts/git-credential-gitea.sh
 scripts/rclone.sh
 scripts/rpi
 scripts/rsync-time-machine.sh
