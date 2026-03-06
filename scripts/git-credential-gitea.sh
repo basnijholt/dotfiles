@@ -6,11 +6,11 @@ action="${1:-}"
 input="$(cat)"
 printf '%s\n' "$input" | grep -q '^host=git\.nijho\.lt$' || exit 0
 
-# Load token from secrets.env if not already in the environment.
+# Load token from the agenix-managed OpenClaw tooling env if not already set.
 if [ -z "${GITEA_TOKEN:-}" ]; then
-  secrets_file="${HOME}/.openclaw/secrets.env"
-  if [ -r "$secrets_file" ]; then
-    token_line="$(grep -m1 '^GITEA_TOKEN=' "$secrets_file" || true)"
+  tooling_env="/run/agenix/openclaw-tooling-env"
+  if [ -r "$tooling_env" ]; then
+    token_line="$(grep -m1 '^GITEA_TOKEN=' "$tooling_env" || true)"
     if [ -n "$token_line" ]; then
       GITEA_TOKEN="${token_line#GITEA_TOKEN=}"
       GITEA_TOKEN="${GITEA_TOKEN%$'\r'}"
