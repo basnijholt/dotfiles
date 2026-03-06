@@ -5,8 +5,8 @@
 }:
 let
   homeDir = config.users.users.basnijholt.home;
-  openclawHostSecretsDir = ../hosts/${config.networking.hostName}/secrets;
-  openclawSharedSecretsDir = ../home/openclaw/secrets;
+  openclawHostSecretsDir = ../../hosts/${config.networking.hostName}/secrets;
+  openclawSharedSecretsDir = ./secrets;
   openclawRuntimeEnvPath = config.age.secrets.openclaw-runtime-env.path;
   openclawIntegrationsEnvPath = config.age.secrets.openclaw-integrations-env.path;
   openclawToolingEnvPath = config.age.secrets.openclaw-tooling-env.path;
@@ -19,11 +19,11 @@ let
   openclawWorkingDirectory = "${openclawStateDir}/workspace";
   openclawConfigPath = "/etc/openclaw/openclaw.json";
   openclawLogPath = "${openclawStateDir}/logs/gateway.log";
-  openclawConfigFile = pkgs.writeText "openclaw.json" (builtins.toJSON (import ../home/openclaw/openclaw-config.nix));
+  openclawConfigFile = pkgs.writeText "openclaw.json" (builtins.toJSON (import ./config.nix));
 in
 {
   nixpkgs.overlays = [
-    (import ../home/openclaw/overlay.nix)
+    (import ./overlay.nix)
   ];
 
   environment.systemPackages = [ pkgs.openclaw ];

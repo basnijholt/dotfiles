@@ -16,7 +16,7 @@
     ./element.nix
     ./tuwunel.nix  # Local Matrix homeserver (MindRoom Tuwunel fork)
     ./caddy.nix
-    ../../optional/openclaw-services.nix
+    ../../optional/openclaw/services.nix
   ];
 
   # Allow basnijholt passwordless sudo (for mindroom agent)

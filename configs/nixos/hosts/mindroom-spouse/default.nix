@@ -3,7 +3,7 @@
 {
   imports = [
     ./networking.nix
-    ../../optional/openclaw-services.nix
+    ../../optional/openclaw/services.nix
   ];
 
   # Passwordless sudo for OpenClaw agent
