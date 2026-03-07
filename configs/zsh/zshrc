@@ -1,5 +1,4 @@
 # zmodload zsh/zprof # Uncomment for profiling
 
 source ~/dotfiles/configs/shell/main.sh
-
 # zprof # Uncomment for profiling

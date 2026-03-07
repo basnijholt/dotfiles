@@ -6,10 +6,10 @@
 
 {
   imports = [
+    ../../optional/git-repo-checkouts.nix
     ../../optional/zfs-auto-snapshot.nix
     ./networking.nix
     ./local_mindroom_provisioning_service.nix
-    ./git-repo-checkouts.nix
 
     # Service-focused modules
     ./secrets-config.nix
@@ -44,7 +44,7 @@
     "https://nix-community.cachix.org"
   ];
 
-  # Required by nixpkgs' current mautrix-signal package.
+  # Required by current mautrix bridge packages that still depend on libolm.
   nixpkgs.config.permittedInsecurePackages = [ "olm-3.2.16" ];
 
   # Limit build parallelism on small VPS
