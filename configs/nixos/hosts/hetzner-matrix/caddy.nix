@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain cinnyDomain;
+  inherit (constants) siteDomain cinnyDomain pushDomain;
 in
 {
   systemd.tmpfiles.rules = [
@@ -46,6 +46,12 @@ in
         root * /var/www/cinny/dist
         try_files {path} /index.html
         file_server
+      '';
+    };
+
+    virtualHosts."${pushDomain}" = {
+      extraConfig = ''
+        reverse_proxy localhost:5000
       '';
     };
   };

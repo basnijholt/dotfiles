@@ -17,6 +17,7 @@
     ./caddy.nix
     ./cinny.nix
     ./provisioning.nix
+    ./sygnal.nix
     ./signal.nix
     ./whatsapp.nix
     ./telegram.nix
