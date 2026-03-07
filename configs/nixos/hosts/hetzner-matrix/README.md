@@ -54,6 +54,7 @@ If a previous failed server already exists, recreate it:
 Create A records pointing to the server IP:
 - `mindroom.chat` - website + Matrix `.well-known` delegation
 - `chat.mindroom.chat` - Cinny web client
+- `push.mindroom.chat` - Matrix push gateway (`/_matrix/push/v1/notify`)
 
 ### Tuwunel config (Nix-managed)
 
@@ -103,6 +104,8 @@ Current managed secrets:
 - `sso-google-secret.age`
 - `sso-github-secret.age`
 - `sso-apple-secret.age`
+- `sygnal-env.age`
+- `sygnal-apns-key.age`
 - `signal-appservice-env.age`
 - `whatsapp-appservice-env.age`
 - `telegram-appservice-env.age`
@@ -123,6 +126,39 @@ https://mindroom.chat/_matrix/client/unstable/login/sso/callback/<client_id>
 ```
 
 Provider IDs and callback URLs are in Nix config, while client secrets are read from decrypted agenix files at runtime.
+
+### Push gateway (Sygnal)
+
+Sygnal runs locally in a Podman container and is exposed via:
+
+`https://push.mindroom.chat/_matrix/push/v1/notify`
+
+It is intentionally startup-gated. The `podman-sygnal` unit is skipped until the agenix secrets below contain real values instead of the committed `CHANGE_ME` placeholders.
+
+`sygnal-env.age` should decrypt to:
+
+```bash
+SYGNAL_APNS_KEY_ID=CHANGE_ME
+SYGNAL_APNS_TEAM_ID=CHANGE_ME
+SYGNAL_APNS_TOPIC=com.mindroom-ai.app
+SYGNAL_APNS_PLATFORM=production
+```
+
+`sygnal-apns-key.age` should decrypt to the Apple `.p8` private key contents for the same App ID / team.
+
+After updating both secrets:
+
+```bash
+sudo systemctl restart sygnal-setup podman-sygnal caddy
+systemctl status sygnal-setup podman-sygnal --no-pager
+journalctl -u podman-sygnal -n 100 --no-pager
+```
+
+MindRoom iOS client values:
+
+- `push.ios.gatewayUrl=https://push.mindroom.chat/_matrix/push/v1/notify`
+- `push.ios.appId=com.mindroom-ai.app.ios`
+- APNs topic / bundle ID: `com.mindroom-ai.app`
 
 ### Matrix bridges
 
