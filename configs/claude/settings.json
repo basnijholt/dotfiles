@@ -3,7 +3,7 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "includeCoAuthoredBy": false,
-  "model": "opus",
+  "model": "claude-opus-4-6[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -28,8 +28,9 @@
     "agent-cli-dev@agent-cli": true
   },
   "alwaysThinkingEnabled": true,
+  "fastMode": true,
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.41",
   "skipDangerousModePermissionPrompt": true,
-  "fastMode": true
+  "effortLevel": "high"
 }
