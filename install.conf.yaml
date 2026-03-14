@@ -36,6 +36,7 @@
     ~/.gemini/settings.json: configs/gemini/settings.json
     ~/.gitconfig-personal: configs/git/gitconfig-personal
     ~/.gitconfig: configs/git/gitconfig
+    ~/.local/bin/git-credential-gitea: scripts/git-credential-gitea.sh
     ~/.local/bin/git-fixup-file: scripts/git-fixup-file.sh
     ~/.local/bin/pypi-sha256: scripts/pypi-sha256.sh
     ~/.nanorc: configs/nano/nanorc
