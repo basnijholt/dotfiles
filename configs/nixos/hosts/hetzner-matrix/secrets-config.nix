@@ -33,6 +33,18 @@
       group = "tuwunel";
       mode = "0400";
     };
+    sygnal-env = {
+      file = ./secrets/sygnal-env.age;
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
+    sygnal-apns-key = {
+      file = ./secrets/sygnal-apns-key.age;
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
     signal-appservice-env-tuwunel = {
       file = ./secrets/signal-appservice-env.age;
       owner = "tuwunel";
