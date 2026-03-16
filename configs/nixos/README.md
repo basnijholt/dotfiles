@@ -6,7 +6,7 @@
 configs/nixos/
 ├── common/           # Tier 1: shared by ALL hosts
 ├── optional/         # Tier 2: opt-in modules (desktop, audio, virtualization, power, etc.)
-├── hosts/            # Tier 3: host-specific (pc, nuc, hp)
+├── hosts/            # Tier 3: host-specific (pc, nuc, hp, dev-vm, build-vm)
 ├── installers/       # ISO builder
 └── archive/          # Old migration scripts/notes
 ```
@@ -24,6 +24,7 @@ configs/nixos/
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
+| `dev-vm-aarch64` | QEMU VM | Lightweight dev environment (aarch64, for ARM Macs via QEMU) |
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
@@ -66,7 +67,8 @@ For Incus VM installation, see the instructions in:
 - `hosts/hp/incus-overrides.nix` (HP VM)
 - `hosts/nuc/incus-overrides.nix` (NUC VM)
 - `hosts/pc/incus-overrides.nix` (PC VM)
-- `scripts/create-dev-vm.sh` (dev-vm helper script)
+
+For dev-vm on macOS (Apple Silicon), see `hosts/dev-vm/README.md`
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
 
