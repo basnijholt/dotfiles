@@ -107,25 +107,6 @@ def main() -> int:
     if new_lines != lines:
         install_conf.write_text("\n".join(new_lines) + "\n")
 
-    if "scripts/git-credential-gitea.sh" in ignore_paths:
-        gitconfig = repo_root / "configs/git/gitconfig"
-        if gitconfig.exists():
-            log("Patching configs/git/gitconfig to drop private Gitea helper")
-            lines = gitconfig.read_text().splitlines()
-            new_lines: list[str] = []
-            skip_block = False
-            for ln in lines:
-                stripped = ln.strip()
-                if stripped.startswith("[") and stripped.endswith("]"):
-                    skip_block = stripped == '[credential "https://git.nijho.lt"]'
-                    if skip_block:
-                        continue
-                if skip_block:
-                    continue
-                new_lines.append(ln)
-            if new_lines != lines:
-                gitconfig.write_text("\n".join(new_lines) + "\n")
-
     # 2c) Convert submodule SSH URLs to HTTPS for public access
     gitmodules = repo_root / ".gitmodules"
     if gitmodules.exists():
