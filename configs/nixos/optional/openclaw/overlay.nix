@@ -1,14 +1,14 @@
 final: prev:
 let
   fork = rec {
-    rev = "8245cd260f85a6e772c077bbe95497bf1f9e8cc4";
+    rev = "28ffa322a35b1778fc532127fe83399021adfc56";
     src = final.fetchgit {
       url = "https://github.com/basnijholt/openclaw.git";
       inherit rev;
-      hash = "sha256-hiFhf2bn3f5+AluxfU65I89i/ovPN9S7axNHW8VjTkM=";
+      hash = "sha256-76Po1BQYtmICcvcHeTLD3DPQUAbuaOZ/SxRnEpvgiC0=";
     };
     version = (final.lib.importJSON "${src}/package.json").version;
-    pnpmDepsHash = "sha256-CqudeRT7QT7KslnfPWNFWXvGy2U9AbbahoJJYyUyapU=";
+    pnpmDepsHash = "sha256-v6enDQAGdX7UMZEWYvCgni8zMknyfuaGvfUAjecVeTg=";
   };
   openclaw = prev.openclaw.overrideAttrs (old: {
     inherit (fork) src version pnpmDepsHash;
