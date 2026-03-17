@@ -4,9 +4,9 @@
     enable = true;
     repositories.openclaw = {
       path = "/srv/openclaw";
-      # Mirror the current local OpenClaw fork checkout onto /srv so rebuilds
-      # do not depend on an impure flake path in basnijholt's home directory.
-      url = "/home/basnijholt/openclaw-src";
+      # Track Bas's fork on GitHub from /srv so rebuilds stay pure and the
+      # managed checkout matches the current message-enrich workstream.
+      url = "https://github.com/basnijholt/openclaw.git";
       branch = "message-enrich";
       user = "basnijholt";
       group = "users";
