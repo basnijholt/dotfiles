@@ -6,8 +6,6 @@
 }:
 let
   homeDir = config.users.users.basnijholt.home;
-  openclawHostSecretsDir = ../../hosts/${config.networking.hostName}/secrets;
-  openclawSharedSecretsDir = ./secrets;
   agentRuntimeEnvPath = config.age.secrets.agent-runtime-env.path;
   agentIntegrationsEnvPath = config.age.secrets.agent-integrations-env.path;
   agentToolingEnvPath = config.age.secrets.agent-tooling-env.path;
@@ -58,27 +56,6 @@ in
   ];
 
   environment.systemPackages = [ openclawCliPackage ];
-
-  # Match hetzner-matrix pattern: decrypt at activation with host SSH key.
-  age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  age.secrets.agent-runtime-env = {
-    file = openclawHostSecretsDir + "/agent-runtime.env.age";
-    owner = "basnijholt";
-    group = "users";
-    mode = "0400";
-  };
-  age.secrets.agent-integrations-env = {
-    file = openclawSharedSecretsDir + "/agent-integrations.env.age";
-    owner = "basnijholt";
-    group = "users";
-    mode = "0400";
-  };
-  age.secrets.agent-tooling-env = {
-    file = openclawSharedSecretsDir + "/agent-tooling.env.age";
-    owner = "basnijholt";
-    group = "users";
-    mode = "0400";
-  };
 
   systemd.tmpfiles.rules = [
     "d ${openclawStateDir} 0750 basnijholt users - -"

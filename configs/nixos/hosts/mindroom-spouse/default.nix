@@ -3,6 +3,7 @@
 {
   imports = [
     ./networking.nix
+    ../../optional/agent-env.nix
     ../../optional/openclaw/services.nix
   ];
 

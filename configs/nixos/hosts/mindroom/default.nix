@@ -7,6 +7,7 @@
     ../../optional/git-repo-checkouts.nix
     ../../optional/virtualization.nix
     ../../optional/mindroom-runtime-services.nix
+    ../../optional/agent-env.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix

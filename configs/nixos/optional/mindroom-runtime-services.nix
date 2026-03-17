@@ -1,4 +1,18 @@
-{ pkgs, ... }:
+{
+  config,
+  pkgs,
+  ...
+}:
+let
+  agentRuntimeEnvPath = config.age.secrets.agent-runtime-env.path;
+  agentIntegrationsEnvPath = config.age.secrets.agent-integrations-env.path;
+  agentToolingEnvPath = config.age.secrets.agent-tooling-env.path;
+  agentEnvironmentFiles = [
+    agentRuntimeEnvPath
+    agentIntegrationsEnvPath
+    agentToolingEnvPath
+  ];
+in
 {
   systemd.services = {
     mindroom-local = {
@@ -11,7 +25,7 @@
         User = "basnijholt";
         Group = "users";
         WorkingDirectory = "/home/basnijholt/mindroom";
-        EnvironmentFile = "/home/basnijholt/mindroom/.env";
+        EnvironmentFile = [ "/home/basnijholt/mindroom/.env" ] ++ agentEnvironmentFiles;
         Environment = [
           "MINDROOM_CONFIG_PATH=/home/basnijholt/mindroom/config.yaml"
           "MINDROOM_STORAGE_PATH=/home/basnijholt/mindroom/mindroom_data"
@@ -39,7 +53,7 @@
         User = "basnijholt";
         Group = "users";
         WorkingDirectory = "/home/basnijholt/.mindroom";
-        EnvironmentFile = "/home/basnijholt/.mindroom/.env";
+        EnvironmentFile = [ "/home/basnijholt/.mindroom/.env" ] ++ agentEnvironmentFiles;
         Environment = [
           "MINDROOM_CONFIG_PATH=/home/basnijholt/.mindroom/config.yaml"
           "MINDROOM_STORAGE_PATH=/home/basnijholt/.mindroom/mindroom_data"
