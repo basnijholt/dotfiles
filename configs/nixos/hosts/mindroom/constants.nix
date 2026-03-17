@@ -4,6 +4,6 @@
   publicSiteDomain = "mindroom.lab.mindroom.chat";
   publicCinnyDomain = "chat.lab.mindroom.chat";
   publicElementDomain = "element.lab.mindroom.chat";
-  tuwunelVersion = "v1.5.0-mindroom.15";
-  tuwunelArchiveHash = "sha256-MKqtcKD2IyyaOJ3ev4uhk4kBZqYSgyly3kcII+NVVIE=";
+  tuwunelVersion = "v1.5.1-mindroom.5";
+  tuwunelArchiveHash = "sha256-lp131zE5nUimONx4G/VwgvHMy+OuCIXWcL1Wwm6EwL8=";
 }

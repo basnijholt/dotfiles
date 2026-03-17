@@ -19,6 +19,7 @@ let
     cups # lp command for network printing
     docker
     devbox
+    devenv
     dnsutils # Provides dig, nslookup, host
     duf
     eza
