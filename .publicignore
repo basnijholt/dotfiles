@@ -21,6 +21,7 @@ configs/nix-darwin
 configs/nixos
 configs/skhd
 configs/syncthing
+scripts/git-credential-gitea.sh
 scripts/rclone.sh
 scripts/rpi
 scripts/rsync-time-machine.sh

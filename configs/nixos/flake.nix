@@ -24,7 +24,17 @@
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, ragenix, nixos-raspberrypi, ... }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      disko,
+      comin,
+      ragenix,
+      nixos-raspberrypi,
+      ...
+    }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
@@ -127,12 +137,14 @@
 
         # Companion bot LXC container for Incus
         mindroom-spouse = mkHost [
+          ragenix.nixosModules.default
           ./hosts/mindroom-spouse/default.nix
           ./optional/lxc-container.nix
         ];
 
         # Lightweight development LXC container for Incus (on HP)
         mindroom = mkHost [
+          ragenix.nixosModules.default
           ./hosts/mindroom/default.nix
           ./optional/lxc-container.nix
         ];

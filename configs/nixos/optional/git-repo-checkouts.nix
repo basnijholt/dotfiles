@@ -79,7 +79,7 @@ in
             after = [ "network-online.target" ];
             wants = [ "network-online.target" ];
             wantedBy = [ "multi-user.target" ];
-            path = with pkgs; [ bash coreutils git ];
+            path = with pkgs; [ bash coreutils git git-lfs openssh ];
             serviceConfig = {
               Type = "oneshot";
               User = repo.user;
