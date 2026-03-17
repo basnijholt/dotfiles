@@ -50,5 +50,3 @@
 	dark = true  # or light = true, or omit for auto-detection
 	line-numbers = true
 	side-by-side = false
-[credential "https://git.nijho.lt"]
-	helper = /home/basnijholt/.local/bin/git-credential-gitea
