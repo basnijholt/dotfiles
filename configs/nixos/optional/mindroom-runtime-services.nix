@@ -30,7 +30,7 @@
     };
 
     mindroom-chat = {
-      description = "MindRoom AI Agent System (mindroom.chat)";
+      description = "MindRoom AI Agent System (mindroom.lab.mindroom.chat)";
       after = [ "network-online.target" "git-checkout-mindroom.service" ];
       wants = [ "network-online.target" "git-checkout-mindroom.service" ];
       wantedBy = [ "multi-user.target" ];

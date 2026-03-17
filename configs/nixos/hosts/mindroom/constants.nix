@@ -1,5 +1,5 @@
 {
-  siteDomain = "mindroom.local";
+  siteDomain = "mindroom.lab.mindroom.chat";
   publicBaseDomain = "lab.mindroom.chat";
   publicSiteDomain = "mindroom.lab.mindroom.chat";
   publicCinnyDomain = "chat.lab.mindroom.chat";

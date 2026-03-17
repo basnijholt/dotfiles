@@ -13,14 +13,28 @@ in
     virtualHosts = {
       "${publicSiteDomain}:80" = {
         extraConfig = ''
-          # The lab host fronts the app UI; Matrix discovery and the canonical
-          # homeserver for the public clients currently live elsewhere.
           route {
-            handle /.well-known/matrix/* {
-              respond "Not found" 404
+            handle /.well-known/matrix/server {
+              header Content-Type application/json
+              respond 200 {
+                body "{\"m.server\":\"${publicSiteDomain}:443\"}"
+                close
+              }
+            }
+
+            handle /.well-known/matrix/client {
+              header Content-Type application/json
+              respond 200 {
+                body "{\"m.homeserver\":{\"base_url\":\"https://${publicSiteDomain}\"}}"
+                close
+              }
             }
 
             handle /_matrix/* {
+              reverse_proxy 127.0.0.1:8008
+            }
+
+            handle /.well-known/matrix/* {
               respond "Not found" 404
             }
 
