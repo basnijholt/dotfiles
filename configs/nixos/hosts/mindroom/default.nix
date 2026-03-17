@@ -12,6 +12,7 @@
     ./networking.nix
     ./secrets-config.nix
     ./mindroom.nix
+    ./openclaw.nix
     ./cinny.nix
     ./element.nix
     ./tuwunel.nix  # Local Matrix homeserver (MindRoom Tuwunel fork)
