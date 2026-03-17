@@ -30,8 +30,6 @@
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli ];
 
-  # OpenClaw and related runtime services are managed as NixOS system services.
-
   # Disable comin on this host — we deploy manually via nixos-rebuild switch.
   services.comin.enable = lib.mkForce false;
 }
