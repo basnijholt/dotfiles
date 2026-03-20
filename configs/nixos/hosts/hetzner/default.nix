@@ -53,6 +53,9 @@
     memoryPercent = 50; # Use up to 50% of RAM for compressed swap
   };
 
+  # Avoid restart attempts for an in-use zram device during switch-to-configuration.
+  systemd.services."systemd-zram-setup@zram0".restartIfChanged = false;
+
   # Required for ZFS
   networking.hostId = "027a1bbc";
   # ZFS 2.4.0 pin is in hardware-configuration.nix

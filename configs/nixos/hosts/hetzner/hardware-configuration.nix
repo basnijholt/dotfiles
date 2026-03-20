@@ -28,6 +28,7 @@
   # UEFI boot with systemd-boot (ARM requires UEFI)
   boot.loader = {
     systemd-boot.enable = true;
+    systemd-boot.configurationLimit = 3;
     efi.canTouchEfiVariables = true;
   };
 

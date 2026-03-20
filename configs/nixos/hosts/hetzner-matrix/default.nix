@@ -57,6 +57,9 @@
     memoryPercent = 50;
   };
 
+  # Avoid restart attempts for an in-use zram device during switch-to-configuration.
+  systemd.services."systemd-zram-setup@zram0".restartIfChanged = false;
+
   # ZFS
   networking.hostId = "a1b2c3d4"; # Generate with: head -c4 /dev/urandom | od -A none -t x4 | tr -d ' '
 
