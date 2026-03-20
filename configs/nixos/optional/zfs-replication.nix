@@ -59,6 +59,13 @@
       # Target pool structure: tank/backups/<hostname>/<dataset>
       TARGET_PATH="tank/backups/${config.networking.hostName}"
 
+      # This is a timer-driven best-effort backup job. If TrueNAS is not
+      # reachable yet, skip this run instead of poisoning system activation.
+      if ! ssh -o BatchMode=yes -o ConnectTimeout=10 "$TARGET_USER@$TARGET_HOST" true >/dev/null 2>&1; then
+        echo "Skipping ZFS replication: $TARGET_HOST is not reachable over SSH"
+        exit 0
+      fi
+
       # Replicate Home (Most important)
       # recursive=true includes sub-datasets
       syncoid \
