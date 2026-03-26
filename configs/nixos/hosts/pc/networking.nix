@@ -4,12 +4,57 @@
 {
   networking.hostName = lib.mkDefault "pc";
   networking.hostId = "8425e349"; # Required for ZFS
-  networking.networkmanager.enable = true;
+  networking.networkmanager = {
+    enable = true;
+    # Leave Wi-Fi under NetworkManager, but let networkd own the wired bridge.
+    unmanaged = [ "interface-name:enp5s0" "interface-name:br0" ];
+    settings."connection"."wifi.powersave" = 2;
+  };
+  networking.useDHCP = false;
   networking.nftables.enable = true;
   networking.firewall.enable = true;
 
-  # --- WiFi Power Management ---
-  networking.networkmanager.settings."connection"."wifi.powersave" = 2;
+  # --- Bridge Netfilter Fix ---
+  # Docker loads br_netfilter which causes bridged frames (including Incus
+  # container traffic) to traverse iptables/nftables chains. This breaks
+  # Incus container -> Docker-published-port connectivity (e.g., Whisper).
+  boot.kernel.sysctl."net.bridge.bridge-nf-call-iptables" = 0;
+  boot.kernel.sysctl."net.bridge.bridge-nf-call-ip6tables" = 0;
+
+  systemd.network.enable = true;
+
+  # --- Wired LAN Bridge ---
+  # Put Incus containers directly on the LAN without macvlan's host reachability
+  # limitation. Reuse the physical NIC's MAC so the router keeps the same lease.
+  systemd.network.netdevs."20-br0" = {
+    netdevConfig = {
+      Kind = "bridge";
+      Name = "br0";
+      MACAddress = "24:4b:fe:48:60:2a";
+    };
+  };
+
+  systemd.network.networks."30-enp5s0" = {
+    matchConfig.Name = "enp5s0";
+    networkConfig.Bridge = "br0";
+    linkConfig.RequiredForOnline = "no";
+  };
+
+  systemd.network.networks."40-br0" = {
+    matchConfig.Name = "br0";
+    networkConfig.DHCP = "yes";
+    linkConfig.RequiredForOnline = "no";
+    dhcpV4Config.RouteMetric = 100;
+    ipv6AcceptRAConfig.RouteMetric = 100;
+    routes = [
+      {
+        Destination = "192.168.1.4/32";
+        Scope = "link";
+        PreferredSource = "192.168.1.5";
+        Metric = 50;
+      }
+    ];
+  };
 
   # --- Local DNS Overrides ---
   networking.extraHosts = ''
@@ -28,7 +73,7 @@
   # the check here prevents rpfilter from black-holing inter-node traffic
   # whenever kind recreates its Docker network.
   networking.firewall.checkReversePath = false;
-  networking.firewall.trustedInterfaces = [ "incusbr0" ];
+  networking.firewall.trustedInterfaces = [ "br0" "incusbr0" "tailscale0" ];
   networking.firewall.allowedTCPPorts = [
     10200 # Wyoming Piper
     10300 # Wyoming Faster Whisper - English
@@ -55,7 +100,7 @@
   # --- NAT for Incus Containers ---
   networking.nat = {
     enable = true;
-    externalInterface = "wlp7s0";
+    externalInterface = "br0";
     internalInterfaces = [ "incusbr0" ];
     forwardPorts = [
       { sourcePort = 8123; destination = "10.5.28.161:8123"; proto = "tcp"; }
