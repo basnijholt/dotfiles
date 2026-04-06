@@ -31,6 +31,7 @@ Assume the user is often discussing Python programming.
 Use backticks for variable names, function names, and other code elements.
 Follow PEP8: use `snake_case` for variables, functions, and package names; `CamelCase` for classes.
 Other frequent words are `pipefunc` (a Python package), agent-cli (a Python package), IonQ (a quantum computing company), trapped-ion quantum computer, `pre-commit`, `pytest`, `ruff`, `unidep`.
+Very frequently asking questions. If it sounds like a question add ?
 """
 transcription-log = "~/transcription.log"
 
