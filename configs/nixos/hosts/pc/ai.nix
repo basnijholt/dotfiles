@@ -31,6 +31,20 @@
 
     models:  # Ordered from newest to oldest
 
+      # Uploaded 2026-04-02, size 18.8 GB, max ctx: 262144, layers: 60
+      # Source: https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/blob/main/gemma-4-31B-it-UD-Q4_K_XL.gguf
+      "gemma-4:31b-q4":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --model-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/gemma-4-31B-it-UD-Q4_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 2048
+          --ubatch-size 512
+          --threads 1
+          --jinja
+
       # Qwen3.5-35B-A3B - MoE model with 35B total / 3B active params
       "qwen3.5:35b-a3b-q4":
         cmd: |
