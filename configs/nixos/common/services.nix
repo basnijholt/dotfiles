@@ -9,8 +9,8 @@
   # --- System Stability ---
   services.earlyoom = {
     enable = true;
-    freeSwapThreshold = 2;
-    freeMemThreshold = 2;
+    freeSwapThreshold = 10;
+    freeMemThreshold = 10;
   };
 
   # --- SSH ---
