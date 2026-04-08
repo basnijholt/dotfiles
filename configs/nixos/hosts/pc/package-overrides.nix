@@ -95,13 +95,6 @@
               ${oldAttrs.preConfigure or ""}
             '';
 
-            # Upstream nixpkgs removes a precompressed UI asset that no longer
-            # exists in newer llama.cpp tags, so make that cleanup tolerant.
-            postPatch = pkgs.lib.replaceStrings [
-              "rm tools/server/public/index.html.gz"
-            ] [
-              "rm -f tools/server/public/index.html.gz"
-            ] (oldAttrs.postPatch or "");
           });
 
       # llama-swap from GitHub releases
