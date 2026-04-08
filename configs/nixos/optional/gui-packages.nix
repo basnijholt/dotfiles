@@ -25,7 +25,7 @@ let
     hyprpanel
     wofi
     mako
-    swww
+    awww
     wl-clipboard
     wl-clip-persist
     cliphist
