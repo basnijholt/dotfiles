@@ -27,7 +27,7 @@ if [[ $- == *i* ]]; then
     alias gcaia="${HOME}/dotfiles/scripts/commit.py --edit --all "
     alias c='code'
     alias cl='claude --dangerously-skip-permissions '
-    alias vcl='CLAUDE_CODE_USE_VERTEX=1 ANTHROPIC_MODEL="claude-opus-4-6" ANTHROPIC_SMALL_FAST_MODEL="claude-haiku-4-5" claude --dangerously-skip-permissions '
+    alias vcl='CLAUDE_CODE_USE_VERTEX=1 CLOUD_ML_REGION=global ANTHROPIC_MODEL="claude-opus-4-7" ANTHROPIC_SMALL_FAST_MODEL="claude-haiku-4-5" claude --dangerously-skip-permissions '
     alias cr='coder --dangerously-bypass-approvals-and-sandbox '
     alias cx='codex --dangerously-bypass-approvals-and-sandbox '
     alias oc='opencode '
