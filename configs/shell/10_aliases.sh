@@ -41,6 +41,7 @@ if [[ $- == *i* ]]; then
         alias ci='code-insiders'
         alias s='/usr/local/bin/subl'
         alias ss='open -b com.apple.ScreenSaver.Engine'
+        alias switch-agent-cli-ip="${HOME}/dotfiles/scripts/switch-agent-cli-ip.py"
         alias tun='autossh -N -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -L 8888:localhost:9999 cw'
         alias nixswitch="sudo darwin-rebuild switch --flake ~/dotfiles/configs/nix-darwin"
         alias nixupdate="cd ~/dotfiles/configs/nix-darwin && nix flake update --extra-experimental-features nix-command --extra-experimental-features flakes && nixswitch && cd -"
