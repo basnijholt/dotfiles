@@ -28,6 +28,7 @@
                 };
               };
               config.isPersonal = true;
+              config.system.primaryUser = "basnijholt";
             }
           ];
         };
@@ -43,6 +44,7 @@
                 };
               };
               config.isPersonal = false;
+              config.system.primaryUser = "bas.nijholt";
             }
           ];
         };
