@@ -100,15 +100,11 @@ def main() -> int:
     console.print(f"[bold]Selected IP:[/bold] [green]{target_ip}[/green]")
 
     if original == updated:
-        console.print(
-            f"[yellow]{config_path} already uses {target_ip}[/yellow]"
-        )
+        console.print(f"[yellow]{config_path} already uses {target_ip}[/yellow]")
         return 0
 
     if args.dry_run:
-        console.print(
-            f"[yellow]Would switch {config_path} to {target_ip}[/yellow]"
-        )
+        console.print(f"[yellow]Would switch {config_path} to {target_ip}[/yellow]")
         return 0
 
     config_path.write_text(updated)
