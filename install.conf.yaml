@@ -62,6 +62,7 @@
 - shell:
   - bash scripts/sync-uv.sh
   - bash scripts/sync-bun.sh
+  - bash scripts/install-nano-syntax.sh
   - git submodule update --init --recursive
   - command: '[[ "$(uname)" = "Darwin" ]] && [ -f ./secrets/install ] && (echo "SECRETS" && ./secrets/install) || true'
     stdout: true

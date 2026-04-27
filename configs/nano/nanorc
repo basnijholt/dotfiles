@@ -1,3 +1,6 @@
+# Load syntax definitions synced by scripts/install-nano-syntax.sh.
+include "~/.nano/syntax/system/*.nanorc"
+
 # Word navigation with Alt+b / Alt+f (Emacs-style)
 # Configure iTerm2 to send Esc+b/f for Alt+Arrow:
 # Preferences → Profiles → Keys → Key Mappings → Add:
