@@ -22,7 +22,7 @@ Nix-managed:
 
 Manual/runtime-managed:
 
-- Cinny build/deploy from `/var/www/cinny` into `/var/www/cinny/dist`.
+- Cinny build/deploy from `/var/www/cinny` into the published root at `/var/www/cinny-published/current`.
 - Website files in `/var/www/mindroom`.
 - DNS records at your DNS provider.
 
@@ -146,19 +146,21 @@ Onboarding flow:
 ### Cinny web client
 
 Cinny build artifacts are not pinned in Nix.
-The checkout at `/var/www/cinny` is ensured by the `git-checkout-cinny` systemd service, and Caddy serves `/var/www/cinny/dist`.
+The checkout at `/var/www/cinny` is ensured by the `git-checkout-cinny` systemd service.
+Caddy serves the published symlink at `/var/www/cinny-published/current`, so failed builds do not blank the live site.
 
 ```bash
 # Refresh checkout to configured branch tip (skips pull if local changes exist)
 sudo systemctl start git-checkout-cinny
 
-# Build and publish static files
-cd /var/www/cinny
-npm ci
-npm run build
+# Build in a detached worktree and atomically publish the result
+mindroom-publish-cinny v4.10.5-mindroom.X
 ```
 
 No `nixos-rebuild` is needed for Cinny-only updates.
+The publish command also sets a larger Node heap limit for the build and validates
+that `index.html`, `runtime-config.js`, and `assets/` exist before it updates the
+live symlink.
 
 ### Local provisioning service code
 

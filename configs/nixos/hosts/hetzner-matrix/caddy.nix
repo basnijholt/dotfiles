@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain cinnyDomain;
+  inherit (constants) siteDomain cinnyDomain cinnyCurrentPath;
 in
 {
   systemd.tmpfiles.rules = [
@@ -43,7 +43,7 @@ in
     # Cinny web client (SPA)
     virtualHosts."${cinnyDomain}" = {
       extraConfig = ''
-        root * /var/www/cinny/dist
+        root * ${cinnyCurrentPath}
         try_files {path} /index.html
         file_server
       '';
