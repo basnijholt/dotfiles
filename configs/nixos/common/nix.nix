@@ -4,10 +4,11 @@
 {
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
+    fallback = true;
     trusted-users = [ "root" "basnijholt" ];
     substituters = [
       "https://cache.nixos.org/"
-      "http://nix-cache.local:5000"
+      "http://192.168.1.145:5000"
       "https://nix-community.cachix.org"
       "https://cache.nixos-cuda.org"
       "https://nixos-raspberrypi.cachix.org"
