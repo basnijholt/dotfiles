@@ -45,6 +45,20 @@
           --threads 1
           --jinja
 
+      # Same Gemma 4 weights, but disables <|think|> injection in the chat template
+      "gemma-4:31b-q4-nothink":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --model-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/gemma-4-31B-it-UD-Q4_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 2048
+          --ubatch-size 512
+          --threads 1
+          --chat-template-kwargs '{"enable_thinking": false}'
+          --jinja
+
       # Qwen3.5-35B-A3B - MoE model with 35B total / 3B active params
       "qwen3.5:35b-a3b-q4":
         cmd: |
@@ -54,6 +68,34 @@
           --ctx-size 65536
           --batch-size 2048
           --ubatch-size 512
+          --threads 1
+          --jinja
+
+      # Qwen3.6-27B dense model - 35.3 GB UD-Q8_K_XL, split across both 3090s
+      "qwen3.6:27b-q8":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3.6-27B-GGUF:UD-Q8_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 2048
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1,1
+          --threads 1
+          --jinja
+
+      # Qwen3.6-35B-A3B MoE model - 38.5 GB UD-Q8_K_XL, split across both 3090s
+      "qwen3.6:35b-a3b-q8":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q8_K_XL
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 2048
+          --ubatch-size 512
+          --split-mode layer
+          --tensor-split 1,1
           --threads 1
           --jinja
 
