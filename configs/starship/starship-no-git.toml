@@ -1,0 +1,35 @@
+[time]
+disabled = false
+
+[gcloud]
+disabled = true
+
+[character]
+success_symbol = '[|ψ❯](bold green) '
+error_symbol = '[✗](bold red) '
+
+[custom.bash]
+command = "echo bash"
+description = "Displays 'bash' if in bash shell"
+when = '[ "$STARSHIP_SHELL" = "bash" ]'
+format = '[$output](cyan bold) '
+disabled = false
+
+# /opt/stacks is a Git repo on NFS. Disable Git modules there so prompts stay responsive.
+[git_branch]
+disabled = true
+
+[git_status]
+disabled = true
+
+[git_state]
+disabled = true
+
+[git_metrics]
+disabled = true
+
+[hg_branch]
+disabled = true
+
+[fossil_branch]
+disabled = true
