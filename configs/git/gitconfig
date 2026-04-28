@@ -50,3 +50,9 @@
 	dark = true  # or light = true, or omit for auto-detection
 	line-numbers = true
 	side-by-side = false
+[credential "https://github.com"]
+	helper = 
+	helper = !/run/current-system/sw/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/run/current-system/sw/bin/gh auth git-credential
