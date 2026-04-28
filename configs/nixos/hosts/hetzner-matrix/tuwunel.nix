@@ -32,7 +32,7 @@ let
     mindroom_edit_purge_enabled = true
     mindroom_edit_purge_min_age_secs = 86400
     mindroom_edit_purge_interval_secs = 3600
-    mindroom_edit_purge_batch_size = 1000
+    mindroom_edit_purge_batch_size = 10000
     max_request_size = 25165824
 
     [global.well_known]
