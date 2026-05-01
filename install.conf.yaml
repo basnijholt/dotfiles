@@ -17,6 +17,8 @@
     ~/.config/bat/config: configs/bat/config
     ~/.config/codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.config/codex/config.toml: configs/codex/config.toml
+    ~/.codex/hooks: configs/codex/hooks
+    ~/.codex/hooks.json: configs/codex/hooks.json
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
     ~/.config/git/attributes: configs/git/attributes
