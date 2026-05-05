@@ -27,14 +27,23 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.20.4";
+        version = "0.23.0";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-8TbZvxxaUdROpe3gnBx0XzX62tbQ9QeJP3Yp7XXJoTQ=";
+          hash = "sha256-VYaFCSqhIlJPJv1SUiNDgSzLqySK3NTfucdWA7IZaAk=";
         };
         vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
+        postPatch = (oldAttrs.postPatch or "") + ''
+          substituteInPlace cmd/launch/openclaw_test.go \
+            --replace-fail '/usr/bin/env' '${pkgs.coreutils}/bin/env' \
+            --replace-fail '/usr/bin/sort' '${pkgs.coreutils}/bin/sort' \
+            --replace-fail '/bin/chmod' '${pkgs.coreutils}/bin/chmod'
+          substituteInPlace cmd/launch/pi_test.go \
+            --replace-fail '/bin/cat' '${pkgs.coreutils}/bin/cat' \
+            --replace-fail '/bin/chmod' '${pkgs.coreutils}/bin/chmod'
+        '';
         preBuild = oldAttrs.preBuild + ''
           # Fix tree-sitter vendor: copy C sources that go mod vendor excludes
           if [ -d vendor/github.com/tree-sitter ]; then

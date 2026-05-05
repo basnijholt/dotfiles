@@ -6,5 +6,6 @@
   virtualisation.docker.enable = true;
   virtualisation.libvirtd.enable = true;
   virtualisation.incus.enable = true;
+  virtualisation.incus.bucketSupport = false;
   programs.virt-manager.enable = true;
 }
