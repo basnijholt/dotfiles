@@ -71,11 +71,14 @@
           --threads 1
           --jinja
 
-      # Qwen3.6-27B dense model - 35.3 GB UD-Q8_K_XL, split across both 3090s
+      # Latest Unsloth Qwen3.6-27B dense model, verified 2026-05-05.
+      # Source: https://huggingface.co/unsloth/Qwen3.6-27B-GGUF
+      # UD-Q8_K_XL quant, split across both 3090s
       "qwen3.6:27b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           -hf unsloth/Qwen3.6-27B-GGUF:UD-Q8_K_XL
+          --alias qwen3.6:27b-q8
           --port ''${PORT}
           --ctx-size 65536
           --batch-size 2048
