@@ -20,6 +20,7 @@ let
     docker
     devbox
     devenv
+    delta
     dnsutils # Provides dig, nslookup, host
     duf
     eza
