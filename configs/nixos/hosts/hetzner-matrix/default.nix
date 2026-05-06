@@ -47,6 +47,9 @@
   # Required by current mautrix bridge packages that still depend on libolm.
   nixpkgs.config.permittedInsecurePackages = [ "olm-3.2.16" ];
 
+  # Keep live switches compatible with the currently running generation.
+  services.dbus.implementation = "dbus";
+
   # Limit build parallelism on small VPS
   nix.settings.max-jobs = 2;
   nix.settings.cores = 2;
