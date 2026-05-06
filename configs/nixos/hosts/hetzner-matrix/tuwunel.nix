@@ -1,4 +1,9 @@
-{ lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 
 let
   constants = import ./constants.nix;
@@ -9,14 +14,21 @@ let
     hash = tuwunelArchiveHash;
   };
 
-  tuwunelPackage = pkgs.runCommand "tuwunel-${tuwunelVersion}-linux-aarch64" {
-    nativeBuildInputs = with pkgs; [ gnutar gzip findutils ];
-  } ''
-    mkdir -p "$out/bin"
-    tar -xzf "${tuwunelArchive}" -C "$TMPDIR"
-    bin_path="$(find "$TMPDIR" -maxdepth 2 -type f -name tuwunel | head -n1)"
-    install -m 0755 "$bin_path" "$out/bin/tuwunel"
-  '';
+  tuwunelPackage =
+    pkgs.runCommand "tuwunel-${tuwunelVersion}-linux-aarch64"
+      {
+        nativeBuildInputs = with pkgs; [
+          gnutar
+          gzip
+          findutils
+        ];
+      }
+      ''
+        mkdir -p "$out/bin"
+        tar -xzf "${tuwunelArchive}" -C "$TMPDIR"
+        bin_path="$(find "$TMPDIR" -maxdepth 2 -type f -name tuwunel | head -n1)"
+        install -m 0755 "$bin_path" "$out/bin/tuwunel"
+      '';
 
   tuwunelHealthcheck = pkgs.writeShellScript "tuwunel-healthcheck" ''
     set -euo pipefail
@@ -58,6 +70,12 @@ let
     mindroom_edit_purge_interval_secs = 3600
     mindroom_edit_purge_batch_size = 10000
     max_request_size = 25165824
+    admin_execute = [
+      "query oauth delete @ndyatobitillrkbxeyvg:mindroom.chat --force",
+      "query oauth associate 974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com @basnijholt:mindroom.chat --claim sub=104092771642814673270",
+      "query oauth delete @ujvm7jr2me0nvxx:mindroom.chat --force",
+      "query oauth associate 974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com @latone:mindroom.chat --claim sub=110953386229227434348"
+    ]
 
     [global.well_known]
     client = "https://${siteDomain}"
@@ -68,6 +86,8 @@ let
     client_id = "974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com"
     client_secret_file = "${config.age.secrets.sso-google-secret.path}"
     callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com"
+    userid_claims = ["email"]
+    unique_id_fallbacks = false
     default = true
 
     [[global.identity_provider]]
@@ -198,8 +218,14 @@ in
 
   systemd.services.tuwunel-healthcheck = {
     description = "Restart Tuwunel when the Matrix client endpoint hangs";
-    after = [ "network-online.target" "tuwunel.service" ];
-    wants = [ "network-online.target" "tuwunel.service" ];
+    after = [
+      "network-online.target"
+      "tuwunel.service"
+    ];
+    wants = [
+      "network-online.target"
+      "tuwunel.service"
+    ];
 
     serviceConfig = {
       Type = "oneshot";
