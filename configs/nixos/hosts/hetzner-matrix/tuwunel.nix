@@ -64,6 +64,7 @@ let
     server = "${siteDomain}:443"
 
     [[global.identity_provider]]
+    # Keep Google identities independent from GitHub-backed Matrix accounts.
     brand = "Google"
     client_id = "974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com"
     client_secret_file = "${config.age.secrets.sso-google-secret.path}"
