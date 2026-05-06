@@ -74,6 +74,7 @@ let
     brand = "GitHub"
     client_id = "Ov23li6wDSuBsiVjYWar"
     client_secret_file = "${config.age.secrets.sso-github-secret.path}"
+    issuer_url = "https://github.com/login/oauth"
     callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/Ov23li6wDSuBsiVjYWar"
 
     [[global.identity_provider]]
