@@ -59,6 +59,7 @@ let
     mindroom_edit_purge_batch_size = 10000
     max_request_size = 25165824
 
+    # One-off OAuth repair commands should be run out-of-band, not committed here.
     [global.well_known]
     client = "https://${siteDomain}"
     server = "${siteDomain}:443"
