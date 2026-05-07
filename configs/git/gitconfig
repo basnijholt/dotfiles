@@ -35,8 +35,6 @@
 	required = true
 [http]
 	version = HTTP/1.1
-[credential "https://dev.azure.com"]
-	useHttpPath = true
 [rerere]
 	enabled = true
 	autoUpdate = true
@@ -56,3 +54,8 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/run/current-system/sw/bin/gh auth git-credential
+[credential]
+	helper = 
+	helper = /usr/local/share/gcm-core/git-credential-manager
+[credential "https://dev.azure.com"]
+	useHttpPath = true
