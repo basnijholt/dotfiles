@@ -30,8 +30,7 @@ in
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli ];
 
-  services.openclaw.useForkOverlay = false;
-  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [ "openclaw-2026.4.2" ];
+  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [ "openclaw-2026.4.21" ];
 
   systemd.tmpfiles.rules = [
     "d ${mindroomDir} 0750 basnijholt users - -"

@@ -13,7 +13,6 @@
     ./networking.nix
     ./secrets-config.nix
     ./mindroom.nix
-    ./openclaw.nix
     ./cinny.nix
     ./element.nix
     ./tuwunel.nix  # Local Matrix homeserver (MindRoom Tuwunel fork)
@@ -29,6 +28,8 @@
 
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli pkgs.ffmpeg-headless pkgs.chromium ];
+
+  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [ "openclaw-2026.4.21" ];
 
   # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)
   # that link against it. Without this, uv run / pytest fail with import errors.

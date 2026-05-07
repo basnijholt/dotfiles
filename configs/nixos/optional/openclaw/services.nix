@@ -5,7 +5,6 @@
   ...
 }:
 let
-  cfg = config.services.openclaw;
   homeDir = config.users.users.basnijholt.home;
   agentRuntimeEnvPath = config.age.secrets.agent-runtime-env.path;
   agentIntegrationsEnvPath = config.age.secrets.agent-integrations-env.path;
@@ -52,17 +51,7 @@ let
   };
 in
 {
-  options.services.openclaw.useForkOverlay = lib.mkOption {
-    type = lib.types.bool;
-    default = true;
-    description = "Use Bas's OpenClaw fork overlay instead of the upstream nixpkgs OpenClaw package.";
-  };
-
   config = {
-    nixpkgs.overlays = lib.mkIf cfg.useForkOverlay [
-      (import ./overlay.nix)
-    ];
-
     environment.systemPackages = [ openclawCliPackage ];
 
     systemd.tmpfiles.rules = [
