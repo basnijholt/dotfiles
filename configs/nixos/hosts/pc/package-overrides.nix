@@ -36,10 +36,6 @@
         };
         vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
         postPatch = (oldAttrs.postPatch or "") + ''
-          substituteInPlace cmd/launch/openclaw_test.go \
-            --replace-fail '/usr/bin/env' '${pkgs.coreutils}/bin/env' \
-            --replace-fail '/usr/bin/sort' '${pkgs.coreutils}/bin/sort' \
-            --replace-fail '/bin/chmod' '${pkgs.coreutils}/bin/chmod'
           substituteInPlace cmd/launch/pi_test.go \
             --replace-fail '/bin/cat' '${pkgs.coreutils}/bin/cat' \
             --replace-fail '/bin/chmod' '${pkgs.coreutils}/bin/chmod'
@@ -63,6 +59,9 @@
         ] oldAttrs.postFixup;
       });
 
+      # TODO: when ggml-org/llama.cpp#22673 lands upstream, revisit Gemma 4
+      # MTP support. The current b9058 build has speculative decoding flags, but
+      # not the --spec-type mtp / --mtp-head path needed for Gemma 4 assistants.
       # Override llama-cpp to latest version b6150 with CUDA support
       llama-cpp =
         (pkgs.llama-cpp.override {
