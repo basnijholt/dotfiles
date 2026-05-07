@@ -1,4 +1,4 @@
 model_reasoning_effort = "high"
 
 [features]
-codex_hooks = true
+hooks = true
