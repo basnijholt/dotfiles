@@ -6,13 +6,14 @@ llm-ollama-model = "gpt-oss:20b"
 llm-ollama-host = "http://192.168.1.5:11434"
 
 # llama.cpp
-llm-openai-model = "gpt-oss-low:20b"
+#llm-openai-model = "gpt-oss-low:20b"
+llm-openai-model = "gemma-4:31b-q4-nothink"
 openai-base-url = "http://192.168.1.5:9292/v1"
 
 # Other
 # asr-wyoming-ip = "localhost"
-asr-wyoming-ip = "192.168.1.5"
 # asr-wyoming-port = 10302
+asr-wyoming-ip = "192.168.1.5"
 tts-wyoming-ip = "192.168.1.5"
 tts-kokoro-host = "http://192.168.1.5:8880/v1"
 tts-kokoro-voice = "af_bella(1)+af_nicole(1.5)"
@@ -30,7 +31,7 @@ Proper nouns: Bas Nijholt, pipefunc, agent-cli, IonQ, Claude Code.
 Assume the user is often discussing Python programming.
 Use backticks for variable names, function names, and other code elements.
 Follow PEP8: use `snake_case` for variables, functions, and package names; `CamelCase` for classes.
-Other frequent words are `pipefunc` (a Python package), agent-cli (a Python package), IonQ (a quantum computing company), trapped-ion quantum computer, `pre-commit`, `pytest`, `ruff`, `unidep`.
+Other frequent words are `pipefunc` (a Python package), agent-cli (a Python package), IonQ (a quantum computing company), trapped-ion quantum computer, `pre-commit`, `pytest`, `ruff`, `unidep`, `mindroom`, `cinny`, `gitea`, `tuwunel`.
 Very frequently asking questions. If it sounds like a question add ?
 """
 transcription-log = "~/transcription.log"
