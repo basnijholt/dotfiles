@@ -28,7 +28,11 @@
   }];
 
   # signal-cli for OpenClaw Signal channel
-  environment.systemPackages = [ pkgs.signal-cli ];
+  environment.systemPackages = [ pkgs.signal-cli pkgs.ffmpeg-headless pkgs.chromium ];
+
+  # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)
+  # that link against it. Without this, uv run / pytest fail with import errors.
+  environment.variables.LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
 
   # Disable comin on this host — we deploy manually via nixos-rebuild switch.
   services.comin.enable = lib.mkForce false;
