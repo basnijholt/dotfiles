@@ -126,6 +126,8 @@ in
 
                   if git -C "$repo_path" merge-base --is-ancestor "$local_head" "$remote_head"; then
                     git -C "$repo_path" pull --ff-only origin "$repo_branch"
+                  elif git -C "$repo_path" merge-base --is-ancestor "$remote_head" "$local_head"; then
+                    echo "Local $repo_path is ahead of origin/$repo_branch; skipping update."
                   elif [ "$hard_reset_when_diverged" = "1" ]; then
                     echo "Branch diverged; resetting $repo_path to origin/$repo_branch."
                     git -C "$repo_path" reset --hard "origin/$repo_branch"
