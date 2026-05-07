@@ -22,6 +22,10 @@
   boot.kernel.sysctl."net.bridge.bridge-nf-call-ip6tables" = 0;
 
   systemd.network.enable = true;
+  # networkd only owns the wired bridge here. Wi-Fi stays under NetworkManager,
+  # and the networkd-managed links are intentionally not required for online
+  # state so a missing cable does not block boot or nixos-rebuild switch.
+  systemd.network.wait-online.enable = false;
 
   # --- Wired LAN Bridge ---
   # Put Incus containers directly on the LAN without macvlan's host reachability
