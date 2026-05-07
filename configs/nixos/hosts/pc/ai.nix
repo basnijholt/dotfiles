@@ -78,7 +78,6 @@
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           -hf unsloth/Qwen3.6-27B-GGUF:UD-Q8_K_XL
-          --alias qwen3.6:27b-q8
           --port ''${PORT}
           --ctx-size 65536
           --batch-size 2048
