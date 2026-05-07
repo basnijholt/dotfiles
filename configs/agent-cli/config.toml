@@ -44,5 +44,16 @@ codex = ["--dangerously-bypass-approvals-and-sandbox"]
 
 [dev.agent_env.claude]
 CLAUDE_CODE_USE_VERTEX = "1"
-ANTHROPIC_MODEL = "claude-opus-4-7"
-ANTHROPIC_SMALL_FAST_MODEL = "claude-haiku-4-5"
+# [1m] suffix enables 1M context window (Claude Code strips it before sending to Vertex).
+# On Vertex the `opus` alias still resolves to 4.6, so we pin the version explicitly.
+ANTHROPIC_MODEL = "claude-opus-4-7[1m]"
+# Route Opus 4.7 via the Vertex *global* endpoint instead of us-east5.
+# Global has its own (much larger) quota pool, gets new models first, and skips the
+# regional price premium. us-east5 was returning 429 RESOURCE_EXHAUSTED on the
+# per-region online_prediction_input_tokens_per_minute_per_base_model quota.
+VERTEX_REGION_CLAUDE_4_7_OPUS = "global"
+# ANTHROPIC_SMALL_FAST_MODEL is deprecated; use ANTHROPIC_DEFAULT_HAIKU_MODEL instead.
+ANTHROPIC_DEFAULT_HAIKU_MODEL = "claude-haiku-4-5"
+# Note: ANTHROPIC_API_KEY in the parent shell overrides CLAUDE_CODE_USE_VERTEX and
+# routes requests to api.anthropic.com ("API Usage Billing" header). Setting the var
+# to "" via TOML does NOT fix it (Claude Code treats empty as set).
