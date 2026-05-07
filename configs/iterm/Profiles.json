@@ -64,9 +64,9 @@
         "text": "/opt/homebrew/bin/code -r -g \\5/\\1:\\2",
         "action": "editor"
       },
-      "Normal Font": "FiraMonoNFM-Regular 16",
+      "Normal Font": "FiraMonoNFM-Regular 12",
       "Command": "/opt/homebrew/bin/zsh --login",
-      "Non Ascii Font": "FiraMonoNFM-Regular 16"
+      "Non Ascii Font": "FiraMonoNFM-Regular 12"
     }
   ]
 }
