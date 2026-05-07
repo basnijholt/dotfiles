@@ -71,5 +71,6 @@
     nerd-fonts.droid-sans-mono
     nerd-fonts.jetbrains-mono
     libertine # Linux Libertine fonts
+    noto-fonts-color-emoji # Color emoji for headless browser screenshots
   ];
 }

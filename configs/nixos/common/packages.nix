@@ -60,6 +60,7 @@ let
     rclone
     ripgrep
     rsync
+    sqlite
     starship
     tealdeer
     terraform

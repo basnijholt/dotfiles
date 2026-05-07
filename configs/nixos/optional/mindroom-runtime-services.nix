@@ -7,6 +7,7 @@ let
   agentRuntimeEnvPath = config.age.secrets.agent-runtime-env.path;
   agentIntegrationsEnvPath = config.age.secrets.agent-integrations-env.path;
   agentToolingEnvPath = config.age.secrets.agent-tooling-env.path;
+  mindroomPython = pkgs.python314;
   # Load the shared agenix env first so each runtime's own .env can override
   # Matrix/provisioning values without editing the shared secret bundle.
   agentEnvironmentFiles = [
@@ -14,6 +15,47 @@ let
     agentIntegrationsEnvPath
     agentToolingEnvPath
   ];
+
+  # Shared uv + python wrapper for mindroom CLI invocations.
+  mindroom-uv = dir: args:
+    pkgs.writeShellScript "mindroom-uv-${builtins.replaceStrings [" " "/"] ["-" "-"] args}" ''
+      export PATH="${pkgs.coreutils}/bin:${pkgs.uv}/bin:/run/current-system/sw/bin:$PATH"
+      export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:''${LD_LIBRARY_PATH:-}"
+      export UV_PROJECT_ENVIRONMENT="${dir}/.venv-python314"
+      exec uv run --python ${mindroomPython}/bin/python3 \
+        --project "/srv/mindroom" \
+        --directory "${dir}" \
+        mindroom ${args}
+    '';
+
+  mindroom-avatar-service = {
+    name,
+    dir,
+    extraEnvironment ? [ ],
+  }: {
+    description = "MindRoom avatar maintenance (${name})";
+    after = [ name ];
+    wants = [ name ];
+    partOf = [ name ];
+    wantedBy = [ name ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "basnijholt";
+      Group = "users";
+      WorkingDirectory = dir;
+      EnvironmentFile = agentEnvironmentFiles ++ [ "${dir}/.env" ];
+      Environment = [
+        "MINDROOM_CONFIG_PATH=${dir}/config.yaml"
+        "MINDROOM_STORAGE_PATH=${dir}/mindroom_data"
+        "MINDROOM_LOG_FORMAT=json"
+        "MINDROOM_TIMING=1"
+      ] ++ extraEnvironment;
+    };
+    script = ''
+      ${mindroom-uv dir "avatars generate"} || true
+      ${mindroom-uv dir "avatars sync"} || true
+    '';
+  };
 in
 {
   systemd.services = {
@@ -33,15 +75,10 @@ in
         Environment = [
           "MINDROOM_CONFIG_PATH=/home/basnijholt/.mindroom-lab/config.yaml"
           "MINDROOM_STORAGE_PATH=/home/basnijholt/.mindroom-lab/mindroom_data"
+          "MINDROOM_LOG_FORMAT=json"
+          "MINDROOM_TIMING=1"
         ];
-        ExecStart = "${pkgs.writeShellScript "run-mindroom-lab" ''
-          export PATH="${pkgs.coreutils}/bin:${pkgs.uv}/bin:/run/current-system/sw/bin:$PATH"
-          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:''${LD_LIBRARY_PATH:-}"
-          exec uv run --python ${pkgs.python313}/bin/python3 \
-            --project "/srv/mindroom" \
-            --directory "/home/basnijholt/.mindroom-lab" \
-            mindroom run
-        ''}";
+        ExecStart = "${mindroom-uv "/home/basnijholt/.mindroom-lab" "run"}";
         Restart = "on-failure";
         RestartSec = "10s";
       };
@@ -63,19 +100,25 @@ in
         Environment = [
           "MINDROOM_CONFIG_PATH=/home/basnijholt/.mindroom-chat/config.yaml"
           "MINDROOM_STORAGE_PATH=/home/basnijholt/.mindroom-chat/mindroom_data"
+          "MINDROOM_LOG_FORMAT=json"
+          "MINDROOM_TIMING=1"
           "BACKEND_PORT=8766"
         ];
-        ExecStart = "${pkgs.writeShellScript "run-mindroom-chat" ''
-          export PATH="${pkgs.coreutils}/bin:${pkgs.uv}/bin:/run/current-system/sw/bin:$PATH"
-          export LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}/lib:''${LD_LIBRARY_PATH:-}"
-          exec uv run --python ${pkgs.python313}/bin/python3 \
-            --project "/srv/mindroom" \
-            --directory "/home/basnijholt/.mindroom-chat" \
-            mindroom run --api-port 8766
-        ''}";
-        Restart = "on-failure";
+        ExecStart = "${mindroom-uv "/home/basnijholt/.mindroom-chat" "run --api-port 8766"}";
+        Restart = "always";
         RestartSec = "10s";
       };
+    };
+
+    mindroom-lab-avatars = mindroom-avatar-service {
+      name = "mindroom-lab.service";
+      dir = "/home/basnijholt/.mindroom-lab";
+    };
+
+    mindroom-chat-avatars = mindroom-avatar-service {
+      name = "mindroom-chat.service";
+      dir = "/home/basnijholt/.mindroom-chat";
+      extraEnvironment = [ "BACKEND_PORT=8766" ];
     };
 
     mindroom-cinny = {
@@ -83,12 +126,16 @@ in
       after = [ "network-online.target" "git-checkout-cinny.service" ];
       wants = [ "network-online.target" "git-checkout-cinny.service" ];
       wantedBy = [ "multi-user.target" ];
+      path = with pkgs; [ bash nodejs_22 ];
       serviceConfig = {
         Type = "simple";
         User = "basnijholt";
         Group = "users";
-        WorkingDirectory = "/var/www/cinny/dist";
-        ExecStart = "${pkgs.python3}/bin/python3 /var/www/cinny/serve.py 8090";
+        WorkingDirectory = "/var/www/cinny";
+        Environment = [
+          "VITE_ALLOWED_HOSTS=chat.lab.mindroom.chat,127.0.0.1,localhost"
+        ];
+        ExecStart = "${pkgs.nodejs_22}/bin/npm start -- --host 127.0.0.1 --port 8090 --strictPort";
         Restart = "always";
         RestartSec = "5s";
       };
@@ -104,7 +151,7 @@ in
         coreutils
         git
         nodejs_22
-        nodePackages.node-gyp
+        node-gyp
         pkg-config
       ];
       serviceConfig = {
