@@ -92,6 +92,7 @@
       "vsftpd" # FTP server
       "wget" # File downloader
       "yq" # YAML processor
+      "zellij" # Terminal workspace
       "zsh" # Shell
     ] ++ (
       if config.isPersonal then
