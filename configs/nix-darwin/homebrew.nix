@@ -109,12 +109,10 @@
     casks = [
       "1password-cli" # 1Password CLI
       "adobe-creative-cloud" # Adobe suite
-      "adobe-digital-editions" # E-book reader
       "airflow" # Video transcoder
       "balenaetcher" # USB image writer
       "block-goose" # open source AI agent
       "brave-browser" # Web browser
-      "calibre" # E-book manager
       "chromedriver" # Chrome automation
       "cryptomator" # File encryption
       "cursor" # Cursor editor
@@ -138,17 +136,14 @@
       "inkscape" # Vector graphics editor
       "istat-menus" # System monitor
       "iterm2" # Terminal emulator
-      "jabref" # Reference manager
       "thaw" # Menu bar manager
       "karabiner-elements" # Keyboard customizer
       "keepingyouawake" # Prevent sleep
       "keyboard-maestro" # Automation tool
       "licecap" # Screen recorder
       "lulu" # Firewall
-      "lyx" # Document processor
       "macfuse" # Filesystem in userspace
       "mactracker" # Apple product database
-      "mendeley-reference-manager" # Reference manager
       "microsoft-auto-update" # Microsoft updater
       "microsoft-azure-storage-explorer" # Azure storage tool
       "microsoft-office" # Office suite
