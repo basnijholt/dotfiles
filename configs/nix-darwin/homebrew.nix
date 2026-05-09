@@ -111,7 +111,6 @@
       "adobe-creative-cloud" # Adobe suite
       "adobe-digital-editions" # E-book reader
       "airflow" # Video transcoder
-      "avast-security" # Antivirus
       "balenaetcher" # USB image writer
       "block-goose" # open source AI agent
       "brave-browser" # Web browser
