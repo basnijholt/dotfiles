@@ -23,7 +23,6 @@
       "cloudflared" # Cloudflare tunnel
       "cmake" # Build system
       "cmatrix" # Matrix-style screen animation
-      "cointop" # Cryptocurrency tracker
       "coreutils" # GNU core utilities
       "create-dmg" # DMG creator
       "d2" # Diagram scripting language
@@ -43,6 +42,8 @@
       "gping" # Ping with graph
       "graphviz" # Graph visualization
       "grep" # GNU grep
+      "hashicorp/tap/terraform" # Infrastructure as code
+      "helm@3" # Kubernetes package manager
       "htop" # Process viewer
       "hugo" # Static site generator
       "imagemagick" # Image manipulation
@@ -83,7 +84,6 @@
       "swiftformat" # Swift code formatter
       "tealdeer" # Fast alternative to tldr
       "terminal-notifier" # macOS notification tool
-      "terraform" # Infrastructure as code
       "tokei" # Code statistics
       "tmux" # Terminal multiplexer
       "tre-command" # Tree command, improved
@@ -148,7 +148,7 @@
       "lyx" # Document processor
       "macfuse" # Filesystem in userspace
       "mactracker" # Apple product database
-      "mendeley" # Reference manager
+      "mendeley-reference-manager" # Reference manager
       "microsoft-auto-update" # Microsoft updater
       "microsoft-azure-storage-explorer" # Azure storage tool
       "microsoft-office" # Office suite
@@ -161,7 +161,7 @@
       "onyx" # System maintenance
       "proton-mail-bridge" # ProtonMail bridge
       "qbittorrent" # Torrent client
-      "qlvideo" # Video QuickLook
+      "quicklook-video" # Video QuickLook
       "raycast" # Productivity tool
       "rectangle" # Window manager
       "rotki" # Portfolio tracker
@@ -209,6 +209,7 @@
     # Additional repositories
     taps = [
       "gromgit/fuse" # For SSHFS
+      "hashicorp/tap" # For Terraform
       "jackielii/tap" # for skhd-zig
     ];
   };
