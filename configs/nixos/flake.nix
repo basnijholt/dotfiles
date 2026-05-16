@@ -195,12 +195,15 @@
         ];
 
         # Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS
-        hetzner-saas = mkHost [
-          disko.nixosModules.disko
-          ./hosts/hetzner-saas/disko.nix
-          ./hosts/hetzner-saas/default.nix
-          ./hosts/hetzner-saas/hardware-configuration.nix
-        ];
+        hetzner-saas = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/hetzner-saas/disko.nix
+            ./hosts/hetzner-saas/default.nix
+            ./hosts/hetzner-saas/hardware-configuration.nix
+          ];
+        };
 
         # Minimal first-stage config for nixos-anywhere in rescue mode.
         hetzner-saas-bootstrap = lib.nixosSystem {
