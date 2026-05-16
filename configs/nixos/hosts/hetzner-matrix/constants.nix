@@ -1,5 +1,6 @@
 {
   siteDomain = "mindroom.chat";
+  appDomain = "app.mindroom.chat";
   cinnyDomain = "chat.mindroom.chat";
   cinnyCheckoutPath = "/var/www/cinny";
   cinnyPublishedPath = "/var/www/cinny-published";

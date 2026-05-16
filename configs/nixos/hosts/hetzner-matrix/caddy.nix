@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain cinnyDomain cinnyCurrentPath;
+  inherit (constants) siteDomain appDomain cinnyDomain cinnyCurrentPath;
 in
 {
   systemd.tmpfiles.rules = [
@@ -32,6 +32,10 @@ in
             body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"}}"
             close
           }
+        }
+
+        handle / {
+          redir https://${appDomain}/ 308
         }
 
         root * /var/www/mindroom
