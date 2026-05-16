@@ -189,6 +189,15 @@
           ./hosts/hetzner/hardware-configuration.nix
         ];
 
+        # Hetzner Cloud VPS (ARM) - single-node K3s host for MindRoom SaaS
+        hetzner-saas = mkHostArm [
+          disko.nixosModules.disko
+          ./hosts/hetzner/disko.nix
+          ./hosts/hetzner/default.nix
+          ./hosts/hetzner-saas/default.nix
+          ./hosts/hetzner/hardware-configuration.nix
+        ];
+
         # Paul's Wyse 5070 - gateway to home services via Tailscale
         paul-wyse = mkHost [
           disko.nixosModules.disko
