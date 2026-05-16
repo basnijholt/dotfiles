@@ -1,7 +1,6 @@
 # Hetzner Cloud x86_64 disk configuration.
 #
-# Hetzner Cloud x86_64 instances boot through legacy BIOS, so GRUB needs a
-# BIOS boot partition on GPT.
+# CPX instances boot through UEFI, so keep a small ESP mounted at /boot.
 { ... }:
 
 {
@@ -12,9 +11,16 @@
       content = {
         type = "gpt";
         partitions = {
-          bios = {
-            size = "1M";
-            type = "EF02";
+          esp = {
+            label = "ESP-SAAS";
+            size = "512M";
+            type = "EF00";
+            content = {
+              type = "filesystem";
+              format = "vfat";
+              mountpoint = "/boot";
+              mountOptions = [ "umask=0077" ];
+            };
           };
           root = {
             size = "100%";

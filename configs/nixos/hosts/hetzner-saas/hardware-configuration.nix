@@ -22,12 +22,14 @@
   ];
 
   boot.loader = {
-    grub = {
+    systemd-boot = {
       enable = true;
-      device = lib.mkForce "";
       configurationLimit = 3;
     };
-    efi.canTouchEfiVariables = false;
+    efi = {
+      canTouchEfiVariables = true;
+      efiSysMountPoint = "/boot";
+    };
   };
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
