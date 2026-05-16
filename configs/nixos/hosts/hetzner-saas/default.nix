@@ -1,6 +1,11 @@
 { lib, pkgs, ... }:
 
 {
+  imports = [
+    ../../optional/zfs-auto-snapshot.nix
+    ./networking.nix
+  ];
+
   networking.hostName = lib.mkForce "hetzner-saas";
 
   services.k3s = {
@@ -15,15 +20,31 @@
   environment.systemPackages = with pkgs; [
     kubectl
     kubernetes-helm
+    k9s
   ];
 
-  networking.firewall = {
-    trustedInterfaces = [ "cni0" "flannel.1" ];
-    allowedTCPPorts = lib.mkForce (
-      [ 22 80 443 6443 ]
-      ++ [ 20 21 ]
-      ++ (lib.range 21100 21110)
-    );
-    allowedUDPPorts = [ 8472 ];
+  virtualisation.docker.enable = true;
+
+  services.fwupd.enable = lib.mkForce false;
+  services.syncthing.enable = lib.mkForce false;
+
+  services.openssh.settings = {
+    UseDns = lib.mkForce false;
+    PermitRootLogin = lib.mkForce "prohibit-password";
   };
+
+  nix.settings.substituters = lib.mkForce [
+    "https://cache.nixos.org/"
+    "https://nix-community.cachix.org"
+  ];
+  nix.settings.max-jobs = 1;
+  nix.settings.cores = 2;
+
+  zramSwap = {
+    enable = true;
+    memoryPercent = 50;
+  };
+  systemd.services."systemd-zram-setup@zram0".restartIfChanged = false;
+
+  networking.hostId = "5d9d75a1";
 }

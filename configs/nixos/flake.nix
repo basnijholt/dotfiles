@@ -49,31 +49,36 @@
         }
       ];
 
-      mkHost = extraModules:
+      mkHost =
+        extraModules:
         lib.nixosSystem {
           inherit system;
           modules = commonModules ++ extraModules;
         };
 
-      mkHostArm = extraModules:
+      mkHostArm =
+        extraModules:
         lib.nixosSystem {
           system = "aarch64-linux";
           modules = commonModules ++ extraModules;
         };
 
-      mkPi = piModule: extraModules:
+      mkPi =
+        piModule: extraModules:
         nixos-raspberrypi.lib.nixosSystem {
           specialArgs = { inherit nixos-raspberrypi; };
           modules = [ piModule ] ++ commonModules ++ extraModules;
         };
 
-      mkPiInstaller = piModule: extraModules:
+      mkPiInstaller =
+        piModule: extraModules:
         nixos-raspberrypi.lib.nixosInstaller {
           specialArgs = { inherit nixos-raspberrypi; };
           modules = [ piModule ] ++ extraModules;
         };
 
-    in {
+    in
+    {
       nixosConfigurations = {
         pc = mkHost [
           disko.nixosModules.disko
@@ -189,14 +194,25 @@
           ./hosts/hetzner/hardware-configuration.nix
         ];
 
-        # Hetzner Cloud VPS (ARM) - single-node K3s host for MindRoom SaaS
-        hetzner-saas = mkHostArm [
+        # Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS
+        hetzner-saas = mkHost [
           disko.nixosModules.disko
-          ./hosts/hetzner/disko.nix
-          ./hosts/hetzner/default.nix
+          ./hosts/hetzner-saas/disko.nix
           ./hosts/hetzner-saas/default.nix
-          ./hosts/hetzner/hardware-configuration.nix
+          ./hosts/hetzner-saas/hardware-configuration.nix
         ];
+
+        # Minimal first-stage config for nixos-anywhere in rescue mode.
+        hetzner-saas-bootstrap = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/hetzner-saas/disko.nix
+            ./hosts/hetzner-saas/networking.nix
+            ./hosts/hetzner-saas/hardware-configuration.nix
+            ./hosts/hetzner/bootstrap.nix
+          ];
+        };
 
         # Paul's Wyse 5070 - gateway to home services via Tailscale
         paul-wyse = mkHost [
