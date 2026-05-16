@@ -16,7 +16,10 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
-  boot.kernelParams = [ "console=ttyS0,115200" ];
+  boot.kernelParams = [
+    "console=ttyS0,115200"
+    "net.ifnames=0"
+  ];
 
   boot.loader = {
     grub = {

@@ -5,17 +5,24 @@
   networking.hostName = "hetzner-saas";
 
   systemd.network.enable = true;
+  systemd.network.wait-online.enable = false;
   networking.useDHCP = lib.mkDefault false;
 
   systemd.network.networks."30-wan" = {
-    matchConfig.Name = "en* eth*";
+    matchConfig.Name = "eth0";
+    address = [ "46.62.174.103/32" ];
     networkConfig = {
-      DHCP = "ipv4";
       DNS = [
         "1.1.1.1"
         "8.8.8.8"
       ];
     };
+    routes = [
+      {
+        Gateway = "172.31.1.1";
+        GatewayOnLink = true;
+      }
+    ];
   };
 
   networking.nameservers = lib.mkForce [
