@@ -5,7 +5,6 @@ let
 in
 {
   imports = [
-    ../../optional/zfs-auto-snapshot.nix
     ./networking.nix
   ];
 
@@ -98,8 +97,6 @@ in
   };
   systemd.services."systemd-zram-setup@zram0".restartIfChanged = false;
 
-  networking.hostId = "5d9d75a1";
-  boot.zfs.requestEncryptionCredentials = false;
   boot.kernelModules = [ "tcp_bbr" ];
   boot.kernel.sysctl = {
     "kernel.sysrq" = 1;

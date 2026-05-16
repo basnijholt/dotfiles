@@ -18,9 +18,6 @@
   boot.extraModulePackages = [ ];
   boot.kernelParams = [ "console=ttyS0,115200" ];
 
-  boot.supportedFilesystems = [ "zfs" ];
-  boot.zfs.forceImportRoot = false;
-
   boot.loader = {
     grub = {
       enable = true;

@@ -1,7 +1,7 @@
-# Hetzner Cloud x86_64 disk configuration with ZFS.
+# Hetzner Cloud x86_64 disk configuration.
 #
 # Hetzner Cloud x86_64 instances boot through legacy BIOS, so GRUB needs a
-# BIOS boot partition on GPT in addition to /boot.
+# BIOS boot partition on GPT.
 { ... }:
 
 {
@@ -16,65 +16,14 @@
             size = "1M";
             type = "EF02";
           };
-          boot = {
-            label = "BOOT-SAAS";
-            size = "512M";
-            type = "EF00";
-            content = {
-              type = "filesystem";
-              format = "vfat";
-              mountpoint = "/boot";
-              mountOptions = [ "umask=0077" ];
-            };
-          };
-          zfs = {
+          root = {
             size = "100%";
             content = {
-              type = "zfs";
-              pool = "zroot";
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/";
             };
           };
-        };
-      };
-    };
-
-    zpool.zroot = {
-      type = "zpool";
-      mode = "";
-      options = {
-        ashift = "12";
-        autotrim = "on";
-      };
-      rootFsOptions = {
-        compression = "zstd";
-        "com.sun:auto-snapshot" = "true";
-        acltype = "posixacl";
-        xattr = "sa";
-        atime = "off";
-      };
-      datasets = {
-        root = {
-          type = "zfs_fs";
-          mountpoint = "/";
-          options.mountpoint = "legacy";
-        };
-        nix = {
-          type = "zfs_fs";
-          mountpoint = "/nix";
-          options = {
-            mountpoint = "legacy";
-            "com.sun:auto-snapshot" = "false";
-          };
-        };
-        var = {
-          type = "zfs_fs";
-          mountpoint = "/var";
-          options.mountpoint = "legacy";
-        };
-        home = {
-          type = "zfs_fs";
-          mountpoint = "/home";
-          options.mountpoint = "legacy";
         };
       };
     };
