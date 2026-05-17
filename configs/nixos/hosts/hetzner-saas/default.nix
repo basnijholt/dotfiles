@@ -2,6 +2,8 @@
 
 let
   sshKeys = (import ../../common/ssh-keys.nix).sshKeys;
+  kubeconfig = "/etc/rancher/k3s/k3s.yaml";
+  hcloudTokenFile = "/var/lib/mindroom-saas/hcloud-token";
 in
 {
   imports = [
@@ -75,6 +77,84 @@ in
       "--disable=traefik"
       "--write-kubeconfig-mode=0644"
     ];
+    autoDeployCharts = {
+      ingress-nginx = {
+        repo = "https://kubernetes.github.io/ingress-nginx";
+        name = "ingress-nginx";
+        version = "4.15.1";
+        hash = "sha256-Pv8L0YFR1uaxxEFGNBBXFEPdoax4KSyxiTRmKN54Tww=";
+        targetNamespace = "ingress-nginx";
+        createNamespace = true;
+        values = {
+          controller.service = {
+            type = "LoadBalancer";
+            externalTrafficPolicy = "Local";
+          };
+        };
+      };
+      cert-manager = {
+        repo = "https://charts.jetstack.io";
+        name = "cert-manager";
+        version = "v1.20.2";
+        hash = "sha256-0qUL1EoJ2DjCV2qPPfyhUkWXxzk8+Ngqs+yKRlue63k=";
+        targetNamespace = "cert-manager";
+        createNamespace = true;
+        values.crds.enabled = true;
+      };
+      hcloud-csi = {
+        repo = "https://charts.hetzner.cloud";
+        name = "hcloud-csi";
+        version = "2.21.0";
+        hash = "sha256-48vH+NR3wrYOlevXyopkmwuvOnT5Yv2ip4NAzYV9wd8=";
+        targetNamespace = "kube-system";
+        values = {
+          controller.hcloudVolumeDefaultLocation = "hel1";
+          storageClasses = [{
+            name = "hcloud-volumes";
+            defaultStorageClass = false;
+            reclaimPolicy = "Delete";
+            annotations = { };
+            extraParameters = { };
+          }];
+        };
+      };
+    };
+  };
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/mindroom-saas 0700 root root -"
+  ];
+
+  systemd.services.mindroom-saas-hcloud-secret = {
+    description = "Create hcloud Secret for the Hetzner CSI driver";
+    after = [ "k3s.service" ];
+    requires = [ "k3s.service" ];
+    wantedBy = [ "multi-user.target" ];
+    path = with pkgs; [
+      coreutils
+      k3s
+    ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      if [ ! -s "${hcloudTokenFile}" ]; then
+        echo "Skipping hcloud Secret creation; ${hcloudTokenFile} is missing"
+        exit 0
+      fi
+
+      export KUBECONFIG="${kubeconfig}"
+      until k3s kubectl get namespace kube-system >/dev/null 2>&1; do
+        sleep 2
+      done
+
+      k3s kubectl -n kube-system create secret generic hcloud \
+        --from-file=token="${hcloudTokenFile}" \
+        --dry-run=client \
+        -o yaml \
+        | k3s kubectl apply -f -
+    '';
   };
 
   environment.systemPackages = with pkgs; [
