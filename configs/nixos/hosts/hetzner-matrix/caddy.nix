@@ -20,6 +20,7 @@ in
 
         handle /.well-known/matrix/server {
           header Content-Type application/json
+          header Access-Control-Allow-Origin "*"
           respond 200 {
             body "{\"m.server\":\"${siteDomain}:443\"}"
             close
@@ -28,6 +29,7 @@ in
 
         handle /.well-known/matrix/client {
           header Content-Type application/json
+          header Access-Control-Allow-Origin "*"
           respond 200 {
             body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"}}"
             close
