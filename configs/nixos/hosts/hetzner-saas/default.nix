@@ -149,8 +149,14 @@ in
         sleep 2
       done
 
+      token="$(tr -cd '[:alnum:]' < "${hcloudTokenFile}")"
+      if [ "''${#token}" -ne 64 ]; then
+        echo "Skipping hcloud Secret creation; sanitized token length is ''${#token}, expected 64"
+        exit 1
+      fi
+
       k3s kubectl -n kube-system create secret generic hcloud \
-        --from-file=token="${hcloudTokenFile}" \
+        --from-literal=token="$token" \
         --dry-run=client \
         -o yaml \
         | k3s kubectl apply -f -
