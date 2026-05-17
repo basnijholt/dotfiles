@@ -4,7 +4,6 @@ let
   sshKeys = (import ../../common/ssh-keys.nix).sshKeys;
   kubeconfig = "/etc/rancher/k3s/k3s.yaml";
   hcloudTokenFile = "/var/lib/mindroom-saas/hcloud-token";
-  ghcrPullSecretFile = "/var/lib/mindroom-saas/ghcr-pull.dockerconfigjson";
 in
 {
   imports = [
@@ -160,61 +159,6 @@ in
         --from-literal=token="$token" \
         --dry-run=client \
         -o yaml \
-        | k3s kubectl apply -f -
-    '';
-  };
-
-  systemd.services.mindroom-saas-ghcr-pull-secret = {
-    description = "Create MindRoom GHCR pull Secrets for SaaS namespaces";
-    after = [ "k3s.service" ];
-    requires = [ "k3s.service" ];
-    wantedBy = [ "multi-user.target" ];
-    path = with pkgs; [
-      coreutils
-      jq
-      k3s
-    ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      export KUBECONFIG="${kubeconfig}"
-      until k3s kubectl get namespace kube-system >/dev/null 2>&1; do
-        sleep 2
-      done
-
-      for namespace in mindroom-production mindroom-instances; do
-        k3s kubectl create namespace "$namespace" --dry-run=client -o yaml \
-          | k3s kubectl apply -f -
-      done
-
-      if [ -s "${ghcrPullSecretFile}" ]; then
-        for namespace in mindroom-production mindroom-instances; do
-          k3s kubectl -n "$namespace" create secret generic ghcr-pull \
-            --type=kubernetes.io/dockerconfigjson \
-            --from-file=.dockerconfigjson="${ghcrPullSecretFile}" \
-            --dry-run=client \
-            -o yaml \
-            | k3s kubectl apply -f -
-        done
-        exit 0
-      fi
-
-      if ! k3s kubectl -n mindroom-instances get secret ghcr-pull >/dev/null 2>&1; then
-        echo "Skipping GHCR pull Secret creation; ${ghcrPullSecretFile} and mindroom-instances/ghcr-pull are missing"
-        exit 0
-      fi
-
-      k3s kubectl -n mindroom-instances get secret ghcr-pull -o json \
-        | jq 'del(
-            .metadata.annotations,
-            .metadata.creationTimestamp,
-            .metadata.managedFields,
-            .metadata.namespace,
-            .metadata.resourceVersion,
-            .metadata.uid
-          ) | .metadata.namespace = "mindroom-production"' \
         | k3s kubectl apply -f -
     '';
   };
