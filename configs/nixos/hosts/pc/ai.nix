@@ -71,33 +71,97 @@
           --threads 1
           --jinja
 
-      # Latest Unsloth Qwen3.6-27B dense model, verified 2026-05-05.
-      # Source: https://huggingface.co/unsloth/Qwen3.6-27B-GGUF
+      # Latest Unsloth Qwen3.6-27B dense MTP model, verified 2026-05-17.
+      # Source: https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF
       # UD-Q8_K_XL quant, split across both 3090s
       "qwen3.6:27b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3.6-27B-GGUF:UD-Q8_K_XL
+          -hf unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q8_K_XL
           --port ''${PORT}
-          --ctx-size 65536
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
           --batch-size 2048
           --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
           --split-mode layer
-          --tensor-split 1,1
+          --spec-type draft-mtp
+          --spec-draft-n-max 6
+          --spec-draft-p-min 0.75
           --threads 1
           --jinja
 
-      # Qwen3.6-35B-A3B MoE model - 38.5 GB UD-Q8_K_XL, split across both 3090s
+      # Same Qwen3.6-27B MTP model with smaller UD-Q4_K_XL quant
+      "qwen3.6:27b-q4":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
+          --split-mode layer
+          --spec-type draft-mtp
+          --spec-draft-n-max 6
+          --spec-draft-p-min 0.75
+          --threads 1
+          --jinja
+
+      # Qwen3.6-35B-A3B MTP MoE model - 38.5 GB UD-Q8_K_XL, split across both 3090s
       "qwen3.6:35b-a3b-q8":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3.6-35B-A3B-GGUF:UD-Q8_K_XL
+          -hf unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL
           --port ''${PORT}
-          --ctx-size 65536
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
           --batch-size 2048
           --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
           --split-mode layer
-          --tensor-split 1,1
+          --spec-type draft-mtp
+          --spec-draft-n-max 6
+          --spec-draft-p-min 0.75
+          --threads 1
+          --jinja
+
+      # Same Qwen3.6-35B-A3B MTP model with smaller UD-Q4_K_XL quant
+      "qwen3.6:35b-a3b-q4":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
+          --split-mode layer
+          --spec-type draft-mtp
+          --spec-draft-n-max 6
+          --spec-draft-p-min 0.75
           --threads 1
           --jinja
 

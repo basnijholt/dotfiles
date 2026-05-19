@@ -27,12 +27,12 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.23.1";
+        version = "0.24.0";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-19rx+PNCpvRxhVr1+bgqsQIwpZzgdazlCoppxlDKzvE=";
+          hash = "sha256-cSZtbF0oUI7a++baTipF6OUu+w8tBpILzE0Wm1Y6wUk=";
         };
         vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
         postPatch = (oldAttrs.postPatch or "") + ''
@@ -73,19 +73,20 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "9058";
+            version = "9190";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-0f6ZIlDwrNPCyXkxEJ8+jVuVoKK1wFXQAI1DMcn3Y7k=";
+              hash = "sha256-zajArFzrLUUVsfG1xBttwzwaT9QNlKzDbvSxvof+FMQ=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
                 find "$out" -name .git -print0 | xargs -0 rm -rf
               '';
             };
-            npmDepsHash = "sha256-k62LIbyY2DXvs7XXbX0lNPiYxuYzeJUyQtS4eA+68f8=";
+            npmRoot = "tools/ui";
+            npmDepsHash = "sha256-WaEePrEZ7O/7deP2KJhe0AwiSKYA8HOqETmMHUkmBe0=";
             # Enable native CPU optimizations for massively better CPU performance
             # This enables AVX, AVX2, AVX-512, FMA, etc. for your specific CPU
             # NOTE: This is intentionally opposite of nixpkgs (which uses -DGGML_NATIVE=off
