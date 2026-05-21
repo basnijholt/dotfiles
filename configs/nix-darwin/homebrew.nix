@@ -96,7 +96,7 @@
       "zsh" # Shell
     ] ++ (
       if config.isPersonal then
-        []
+        [ ]
       else
         [
           "llvm@17" # LLVM toolchain
@@ -119,7 +119,6 @@
       "cyberduck" # FTP client
       "db-browser-for-sqlite" # SQLite browser
       "disk-inventory-x" # Disk space visualizer
-      "docker-desktop" # Container platform
       "dropbox" # Cloud storage
       "eqmac" # Audio equalizer
       "filebot" # File renamer
