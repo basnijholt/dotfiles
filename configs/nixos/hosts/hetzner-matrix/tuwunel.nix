@@ -84,6 +84,7 @@ let
     brand = "AppleOIDC"
     name = "Apple"
     client_id = "chat.mindroom.matrix.apple"
+    native_client_ids = ["chat.mindroom.app"]
     client_secret_file = "${config.age.secrets.sso-apple-secret.path}"
     issuer_url = "https://appleid.apple.com"
     callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/chat.mindroom.matrix.apple"

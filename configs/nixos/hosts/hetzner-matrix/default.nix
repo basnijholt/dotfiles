@@ -14,6 +14,7 @@
     # Service-focused modules
     ./secrets-config.nix
     ./tuwunel.nix
+    ./tuwunel-demo.nix
     ./caddy.nix
     ./cinny.nix
     ./provisioning.nix
