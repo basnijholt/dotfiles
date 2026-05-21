@@ -15,6 +15,12 @@
       group = "mindroom-local-provisioning";
       mode = "0400";
     };
+    registration-token-demo = {
+      file = ./secrets/registration-token.age;
+      owner = "tuwunel-demo";
+      group = "tuwunel-demo";
+      mode = "0400";
+    };
     sso-google-secret = {
       file = ./secrets/sso-google-secret.age;
       owner = "tuwunel";
