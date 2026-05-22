@@ -21,6 +21,13 @@
 
   programs.dconf.enable = true;
   services.displayManager.gdm.enable = true;
+  # Sunshine runs as a user graphical-session service, so auto-login creates
+  # the GNOME session needed for headless Moonlight access after boot.
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "basnijholt";
+  };
+  services.displayManager.defaultSession = "gnome";
   services.desktopManager.gnome.enable = true;
 
   # --- Hyprland ---
