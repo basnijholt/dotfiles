@@ -1,5 +1,5 @@
 # Desktop environment (GNOME + Hyprland)
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   # --- Mechabar Dependencies (Home Manager) ---
@@ -27,7 +27,7 @@
     enable = true;
     user = "basnijholt";
   };
-  services.displayManager.defaultSession = "gnome";
+  services.displayManager.defaultSession = lib.mkDefault "gnome";
   services.desktopManager.gnome.enable = true;
 
   # --- Hyprland ---
