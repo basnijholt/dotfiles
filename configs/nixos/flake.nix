@@ -7,6 +7,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    home-manager-pi = {
+      url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,6 +33,7 @@
       self,
       nixpkgs,
       home-manager,
+      home-manager-pi,
       disko,
       comin,
       ragenix,
@@ -39,9 +44,9 @@
       lib = nixpkgs.lib;
       system = "x86_64-linux";
 
-      commonModules = [
+      commonModules = homeManager: [
         ./configuration.nix
-        home-manager.nixosModules.home-manager
+        homeManager.nixosModules.home-manager
         comin.nixosModules.comin
         {
           home-manager.useGlobalPkgs = true;
@@ -53,21 +58,21 @@
         extraModules:
         lib.nixosSystem {
           inherit system;
-          modules = commonModules ++ extraModules;
+          modules = commonModules home-manager ++ extraModules;
         };
 
       mkHostArm =
         extraModules:
         lib.nixosSystem {
           system = "aarch64-linux";
-          modules = commonModules ++ extraModules;
+          modules = commonModules home-manager ++ extraModules;
         };
 
       mkPi =
         piModule: extraModules:
         nixos-raspberrypi.lib.nixosSystem {
           specialArgs = { inherit nixos-raspberrypi; };
-          modules = [ piModule ] ++ commonModules ++ extraModules;
+          modules = [ piModule ] ++ commonModules home-manager-pi ++ extraModules;
         };
 
       mkPiInstaller =
