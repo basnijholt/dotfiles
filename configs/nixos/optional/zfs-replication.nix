@@ -70,6 +70,7 @@
       # recursive=true includes sub-datasets
       syncoid \
         --recursive \
+        --delete-target-snapshots \
         --sshport=22 \
         zroot/home \
         "$TARGET_USER@$TARGET_HOST:$TARGET_PATH/home"
@@ -77,6 +78,7 @@
       # Replicate Var (Logs, databases, system state)
       syncoid \
         --recursive \
+        --delete-target-snapshots \
         --sshport=22 \
         zroot/var \
         "$TARGET_USER@$TARGET_HOST:$TARGET_PATH/var"
@@ -84,6 +86,7 @@
       # Replicate Root (System config, /root, /etc)
       syncoid \
         --recursive \
+        --delete-target-snapshots \
         --sshport=22 \
         zroot/root \
         "$TARGET_USER@$TARGET_HOST:$TARGET_PATH/root"
@@ -92,6 +95,7 @@
       if zfs list zroot/incus >/dev/null 2>&1; then
         syncoid \
           --recursive \
+          --delete-target-snapshots \
           --sshport=22 \
           zroot/incus \
           "$TARGET_USER@$TARGET_HOST:$TARGET_PATH/incus"
