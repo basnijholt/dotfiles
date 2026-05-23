@@ -49,6 +49,7 @@
       mbuffer
       gawk
       nettools
+      zfs
     ];
 
     script = ''
