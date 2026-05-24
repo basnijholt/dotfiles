@@ -1,67 +1,13 @@
-# Building aarch64-linux NixOS VM on macOS (ARM)
+# Building aarch64-linux NixOS on macOS
 
-Run a NixOS development VM (`dev-vm-aarch64`) on an ARM Mac using Incus.
+Apple Silicon Macs are `aarch64-darwin`; the VM and Raspberry Pi targets are
+`aarch64-linux`. The CPU architecture matches, but macOS still needs a Linux
+builder to build Linux derivations.
 
-## Quick Start
+## Native Linux Builder
 
-### 1. Download the installer ISO
-
-```bash
-wget -O /tmp/nixos-installer-aarch64-linux.iso \
-  "https://github.com/nix-community/nixos-images/releases/download/nixos-unstable/nixos-installer-aarch64-linux.iso"
-```
-
-### 2. Create and boot the VM
-
-```bash
-# Create VM with disk
-incus init dev-vm --empty --vm -c limits.cpu=4 -c limits.memory=8GiB
-incus config device add dev-vm root disk pool=default size=20GiB
-
-# Attach ISO and boot
-incus config device add dev-vm iso disk source=/tmp/nixos-installer-aarch64-linux.iso boot.priority=10
-incus start dev-vm
-incus console dev-vm
-```
-
-### 3. Install NixOS (inside VM console)
-
-```bash
-# Partition and format with disko
-sudo nix --experimental-features "nix-command flakes" run \
-  github:nix-community/disko -- --mode disko \
-  --flake 'github:basnijholt/dotfiles?dir=configs/nixos#dev-vm-aarch64'
-
-# Install NixOS
-sudo nixos-install --no-root-passwd \
-  --flake 'github:basnijholt/dotfiles?dir=configs/nixos#dev-vm-aarch64'
-
-sudo poweroff
-```
-
-### 4. Boot the installed system
-
-```bash
-incus config device remove dev-vm iso
-incus start dev-vm
-incus console dev-vm
-```
-
-## Why not build disk images directly?
-
-Building disk images with `diskoImages` requires nested virtualization (QEMU inside the Linux builder VM). The Determinate Nix Linux builder lacks KVM support, causing QEMU to fall back to slow software emulation (~10-100x slower), which leads to timeouts and kernel panics.
-
-If you have a Linux machine with KVM (or a remote builder), you can build images directly:
-
-```bash
-nix build .#nixosConfigurations.dev-vm-aarch64.config.system.build.diskoImages
-incus image import result/main.raw.zst --alias nixos-dev-vm
-incus launch nixos-dev-vm dev-vm --vm
-```
-
-## Prerequisites (for building aarch64-linux packages)
-
-To build aarch64-linux packages on macOS, configure Determinate Nix's Linux builder:
+To build `aarch64-linux` packages on macOS, configure Determinate Nix's native
+Linux builder:
 
 ```bash
 sudo mkdir -p /etc/determinate
@@ -77,20 +23,44 @@ EOF
 sudo launchctl kickstart -k system/systems.determinate.nix-daemon
 ```
 
-Memory values: 8GB=`8589934592`, 16GB=`17179869184`, 32GB=`34359738368`
+Memory values: 8GB=`8589934592`, 16GB=`17179869184`, 32GB=`34359738368`.
 
-## Troubleshooting
+## Development VM
 
-### Kernel panic during disk image build
+On macOS, use QEMU with Apple's Hypervisor Framework for `dev-vm-aarch64`; Incus
+does not run natively on macOS. See `hosts/dev-vm/README.md` for the full QEMU
+installation flow.
 
-Use the ISO installation method instead. See "Why not build disk images directly?" above.
-
-### Cannot access VM console
+The VM configuration can be evaluated with:
 
 ```bash
-incus console dev-vm --type=vga
+nix eval .#nixosConfigurations.dev-vm-aarch64.config.nixpkgs.hostPlatform.system --raw
 ```
 
-### "no space left on device" during builds
+Building it requires the Linux builder:
 
-Increase `memoryBytes` in `/etc/determinate/config.json` and restart the daemon.
+```bash
+nix build .#nixosConfigurations.dev-vm-aarch64.config.system.build.toplevel
+```
+
+## Disk Images
+
+Building disk images with `diskoImages` requires nested virtualization (QEMU
+inside the Linux builder VM). The Determinate Nix Linux builder does not provide
+KVM for that nested QEMU workload, so disk-image builds can fall back to slow
+software emulation and fail.
+
+If you have a Linux machine with KVM, build images there:
+
+```bash
+nix build .#nixosConfigurations.dev-vm-aarch64.config.system.build.diskoImages
+```
+
+## Raspberry Pi
+
+The same Linux builder is also what makes local Mac builds of the Raspberry Pi 4
+configuration practical:
+
+```bash
+nix build 'path:.#nixosConfigurations.pi4.config.system.build.toplevel' --impure
+```
