@@ -12,6 +12,7 @@
   # Add system packages
   environment.systemPackages = with pkgs; [
     colima # Container runtime for macOS
+    lima # VM manager used by Colima; provides limactl for standalone VMs
     cups # lp command for network printing
     devbox
     docker # Docker CLI

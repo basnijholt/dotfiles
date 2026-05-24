@@ -77,7 +77,6 @@
       "rsync" # File sync tool
       "ruby" # Ruby programming language
       "rustup" # Rust toolchain installer
-      "skhd-zig" # Hotkey daemon
       "ssh-copy-id" # SSH public key installer
       "starship" # Shell prompt
       "superfile" # Modern terminal file manager
@@ -160,6 +159,7 @@
       "rectangle" # Window manager
       "rotki" # Portfolio tracker
       "sabnzbd" # Usenet client
+      "skhd-zig" # Hotkey daemon
       "scroll-reverser" # Scroll direction control
       "selfcontrol" # Website blocker
       "signal" # Secure messenger
@@ -204,7 +204,6 @@
     taps = [
       "gromgit/fuse" # For SSHFS
       "hashicorp/tap" # For Terraform
-      "jackielii/tap" # for skhd-zig
     ];
   };
 }
