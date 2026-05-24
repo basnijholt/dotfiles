@@ -10,6 +10,7 @@
     ../../optional/zfs-replication.nix
 
     # Host-specific modules (Tier 3)
+    ./kernel-trim.nix
     ./networking.nix
     ./storage-helper.nix
   ];

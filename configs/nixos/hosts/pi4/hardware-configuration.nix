@@ -7,18 +7,18 @@
 {
   # ZFS support (not provided by nixos-raspberrypi)
   boot.supportedFilesystems = [ "zfs" ];
-  boot.initrd.supportedFilesystems = [ "zfs" ];  # Critical for ZFS root!
+  boot.initrd.supportedFilesystems = [ "zfs" ]; # Critical for ZFS root!
 
   # CRITICAL: Force ZFS import even if hostId doesn't match
   boot.zfs.forceImportRoot = true;
-  boot.zfs.devNodes = "/dev/disk/by-partuuid";  # More reliable for USB on Pi
+  boot.zfs.devNodes = "/dev/disk/by-partuuid"; # More reliable for USB on Pi
 
   # USB drivers needed in initrd to find root filesystem on USB SSD
   boot.initrd.availableKernelModules = [
-    "xhci_pci"        # USB 3.0 controller
-    "usb_storage"     # USB mass storage
-    "usbhid"          # USB HID
-    "uas"             # USB Attached SCSI
+    "xhci_pci" # USB 3.0 controller
+    "usb_storage" # USB mass storage
+    "usbhid" # USB HID
+    "uas" # USB Attached SCSI
   ];
 
   # Wait for USB devices to enumerate before ZFS import
@@ -29,7 +29,7 @@
 
   # Kernel params for ZFS boot
   boot.kernelParams = [
-    "zfs_force=1"           # Force ZFS import regardless of hostid
+    "zfs_force=1" # Force ZFS import regardless of hostid
   ];
 
   # --- Filesystem Configuration ---
@@ -57,6 +57,7 @@
   # /boot is defined by disko.nix (ESP partition).
   # nixos-raspberrypi uses boot.loader.raspberry-pi.* now; keep firmware on the
   # same partition as /boot because this image does not split /boot/firmware out.
+  boot.loader."raspberry-pi".firmwarePackage = pkgs.raspberrypifw;
   boot.loader."raspberry-pi".firmwarePath = "/boot";
 
   # Power management
