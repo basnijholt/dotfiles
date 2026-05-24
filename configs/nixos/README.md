@@ -6,7 +6,7 @@
 configs/nixos/
 ├── common/           # Tier 1: shared by ALL hosts
 ├── optional/         # Tier 2: opt-in modules (desktop, audio, virtualization, power, etc.)
-├── hosts/            # Tier 3: host-specific (pc, nuc, hp)
+├── hosts/            # Tier 3: host-specific modules
 ├── installers/       # ISO builder
 └── archive/          # Old migration scripts/notes
 ```
@@ -18,21 +18,28 @@ configs/nixos/
 | `pc` | Physical | Desktop/workstation (NVIDIA, Hyprland, AI services) |
 | `nuc` | Physical | Media box (Kodi, Btrfs, desktop + power management) |
 | `hp` | Physical | Headless server (ZFS, virtualization + power management) |
-| `pi3` | Physical | Raspberry Pi 3 - lightweight headless server (aarch64) |
-| `pi4` | Physical | Raspberry Pi 4 - lightweight headless server (aarch64) |
 | `hp-incus` | Incus VM | HP config for Incus VM testing |
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
+| `mindroom-spouse` | Incus LXC | Companion bot / MindRoom runtime container |
+| `mindroom` | Incus LXC | MindRoom lab/runtime container with local Matrix and web services |
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
+| `hetzner-matrix` | Cloud VPS | Hetzner ARM Tuwunel Matrix homeserver for MindRoom |
+| `hetzner-bootstrap` | Bootstrap | Minimal first-stage config for Hetzner ARM installs |
 | `hetzner` | Cloud VPS | Minimal Docker Compose host for websites (Hetzner Cloud) |
+| `hetzner-saas` | Cloud VPS | Hetzner x86_64 single-node K3s host for MindRoom SaaS |
+| `hetzner-saas-bootstrap` | Bootstrap | Minimal first-stage config for Hetzner SaaS installs |
 | `paul-wyse` | Physical | Gateway to home services via Tailscale (Dell Wyse 5070) |
-| `paul-wyse-installer` | ISO | Installer for Paul's Wyse 5070 with auto-install script |
+| `paul-wyse-incus` | Incus VM | Paul Wyse config for Incus VM testing |
+| `pi4` | Physical | Raspberry Pi 4 - lightweight headless server with ZFS on SSD (aarch64) |
+| `pi3` | Physical | Raspberry Pi 3 - lightweight headless server with WiFi (aarch64) |
+| `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap image with WiFi + SSH |
+| `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap image with WiFi + SSH |
 | `installer` | ISO | Minimal installer with SSH enabled |
-| `pi3-bootstrap` | SD Image | Minimal Pi 3 bootstrap with WiFi + SSH |
-| `pi4-bootstrap` | SD Image | Minimal Pi 4 bootstrap with WiFi + SSH |
+| `paul-wyse-installer` | ISO | Installer for Paul's Wyse 5070 with auto-install script |
 
 ## Quick Commands
 
@@ -66,7 +73,6 @@ For Incus VM installation, see the instructions in:
 - `hosts/hp/incus-overrides.nix` (HP VM)
 - `hosts/nuc/incus-overrides.nix` (NUC VM)
 - `hosts/pc/incus-overrides.nix` (PC VM)
-- `scripts/create-dev-vm.sh` (dev-vm helper script)
 
 > **Note:** Default password is `nixos`. Change it after first boot with `passwd basnijholt`.
 
