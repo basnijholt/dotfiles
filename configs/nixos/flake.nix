@@ -29,16 +29,15 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      home-manager-pi,
-      disko,
-      comin,
-      ragenix,
-      nixos-raspberrypi,
-      ...
+    { self
+    , nixpkgs
+    , home-manager
+    , home-manager-pi
+    , disko
+    , comin
+    , ragenix
+    , nixos-raspberrypi
+    , ...
     }:
     let
       lib = nixpkgs.lib;

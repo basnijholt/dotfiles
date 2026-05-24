@@ -6,24 +6,28 @@ builder to build Linux derivations.
 
 ## Native Linux Builder
 
-To build `aarch64-linux` packages on macOS, configure Determinate Nix's native
+To build `aarch64-linux` packages on macOS, enable Determinate Nix's native
 Linux builder:
 
+1. Install Determinate Nix.
+2. Sign up for FlakeHub and log in with `determinate-nixd auth login`.
+3. Make sure your FlakeHub account has native Linux builder access.
+4. If the builder is unavailable after login, restart Determinate Nixd.
+
 ```bash
-sudo mkdir -p /etc/determinate
-cat <<EOF | sudo tee /etc/determinate/config.json
-{
-  "builder": {
-    "state": "enabled",
-    "memoryBytes": 17179869184,
-    "cpuCount": 1
-  }
-}
-EOF
+determinate-nixd status
 sudo launchctl kickstart -k system/systems.determinate.nix-daemon
 ```
 
-Memory values: 8GB=`8589934592`, 16GB=`17179869184`, 32GB=`34359738368`.
+See Determinate's native Linux builder troubleshooting guide:
+<https://docs.determinate.systems/troubleshooting/native-linux-builder/>.
+
+Test the builder with a small `aarch64-linux` derivation:
+
+```bash
+nix build --print-build-logs --substituters "" \
+  "https://flakehub.com/f/DeterminateSystems/minimal-stdenv/0.1#packages.aarch64-linux.default"
+```
 
 ## Development VM
 
