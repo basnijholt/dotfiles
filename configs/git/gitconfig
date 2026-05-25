@@ -50,14 +50,10 @@
 	side-by-side = false
 [credential]
 	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
 	helper = /usr/local/share/gcm-core/git-credential-manager
+	helper = !/run/current-system/sw/bin/gh auth git-credential
 [credential "https://dev.azure.com"]
 	useHttpPath = true
-[credential "https://github.com"]
-	helper = 
-	helper = !/run/current-system/sw/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/run/current-system/sw/bin/gh auth git-credential
 [credential "https://git.nijho.lt"]
 	provider = generic
