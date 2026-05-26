@@ -10,5 +10,10 @@
 	directory = /opt/stacks
 [include]
 	path = ~/.gitconfig-sign
+[credential]
+	helper =
+	helper = !$HOME/.local/bin/git-credential-portable
 [credential "https://git.lab.nijho.lt"]
+	provider = generic
+[credential "https://git.nijho.lt"]
 	provider = generic

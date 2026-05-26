@@ -12,6 +12,7 @@ secrets
 .gitignore
 configs/agent-cli/config.toml
 configs/atuin/zfs
+configs/git/gitconfig-personal
 configs/hypr
 configs/hyprpanel
 configs/karabiner
@@ -22,6 +23,7 @@ configs/nixos
 configs/skhd
 configs/syncthing
 scripts/git-credential-gitea.sh
+scripts/git-credential-portable.sh
 scripts/rclone.sh
 scripts/rpi
 scripts/rsync-time-machine.sh
