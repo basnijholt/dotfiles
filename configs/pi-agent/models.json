@@ -83,16 +83,16 @@
       "apiKey": "sk-dummy",
       "models": [
         {
-          "id": "claude-opus-4-6",
-          "name": "Claude Opus 4.6 (LiteLLM)",
+          "id": "claude-opus-4-8",
+          "name": "Claude Opus 4.8 (LiteLLM)",
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 200000,
           "maxTokens": 32000
         },
         {
-          "id": "claude-opus-4-5",
-          "name": "Claude Opus 4.5 (LiteLLM)",
+          "id": "claude-opus-4-7",
+          "name": "Claude Opus 4.7 (LiteLLM)",
           "reasoning": true,
           "input": ["text", "image"],
           "contextWindow": 200000,
