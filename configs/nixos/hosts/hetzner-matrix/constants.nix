@@ -2,6 +2,8 @@
   siteDomain = "mindroom.chat";
   appDomain = "app.mindroom.chat";
   cinnyDomain = "chat.mindroom.chat";
+  pushDomain = "push.mindroom.chat";
+  iosPushAppId = "com.mindroom-ai.app.ios";
   demoDomain = "demo.mindroom.chat";
   demoTuwunelPort = 8018;
   cinnyCheckoutPath = "/var/www/cinny";

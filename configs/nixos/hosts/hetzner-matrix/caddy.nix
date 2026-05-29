@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain appDomain cinnyDomain demoDomain demoTuwunelPort cinnyCurrentPath;
+  inherit (constants) siteDomain appDomain cinnyDomain pushDomain demoDomain demoTuwunelPort cinnyCurrentPath;
 in
 {
   systemd.tmpfiles.rules = [
@@ -85,6 +85,13 @@ in
         root * ${cinnyCurrentPath}
         try_files {path} /index.html
         file_server
+      '';
+    };
+
+    # Matrix push gateway for native mobile clients.
+    virtualHosts."${pushDomain}" = {
+      extraConfig = ''
+        reverse_proxy localhost:5000
       '';
     };
   };
