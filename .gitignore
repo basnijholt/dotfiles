@@ -50,3 +50,4 @@ configs/nixos/hosts/pi4/wifi.nix
 
 # Environment files with secrets
 .env
+.warden/

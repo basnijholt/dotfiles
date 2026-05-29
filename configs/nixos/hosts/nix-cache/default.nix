@@ -13,6 +13,7 @@
     ./networking.nix
     ./nix-build.nix
     ./harmonia.nix
+    ./ncps.nix
     ./system-packages.nix
     ./auto-build.nix
   ];

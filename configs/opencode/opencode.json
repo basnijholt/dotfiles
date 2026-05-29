@@ -11,16 +11,12 @@
         "apiKey": "sk-dummy"
       },
       "models": {
-        "claude-opus-4-6": {
-          "name": "Claude Opus 4.6 (LiteLLM)",
+        "claude-opus-4-8": {
+          "name": "Claude Opus 4.8 (LiteLLM)",
           "limit": { "context": 200000, "output": 32000 }
         },
-        "claude-opus-4-5": {
-          "name": "Claude Opus 4.5 (LiteLLM)",
-          "limit": { "context": 200000, "output": 32000 }
-        },
-        "claude-sonnet-4-5": {
-          "name": "Claude Sonnet 4.5 (LiteLLM)",
+        "claude-sonnet-4-6": {
+          "name": "Claude Sonnet 4.6 (LiteLLM)",
           "limit": { "context": 200000, "output": 16000 }
         },
         "claude-haiku-4-5": {
@@ -97,5 +93,5 @@
       }
     }
   },
-  "model": "litellm/claude-opus-4-6"
+  "model": "litellm/claude-opus-4-8"
 }

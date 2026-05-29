@@ -23,6 +23,7 @@
 
   # Required for ZFS
   networking.hostId = "8a5b2c1f";
+  boot.zfs.forceImportRoot = false;
 
   local.wakeOnLan.interface = "eno1";
 }
