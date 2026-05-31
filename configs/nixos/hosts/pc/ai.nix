@@ -63,7 +63,8 @@
       "qwen3.5:35b-a3b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3.5-35B-A3B-GGUF:UD-Q4_K_XL
+          --hf-repo unsloth/Qwen3.5-35B-A3B-GGUF
+          --hf-file Qwen3.5-35B-A3B-UD-Q4_K_XL.gguf
           --port ''${PORT}
           --ctx-size 65536
           --batch-size 2048
@@ -71,36 +72,13 @@
           --threads 1
           --jinja
 
-      # Latest Unsloth Qwen3.6-27B dense MTP model, verified 2026-05-17.
-      # Source: https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF
-      # UD-Q8_K_XL quant, split across both 3090s
-      "qwen3.6:27b-q8":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q8_K_XL
-          --port ''${PORT}
-          --ctx-size 0
-          --fit on
-          --fit-target 2048,2048
-          --fit-ctx 16384
-          --parallel 1
-          --batch-size 2048
-          --ubatch-size 512
-          --flash-attn on
-          --cache-type-k q4_0
-          --cache-type-v q4_0
-          --split-mode layer
-          --spec-type draft-mtp
-          --spec-draft-n-max 6
-          --spec-draft-p-min 0.75
-          --threads 1
-          --jinja
-
       # Same Qwen3.6-27B MTP model with smaller UD-Q4_K_XL quant
       "qwen3.6:27b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL
+          --hf-repo unsloth/Qwen3.6-27B-MTP-GGUF
+          --hf-file Qwen3.6-27B-UD-Q4_K_XL.gguf
+          --no-mmproj
           --port ''${PORT}
           --ctx-size 0
           --fit on
@@ -114,31 +92,28 @@
           --cache-type-v q4_0
           --split-mode layer
           --spec-type draft-mtp
-          --spec-draft-n-max 6
-          --spec-draft-p-min 0.75
+          --spec-draft-n-max 3
           --threads 1
           --jinja
 
-      # Qwen3.6-35B-A3B MTP MoE model - 38.5 GB UD-Q8_K_XL, split across both 3090s
-      "qwen3.6:35b-a3b-q8":
+      # Qwen3.6-27B MTP model with UD-Q5_K_XL quant
+      "qwen3.6:27b-q5":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q8_K_XL
+          --hf-repo unsloth/Qwen3.6-27B-MTP-GGUF
+          --hf-file Qwen3.6-27B-UD-Q5_K_XL.gguf
+          --no-mmproj
           --port ''${PORT}
-          --ctx-size 0
-          --fit on
-          --fit-target 2048,2048
-          --fit-ctx 16384
+          --ctx-size 200000
           --parallel 1
           --batch-size 2048
           --ubatch-size 512
           --flash-attn on
-          --cache-type-k q4_0
-          --cache-type-v q4_0
+          --cache-type-k f16
+          --cache-type-v f16
           --split-mode layer
           --spec-type draft-mtp
-          --spec-draft-n-max 6
-          --spec-draft-p-min 0.75
+          --spec-draft-n-max 2
           --threads 1
           --jinja
 
@@ -146,7 +121,9 @@
       "qwen3.6:35b-a3b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL
+          --hf-repo unsloth/Qwen3.6-35B-A3B-MTP-GGUF
+          --hf-file Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf
+          --no-mmproj
           --port ''${PORT}
           --ctx-size 0
           --fit on
@@ -160,8 +137,116 @@
           --cache-type-v q4_0
           --split-mode layer
           --spec-type draft-mtp
-          --spec-draft-n-max 6
-          --spec-draft-p-min 0.75
+          --spec-draft-n-max 3
+          --threads 1
+          --jinja
+
+      # Qwen3.6-35B-A3B MTP MoE model with UD-Q5_K_XL quant, split across both 3090s
+      "qwen3.6:35b-a3b-q5":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Qwen3.6-35B-A3B-MTP-GGUF
+          --hf-file Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf
+          --no-mmproj
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
+          --split-mode layer
+          --spec-type draft-mtp
+          --spec-draft-n-max 3
+          --threads 1
+          --jinja
+
+      # Qwen3.6 vision aliases keep mmproj enabled and speculative MTP disabled
+      "qwen3.6:27b-q4-vision":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Qwen3.6-27B-MTP-GGUF
+          --hf-file Qwen3.6-27B-UD-Q4_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
+          --split-mode layer
+          --threads 1
+          --jinja
+
+      "qwen3.6:27b-q5-vision":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Qwen3.6-27B-MTP-GGUF
+          --hf-file Qwen3.6-27B-UD-Q5_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/Qwen3.6-27B-MTP-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
+          --split-mode layer
+          --threads 1
+          --jinja
+
+      "qwen3.6:35b-a3b-q4-vision":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Qwen3.6-35B-A3B-MTP-GGUF
+          --hf-file Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
+          --split-mode layer
+          --threads 1
+          --jinja
+
+      "qwen3.6:35b-a3b-q5-vision":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Qwen3.6-35B-A3B-MTP-GGUF
+          --hf-file Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/Qwen3.6-35B-A3B-MTP-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q4_0
+          --cache-type-v q4_0
+          --split-mode layer
           --threads 1
           --jinja
 
@@ -242,119 +327,6 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Uploaded 2025-11-28, size 42.9 GB, max ctx: 262144, layers: 48
-      "qwen3-next-80b-a3b:q4_k_xl":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-Next-80B-A3B-Instruct-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 2048
-          --ubatch-size 512
-          --split-mode layer
-          --tensor-split 1,1
-          --n-cpu-moe 10
-          --threads 8
-          --jinja
-
-      # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144, layers: 36
-      "qwen3-vl-thinking:4b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-4B-Thinking-GGUF:Q8_0
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Uploaded 2025-10-31, size 4.4 GB, max ctx: 262144, layers: 36
-      "qwen3-vl:4b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-4B-Instruct-GGUF:Q8_0
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Uploaded 2025-10-31, size 8.8 GB, max ctx: 262144, layers: 36
-      "qwen3-vl-thinking:8b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-8B-Thinking-GGUF:Q8_0
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Uploaded 2025-10-31, size 8.8 GB, max ctx: 262144, layers: 36
-      "qwen3-vl:8b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf Qwen/Qwen3-VL-8B-Instruct-GGUF:Q8_0
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Uploaded 2025-10-30, size 18.6 GB, max ctx: 262144, layers: 64
-      "qwen3-vl-thinking:32b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Thinking-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 32768
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Uploaded 2025-10-30, size 18.7 GB, max ctx: 262144, layers: 64
-      "qwen3-vl:32b-q4":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 32768
-          --batch-size 2048
-          --ubatch-size 2048
-          --threads 1
-          --jinja
-
-      # Uploaded 2025-10-30, size 36.8 GB, max ctx: 262144, layers: 64
-      "qwen3-vl:32b-q8":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf unsloth/Qwen3-VL-32B-Instruct-GGUF:UD-Q8_K_XL
-          --port ''${PORT}
-          --ctx-size 16384
-          --batch-size 2048
-          --ubatch-size 512
-          --threads 1
-          --jinja
-
-      # Uploaded 2025-10-23, size 32.4 GB, max ctx: 262144, layers: 64
-      "qwen3-vl-thinking-abliterated:32b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated
-          --hf-file GGUF/ggml-model-q8_0.gguf
-          --mmproj-url https://huggingface.co/huihui-ai/Huihui-Qwen3-VL-32B-Thinking-abliterated/resolve/main/GGUF/mmproj-model-f16.gguf
-          --port ''${PORT}
-          --ctx-size 16384
-          --batch-size 2048
-          --ubatch-size 512
-          --threads 1
-          --jinja
-
       # Uploaded 2025-10-02, size 16.8 GB, max ctx: 262400, layers: 48
       "apriel-thinker:15b":
         cmd: |
@@ -402,14 +374,6 @@
           --ubatch-size 2048
           --threads 1
           --jinja
-
-      # Uploaded 2025-08-06, size 2.4 GB, max ctx: 262144, layers: 36
-      "qwen3-thinking:4b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-4B-Thinking-2507-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 0
 
       # Uploaded 2025-08-05, size 59.0 GB, max ctx: 131072, layers: 36
       "gpt-oss:120b-q8":
@@ -504,14 +468,6 @@
           --chat-template-kwargs '{"reasoning_effort": "high"}'
           --jinja
 
-      # Uploaded 2025-07-31, size 16.5 GB, max ctx: 262144, layers: 48
-      "qwen3-coder:30b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 131072
-
       # Uploaded 2025-07-07, size 13.3 GB, max ctx: 131072, layers: 40
       "devstral:24b":
         cmd: |
@@ -519,19 +475,6 @@
           --hf-repo mistralai/Devstral-Small-2507_gguf:Q4_K_M
           --port ''${PORT}
           --ctx-size 65536
-          --jinja
-
-      # Best uncensored model according to https://www.reddit.com/r/LocalLLaMA/comments/1nq0cp9/important_why_abliterated_models_suck_here_is_a
-      # Uploaded 2025-05-10, size 17.3 GB, max ctx: 40960, layers: 48
-      "qwen3-30b-a3b-abliterated":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo mradermacher/Qwen3-30B-A3B-abliterated-erotic-i1-GGUF
-          --port ''${PORT}
-          --ctx-size 0
-          --batch-size 4096
-          --ubatch-size 2048
-          --threads 1
           --jinja
 
       # Uploaded 2025-05-09, size 13.3 GB, max ctx: 32768, layers: 40
@@ -543,27 +486,11 @@
           --ctx-size 65536
           --jinja
 
-      # Uploaded 2025-04-28, size 4.8 GB, max ctx: 131072, layers: 36
-      "qwen3-thinking:8b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo unsloth/Qwen3-8B-128K-GGUF:UD-Q4_K_XL
-          --port ''${PORT}
-          --ctx-size 0
-
       # Uploaded 2024-10-31, size 0.1 GB, max ctx: 8192, layers: 30
       "smollm2:135m":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo unsloth/SmolLM2-135M-Instruct-GGUF:Q8_0
-          --port ''${PORT}
-          --ctx-size 0
-
-      # Uploaded 2024-09-17, size 0.4 GB, max ctx: 32768, layers: 24
-      "qwen2.5:0.5b":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --hf-repo bartowski/Qwen2.5-0.5B-Instruct-GGUF:Q4_K_M
           --port ''${PORT}
           --ctx-size 0
 
