@@ -29,15 +29,6 @@ let
         "exec": {
           "host": "gateway"
         }
-      },
-      "channels": {
-        "telegram": {
-          "webhookUrl": null,
-          "webhookSecret": null,
-          "webhookPath": null,
-          "webhookHost": null,
-          "webhookPort": null
-        }
       }
     }
   '';
