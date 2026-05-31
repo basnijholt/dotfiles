@@ -11,6 +11,10 @@ let
   agentRuntimeEnvPath = config.age.secrets.agent-runtime-env.path;
   agentIntegrationsEnvPath = config.age.secrets.agent-integrations-env.path;
   agentToolingEnvPath = config.age.secrets.agent-tooling-env.path;
+  mindroomUnsetEnvironment = [
+    "OPENCLAW_TELEGRAM_BOT_TOKEN"
+    "TELEGRAM_BOT_TOKEN"
+  ];
 in
 {
   imports = [
@@ -30,7 +34,11 @@ in
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli ];
 
-  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [ "openclaw-2026.4.21" ];
+  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
+    "openclaw-2026.4.2"
+    "openclaw-2026.4.21"
+    "openclaw-2026.5.7"
+  ];
 
   systemd.tmpfiles.rules = [
     "d ${mindroomDir} 0750 basnijholt users - -"
@@ -52,6 +60,7 @@ in
         agentToolingEnvPath
         "${mindroomDir}/.env"
       ];
+      UnsetEnvironment = mindroomUnsetEnvironment;
       Environment = [
         "MINDROOM_CONFIG_PATH=${mindroomDir}/config.yaml"
         "MINDROOM_STORAGE_PATH=${mindroomDir}/mindroom_data"
@@ -66,8 +75,13 @@ in
       ''}";
       Restart = "on-failure";
       RestartSec = "10s";
+      TimeoutStopSec = "15s";
+      KillMode = "mixed";
+      SuccessExitStatus = "143 SIGTERM";
     };
   };
+
+  systemd.services.openclaw-gateway.serviceConfig.UnsetEnvironment = mindroomUnsetEnvironment;
 
   # Deploy manually while this container is being used as a hands-on MindRoom
   # runtime.

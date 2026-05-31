@@ -15,6 +15,10 @@ let
     agentIntegrationsEnvPath
     agentToolingEnvPath
   ];
+  mindroomUnsetEnvironment = [
+    "OPENCLAW_TELEGRAM_BOT_TOKEN"
+    "TELEGRAM_BOT_TOKEN"
+  ];
 
   # Shared uv + python wrapper for mindroom CLI invocations.
   mindroom-uv = dir: args:
@@ -44,6 +48,7 @@ let
       Group = "users";
       WorkingDirectory = dir;
       EnvironmentFile = agentEnvironmentFiles ++ [ "${dir}/.env" ];
+      UnsetEnvironment = mindroomUnsetEnvironment;
       Environment = [
         "MINDROOM_CONFIG_PATH=${dir}/config.yaml"
         "MINDROOM_STORAGE_PATH=${dir}/mindroom_data"
@@ -72,6 +77,7 @@ in
         Group = "users";
         WorkingDirectory = "/home/basnijholt/.mindroom-lab";
         EnvironmentFile = agentEnvironmentFiles ++ [ "/home/basnijholt/.mindroom-lab/.env" ];
+        UnsetEnvironment = mindroomUnsetEnvironment;
         Environment = [
           "MINDROOM_CONFIG_PATH=/home/basnijholt/.mindroom-lab/config.yaml"
           "MINDROOM_STORAGE_PATH=/home/basnijholt/.mindroom-lab/mindroom_data"
@@ -81,6 +87,9 @@ in
         ExecStart = "${mindroom-uv "/home/basnijholt/.mindroom-lab" "run"}";
         Restart = "on-failure";
         RestartSec = "10s";
+        TimeoutStopSec = "15s";
+        KillMode = "mixed";
+        SuccessExitStatus = "143 SIGTERM";
       };
     };
 
@@ -97,6 +106,7 @@ in
         Group = "users";
         WorkingDirectory = "/home/basnijholt/.mindroom-chat";
         EnvironmentFile = agentEnvironmentFiles ++ [ "/home/basnijholt/.mindroom-chat/.env" ];
+        UnsetEnvironment = mindroomUnsetEnvironment;
         Environment = [
           "MINDROOM_CONFIG_PATH=/home/basnijholt/.mindroom-chat/config.yaml"
           "MINDROOM_STORAGE_PATH=/home/basnijholt/.mindroom-chat/mindroom_data"
@@ -107,6 +117,9 @@ in
         ExecStart = "${mindroom-uv "/home/basnijholt/.mindroom-chat" "run --api-port 8766"}";
         Restart = "always";
         RestartSec = "10s";
+        TimeoutStopSec = "15s";
+        KillMode = "mixed";
+        SuccessExitStatus = "143 SIGTERM";
       };
     };
 

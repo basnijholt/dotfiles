@@ -14,16 +14,44 @@ let
     agentIntegrationsEnvPath
     agentToolingEnvPath
   ];
+  openclawTelegramUnsetEnvironment = [
+    "OPENCLAW_TELEGRAM_BOT_TOKEN"
+    "TELEGRAM_BOT_TOKEN"
+  ];
   openclawStateDir = "${homeDir}/.openclaw";
   openclawWorkingDirectory = "${openclawStateDir}/workspace";
   openclawConfigPath = "${openclawStateDir}/openclaw.json";
   openclawLogPath = "${openclawStateDir}/logs/gateway.log";
+  openclawPackage = pkgs.openclaw;
+  openclawRuntimePolicyPatch = pkgs.writeText "openclaw-runtime-policy.json" ''
+    {
+      "tools": {
+        "exec": {
+          "host": "gateway"
+        }
+      },
+      "channels": {
+        "telegram": {
+          "webhookUrl": null,
+          "webhookSecret": null,
+          "webhookPath": null,
+          "webhookHost": null,
+          "webhookPort": null
+        }
+      }
+    }
+  '';
+  openclawApplyRuntimePolicy = pkgs.writeShellScript "openclaw-apply-runtime-policy" ''
+    if ! ${openclawPackage}/bin/openclaw config patch --help 2>&1 | ${pkgs.gnugrep}/bin/grep -q -- '--stdin'; then
+      exit 0
+    fi
+    exec ${openclawPackage}/bin/openclaw config patch --stdin < ${openclawRuntimePolicyPatch}
+  '';
   openclawInteractiveWrapper = pkgs.writeShellScriptBin "openclaw" ''
     export HOME=${lib.escapeShellArg homeDir}
     export OPENCLAW_CONFIG_PATH=${lib.escapeShellArg openclawConfigPath}
+    export OPENCLAW_NIX_MODE=0
     export OPENCLAW_STATE_DIR=${lib.escapeShellArg openclawStateDir}
-    export CLAWDBOT_CONFIG_PATH=${lib.escapeShellArg openclawConfigPath}
-    export CLAWDBOT_STATE_DIR=${lib.escapeShellArg openclawStateDir}
 
     for env_file in \
       ${lib.escapeShellArg agentRuntimeEnvPath} \
@@ -36,12 +64,12 @@ let
       set +a
     done
 
-    exec ${pkgs.openclaw}/bin/openclaw "$@"
+    exec ${openclawPackage}/bin/openclaw "$@"
   '';
   openclawCliPackage = pkgs.symlinkJoin {
     name = "openclaw-cli";
     paths = [
-      pkgs.openclaw
+      openclawPackage
       openclawInteractiveWrapper
     ];
     postBuild = ''
@@ -68,17 +96,17 @@ in
         environment = {
           HOME = homeDir;
           OPENCLAW_CONFIG_PATH = openclawConfigPath;
+          OPENCLAW_NIX_MODE = "0";
           OPENCLAW_STATE_DIR = openclawStateDir;
-          CLAWDBOT_CONFIG_PATH = openclawConfigPath;
-          CLAWDBOT_STATE_DIR = openclawStateDir;
         };
-        path = with pkgs; [ bash coreutils git openssh signal-cli uv ];
+        path = with pkgs; [ bash coreutils docker git openssh signal-cli uv ];
         serviceConfig = {
           User = "basnijholt";
           Group = "users";
           WorkingDirectory = openclawWorkingDirectory;
           EnvironmentFile = openclawGatewayEnvironmentFiles;
-          ExecStart = "${pkgs.openclaw}/bin/openclaw gateway --port 18789";
+          ExecStartPre = openclawApplyRuntimePolicy;
+          ExecStart = "${openclawPackage}/bin/openclaw gateway --port 18789";
           Restart = "always";
           RestartSec = 5;
           StandardOutput = "append:${openclawLogPath}";
@@ -100,6 +128,8 @@ in
           RestartSec = "5s";
           WorkingDirectory = openclawWorkingDirectory;
           EnvironmentFile = [ agentRuntimeEnvPath ];
+          UnsetEnvironment = openclawTelegramUnsetEnvironment;
+          SuccessExitStatus = "143 SIGTERM";
         };
         script = ''
           export HOME=${homeDir}

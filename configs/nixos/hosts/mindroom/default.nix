@@ -29,7 +29,10 @@
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli pkgs.ffmpeg-headless pkgs.chromium ];
 
-  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [ "openclaw-2026.4.21" ];
+  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
+    "openclaw-2026.4.21"
+    "openclaw-2026.5.7"
+  ];
 
   # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)
   # that link against it. Without this, uv run / pytest fail with import errors.
