@@ -17,6 +17,7 @@ let
   modelRepo = "Lorbus/Qwen3.6-27B-int4-AutoRound";
   containerName = "club-3090-vllm-qwen36";
   downloadContainerName = "${containerName}-download";
+  idleTimeoutSeconds = 30 * 60;
 
   patches = "${club3090}/models/qwen3.6-27b/vllm/patches";
 
@@ -115,6 +116,80 @@ let
       --host 0.0.0.0 \
       --port 8000
   '';
+
+  idleCheck = pkgs.writeShellScript "club-3090-vllm-idle-check" ''
+    set -euo pipefail
+
+    env_file="${stateDir}/env"
+    if [ -r "$env_file" ]; then
+      # shellcheck disable=SC1090
+      source "$env_file"
+    fi
+
+    idle_timeout="''${CLUB3090_VLLM_IDLE_TIMEOUT_SECONDS:-${toString idleTimeoutSeconds}}"
+    last_active_file="${stateDir}/last-active"
+    fingerprint_file="${stateDir}/last-fingerprint"
+
+    if ! ${pkgs.systemd}/bin/systemctl is-active --quiet club-3090-vllm.service; then
+      echo "club-3090-vllm is not active; nothing to unload"
+      exit 0
+    fi
+
+    now="$(${pkgs.coreutils}/bin/date +%s)"
+    metrics="$(${pkgs.curl}/bin/curl -fsS --max-time 5 http://127.0.0.1:8010/metrics 2>/dev/null || true)"
+
+    # During cold start the HTTP port may accept connections before /metrics is
+    # useful. Treat that as active so the timer cannot kill a slow warmup.
+    if [ -z "$metrics" ]; then
+      printf '%s\n' "$now" > "$last_active_file"
+      echo "metrics unavailable; treating service as active"
+      exit 0
+    fi
+
+    active_requests="$(
+      printf '%s\n' "$metrics" | ${pkgs.gawk}/bin/awk '
+        /^vllm:num_requests_running\{/ { total += $2 }
+        /^vllm:num_requests_waiting\{/ { total += $2 }
+        END { print total + 0 }
+      '
+    )"
+
+    activity_fingerprint="$(
+      printf '%s\n' "$metrics" | ${pkgs.gawk}/bin/awk '
+        /^vllm:prompt_tokens_total\{/ { total += $2 }
+        /^vllm:generation_tokens_total\{/ { total += $2 }
+        /^http_requests_total\{.*handler="\/v1\/chat\/completions"/ { total += $2 }
+        END { printf "%.0f\n", total }
+      '
+    )"
+
+    previous_fingerprint=""
+    if [ -f "$fingerprint_file" ]; then
+      previous_fingerprint="$(cat "$fingerprint_file")"
+    fi
+
+    if [ "$active_requests" != "0" ] || [ "$activity_fingerprint" != "$previous_fingerprint" ]; then
+      printf '%s\n' "$now" > "$last_active_file"
+      printf '%s\n' "$activity_fingerprint" > "$fingerprint_file"
+      echo "activity detected: active_requests=$active_requests fingerprint=$activity_fingerprint"
+      exit 0
+    fi
+
+    if [ ! -f "$last_active_file" ]; then
+      printf '%s\n' "$now" > "$last_active_file"
+      echo "initialized idle timer"
+      exit 0
+    fi
+
+    last_active="$(cat "$last_active_file")"
+    idle_for="$((now - last_active))"
+    if [ "$idle_for" -ge "$idle_timeout" ]; then
+      echo "idle for ''${idle_for}s >= ''${idle_timeout}s; stopping club-3090-vllm"
+      ${pkgs.systemd}/bin/systemctl stop club-3090-vllm.service
+    else
+      echo "idle for ''${idle_for}s < ''${idle_timeout}s; keeping club-3090-vllm running"
+    fi
+  '';
 in
 {
   networking.firewall.allowedTCPPorts = [ 8010 ];
@@ -126,6 +201,8 @@ in
     "d ${cacheDir}/torch_compile 0755 basnijholt users - -"
     "d ${cacheDir}/triton 0755 basnijholt users - -"
     "f ${stateDir}/env 0600 root root - -"
+    "f ${stateDir}/last-active 0644 root root - -"
+    "f ${stateDir}/last-fingerprint 0644 root root - -"
   ];
 
   systemd.services.club-3090-vllm = {
@@ -141,8 +218,30 @@ in
       ExecStart = startVllm;
       ExecStop = "${pkgs.docker}/bin/docker rm -f ${containerName}";
       Restart = "on-failure";
+      RestartPreventExitStatus = "137 143";
       RestartSec = 10;
+      SuccessExitStatus = "137 143";
       TimeoutStartSec = "2h";
+    };
+  };
+
+  systemd.services.club-3090-vllm-idle-check = {
+    description = "Stop club-3090 vLLM after idle timeout";
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      ExecStart = idleCheck;
+    };
+  };
+
+  systemd.timers.club-3090-vllm-idle-check = {
+    description = "Periodic club-3090 vLLM idle check";
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "5min";
+      OnUnitActiveSec = "1min";
+      AccuracySec = "15s";
+      Unit = "club-3090-vllm-idle-check.service";
     };
   };
 }
