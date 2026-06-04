@@ -90,10 +90,9 @@ let
     gcc
     gnumake
     meson
-    nodejs_20
+    nodejs_22
     pkg-config
     portaudio
-    (python3.withPackages (ps: [ ps.pipx ]))
   ];
 in
 {
