@@ -7,6 +7,7 @@ let
 in
 {
   imports = [
+    ../../common/disk-cleanup.nix
     ./networking.nix
   ];
 

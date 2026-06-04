@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 {
   imports = [
@@ -17,4 +17,11 @@
     ./system-packages.nix
     ./auto-build.nix
   ];
+
+  # Harmonia serves local /nix/store paths, so avoid automatic cleanup removing
+  # cache contents. ncps has its own LRU for /var/lib/ncps.
+  nix.gc.automatic = lib.mkForce false;
+  nix.settings.min-free = lib.mkForce 0;
+  nix.settings.max-free = lib.mkForce 0;
+  virtualisation.docker.autoPrune.enable = lib.mkForce false;
 }

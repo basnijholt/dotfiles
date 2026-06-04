@@ -10,6 +10,7 @@
     ./user.nix
     ./services.nix
     ./packages.nix
+    ./disk-cleanup.nix
     ./home-manager.nix
     ./comin.nix
   ];
