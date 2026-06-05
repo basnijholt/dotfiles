@@ -18,7 +18,9 @@
     docker # Docker CLI
     docker-buildx # Docker Buildx CLI plugin
     docker-compose # Docker Compose CLI plugin
+    kubernetes-helm # Helm 3 Kubernetes package manager
     nixpkgs-fmt
+    sops # Secrets editor
     cocoapods # required for Capacitor iOS builds (pod install)
   ];
 

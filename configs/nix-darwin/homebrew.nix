@@ -44,7 +44,6 @@
       "graphviz" # Graph visualization
       "grep" # GNU grep
       "hashicorp/tap/terraform" # Infrastructure as code
-      "helm@3" # Kubernetes package manager
       "htop" # Process viewer
       "hugo" # Static site generator
       "imagemagick" # Image manipulation
