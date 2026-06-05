@@ -207,6 +207,7 @@
       "gromgit/fuse" # For SSHFS
       "hashicorp/tap" # For Terraform
       "basnijholt/tap" # For agent-cli
+      "jackielii/tap" # For skhd-zig
     ];
   };
 }
