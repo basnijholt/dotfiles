@@ -21,26 +21,53 @@
           rev = "v0.23.4";
           hash = "sha256-tP5Tu747V8QMCEBYwOEmMQUm8OjojpJdlRmjcJTbe2k=";
         };
+        ollamaLlamaCppSrc = pkgs.fetchFromGitHub {
+          owner = "ggml-org";
+          repo = "llama.cpp";
+          tag = "b9509";
+          hash = "sha256-bO1ucb/+vidj/EYzNCssotjte9NlVLdjC794jToNNeM=";
+        };
       in
       {
       ollama = (pkgs.ollama.override {
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.24.0";
+        version = "0.30.5";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-cSZtbF0oUI7a++baTipF6OUu+w8tBpILzE0Wm1Y6wUk=";
+          hash = "sha256-jh/B/FkmAliCVzqc8DGCPYa5+XejE3cFZTzSuRxjPvw=";
         };
-        vendorHash = "sha256-Lc1Ktdqtv2VhJQssk8K1UOimeEjVNvDWePE9WkamCos=";
+        vendorHash = "sha256-lZdGzGb9xRjTm1Rm7/wHjqM490gLznLEndmb4mNbCX0=";
+        nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [ pkgs.patchelf ];
+        excludedPackages = (oldAttrs.excludedPackages or []) ++ [ "./integration" ];
         postPatch = (oldAttrs.postPatch or "") + ''
+          substituteInPlace cmd/launch/cline_test.go \
+            --replace-fail '/bin/cat' '${pkgs.coreutils}/bin/cat' \
+            --replace-fail '/bin/chmod' '${pkgs.coreutils}/bin/chmod'
           substituteInPlace cmd/launch/pi_test.go \
             --replace-fail '/bin/cat' '${pkgs.coreutils}/bin/cat' \
             --replace-fail '/bin/chmod' '${pkgs.coreutils}/bin/chmod'
+          substituteInPlace cmd/launch/qwen_test.go \
+            --replace-fail '/bin/mkdir' '${pkgs.coreutils}/bin/mkdir' \
+            --replace-fail '/bin/cat' '${pkgs.coreutils}/bin/cat' \
+            --replace-fail '/bin/chmod' '${pkgs.coreutils}/bin/chmod'
         '';
-        preBuild = oldAttrs.preBuild + ''
+        preBuild =
+          ''
+            cp -r ${ollamaLlamaCppSrc} llama-cpp-source
+            chmod -R u+w llama-cpp-source
+            cmake -E chdir llama-cpp-source \
+              cmake -DPATCH_DIR=$PWD/llama/compat -P $PWD/llama/compat/apply-patch.cmake
+          ''
+          +
+          pkgs.lib.replaceStrings
+            [ "cmake -B build \\" ]
+            [ "cmake -B build \\\n  -DFETCHCONTENT_SOURCE_DIR_LLAMA_CPP=$PWD/llama-cpp-source \\" ]
+            oldAttrs.preBuild
+          + ''
           # Fix tree-sitter vendor: copy C sources that go mod vendor excludes
           if [ -d vendor/github.com/tree-sitter ]; then
             chmod -R u+w vendor/github.com/tree-sitter
@@ -49,6 +76,27 @@
             cp -r ${treeSitterGoSrc}/src vendor/github.com/tree-sitter/go-tree-sitter/
             cp -r ${treeSitterCppSrc}/src vendor/github.com/tree-sitter/tree-sitter-cpp/
           fi
+        '';
+        postInstall = (oldAttrs.postInstall or "") + ''
+          for lib in "$out"/lib/ollama/libggml-cpu-*.so; do
+            [ -e "$lib" ] || continue
+
+            rpath="$(patchelf --print-rpath "$lib")"
+            newRpath=""
+            IFS=':' read -r -a entries <<< "$rpath"
+            for entry in "''${entries[@]}"; do
+              case "$entry" in
+                /build/*) continue ;;
+              esac
+
+              if [ -z "$newRpath" ]; then
+                newRpath="$entry"
+              else
+                newRpath="$newRpath:$entry"
+              fi
+            done
+            patchelf --set-rpath "$newRpath" "$lib"
+          done
         '';
         postFixup = pkgs.lib.replaceStrings [
           ''mv "$out/bin/app" "$out/bin/.ollama-app"''
@@ -73,12 +121,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "9436";
+            version = "9518";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-5lFnT/DA/ohRXsAT78riCA8DPxPxCcDSQFAgxpYIWIA=";
+              hash = "sha256-1wospQaTRltKTwjFhgf0fAVOtEdF9Qneeacw2Ci44vI=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -86,7 +134,7 @@
               '';
             };
             npmRoot = "tools/ui";
-            npmDepsHash = "sha256-Iyg8FpcTKf2UYHuK7mA3cTAqVaLcQPcS0YCa5Qf01Gc=";
+            npmDepsHash = "sha256-pjdbI6NcZRlJVd62xhgbLhWrwFYwgsIwjORqvo1+VD8=";
             # Enable native CPU optimizations for massively better CPU performance
             # This enables AVX, AVX2, AVX-512, FMA, etc. for your specific CPU
             # NOTE: This is intentionally opposite of nixpkgs (which uses -DGGML_NATIVE=off
@@ -111,8 +159,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v219/llama-swap_219_linux_amd64.tar.gz";
-            hash = "sha256-6Ot54bA+ptuRLU3Mk3AxMUPmuaSzhQyRJ96PdLGC1E4=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v223/llama-swap_223_linux_amd64.tar.gz";
+            hash = "sha256-VkE35XdsH8YIl+So3g9zHtBvPqKO7AKhsxvbDyQITi4=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
