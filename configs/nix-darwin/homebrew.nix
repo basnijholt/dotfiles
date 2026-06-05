@@ -6,6 +6,7 @@
     onActivation = {
       autoUpdate = true;
       cleanup = "zap";
+      extraFlags = [ "--force-cleanup" ];
       upgrade = true;
     };
 
@@ -108,6 +109,7 @@
     casks = [
       "1password-cli" # 1Password CLI
       "adobe-creative-cloud" # Adobe suite
+      "agent-cli" # AI agent CLI
       "airflow" # Video transcoder
       "balenaetcher" # USB image writer
       "block-goose" # open source AI agent
@@ -204,6 +206,7 @@
     taps = [
       "gromgit/fuse" # For SSHFS
       "hashicorp/tap" # For Terraform
+      "basnijholt/tap" # For agent-cli
     ];
   };
 }
