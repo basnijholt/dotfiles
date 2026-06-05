@@ -24,7 +24,6 @@
     ./gaming.nix
     ./debugging.nix
     ./ai.nix
-    ./club-3090-vllm.nix
     ./agent-cli.nix
     ./backup.nix
     ./truenas-config-backup.nix

@@ -40,6 +40,11 @@
   systemd.tmpfiles.rules = [
     "d /.snapshots 0755 root root -"
     "d /home/.snapshots 0755 basnijholt users -"
+    "d /var/lib/club-3090-vllm 0755 root root -"
+    "d /var/lib/club-3090-vllm/models 0755 root root -"
+    "d /var/lib/club-3090-vllm/cache 0755 root root -"
+    "d /var/lib/club-3090-vllm/cache/torch_compile 0755 root root -"
+    "d /var/lib/club-3090-vllm/cache/triton 0755 root root -"
   ];
 
   # --- Swap ---
