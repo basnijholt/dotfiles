@@ -93,6 +93,7 @@ let
     nodejs_22
     pkg-config
     portaudio
+    python3
   ];
 in
 {
