@@ -47,7 +47,10 @@
   systemd.network.networks."40-br0" = {
     matchConfig.Name = "br0";
     networkConfig.DHCP = "yes";
-    linkConfig.RequiredForOnline = "no";
+    # NFS mounts use systemd-networkd-wait-online@br0.service so TrueNAS sees
+    # this host as 192.168.1.5, not the Wi-Fi address.
+    linkConfig.RequiredForOnline = "routable";
+    linkConfig.RequiredFamilyForOnline = "ipv4";
     dhcpV4Config.RouteMetric = 100;
     ipv6AcceptRAConfig.RouteMetric = 100;
     routes = [

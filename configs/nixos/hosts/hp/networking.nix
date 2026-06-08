@@ -51,6 +51,10 @@
   systemd.network.networks."40-br0" = {
     matchConfig.Name = "br0";
     networkConfig.DHCP = "yes";
+    # NFS mounts use systemd-networkd-wait-online@br0.service before
+    # contacting TrueNAS.
+    linkConfig.RequiredForOnline = "routable";
+    linkConfig.RequiredFamilyForOnline = "ipv4";
   };
 
   # --- Firewall ---
