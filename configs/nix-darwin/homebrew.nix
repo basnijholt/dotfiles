@@ -109,7 +109,7 @@
     casks = [
       "1password-cli" # 1Password CLI
       "adobe-creative-cloud" # Adobe suite
-      "agent-cli" # AI agent CLI
+      "basnijholt/tap/agent-cli" # AI agent CLI
       "airflow" # Video transcoder
       "balenaetcher" # USB image writer
       "block-goose" # open source AI agent
@@ -161,7 +161,7 @@
       "rectangle" # Window manager
       "rotki" # Portfolio tracker
       "sabnzbd" # Usenet client
-      "skhd-zig" # Hotkey daemon
+      "jackielii/tap/skhd-zig" # Hotkey daemon
       "scroll-reverser" # Scroll direction control
       "selfcontrol" # Website blocker
       "signal" # Secure messenger
