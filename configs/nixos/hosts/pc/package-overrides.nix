@@ -33,12 +33,12 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.30.5";
+        version = "0.30.6";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-jh/B/FkmAliCVzqc8DGCPYa5+XejE3cFZTzSuRxjPvw=";
+          hash = "sha256-qO+Tsjg64QekGHNNiNy5YGSDoToGSnqiN5hN+0LCp4Q=";
         };
         vendorHash = "sha256-lZdGzGb9xRjTm1Rm7/wHjqM490gLznLEndmb4mNbCX0=";
         nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [ pkgs.patchelf ];
@@ -121,12 +121,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "9518";
+            version = "9566";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-1wospQaTRltKTwjFhgf0fAVOtEdF9Qneeacw2Ci44vI=";
+              hash = "sha256-31l+rGTrgNA2kciTxlyyQVjGMADfBRgAk2pd0jU9FMM=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
