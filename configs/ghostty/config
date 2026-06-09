@@ -16,3 +16,11 @@ macos-option-as-alt = true
 # the cmux workspace-cycling shortcuts (cmd+up/down) in terminal panes.
 keybind = cmd+up=unbind
 keybind = cmd+down=unbind
+
+# TODO: once https://github.com/manaflow-ai/cmux/pull/2639 is merged and
+# released, uncomment these for iTerm-style cycling through ALL panes
+# (and remove the focusLeft/focusRight overrides in configs/cmux/cmux.json).
+# Until then cmux maps goto_split:next/previous to plain left/right and
+# skips vertically stacked panes (manaflow-ai/cmux#2350, #2482).
+# keybind = cmd+]=goto_split:next
+# keybind = cmd+[=goto_split:previous
