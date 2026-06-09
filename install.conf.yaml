@@ -15,6 +15,7 @@
     ~/.config/amp/settings.json: configs/amp/settings.json
     ~/.config/atuin: configs/atuin
     ~/.config/bat/config: configs/bat/config
+    ~/.config/cmux/cmux.json: configs/cmux/cmux.json
     ~/.config/codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.config/codex/config.toml: configs/codex/config.toml
     ~/.codex/hooks: configs/codex/hooks
@@ -22,6 +23,7 @@
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
     ~/.config/git/attributes: configs/git/attributes
+    ~/.config/ghostty/config: configs/ghostty/config
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin
     ~/.config/nvim: configs/nvim

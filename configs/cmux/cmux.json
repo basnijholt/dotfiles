@@ -7,6 +7,12 @@
   // Remove a setting to fall back to the value saved in Settings.
   // cmux creates this template on launch when ~/.config/cmux/cmux.json is missing.
   // Legacy settings.json files are read only as fallback for keys not present here.
+  // NOTE: terminal font/colors/scrollback live in ~/.config/ghostty/config (also in dotfiles).
+
+  // Like iTerm's Semantic History: open unsupported files in VS Code.
+  "app" : {
+    "preferredEditor" : "/opt/homebrew/bin/code"
+  },
 
   //   "app" : {
   //     "openMarkdownInCmuxViewer" : true,

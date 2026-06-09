@@ -1,0 +1,13 @@
+# Ghostty config — read by cmux for terminal rendering (font, colors, scrollback).
+# https://cmux.com/docs/configuration ("Terminal rendering still lives in Ghostty config")
+# Mirrors the iTerm2 profile in configs/iterm/Profiles.json.
+
+# iTerm: Normal Font = FiraMonoNFM-Regular 12
+font-family = FiraMono Nerd Font Mono
+font-size = 12
+
+# iTerm: Unlimited Scrollback (Ghostty has no unlimited option; this is bytes)
+scrollback-limit = 100000000
+
+# iTerm: Option Key Sends Esc+ (left and right), Treat Option as Alt
+macos-option-as-alt = true
