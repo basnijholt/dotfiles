@@ -14,55 +14,7 @@
                     "basic.to_if_held_down_threshold_milliseconds": 500,
                     "mouse_motion_to_scroll.speed": 100
                 },
-                "rules": [
-                    {
-                        "description": "cmux: cmd+[ / cmd+] cycle through panes (workaround for manaflow-ai/cmux#2350, remove once PR #2639 ships)",
-                        "manipulators": [
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "close_bracket",
-                                    "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "shell_command": "/Users/bas.nijholt/dotfiles/configs/cmux/cmux-cycle-pane.sh next"
-                                    }
-                                ],
-                                "conditions": [
-                                    {
-                                        "type": "frontmost_application_if",
-                                        "bundle_identifiers": ["^com\\.cmuxterm\\.app$"]
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "basic",
-                                "from": {
-                                    "key_code": "open_bracket",
-                                    "modifiers": {
-                                        "mandatory": ["command"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [
-                                    {
-                                        "shell_command": "/Users/bas.nijholt/dotfiles/configs/cmux/cmux-cycle-pane.sh prev"
-                                    }
-                                ],
-                                "conditions": [
-                                    {
-                                        "type": "frontmost_application_if",
-                                        "bundle_identifiers": ["^com\\.cmuxterm\\.app$"]
-                                    }
-                                ]
-                            }
-                        ]
-                    }
-                ]
+                "rules": []
             },
             "devices": [
                 {
