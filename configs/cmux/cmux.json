@@ -14,6 +14,17 @@
     "preferredEditor" : "/opt/homebrew/bin/code"
   },
 
+  "shortcuts" : {
+    "bindings" : {
+      // Cycle tabs (surfaces) within a workspace.
+      "prevSurface" : "cmd+←",
+      "nextSurface" : "cmd+→",
+      // Cycle workspaces in the sidebar (defaults were cmd+ctrl+[ / ]).
+      "prevSidebarTab" : "cmd+↑",
+      "nextSidebarTab" : "cmd+↓"
+    }
+  },
+
   //   "app" : {
   //     "openMarkdownInCmuxViewer" : true,
   //     "hideTabCloseButton" : false,
