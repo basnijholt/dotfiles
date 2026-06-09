@@ -34,6 +34,17 @@
     }
   },
 
+  // Open links in the system default browser instead of the built-in one.
+  "browser" : {
+    "openTerminalLinksInCmuxBrowser" : false,
+    "interceptTerminalOpenCommandInCmuxBrowser" : false
+  },
+
+  "sidebar" : {
+    "openPortLinksInCmuxBrowser" : false,
+    "openPullRequestLinksInCmuxBrowser" : false
+  },
+
   //   "app" : {
   //     "openMarkdownInCmuxViewer" : true,
   //     "hideTabCloseButton" : false,
