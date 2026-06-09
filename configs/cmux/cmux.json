@@ -21,7 +21,16 @@
       "nextSurface" : "cmd+→",
       // Cycle workspaces in the sidebar (defaults were cmd+ctrl+[ / ]).
       "prevSidebarTab" : "cmd+↑",
-      "nextSidebarTab" : "cmd+↓"
+      "nextSidebarTab" : "cmd+↓",
+      // Move between split panes (defaults were cmd+opt+← / →).
+      "focusLeft" : "cmd+[",
+      "focusRight" : "cmd+]",
+      // Free up cmd+[ / ] from their defaults: focus history unbound,
+      // browser back/forward moved to cmd+opt+[ / ].
+      "focusHistoryBack" : "",
+      "focusHistoryForward" : "",
+      "browserBack" : "cmd+opt+[",
+      "browserForward" : "cmd+opt+]"
     }
   },
 
