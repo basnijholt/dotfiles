@@ -11,3 +11,8 @@ scrollback-limit = 100000000
 
 # iTerm: Option Key Sends Esc+ (left and right), Treat Option as Alt
 macos-option-as-alt = true
+
+# Ghostty binds cmd+up/down to jump_to_prompt by default, which swallows
+# the cmux workspace-cycling shortcuts (cmd+up/down) in terminal panes.
+keybind = cmd+up=unbind
+keybind = cmd+down=unbind
