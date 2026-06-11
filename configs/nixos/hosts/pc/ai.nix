@@ -31,6 +31,86 @@
 
     models:  # Ordered from newest to oldest
 
+      # QAT GGUF. Source: https://huggingface.co/unsloth/gemma-4-31B-it-qat-GGUF
+      # Unsloth recommends UD-Q4_K_XL with temp=1.0, top_p=0.95, top_k=64.
+      # Gemma 4 31B supports a 262144-token context window.
+      "gemma-4:31b-q4":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/gemma-4-31B-it-qat-GGUF
+          --hf-file gemma-4-31B-it-qat-UD-Q4_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/gemma-4-31B-it-qat-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 262144
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q8_0
+          --cache-type-v q8_0
+          --split-mode layer
+          --temp 1.0
+          --top-p 0.95
+          --top-k 64
+          --threads 1
+          --chat-template-kwargs '{"enable_thinking": true}'
+          --jinja
+
+      # Same Gemma 4 31B QAT model, but disables <|think|> injection.
+      "gemma-4:31b-q4-nothink":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/gemma-4-31B-it-qat-GGUF
+          --hf-file gemma-4-31B-it-qat-UD-Q4_K_XL.gguf
+          --mmproj-url https://huggingface.co/unsloth/gemma-4-31B-it-qat-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 262144
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q8_0
+          --cache-type-v q8_0
+          --split-mode layer
+          --temp 1.0
+          --top-p 0.95
+          --top-k 64
+          --threads 1
+          --chat-template-kwargs '{"enable_thinking": false}'
+          --jinja
+
+      # QAT Heretic i1 GGUF. Source: https://huggingface.co/mradermacher/gemma-4-31B-it-qat-q4_0-unquantized-heretic-i1-GGUF
+      "gemma-4:31b-q4-uncensored":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo mradermacher/gemma-4-31B-it-qat-q4_0-unquantized-heretic-i1-GGUF
+          --hf-file gemma-4-31B-it-qat-q4_0-unquantized-heretic.i1-Q4_K_M.gguf
+          --no-mmproj
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 262144
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q8_0
+          --cache-type-v q8_0
+          --split-mode layer
+          --temp 1.0
+          --top-p 0.95
+          --top-k 64
+          --threads 1
+          --chat-template-kwargs '{"enable_thinking":false}'
+          --jinja
+
       # Uploaded 2026-05-29, size 6.9 GB, max ctx: 131072, layers: 48
       # Source: https://huggingface.co/unsloth/gemma-4-12b-it-GGUF/blob/main/gemma-4-12b-it-UD-Q4_K_XL.gguf
       "gemma-4:12b-q4":
@@ -43,35 +123,6 @@
           --batch-size 2048
           --ubatch-size 512
           --threads 1
-          --jinja
-
-      # Uploaded 2026-04-02, size 18.8 GB, max ctx: 262144, layers: 60
-      # Source: https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/blob/main/gemma-4-31B-it-UD-Q4_K_XL.gguf
-      "gemma-4:31b-q4":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --model-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/gemma-4-31B-it-UD-Q4_K_XL.gguf
-          --mmproj-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/mmproj-F16.gguf
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 2048
-          --ubatch-size 512
-          --threads 1
-          --jinja
-
-      # Uploaded 2026-04-02, size 18.8 GB, max ctx: 262144, layers: 60
-      # Same Gemma 4 weights, but disables <|think|> injection in the chat template
-      "gemma-4:31b-q4-nothink":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          --model-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/gemma-4-31B-it-UD-Q4_K_XL.gguf
-          --mmproj-url https://huggingface.co/unsloth/gemma-4-31B-it-GGUF/resolve/main/mmproj-F16.gguf
-          --port ''${PORT}
-          --ctx-size 65536
-          --batch-size 2048
-          --ubatch-size 512
-          --threads 1
-          --chat-template-kwargs '{"enable_thinking": false}'
           --jinja
 
       # Uploaded 2026-05-11, size 16.7 GB, max ctx: 262144, layers: 65
