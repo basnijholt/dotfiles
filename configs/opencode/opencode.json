@@ -32,6 +32,66 @@
         "baseURL": "http://llama.local/v1"
       },
       "models": {
+        "gemma-4:31b-q4": {
+          "name": "Gemma 4 31B Q4 (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "gemma-4:31b-q4-nothink": {
+          "name": "Gemma 4 31B Q4 No Think (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "gemma-4:31b-q4-uncensored": {
+          "name": "Gemma 4 31B Q4 Uncensored (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "gemma-4:12b-q4": {
+          "name": "Gemma 4 12B Q4 (local)",
+          "limit": { "context": 65536, "output": 32768 }
+        },
+        "qwen3.6:27b-q4": {
+          "name": "Qwen3.6 27B Q4 (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:27b-q5": {
+          "name": "Qwen3.6 27B Q5 (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:27b-q4-mtp": {
+          "name": "Qwen3.6 27B Q4 MTP (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:27b-q5-mtp": {
+          "name": "Qwen3.6 27B Q5 MTP (local)",
+          "limit": { "context": 200000, "output": 32768 }
+        },
+        "qwen3.6:27b-q5-uncensored": {
+          "name": "Qwen3.6 27B Q5 Uncensored (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:35b-a3b-q4": {
+          "name": "Qwen3.6 35B A3B Q4 (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:35b-a3b-q5": {
+          "name": "Qwen3.6 35B A3B Q5 (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:35b-a3b-q4-mtp": {
+          "name": "Qwen3.6 35B A3B Q4 MTP (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:35b-a3b-q5-mtp": {
+          "name": "Qwen3.6 35B A3B Q5 MTP (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "qwen3.6:35b-a3b-q4-uncensored": {
+          "name": "Qwen3.6 35B A3B Q4 Uncensored (local)",
+          "limit": { "context": 262144, "output": 32768 }
+        },
+        "glm-4.5-air:ud-q4_k_xl": {
+          "name": "GLM-4.5 Air UD-Q4_K_XL (local)",
+          "limit": { "context": 131072, "output": 32768 }
+        },
         "glm-4.7-flash:q4": {
           "name": "GLM-4.7 Flash Q4 (local)",
           "limit": { "context": 200000, "output": 32768 }
@@ -47,6 +107,22 @@
         "devstral-2:123b": {
           "name": "Devstral-2 123B Q3 (local)",
           "limit": { "context": 65536, "output": 32768 }
+        },
+        "devstral:24b": {
+          "name": "Devstral Small 24B Q4 (local)",
+          "limit": { "context": 65536, "output": 32768 }
+        },
+        "dolphin-mistral:24b": {
+          "name": "Dolphin Mistral 24B Q4 (local)",
+          "limit": { "context": 65536, "output": 32768 }
+        },
+        "nemotron-3-nano:30b-q4": {
+          "name": "Nemotron 3 Nano 30B Q4 (local)",
+          "limit": { "context": 65536, "output": 32768 }
+        },
+        "smollm2:135m": {
+          "name": "SmolLM2 135M Q8 (local)",
+          "limit": { "context": 8192, "output": 8192 }
         },
         "gpt-oss-low:20b": {
           "name": "GPT-OSS 20B Low (local)",
