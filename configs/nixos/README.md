@@ -18,6 +18,7 @@ configs/nixos/
 | `pc` | Physical | Desktop/workstation (NVIDIA, Hyprland, AI services) |
 | `nuc` | Physical | Media box (Kodi, Btrfs, desktop + power management) |
 | `hp` | Physical | Headless server (ZFS, virtualization + power management) |
+| `nas` | Physical | NixOS replacement scaffold for NAS services |
 | `hp-incus` | Incus VM | HP config for Incus VM testing |
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |

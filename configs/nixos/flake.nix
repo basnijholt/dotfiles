@@ -106,6 +106,15 @@
           ./hosts/hp/hardware-configuration.nix
         ];
 
+        # Disko manages only the NAS boot disk. Existing data pools are imported
+        # by name in the host config and must not be described with disko.
+        nas = mkHost [
+          disko.nixosModules.disko
+          ./hosts/nas/disko.nix
+          ./hosts/nas/default.nix
+          ./hosts/nas/hardware-configuration.nix
+        ];
+
         # Incus VM version of HP - same services/packages, VM-appropriate hardware
         hp-incus = mkHost [
           disko.nixosModules.disko
@@ -282,6 +291,7 @@
         pc = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
+        nas = (import ./hosts/nas/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
         hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
         hetzner-matrix = (import ./hosts/hetzner-matrix/disko.nix) { inherit lib; };
