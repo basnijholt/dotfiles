@@ -5,7 +5,13 @@
     "apps": [
         {
             "name": "Desktop",
-            "image-path": "desktop.png"
+            "image-path": "desktop.png",
+            "prep-cmd": [
+                {
+                    "do": "nix run nixpkgs#gnome-monitor-config -- set -L -M DP-1 -m 3840x2160@60.000 -s 1 -p",
+                    "undo": "nix run nixpkgs#gnome-monitor-config -- set -L -M DP-1 -m 5120x2160@120.000 -s 1 -p"
+                }
+            ]
         },
         {
             "name": "Low Res Desktop",
