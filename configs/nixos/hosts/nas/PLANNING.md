@@ -84,6 +84,8 @@ configuration that has been booted on the real NAS.
   Syncoid pushes while keeping keys outside the public repo.
 - [x] SMARTD and ZED invoke a shared `nas-health-alert` hook that logs, walls,
   and can send ntfy when `/etc/nas-health-alert.env` exists.
+- [x] `CUTOVER.md` documents the local `~/nas-cutover/` secret staging
+  directory policy without reading or committing its contents.
 
 ## Live TrueNAS Facts Observed Read-Only
 
@@ -194,6 +196,9 @@ behavior still needs validation.
   (recoverable with the passphrase; no machine-only raw keys to lose).
 - [ ] Before shutdown, export and store every dataset passphrase; TrueNAS's
   auto-unlock copy lives on the boot pool and is destroyed by disko.
+- [ ] Keep any prepared cutover secrets in `~/nas-cutover/` or another
+  non-repo staging location, and copy only the specific file needed for each
+  cutover step into its final destination.
 - [ ] Harden `zfs-unlock-encrypted-datasets` to continue past keys it cannot load
   (for example a legacy dataset whose `keylocation=file:///tmp/zfs_pass` is
   absent on NixOS) instead of aborting the whole batch under `set -e`.

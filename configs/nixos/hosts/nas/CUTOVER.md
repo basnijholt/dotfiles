@@ -137,6 +137,23 @@ incus profile list
 
 Confirm that current backups are acceptable before proceeding.
 
+## Secret staging directory
+
+If using a local `~/nas-cutover/` directory prepared before migration, treat it
+as the cutover-only staging area for secret material. Do not commit it, copy it
+into this repo, paste its contents into logs, or read it from an agent session
+unless explicitly needed for the cutover step being performed.
+
+Expected secret material may include exported ZFS dataset passphrases, inbound
+replication authorized keys, outbound replication private keys, alerting
+configuration such as `nas-health-alert.env`, and any one-time authentication
+notes needed after first boot.
+
+During cutover, copy only the specific file needed for the current step into its
+documented destination, set the documented ownership and mode, verify the
+service, then leave the staging directory off-system or remove it once no
+longer needed.
+
 ### Export encryption passphrases (do this before shutdown)
 
 The encrypted datasets all use ZFS **passphrase** keys, which TrueNAS auto-loads
