@@ -43,6 +43,7 @@
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
 
       commonModules = homeManager: [
         ./configuration.nix
@@ -296,6 +297,12 @@
         hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
         hetzner-matrix = (import ./hosts/hetzner-matrix/disko.nix) { inherit lib; };
         paul-wyse = (import ./hosts/paul-wyse/disko.nix) { inherit lib; };
+      };
+
+      checks.${system}.nas-disko-safety = import ./hosts/nas/disko-safety-test.nix {
+        inherit pkgs;
+        nasDiskoDevice = self.diskoConfigurations.nas.disko.devices.disk.main.device;
+        nasDiskoScript = self.nixosConfigurations.nas.config.system.build.diskoScript;
       };
 
     };

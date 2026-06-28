@@ -25,7 +25,7 @@ NUT, Netdata, Prometheus exporters, Docker, and Incus.
 - Draft PR: https://github.com/basnijholt/dotfiles/pull/61
 - Base branch: `main`
 - Host name in Nix: `nas`
-- Last updated from local workspace: `2026-06-26 23:37 PDT`
+- Last updated from local workspace: `2026-06-28 13:43 PDT`
 
 The scaffold currently builds locally. It is still a migration scaffold, not a
 configuration that has been booted on the real NAS.
@@ -71,6 +71,8 @@ configuration that has been booted on the real NAS.
   in this public planning doc.
 - [x] `/` and `/boot` are supplied by disko-managed `zroot` and `EFI-NAS`.
 - [x] Data pools evaluate as ZFS `extraPools`; they are not in disko.
+- [x] VM disko safety rehearsal passes:
+  `nix build .#checks.x86_64-linux.nas-disko-safety`.
 - [x] ZFS force-import and boot-time encryption credential prompts are disabled.
 - [x] Generated Samba config loads with `testparm -s`.
 - [x] Generated Syncoid service scripts pass `bash -n`.
@@ -108,6 +110,11 @@ configuration that has been booted on the real NAS.
 - [x] Document that running disko destroys the TrueNAS boot pool.
 - [x] Document remote-only disko preflight using stable by-id evaluation,
   `lsblk`, `zpool import`, ZFS label inspection, and `wipefs --no-act`.
+- [x] Add an installer size guard (abort if the disko target is >= 1 TB) and an
+  off-box check that builds `diskoScript` and lists every device it references.
+- [x] Add a disposable VM rehearsal that creates fake boot and data ZFS pools,
+  runs the generated `nas` disko script against the fake boot target, and
+  confirms fake `tank`/`ssd` sentinels still import afterward.
 - [ ] Before cutover, confirm device identity from the NixOS installer by
   comparing the `disko.nix` target with `/dev/disk/by-id/`.
 - [ ] Before cutover, run the remote-only disko preflight and confirm no
@@ -150,6 +157,8 @@ behavior still needs validation.
 - [ ] Refresh SSH host keys and verify `truenas.local` or replacement DNS from
   each pushing host.
 - [ ] Install replication SSH keys outside public Nix config.
+- [ ] Authorize each replication public key on its remote end before first run
+  (NUC for the push target, Hetzner for the pull source).
 - [ ] Verify remote SSH access with `BatchMode=yes` before starting timers.
 - [ ] Run each replication service manually once and inspect source and target
   snapshots.
@@ -170,6 +179,27 @@ behavior still needs validation.
 - [ ] Import Incus instances after first NixOS boot.
 - [ ] Run `nas-apply-incus-config` after import.
 - [ ] Start instances one at a time and validate service behavior.
+- [ ] Decide and set `limits.memory` for the `nixos` and `docker` Incus
+  instances. The original outage was an OOM death spiral from unbounded
+  container memory; host-level zram and earlyoom reduce blast radius but do not
+  bound the workload. `nix-cache` already has a memory limit; these two do not.
+  Observed read-only: `nixos` uses ~22 GiB at idle-ish load, `docker` and
+  `nix-cache` ~0.4 GiB each, host has 62 GiB.
+
+### Task 5: Encryption keys
+
+**Status:** All encrypted datasets are passphrase-keyed; verified read-only.
+
+- [x] Confirm key format: every encrypted root uses `keyformat=passphrase`
+  (recoverable with the passphrase; no machine-only raw keys to lose).
+- [ ] Before shutdown, export and store every dataset passphrase; TrueNAS's
+  auto-unlock copy lives on the boot pool and is destroyed by disko.
+- [ ] Harden `zfs-unlock-encrypted-datasets` to continue past keys it cannot load
+  (for example a legacy dataset whose `keylocation=file:///tmp/zfs_pass` is
+  absent on NixOS) instead of aborting the whole batch under `set -e`.
+- [ ] Decide an auto-unlock strategy: NixOS will not auto-unlock these on boot as
+  TrueNAS did, so encrypted shares stay down after every reboot until unlocked
+  manually.
 
 ## Monitoring And Visualization
 
@@ -194,6 +224,10 @@ Open monitoring work:
 - [ ] Validate that all expected disks appear in `smartctl --scan-open` on
   NixOS.
 - [ ] Validate UPS status with `upsc` and the NUT exporter after first boot.
+- [ ] Confirm the UPS name the NUT server exposes matches the name configured in
+  `health.nix`. The previous TrueNAS client and the NUT server config referred
+  to the UPS by different names, so the monitor can silently fail to attach if
+  the configured name is wrong.
 - [ ] Disable or remove the PC TrueNAS config-backup job at cutover; it depends
   on the TrueNAS API.
 
@@ -208,6 +242,15 @@ nix eval --json '.#nixosConfigurations.nas.config.boot.zfs.extraPools'
 nix eval --json '.#nixosConfigurations.nas.config.boot.zfs.forceImportRoot'
 nix eval --json '.#nixosConfigurations.nas.config.boot.zfs.requestEncryptionCredentials'
 nix eval --json '.#nixosConfigurations.nas.config.services.sanoid.templates.nas-default'
+
+# Run a disposable VM with fake boot/data pools and execute the generated nas
+# disko script against the fake boot target.
+nix build .#checks.x86_64-linux.nas-disko-safety
+
+# Prove disko can only touch the boot disk (off-box, before booting installer):
+# build the destroy/format/mount script and list every device it references.
+# The only real device path must be the boot disk by-id; no tank/ssd member.
+nix build --no-link --print-out-paths '.#nixosConfigurations.nas.config.system.build.diskoScript'
 ```
 
 For generated scripts, build first, then inspect/evaluate the store paths before
@@ -241,6 +284,8 @@ TrueNAS.
 - [ ] Read `CUTOVER.md` fully in the same context window doing the work.
 - [ ] Confirm the PR branch is up to date with the intended commit.
 - [ ] Confirm backups are acceptable.
+- [ ] Export and securely store all ZFS dataset passphrases from TrueNAS before
+  shutdown; without them the encrypted datasets are unrecoverable.
 - [ ] Perform final read-only TrueNAS health checks.
 - [ ] Shut down TrueNAS cleanly.
 - [ ] Boot NixOS installer.

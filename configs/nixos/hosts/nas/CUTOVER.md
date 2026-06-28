@@ -24,6 +24,36 @@ disk. The data pools are not described by disko and are imported by pool name.
 Before running disko, compare the target in `disko.nix` with the installer
 environment and confirm it is the boot-pool disk, not a data-pool member.
 
+You can also prove this off-box, before booting the installer, by building the
+exact script disko will run and listing every device it references:
+
+```bash
+script=$(nix build --no-link --print-out-paths \
+  '.#nixosConfigurations.nas.config.system.build.diskoScript')
+grep -oE '/dev/[^ "]*' "$script" | sort -u
+```
+
+The only real device path printed must be the boot disk by-id. No `tank`/`ssd`
+member device may appear.
+
+## Local disko rehearsal
+
+Before cutover, run the VM rehearsal from `configs/nixos`:
+
+```bash
+nix build .#checks.x86_64-linux.nas-disko-safety
+```
+
+This boots a disposable NixOS VM with four throwaway disks, creates fake
+`boot-pool`, `tank`, and `ssd` pools, runs the generated `nas` disko script
+against the fake boot disk, then re-imports the fake data pools and checks
+sentinel files. It does not connect to the live NAS.
+
+This proves the generated disko script only formats the configured boot target
+in that simulated disk topology. It does not replace the installer preflight:
+the real cutover still depends on the by-id target resolving to the current
+boot-pool disk on the actual machine.
+
 ## Remote-only disko preflight
 
 Run this from the NixOS installer before the destructive disko command. Stop on
@@ -67,6 +97,15 @@ if grep -Eq "name: '(tank|ssd)'" "$target_label_dump"; then
   exit 1
 fi
 
+# Size guard: the boot disk is ~500 GB; every data-pool member is >= 3.6 TB.
+# Abort if the target is 1 TB or larger, which would mean it is a data disk.
+target_bytes="$(lsblk -bdno SIZE "$target_real")"
+echo "DISKO TARGET SIZE: $target_bytes bytes"
+if [ "$target_bytes" -ge 1000000000000 ]; then
+  echo "STOP: disko target is >= 1 TB; the boot disk should be ~500 GB"
+  exit 1
+fi
+
 echo
 echo "Non-destructive signature check for disko target only:"
 lsblk -nrpo NAME "$target_real" | xargs -r wipefs --no-act
@@ -98,6 +137,16 @@ incus profile list
 
 Confirm that current backups are acceptable before proceeding.
 
+### Export encryption passphrases (do this before shutdown)
+
+The encrypted datasets all use ZFS **passphrase** keys, which TrueNAS auto-loads
+from its own database. That database lives on the boot pool and is destroyed by
+disko. Before shutting down, export and securely record every dataset passphrase
+(TrueNAS UI: Datasets -> root dataset -> *Export All Keys*, saved to a password
+manager). Without them, encrypted datasets cannot be unlocked on NixOS and
+their data is unrecoverable. Confirm whether one shared passphrase or a
+different one per dataset.
+
 ## Install NixOS
 
 Boot a NixOS installer and run from `configs/nixos`:
@@ -124,11 +173,23 @@ zfs list
 systemctl status zfs-import-tank.service zfs-import-ssd.service
 ```
 
-Unlock encrypted datasets interactively:
+Unlock encrypted datasets interactively. Encrypted datasets and any shares backed
+by them stay unavailable until unlocked. You are prompted per passphrase:
 
 ```bash
 zfs-unlock-encrypted-datasets
 ```
+
+Caveats:
+
+- One legacy encrypted dataset uses `keylocation=file:///tmp/zfs_pass`, which
+  does not exist on NixOS. The batch helper will fail on that key; harden the
+  helper to continue past keys it cannot load (see PLANNING) and decide whether
+  that legacy dataset is still needed.
+- These datasets do **not** auto-unlock on reboot the way TrueNAS did. After any
+  restart (including a power event) the encrypted shares are down until you run
+  the unlock helper again. Decide an auto-unlock strategy if that is not
+  acceptable.
 
 Confirm shares and health services:
 
@@ -160,8 +221,10 @@ Remote replication services are declared but skip until their SSH keys exist:
 /etc/ssh/nas-replication-hetzner-ed25519
 ```
 
-Install the keys deliberately, restrict file mode to `0600`, verify SSH access,
-then run:
+Install the private keys deliberately, restrict file mode to `0600`, and
+authorize the matching public key on each remote before first run: the NUC must
+accept the push key, and the Hetzner host must accept the pull key. Verify SSH
+access with `BatchMode=yes`, then run:
 
 ```bash
 systemctl start nas-replicate-ssd-to-nuc.service
@@ -201,6 +264,11 @@ systemctl start zfs-replication.service
 
 If `truenas.local` will no longer resolve to the NAS address in your network,
 update the pushing hosts before the first post-cutover replication window.
+
+Some hosts instead back up over sftp using a dedicated service account whose
+`authorized_keys` lives on a data pool, so those keys persist across the cutover.
+For those, only name resolution and the new host key need attention on the
+client side.
 
 ## Incus
 
