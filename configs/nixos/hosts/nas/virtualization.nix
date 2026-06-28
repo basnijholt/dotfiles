@@ -61,6 +61,10 @@ let
 
         if instance_exists docker; then
           set_config docker user.autostart true
+          # Cap container RAM so a runaway cannot exhaust the host (the original
+          # TrueNAS OOM death-spiral). Hard limit; the in-container OOM killer
+          # acts before the host does.
+          set_config docker limits.memory 6GiB
           set_config docker security.nesting true
           set_config docker security.privileged true
           set_config docker raw.lxc "lxc.apparmor.profile=unconfined"
@@ -80,6 +84,9 @@ let
 
         if instance_exists nixos; then
           set_config nixos user.autostart true
+          # Cap the big workload LXC (runs ~104 Docker containers; ~22 GiB at
+          # normal load) so it cannot exhaust host RAM as it did on TrueNAS.
+          set_config nixos limits.memory 40GiB
           set_config nixos security.nesting true
           set_config nixos security.privileged true
           set_config nixos security.syscalls.intercept.mount true
