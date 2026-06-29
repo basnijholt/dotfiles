@@ -1,6 +1,9 @@
 { config, lib, pkgs, ... }:
 
 let
+  ntfyUrl = "http://192.168.1.2:8089/nas-alerts";
+  ntfyPriority = "high";
+
   nasHealthAlert = pkgs.writeShellScriptBin "nas-health-alert" ''
     set -euo pipefail
 
@@ -48,25 +51,16 @@ let
     ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "$subject: $summary"
     printf '%s\n\n%s\n' "$subject" "$body" | ${pkgs.util-linux}/bin/wall || true
 
-    if [ -f /etc/nas-health-alert.env ]; then
-      set -a
-      # shellcheck disable=SC1091
-      . /etc/nas-health-alert.env
-      set +a
-    fi
-
-    if [ -n "''${NTFY_URL:-}" ]; then
-      ${pkgs.curl}/bin/curl \
-        --fail \
-        --silent \
-        --show-error \
-        --max-time 10 \
-        -H "Title: $subject" \
-        -H "Priority: ''${NTFY_PRIORITY:-high}" \
-        --data-binary "$body" \
-        "$NTFY_URL" >/dev/null \
-        || ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "failed to send ntfy alert"
-    fi
+    ${pkgs.curl}/bin/curl \
+      --fail \
+      --silent \
+      --show-error \
+      --max-time 10 \
+      -H "Title: $subject" \
+      -H ${lib.escapeShellArg "Priority: ${ntfyPriority}"} \
+      --data-binary "$body" \
+      ${lib.escapeShellArg ntfyUrl} >/dev/null \
+      || ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "failed to send ntfy alert"
   '';
 
   alertFailedUnit = pkgs.writeShellScript "nas-health-alert-failed-unit" ''

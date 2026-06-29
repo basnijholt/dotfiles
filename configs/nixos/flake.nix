@@ -116,7 +116,6 @@
         # by name in the host config and must not be described with disko.
         nas = mkHost [
           disko.nixosModules.disko
-          ragenix.nixosModules.default
           zfs-unlock.nixosModules.receiver
           ./hosts/nas/disko.nix
           ./hosts/nas/default.nix

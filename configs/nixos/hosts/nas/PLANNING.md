@@ -132,7 +132,7 @@ The data pools are imported by name and are not described by disko.
 ### Monitoring And Access
 
 - [ ] Decide how Netdata should be reached: SSH tunnel, reverse proxy, or Tailscale-only access.
-- [x] Manage `/etc/nas-health-alert.env` with ragenix for ntfy alerts.
+- [x] Configure ntfy alerts declaratively on the `nas-alerts` topic.
 - [x] Validate all disks appear in `smartctl --scan-open` on NixOS.
 - [x] Validate UPS status with `upsc` and the NUT exporter.
 - [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
