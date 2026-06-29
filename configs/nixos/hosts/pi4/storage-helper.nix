@@ -16,7 +16,7 @@ in
       Type = "simple";
       User = user;
       Group = "users";
-      ExecStart = "${pkgs.uv}/bin/uvx truenas-unlock --daemon";
+      ExecStart = "${pkgs.uv}/bin/uvx zfs-unlock --daemon";
       Restart = "on-failure";
       RestartSec = "10s";
 

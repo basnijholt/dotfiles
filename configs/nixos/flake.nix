@@ -23,6 +23,10 @@
       url = "github:yaxitech/ragenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zfs-unlock = {
+      url = "github:basnijholt/zfs-unlock";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
     # its own forked nixpkgs with boot.loader.raspberryPi support
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
@@ -37,6 +41,7 @@
       disko,
       comin,
       ragenix,
+      zfs-unlock,
       nixos-raspberrypi,
       ...
     }:
@@ -111,6 +116,7 @@
         # by name in the host config and must not be described with disko.
         nas = mkHost [
           disko.nixosModules.disko
+          zfs-unlock.nixosModules.receiver
           ./hosts/nas/disko.nix
           ./hosts/nas/default.nix
           ./hosts/nas/hardware-configuration.nix

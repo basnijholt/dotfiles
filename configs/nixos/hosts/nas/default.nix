@@ -16,6 +16,7 @@
     ./replication.nix
     ./samba.nix
     ./virtualization.nix
+    ./zfs-unlock.nix
   ];
 
   # This host replaces NAS services, so avoid unattended system switches
