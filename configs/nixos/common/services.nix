@@ -38,7 +38,7 @@
   # --- Known Hosts ---
   programs.ssh.knownHosts = {
     "truenas.local" = {
-      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJBFtTkkcsQ1KKBJ1ne2Q2COhfBSxs3H0ppO/HEirJt4";
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBVVgr3VXPWMUMtvTatRBBmnvfMfAhBH9qvNjv0Kl7sD";
     };
   };
 }
