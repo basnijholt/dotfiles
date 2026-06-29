@@ -1,3 +1,5 @@
+{ pkgs, ... }:
+
 {
   services.samba = {
     enable = true;
@@ -75,5 +77,19 @@
       addresses = true;
       workstation = true;
     };
+  };
+
+  systemd.services.nas-smb-permissions = {
+    description = "Ensure NAS SMB share root permissions";
+    wants = [ "zfs.target" ];
+    after = [ "zfs.target" ];
+    before = [ "samba-smbd.service" ];
+    wantedBy = [ "multi-user.target" ];
+    path = [ pkgs.acl ];
+    script = ''
+      setfacl -m u:basnijholt:rwx,u:marcella:rwx,m:rwx /mnt/tank/timemachine
+      setfacl -d -m u:basnijholt:rwx,u:marcella:rwx,m:rwx /mnt/tank/timemachine
+    '';
+    serviceConfig.Type = "oneshot";
   };
 }
