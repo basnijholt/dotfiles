@@ -191,6 +191,36 @@ in
     "video"
   ];
 
+  # Unprivileged Incus instances with raw.idmap need newuidmap/newgidmap to
+  # allow the host IDs passed through above. Incus already adds the large
+  # shifted 1000000+ range; these entries cover the explicit passthrough IDs.
+  users.users.root = {
+    subUidRanges = lib.mkAfter [
+      {
+        startUid = 568;
+        count = 1;
+      }
+      {
+        startUid = 1000;
+        count = 1;
+      }
+    ];
+    subGidRanges = lib.mkAfter [
+      {
+        startGid = 568;
+        count = 1;
+      }
+      {
+        startGid = 3000;
+        count = 1;
+      }
+      {
+        startGid = 3006;
+        count = 1;
+      }
+    ];
+  };
+
   environment.systemPackages = [ applyIncusConfig ];
 
   systemd.services.nas-apply-incus-config = {
