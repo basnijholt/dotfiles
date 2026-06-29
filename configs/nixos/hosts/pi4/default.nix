@@ -11,7 +11,7 @@
 
     # Host-specific modules (Tier 3)
     ./networking.nix
-    ./storage-helper.nix
+    ./zfs-unlock-client.nix
   ];
 
   # Required for ZFS

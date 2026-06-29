@@ -18,7 +18,7 @@ This config is deliberately conservative:
 - Encrypted datasets are not unlocked at boot by this config.
   Run `zfs-unlock-encrypted-datasets` after boot and provide passphrases interactively, or deploy `zfs-unlock` as the off-box NixOS/OpenZFS successor to the old TrueNAS API unlock flow.
 - Sanoid approximates the local snapshot cadence.
-  Existing non-Sanoid snapshots are preserved, replication services are declared separately, and Samba uses stock shadow-copy support for TrueNAS-style `auto-*` snapshots.
+  Existing non-Sanoid snapshots are preserved, replication services are declared separately, and old files can be restored directly from `.zfs/snapshot/` when needed.
 - iSCSI is intentionally not recreated because the old target/extent names were tied to the removed JB Weston setup.
 
 Before reinstalling the real machine, read `CUTOVER.md`.

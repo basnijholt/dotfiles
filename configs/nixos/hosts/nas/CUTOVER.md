@@ -262,7 +262,8 @@ Create Samba passwords for users that should authenticate:
 sudo smbpasswd -a USERNAME
 ```
 
-Validate SMB from clients, including Time Machine, photo/media access, guest access to the guest-enabled share, and Previous Versions/shadow-copy browsing.
+Validate SMB from clients, including Time Machine, photo/media access, and guest access to the guest-enabled share.
+For this host, Previous Versions / `shadow_copy2` is intentionally not part of the NixOS SMB surface because there are no Windows clients; restore old files directly from `.zfs/snapshot/` if needed.
 
 ## Incus Recovery
 

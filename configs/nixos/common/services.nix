@@ -37,7 +37,13 @@
 
   # --- Known Hosts ---
   programs.ssh.knownHosts = {
-    "truenas.local" = {
+    "nas" = {
+      hostNames = [
+        "nas"
+        "nas.local"
+        "truenas.local"
+        "192.168.1.4"
+      ];
       publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBVVgr3VXPWMUMtvTatRBBmnvfMfAhBH9qvNjv0Kl7sD";
     };
   };

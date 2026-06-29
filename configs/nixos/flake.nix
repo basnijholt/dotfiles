@@ -257,6 +257,7 @@
         # Raspberry Pi 4 - uses nixos-raspberrypi for hardware + ZFS on SSD
         pi4 = mkPi nixos-raspberrypi.nixosModules.raspberry-pi-4.base [
           disko.nixosModules.disko
+          zfs-unlock.nixosModules.client
           ./hosts/pi4/disko.nix
           ./hosts/pi4/default.nix
           ./hosts/pi4/hardware-configuration.nix
