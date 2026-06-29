@@ -65,7 +65,7 @@ If SSH does not come back on the expected address, use AMT/console or find the t
 Do not run the destructive phase until the preflight below passes inside the temporary installer.
 
 Before the `disko` phase, the disks have not been intentionally modified by this flow.
-If the preflight looks wrong, abort and reboot back into TrueNAS.
+If the preflight looks wrong, abort and reboot back into the still-untouched previous boot pool.
 
 ## Installer Preflight
 
@@ -178,7 +178,7 @@ nix run github:nix-community/nixos-anywhere -- \
   --phases disko,install,reboot
 ```
 
-This is the point of no return for the TrueNAS boot pool.
+This is the point of no return for the previous boot pool.
 
 ## USB/ISO Appendix
 
