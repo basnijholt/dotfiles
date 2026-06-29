@@ -26,7 +26,7 @@ class Package:
     tag_prefix: str
     version_pattern: re.Pattern
     semver: bool = False
-    hash_count: int = 1  # ollama has 2 (hash + vendorHash)
+    hash_count: int = 1
 
 
 PACKAGES = [
@@ -40,7 +40,7 @@ PACKAGES = [
             re.DOTALL,
         ),
         semver=True,
-        hash_count=2,
+        hash_count=3,  # llama.cpp source hash + Ollama source hash + vendorHash
     ),
     Package(
         name="llama-cpp",
@@ -129,6 +129,49 @@ def replace_hashes_in_block(content: str, start: int, count: int) -> str:
     return content
 
 
+def get_ollama_llama_cpp_version(ollama_version: str) -> str | None:
+    """Return the llama.cpp build tag pinned by an Ollama release."""
+    url = (
+        "https://raw.githubusercontent.com/ollama/ollama/"
+        f"v{ollama_version}/LLAMA_CPP_VERSION"
+    )
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+    except Exception as e:
+        print(f"Failed to fetch Ollama LLAMA_CPP_VERSION: {e}")
+        return None
+
+    tag = response.text.strip()
+    return tag if tag.startswith("b") else None
+
+
+def update_ollama_llama_cpp_pin(content: str, ollama_version: str) -> str:
+    """Update the llama.cpp source pin used by the custom Ollama build."""
+    llama_tag = get_ollama_llama_cpp_version(ollama_version)
+    if not llama_tag:
+        print("Could not determine Ollama llama.cpp pin.")
+        sys.exit(1)
+
+    print(f"Ollama {ollama_version} pins llama.cpp {llama_tag}.")
+
+    pattern = re.compile(
+        r'(ollamaLlamaCppSrc\s*=\s*pkgs\.fetchFromGitHub\s*\{'
+        r'(?:(?!\n\s*\};).)*?'
+        r'tag\s*=\s*")([^"]+)(";'
+        r'(?:(?!\n\s*\};).)*?'
+        r'hash\s*=\s*")([^"]+)(";)',
+        re.DOTALL,
+    )
+    replacement = rf"\g<1>{llama_tag}\g<3>{DUMMY_HASH}\g<5>"
+    updated, count = pattern.subn(replacement, content, count=1)
+    if count != 1:
+        print("Could not update ollamaLlamaCppSrc pin.")
+        sys.exit(1)
+
+    return updated
+
+
 def update_version(content: str, pkg: Package) -> tuple[str, bool]:
     """Update package version and replace hashes with dummy values."""
     print(f"\n--- Checking {pkg.name} ---")
@@ -160,8 +203,17 @@ def update_version(content: str, pkg: Package) -> tuple[str, bool]:
     else:
         content = pkg.version_pattern.sub(rf"\g<1>{latest}\g<3>", content)
 
-    # Replace hashes with dummy
-    content = replace_hashes_in_block(content, match.start(), pkg.hash_count)
+    if pkg.name == "ollama":
+        content = update_ollama_llama_cpp_pin(content, latest)
+
+    # Replace hashes with dummy. Ollama's llama.cpp pin lives before the
+    # override block and is handled by update_ollama_llama_cpp_pin().
+    updated_match = pkg.version_pattern.search(content)
+    if not updated_match:
+        print(f"Could not find updated {pkg.name} version definition.")
+        return content, False
+    block_hash_count = 2 if pkg.name == "ollama" else pkg.hash_count
+    content = replace_hashes_in_block(content, updated_match.start(), block_hash_count)
 
     return content, True
 
@@ -189,15 +241,14 @@ def get_new_hash(pkg_attribute: str) -> str | None:
 def resolve_hashes(file_path: Path, content: str, pkg: Package) -> str:
     """Resolve dummy hashes by building and extracting correct values."""
     for i in range(pkg.hash_count):
-        hash_name = "vendorHash" if i == 1 else "hash"
-        print(f"Resolving {pkg.name} {hash_name}...")
+        print(f"Resolving {pkg.name} hash {i + 1}/{pkg.hash_count}...")
 
         new_hash = get_new_hash(pkg.name)
         if not new_hash:
-            print(f"Failed to resolve {pkg.name} {hash_name}.")
+            print(f"Failed to resolve {pkg.name} hash {i + 1}/{pkg.hash_count}.")
             sys.exit(1)
 
-        print(f"Found {hash_name}: {new_hash}")
+        print(f"Found hash: {new_hash}")
         content = content.replace(DUMMY_HASH, new_hash, 1)
         file_path.write_text(content)
 
