@@ -6,11 +6,11 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 
 ## Current State
 
-- Branch: `truenas-nixos-scaffold`
-- Draft PR: https://github.com/basnijholt/dotfiles/pull/61
+- Base migration PR: https://github.com/basnijholt/dotfiles/pull/61
+- Follow-up PR: https://github.com/basnijholt/dotfiles/pull/62
 - Base branch: `main`
 - Host name in Nix: `nas`
-- Last updated: `2026-06-28 post-cutover`
+- Last updated: `2026-06-29 post-cutover follow-ups`
 
 The real NAS has been cut over from TrueNAS to NixOS with this host config.
 The destructive storage migration is complete.
@@ -72,11 +72,14 @@ The data pools are imported by name and are not described by disko.
 - Confirmed host-level Tailscale is authenticated.
 - Confirmed the `zfs-unlock` NAS receiver side is installed as a restricted SSH forced-command account.
 - Confirmed direct `zfs-unlock` SSH access from the PC is denied.
-- Confirmed the `zfs-unlock` client side on `pi4` is not complete yet: the configured private key is missing, no client executable is installed, and no user service is enabled.
+- Confirmed the `zfs-unlock` client side on `pi4` is installed, enabled, and running as a system service.
+- Ran `zfs-unlock doctor` from `pi4`; config parsing, SSH key lookup, NAS reachability, and receiver status checks passed.
+- Ran `zfs-unlock status` from `pi4`; the managed datasets reported unlocked.
 - Installed the staged inbound root replication keys from `~/nas-cutover` into `/etc/ssh/authorized_keys.d/root` on the NAS without reading their contents.
 - Installed the staged outbound NAS replication keys from `~/nas-cutover` into `/etc/ssh/nas-replication-*.ed25519` without reading their contents.
 - Verified the outbound NAS replication keys authenticate to the NUC and Hetzner targets with `BatchMode=yes`.
 - Verified the inbound root replication keys match the root public-key fingerprints on `hp`, `nuc`, and `pi4`.
+- Confirmed the PC NFS mounts are present and resolve to the NAS address.
 
 ## Remaining Work
 
@@ -97,8 +100,9 @@ The data pools are imported by name and are not described by disko.
 - [x] Install outbound replication SSH keys outside this public repo.
 - [x] Authorize the outbound replication public keys on their remote ends.
 - [x] Verify outbound remote SSH access with `BatchMode=yes`.
-- [ ] Deploy the follow-up replication target change so inbound push jobs use the NAS LAN IP instead of `truenas.local`; `pi4` does not resolve `truenas.local` reliably.
-- [ ] Run each Syncoid service manually once and inspect source/target snapshots.
+- [ ] Merge and deploy follow-up PR #62 so inbound push jobs use the NAS LAN IP instead of `truenas.local`; `pi4` does not resolve `truenas.local` reliably.
+- [ ] Let the first long-running local and NUC Syncoid replications finish, then inspect source/target snapshots.
+- [ ] Reconcile the failed Hetzner website replication target; Syncoid refused because `tank/backups/hetzner` exists but has no snapshots matching `zroot/websites`.
 - [ ] Decide whether old TrueNAS-created snapshots should be aged out manually.
 
 ### Encryption
@@ -107,9 +111,9 @@ The data pools are imported by name and are not described by disko.
 - [x] Confirm passphrases are recorded/backed up off-box.
 - [x] Harden `zfs-unlock-encrypted-datasets` so one skipped key does not abort the whole batch.
 - [x] Deploy the NAS-side `zfs-unlock` restricted SSH receiver.
-- [ ] Finish the `pi4` client side of `zfs-unlock`: install the client, install the configured private key, enable the user service, and use a host target that resolves reliably from `pi4`.
-- [ ] Run a non-destructive `zfs-unlock status` check from `pi4` to the NAS receiver.
-- [ ] After the status check works, run one real unlock pass from `pi4` and confirm expected encrypted roots become available.
+- [x] Finish the `pi4` client side of `zfs-unlock`: install the client, install the configured private key, enable the system service, and use a NAS target that resolves reliably from `pi4`.
+- [x] Run a non-destructive `zfs-unlock status` check from `pi4` to the NAS receiver.
+- [ ] Run one real unlock pass from `pi4` after the managed datasets are intentionally unavailable, and confirm expected encrypted roots become available.
 
 ### Monitoring And Access
 
@@ -122,8 +126,7 @@ The data pools are imported by name and are not described by disko.
 
 ### Deploy
 
-- [ ] Run `nixos-rebuild switch --flake .#nas` to deploy `c96eaf1`. Until then the
-  Incus memory caps exist only in the live Incus DB, not from declarative config.
+- [ ] Merge PR #62 and deploy the resulting `main` to `nas`, `pi4`, and the inbound backup-pushing hosts.
 
 ### Reboot Validation
 
