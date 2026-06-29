@@ -11,6 +11,7 @@ HOSTS=(
   "pc"
   "hp"
   "pi4"
+  "nas"
   # VM/LXC hosts
   "nix-cache"
   "docker"
