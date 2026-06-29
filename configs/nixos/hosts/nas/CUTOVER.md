@@ -393,8 +393,10 @@ client side.
 
 ## Incus
 
-The NixOS config preseeds the Incus daemon storage pool, bridge, and default
-profile. It does not copy container root filesystems.
+The NixOS config can preseed the Incus daemon storage pool, bridge, and default
+profile on a fresh setup. During this migration the ZFS storage dataset is
+already populated, so `incus-preseed.service` may fail before recovery. That is
+expected; the container root filesystems still live on the data pool.
 
 The live Incus storage pool is on a data pool and is not touched by disko, but a
 fresh NixOS boot has a fresh Incus database. Recover the existing volumes into
@@ -403,6 +405,25 @@ that database before applying the reconciler:
 ```bash
 systemctl start incus.service
 incus admin recover
+```
+
+Use the following recovery answers:
+
+```text
+Would you like to recover another storage pool? yes
+Name of the storage pool: ssd
+Name of the storage backend (dir, lvm, btrfs, zfs): zfs
+Source of the storage pool (block device, volume group, dataset, path, ... as applicable): ssd/.ix-virt
+Additional storage pool configuration property (KEY=VALUE, empty when done):
+Would you like to recover another storage pool? no
+Would you like to continue with scanning for lost volumes? yes
+Would you like those to be recovered? yes
+```
+
+Use the ZFS dataset name `ssd/.ix-virt`, not a mounted filesystem path. After
+recovery, apply the known instance settings and inspect the imported instances:
+
+```bash
 nas-apply-incus-config
 incus list
 incus config show docker --expanded

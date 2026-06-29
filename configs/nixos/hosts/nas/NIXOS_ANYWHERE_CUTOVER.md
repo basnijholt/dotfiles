@@ -190,5 +190,17 @@ sudo incus list
 sudo tailscale up
 ```
 
+For `incus admin recover`, recover the existing ZFS storage pool as:
+
+```text
+storage pool: ssd
+backend: zfs
+source: ssd/.ix-virt
+additional properties: leave empty
+recover found volumes: yes
+```
+
+Use the ZFS dataset name `ssd/.ix-virt`, not `/mnt/ssd/.ix-virt`.
+
 Install replication keys and alerting secrets from the cutover staging location
 only as needed. Do not commit them to this repo.
