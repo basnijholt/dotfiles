@@ -11,6 +11,7 @@
     ./health.nix
     ./identity.nix
     ./networking.nix
+    ./secrets-config.nix
     ./storage.nix
     ./nfs.nix
     ./replication.nix
