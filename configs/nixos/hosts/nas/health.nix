@@ -68,6 +68,19 @@ let
         || ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "failed to send ntfy alert"
     fi
   '';
+
+  alertFailedUnit = pkgs.writeShellScript "nas-health-alert-failed-unit" ''
+    set -euo pipefail
+
+    unit="''${1:-unknown-unit}"
+    {
+      echo "Unit failed: $unit"
+      echo
+      ${pkgs.systemd}/bin/systemctl status --no-pager --full "$unit" || true
+      echo
+      ${pkgs.systemd}/bin/journalctl -u "$unit" -n 120 --no-pager || true
+    } | ${nasHealthAlert}/bin/nas-health-alert -s "NAS unit failed: $unit"
+  '';
 in
 {
   power.ups.upsmon.monitor.cyberpower.system = lib.mkForce "cyberpower@192.168.1.3:3493";
@@ -119,6 +132,14 @@ in
     nut = {
       enable = true;
       nutServer = "192.168.1.3";
+    };
+  };
+
+  systemd.services."nas-health-alert@" = {
+    description = "Send NAS health alert for failed unit %I";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${alertFailedUnit} %I";
     };
   };
 

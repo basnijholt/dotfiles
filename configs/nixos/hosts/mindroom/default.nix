@@ -32,6 +32,7 @@
   nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
     "openclaw-2026.4.21"
     "openclaw-2026.5.7"
+    "openclaw-2026.5.12"
   ];
 
   # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)

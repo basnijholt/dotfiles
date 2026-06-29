@@ -19,6 +19,7 @@ This config is deliberately conservative:
   Run `zfs-unlock-encrypted-datasets` after boot and provide passphrases interactively, or deploy `zfs-unlock` as the off-box NixOS/OpenZFS successor to the old TrueNAS API unlock flow.
 - Sanoid approximates the local snapshot cadence.
   Existing non-Sanoid snapshots are preserved, replication services are declared separately, and old files can be restored directly from `.zfs/snapshot/` when needed.
+  Replicated backup targets under `tank/backups` are excluded from NAS-local autosnapshots so snapshot-freshness monitoring reflects replication rather than local Sanoid activity.
 - iSCSI is intentionally not recreated because the old target/extent names were tied to the removed JB Weston setup.
 
 Before reinstalling the real machine, read `CUTOVER.md`.

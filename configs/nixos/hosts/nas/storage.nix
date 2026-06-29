@@ -79,6 +79,11 @@ in
         useTemplate = [ "nas-default" ];
         recursive = true;
       };
+      "tank/backups" = {
+        autosnap = false;
+        autoprune = false;
+        recursive = true;
+      };
       ssd = {
         useTemplate = [ "nas-default" ];
         recursive = "zfs";
