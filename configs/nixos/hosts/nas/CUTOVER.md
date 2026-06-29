@@ -433,8 +433,35 @@ incus config show nixos --expanded
 
 Then start instances one at a time and validate their services.
 
+Unprivileged instances using `raw.idmap` also need host subordinate UID/GID
+ranges for any explicit host IDs they map through. The `nas` config declares the
+known passthrough IDs for the recovered instances. If an unprivileged instance
+fails with `newuidmap` or `newgidmap`, confirm `/etc/subuid` and `/etc/subgid`
+include both Incus's shifted range and the explicit passthrough IDs, then
+`nixos-rebuild switch` to the current config before starting it again.
+
 If `incus admin recover` reports that storage-pool or instance metadata is
 missing, stop and inspect the affected volume before starting containers.
+
+## Client validation
+
+After NFS and SMB are up, validate clients from outside the NAS. For the PC
+Docker host, the expected NFS mounts are:
+
+```bash
+findmnt -t nfs,nfs4 -o TARGET,SOURCE,FSTYPE,OPTIONS
+```
+
+Confirm the mounts resolve to the NAS address and that read/write behavior
+matches the old TrueNAS exports. The cutover validated the PC mounts for
+`/opt/stacks`, `/mnt/data`, and the expected `/mnt/tank/...` paths.
+
+`truenas.local` remains a compatibility DNS name for existing clients. `nas` and
+`nas.local` should also resolve to the NAS address; do not let the `.local`
+wildcard point `nas.local` at a workload container.
+
+Remove or disable any client jobs that depended on the TrueNAS API, such as the
+old PC TrueNAS config-backup timer.
 
 ## Tailscale
 

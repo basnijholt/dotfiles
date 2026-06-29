@@ -105,7 +105,7 @@ configuration that has been booted on the real NAS.
 
 ### Task 1: Boot/root cutover risk
 
-**Status:** Mostly configured, still inherently destructive at cutover.
+**Status:** Cutover completed on 2026-06-28 with phased `nixos-anywhere`.
 
 - [x] Point `disko.nix` at the current TrueNAS boot-pool disk.
 - [x] Keep data pools outside disko.
@@ -117,12 +117,15 @@ configuration that has been booted on the real NAS.
 - [x] Add a disposable VM rehearsal that creates fake boot and data ZFS pools,
   runs the generated `nas` disko script against the fake boot target, and
   confirms fake `tank`/`ssd` sentinels still import afterward.
-- [ ] Before cutover, confirm device identity from the NixOS installer by
+- [x] Before cutover, confirm device identity from the NixOS installer by
   comparing the `disko.nix` target with `/dev/disk/by-id/`.
-- [ ] Before cutover, run the remote-only disko preflight and confirm no
+- [x] Before cutover, run the remote-only disko preflight and confirm no
   `tank`/`ssd` ZFS labels are present on the disko target or its partitions.
-- [ ] Run the cutover sequence in `CUTOVER.md` only after a clean TrueNAS
-  shutdown and a final backup decision.
+- [x] Run the phased `nixos-anywhere` cutover sequence in
+  `NIXOS_ANYWHERE_CUTOVER.md`.
+- [x] Confirm after first boot that `tank`, `ssd`, and `zroot` are healthy.
+- [x] Reconcile imported data-pool mountpoints to `/mnt/tank` and `/mnt/ssd`
+  for NFS, SMB, and Incus path compatibility.
 
 ### Task 2: SMB compatibility
 
@@ -180,13 +183,16 @@ first boot.
 - [x] Keep Actual Budget out of scope.
 - [x] Confirm live Incus instance root filesystems live on the `ssd` data pool,
   not on the TrueNAS boot pool.
-- [ ] Recover Incus instances after first NixOS boot with `incus admin recover`.
-- [ ] Run `nas-apply-incus-config` after import.
-- [ ] Start instances one at a time and validate service behavior.
+- [x] Recover Incus instances after first NixOS boot with `incus admin recover`.
+- [x] Run `nas-apply-incus-config` after import.
+- [x] Start instances one at a time and validate that the recovered
+  `docker`, `nix-cache`, and `nixos` instances run.
 - [x] Set `boot.autostart` and workload memory limits for the known Incus
   instances. The original outage was an OOM death spiral from unbounded
   container memory; host-level zram and earlyoom reduce blast radius, and these
   per-instance limits bound the workloads.
+- [x] Declare root subordinate UID/GID passthrough ranges required by the
+  unprivileged `nix-cache` container's `raw.idmap`.
 
 ### Task 5: Encryption keys
 
@@ -234,7 +240,7 @@ Open monitoring work:
   `health.nix`. The previous TrueNAS client and the NUT server config referred
   to the UPS by different names, so the monitor can silently fail to attach if
   the configured name is wrong.
-- [ ] Disable or remove the PC TrueNAS config-backup job at cutover; it depends
+- [x] Disable or remove the PC TrueNAS config-backup job at cutover; it depends
   on the TrueNAS API.
 
 ## Safe Local Validation Commands
@@ -288,26 +294,27 @@ TrueNAS.
 ## Cutover Checklist
 
 - [ ] Read `CUTOVER.md` fully in the same context window doing the work.
-- [ ] Confirm the PR branch is up to date with the intended commit.
+- [x] Confirm the PR branch is up to date with the intended commit.
 - [ ] Confirm backups are acceptable.
 - [x] Confirm ZFS dataset passphrases are recorded/backed up off-box.
 - [ ] Perform final read-only TrueNAS health checks.
 - [ ] Shut down TrueNAS cleanly.
-- [ ] Boot NixOS installer.
-- [ ] Run the remote-only disko preflight from `CUTOVER.md`.
-- [ ] Confirm the disko target is the boot-pool disk and no `tank`/`ssd` labels
+- [x] Boot NixOS installer.
+- [x] Run the remote-only disko preflight from `CUTOVER.md`.
+- [x] Confirm the disko target is the boot-pool disk and no `tank`/`ssd` labels
   are present on the target or its partitions.
-- [ ] Run disko and `nixos-install` for `.#nas`.
-- [ ] Boot NixOS.
-- [ ] Confirm ZFS import, health services, SMB/NFS export state, monitoring, and
+- [x] Run disko and install NixOS for `.#nas`.
+- [x] Boot NixOS.
+- [x] Confirm ZFS import, health services, SMB/NFS export state, monitoring, and
   timers.
-- [ ] Unlock encrypted datasets interactively.
+- [x] Unlock encrypted datasets interactively.
 - [ ] Create Samba passwords.
 - [ ] Install inbound replication public keys for root and verify pusher hosts.
 - [ ] Install replication SSH keys and test remote replication manually.
-- [ ] Import Incus instances and run `nas-apply-incus-config`.
+- [x] Import Incus instances and run `nas-apply-incus-config`.
 - [ ] Authenticate Tailscale.
-- [ ] Validate clients before treating the migration as complete.
+- [x] Validate PC NFS mounts against the new NAS.
+- [ ] Validate SMB clients before treating SMB as complete.
 
 ## Out Of Scope
 

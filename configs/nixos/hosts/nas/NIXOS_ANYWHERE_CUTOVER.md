@@ -202,5 +202,13 @@ recover found volumes: yes
 
 Use the ZFS dataset name `ssd/.ix-virt`, not `/mnt/ssd/.ix-virt`.
 
+If an unprivileged recovered container fails with `newuidmap`/`newgidmap`, switch
+the current `nas` config before retrying. The config declares the subordinate
+UID/GID passthrough ranges used by the recovered instances.
+
+Validate at least one NFS client before treating the storage side as complete.
+From the PC, `findmnt -t nfs,nfs4` should show the expected `truenas.local`
+exports resolving to the NAS address, and basic reads should succeed.
+
 Install replication keys and alerting secrets from the cutover staging location
 only as needed. Do not commit them to this repo.
