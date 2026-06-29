@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   nasHealthAlert = pkgs.writeShellScriptBin "nas-health-alert" ''
@@ -81,6 +81,53 @@ let
       ${pkgs.systemd}/bin/journalctl -u "$unit" -n 120 --no-pager || true
     } | ${nasHealthAlert}/bin/nas-health-alert -s "NAS unit failed: $unit"
   '';
+
+  incus = "${config.virtualisation.incus.package}/bin/incus";
+
+  b2BackupWatchdog = pkgs.writeShellScript "nas-b2-backup-watchdog" ''
+    set -euo pipefail
+
+    container="nixos"
+    unit="rclone-b2-backup.service"
+    max_age_hours=36
+
+    if ! ${incus} info "$container" >/dev/null 2>&1; then
+      echo "MISSING B2 backup container: Incus container $container is not reachable"
+      exit 1
+    fi
+
+    for source in /mnt/tank/backups/ssd/docker/stacks /mnt/tank/backups/ssd/docker/data; do
+      if ! ${incus} exec "$container" -- /run/current-system/sw/bin/test -d "$source"; then
+        echo "MISSING B2 backup source: $container:$source"
+        exit 1
+      fi
+    done
+
+    result="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p Result --value --no-pager)"
+    status="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p ExecMainStatus --value --no-pager)"
+    timestamp="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p ExecMainExitTimestamp --value --no-pager)"
+
+    if [ "$result" != "success" ] || [ "$status" != "0" ]; then
+      echo "STALE B2 backup: $unit last result=$result status=$status"
+      exit 1
+    fi
+
+    if [ -z "$timestamp" ]; then
+      echo "STALE B2 backup: $unit has no recorded successful exit timestamp"
+      exit 1
+    fi
+
+    now="$(${pkgs.coreutils}/bin/date +%s)"
+    last="$(${pkgs.coreutils}/bin/date -d "$timestamp" +%s)"
+    age_hours=$(( (now - last) / 3600 ))
+
+    if [ "$age_hours" -gt "$max_age_hours" ]; then
+      echo "STALE B2 backup: $unit last succeeded at $timestamp, ''${age_hours}h ago; limit is ''${max_age_hours}h"
+      exit 1
+    fi
+
+    echo "OK B2 backup: $unit last succeeded at $timestamp, ''${age_hours}h ago; limit is ''${max_age_hours}h"
+  '';
 in
 {
   power.ups.upsmon.monitor.cyberpower.system = lib.mkForce "cyberpower@192.168.1.3:3493";
@@ -140,6 +187,28 @@ in
     serviceConfig = {
       Type = "oneshot";
       ExecStart = "${alertFailedUnit} %I";
+    };
+  };
+
+  systemd.services.nas-b2-backup-watchdog = {
+    description = "Check Backblaze B2 rclone backup freshness";
+    after = [ "incus.service" ];
+    unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
+    script = ''
+      exec ${b2BackupWatchdog}
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+    };
+  };
+
+  systemd.timers.nas-b2-backup-watchdog = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "hourly";
+      Persistent = true;
+      RandomizedDelaySec = "10m";
     };
   };
 
