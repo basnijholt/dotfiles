@@ -13,6 +13,9 @@ It assumes the current TrueNAS boot-pool disk will become the NixOS boot disk.
 - Shut TrueNAS down cleanly before booting NixOS with the data disks attached.
 - Run only one OS against the data pools at a time.
 - Keep `services.comin.enable = false` until the first manual cutover succeeds.
+- If using `nixos-anywhere`, do not run the default all-in-one phase sequence.
+  Run `kexec` first, stop, run the disko preflight inside the temporary
+  installer, then run `disko,install,reboot`.
 
 ## Boot disk
 
@@ -180,6 +183,69 @@ nixos-install --root /mnt --no-root-passwd --flake .#nas
 ```
 
 Reboot into NixOS.
+
+### Alternative: phased nixos-anywhere
+
+`nixos-anywhere` can replace the USB/ISO boot path by kexecing the running
+TrueNAS system into a temporary NixOS installer over SSH. This is convenient for
+remote work, but the default `nixos-anywhere` phases are
+`kexec,disko,install,reboot`, which would run destructive disko immediately
+after the kexec.
+
+For this NAS, only use it in separated phases. Run from `configs/nixos`:
+
+```bash
+# Phase 1: boot the temporary NixOS installer over SSH.
+nix run github:nix-community/nixos-anywhere -- \
+  --flake .#nas \
+  --target-host root@truenas \
+  --phases kexec
+```
+
+After this returns, TrueNAS is no longer the running OS. SSH back into the
+temporary installer, fetch the exact repo state you intend to install, and run
+the **Remote-only disko preflight** above:
+
+```bash
+ssh root@truenas
+
+git clone https://github.com/basnijholt/dotfiles.git /tmp/dotfiles
+cd /tmp/dotfiles
+git checkout truenas-nixos-scaffold
+git rev-parse --short HEAD
+
+cd configs/nixos
+# Run the full preflight from this document before continuing.
+```
+
+Only if the preflight proves that the disko target is the old boot-pool disk and
+does not contain `tank`/`ssd` labels, run the destructive phases from your local
+machine:
+
+```bash
+nix run github:nix-community/nixos-anywhere -- \
+  --flake .#nas \
+  --target-host root@truenas \
+  --phases disko,install,reboot
+```
+
+Run the second command from the same local branch/commit that you checked in the
+temporary installer.
+
+Do **not** run this for the NAS:
+
+```bash
+nix run github:nix-community/nixos-anywhere -- \
+  --flake .#nas \
+  --target-host root@truenas
+```
+
+That all-in-one form skips the manual installer preflight gate.
+
+Kexec is not the same as a clean TrueNAS shutdown. Treat it as a committed
+cutover path: make the backup/passphrase decision first, stop or quiesce
+write-heavy clients if needed, and expect to continue from the temporary NixOS
+installer rather than returning to the old TrueNAS runtime.
 
 ## First NixOS boot
 
