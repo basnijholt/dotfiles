@@ -60,7 +60,7 @@ The data pools are imported by name and are not described by disko.
 - Confirmed NFS exports from the NAS.
 - Validated unauthenticated SMB access to the guest-enabled share from a fresh `smbclient` invocation.
 - Validated SMB password authentication and read/write access for `basnijholt` and `marcella`.
-- Added a Nix-managed `nas-smb-permissions` service for the Time Machine share root group/mode.
+- Added a Nix-managed `nas-smb-permissions` service that sets the Time Machine share root owner/group and verifies the existing mode.
 - Validated Time Machine access from macOS after deploying the share root group/mode fix.
 - Validated authenticated SMB media access from macOS Finder.
 - Removed the obsolete PC TrueNAS API config-backup job from Nix config.
@@ -90,7 +90,7 @@ The data pools are imported by name and are not described by disko.
 ### SMB
 
 - [x] Create or verify Samba passwords for intended users with `smbpasswd`.
-- [x] Manage Time Machine share root group/mode for `basnijholt` and `marcella`.
+- [x] Manage Time Machine share root owner/group and verify the existing mode for `basnijholt` and `marcella`.
 - [x] Validate Time Machine from a macOS client.
 - [x] Validate photo access from normal client accounts.
 - [x] Validate media access from normal client accounts.
