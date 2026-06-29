@@ -120,6 +120,7 @@ in
 
   systemd.services.nas-replicate-ssd-local = {
     description = "Replicate local ssd pool into tank backup dataset";
+    restartIfChanged = false;
     wants = [ "zfs.target" ];
     after = [ "zfs.target" ];
     unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
@@ -150,6 +151,7 @@ in
 
   systemd.services.nas-replicate-ssd-to-nuc = {
     description = "Replicate ssd pool to NUC over SSH";
+    restartIfChanged = false;
     wants = [
       "network-online.target"
       "zfs.target"
@@ -193,6 +195,7 @@ in
 
   systemd.services.nas-replicate-hetzner-websites = {
     description = "Pull Hetzner website backups over SSH";
+    restartIfChanged = false;
     wants = [
       "network-online.target"
       "zfs.target"
