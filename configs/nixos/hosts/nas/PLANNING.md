@@ -169,24 +169,24 @@ behavior still needs validation.
 
 ### Task 4: Docker and Incus state
 
-**Status:** Daemon shape is declared; workload data movement remains.
+**Status:** Daemon shape is declared; workload root filesystems are on
+`ssd/.ix-virt` and should be recovered into the fresh Incus database after
+first boot.
 
 - [x] Enable Docker with observed DNS settings.
 - [x] Enable Incus.
 - [x] Preseed Incus bridge, ZFS storage pool, and default profile.
 - [x] Add `nas-apply-incus-config` for known imported instances.
 - [x] Keep Actual Budget out of scope.
-- [ ] Export or otherwise preserve live Incus instance root filesystems before
-  destroying the boot pool.
-- [ ] Import Incus instances after first NixOS boot.
+- [x] Confirm live Incus instance root filesystems live on the `ssd` data pool,
+  not on the TrueNAS boot pool.
+- [ ] Recover Incus instances after first NixOS boot with `incus admin recover`.
 - [ ] Run `nas-apply-incus-config` after import.
 - [ ] Start instances one at a time and validate service behavior.
-- [ ] Decide and set `limits.memory` for the `nixos` and `docker` Incus
+- [x] Set `boot.autostart` and workload memory limits for the known Incus
   instances. The original outage was an OOM death spiral from unbounded
-  container memory; host-level zram and earlyoom reduce blast radius but do not
-  bound the workload. `nix-cache` already has a memory limit; these two do not.
-  Observed read-only: `nixos` uses ~22 GiB at idle-ish load, `docker` and
-  `nix-cache` ~0.4 GiB each, host has 62 GiB.
+  container memory; host-level zram and earlyoom reduce blast radius, and these
+  per-instance limits bound the workloads.
 
 ### Task 5: Encryption keys
 

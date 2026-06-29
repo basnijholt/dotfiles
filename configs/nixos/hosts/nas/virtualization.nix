@@ -60,6 +60,7 @@ let
         }
 
         if instance_exists docker; then
+          set_config docker boot.autostart true
           set_config docker user.autostart true
           # Cap container RAM so a runaway cannot exhaust the host (the original
           # TrueNAS OOM death-spiral). Hard limit; the in-container OOM killer
@@ -83,6 +84,7 @@ let
         fi
 
         if instance_exists nixos; then
+          set_config nixos boot.autostart true
           set_config nixos user.autostart true
           # Cap the big workload LXC (runs ~104 Docker containers; ~22 GiB at
           # normal load) so it cannot exhaust host RAM as it did on TrueNAS.
@@ -106,6 +108,7 @@ let
         fi
 
         if instance_exists nix-cache; then
+          set_config nix-cache boot.autostart true
           set_config nix-cache user.autostart true
           set_config nix-cache limits.cpu 8
           set_config nix-cache limits.memory 24576MiB
