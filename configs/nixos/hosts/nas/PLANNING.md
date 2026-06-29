@@ -73,6 +73,10 @@ The data pools are imported by name and are not described by disko.
 - Confirmed the `zfs-unlock` NAS receiver side is installed as a restricted SSH forced-command account.
 - Confirmed direct `zfs-unlock` SSH access from the PC is denied.
 - Confirmed the `zfs-unlock` client side on `pi4` is not complete yet: the configured private key is missing, no client executable is installed, and no user service is enabled.
+- Installed the staged inbound root replication keys from `~/nas-cutover` into `/etc/ssh/authorized_keys.d/root` on the NAS without reading their contents.
+- Installed the staged outbound NAS replication keys from `~/nas-cutover` into `/etc/ssh/nas-replication-*.ed25519` without reading their contents.
+- Verified the outbound NAS replication keys authenticate to the NUC and Hetzner targets with `BatchMode=yes`.
+- Verified the inbound root replication keys match the root public-key fingerprints on `hp`, `nuc`, and `pi4`.
 
 ## Remaining Work
 
@@ -88,11 +92,12 @@ The data pools are imported by name and are not described by disko.
 
 ### Replication And Backups
 
-- [ ] Install inbound replication public keys in `/etc/ssh/authorized_keys.d/root`.
-- [ ] Refresh SSH host keys and name resolution on pushing hosts.
-- [ ] Install outbound replication SSH keys outside this public repo.
-- [ ] Authorize the outbound replication public keys on their remote ends.
-- [ ] Verify remote SSH access with `BatchMode=yes`.
+- [x] Install inbound replication public keys in `/etc/ssh/authorized_keys.d/root`.
+- [x] Refresh SSH host keys on pushing hosts.
+- [x] Install outbound replication SSH keys outside this public repo.
+- [x] Authorize the outbound replication public keys on their remote ends.
+- [x] Verify outbound remote SSH access with `BatchMode=yes`.
+- [ ] Deploy the follow-up replication target change so inbound push jobs use the NAS LAN IP instead of `truenas.local`; `pi4` does not resolve `truenas.local` reliably.
 - [ ] Run each Syncoid service manually once and inspect source/target snapshots.
 - [ ] Decide whether old TrueNAS-created snapshots should be aged out manually.
 
