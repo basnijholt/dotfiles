@@ -58,6 +58,7 @@ The data pools are imported by name and are not described by disko.
 - Removed the obsolete PC TrueNAS API config-backup job from Nix config.
 - Added an explicit `nas` DNS record to avoid wildcard `.local` misrouting.
 - Added faster Nix cache failure behavior for unavailable LAN caches.
+- Locked down the local `~/nas-cutover` staging directory to mode `0700` without reading its contents.
 
 ## Remaining Work
 
@@ -92,9 +93,9 @@ The data pools are imported by name and are not described by disko.
 - [ ] Decide how Netdata should be reached: SSH tunnel, reverse proxy, or Tailscale-only access.
 - [ ] Add `/etc/nas-health-alert.env` with `NTFY_URL` if wall/syslog is not enough.
 - [ ] Validate all disks appear in `smartctl --scan-open` on NixOS.
-- [ ] Validate UPS status with `upsc` and the NUT exporter.
-- [ ] Confirm the configured UPS name matches the name exposed by the remote NUT server.
-- [ ] Authenticate host-level Tailscale with `tailscale up`.
+- [x] Validate UPS status with `upsc` and the NUT exporter.
+- [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
+- [x] Authenticate host-level Tailscale with `tailscale up`.
 
 ## Historical Context
 
