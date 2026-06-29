@@ -10,11 +10,10 @@ Keep this file as the future reinstall/recovery reference.
 - The existing `tank` and `ssd` data pools are not described by disko.
 - Do not run disko against any data-pool member device.
 - Do not rely on physically unplugging data disks as a safety mechanism.
-- Use out-of-band console access and the installer-side preflight before any
-  destructive command.
+- Use out-of-band console access and the installer-side preflight before any destructive command.
 - Run only one OS against the data pools at a time.
-- Do not use the default all-in-one `nixos-anywhere` command. It would run
-  `kexec,disko,install,reboot` without the manual preflight gate.
+- Do not use the default all-in-one `nixos-anywhere` command.
+  It would run `kexec,disko,install,reboot` without the manual preflight gate.
 
 ## Local Prep
 
@@ -42,12 +41,13 @@ script=$(nix build --no-link --print-out-paths \
 grep -oE '/dev/[^ "]*' "$script" | sort -u
 ```
 
-The only real device path printed must be the boot disk by-id. No `tank`/`ssd`
-member device may appear.
+The only real device path printed must be the boot disk by-id.
+No `tank`/`ssd` member device may appear.
 
 ## Phase 1: Kexec Only
 
-This boots a temporary NixOS installer over SSH. It should not run disko.
+This boots a temporary NixOS installer over SSH.
+It should not run disko.
 
 ```bash
 cd /home/basnijholt/dotfiles/configs/nixos
@@ -60,22 +60,19 @@ nix run github:nix-community/nixos-anywhere -- \
   --phases kexec
 ```
 
-After this returns, TrueNAS is no longer the running OS. If SSH does not come
-back on the expected address, use AMT/console or find the temporary installer's
-DHCP address before proceeding. Do not run the destructive phase until the
-preflight below passes inside the temporary installer.
+After this returns, TrueNAS is no longer the running OS.
+If SSH does not come back on the expected address, use AMT/console or find the temporary installer's DHCP address before proceeding.
+Do not run the destructive phase until the preflight below passes inside the temporary installer.
 
-Before the `disko` phase, the disks have not been intentionally modified by this
-flow. If the preflight looks wrong, abort and reboot back into TrueNAS.
+Before the `disko` phase, the disks have not been intentionally modified by this flow.
+If the preflight looks wrong, abort and reboot back into TrueNAS.
 
 ## Installer Preflight
 
-Run this from your local machine after the `kexec` phase returns. It executes
-inside the temporary installer over SSH and checks the same commit built during
-local prep.
+Run this from your local machine after the `kexec` phase returns.
+It executes inside the temporary installer over SSH and checks the same commit built during local prep.
 
-If the installer came up at a different address, replace `root@truenas` with the
-temporary installer address.
+If the installer came up at a different address, replace `root@truenas` with the temporary installer address.
 
 ```bash
 set -euo pipefail
@@ -154,17 +151,14 @@ echo "OK: preflight passed"
 REMOTE_PREFLIGHT
 ```
 
-Abort on any surprising output. The expected result is that the disko target is
-the old boot-pool disk, below the data-disk size guard, and has no `tank` or
-`ssd` ZFS labels.
+Abort on any surprising output.
+The expected result is that the disko target is the old boot-pool disk, below the data-disk size guard, and has no `tank` or `ssd` ZFS labels.
 
 ## Phase 2: Destructive Install
 
-Only run this from your local machine after the installer preflight prints
-`OK: preflight passed`.
+Only run this from your local machine after the installer preflight prints `OK: preflight passed`.
 
-If the installer came up at a different address, replace `root@truenas` with the
-same temporary installer address used for the preflight.
+If the installer came up at a different address, replace `root@truenas` with the same temporary installer address used for the preflight.
 
 ```bash
 set -euo pipefail
@@ -189,9 +183,7 @@ This is the point of no return for the TrueNAS boot pool.
 ## USB/ISO Appendix
 
 The phased `nixos-anywhere` path above is the path used for the real cutover.
-For a future USB/ISO reinstall, shut down the previous OS cleanly, boot the
-installer, clone this repo, run the same installer preflight locally in the
-installer, and only then run:
+For a future USB/ISO reinstall, shut down the previous OS cleanly, boot the installer, clone this repo, run the same installer preflight locally in the installer, and only then run:
 
 ```bash
 nix run github:nix-community/disko -- \
@@ -204,23 +196,16 @@ nixos-install --root /mnt --no-root-passwd --flake .#nas
 
 ## Secret Staging
 
-Keep cutover-only secret material outside this repo. A local `~/nas-cutover/`
-directory may exist, but do not commit it, copy it into this repo, paste its
-contents into logs, or read it from an agent session unless explicitly needed
-for the step being performed.
+Keep cutover-only secret material outside this repo.
+A local `~/nas-cutover/` directory may exist, but do not commit it, copy it into this repo, paste its contents into logs, or read it from an agent session unless explicitly needed for the step being performed.
 
-Expected secret material may include ZFS dataset passphrases, off-box unlock
-material, inbound replication authorized keys, outbound replication private
-keys, alerting config such as `nas-health-alert.env`, and one-time
-authentication notes.
+Expected secret material may include ZFS dataset passphrases, off-box unlock material, inbound replication authorized keys, outbound replication private keys, alerting config such as `nas-health-alert.env`, and one-time authentication notes.
 
 ## Encrypted Dataset Unlocks
 
-The encrypted roots use ZFS passphrase keys. The TrueNAS-era automatic unlock
-flow used `truenas-unlock` and the TrueNAS API from another device on the LAN.
-The NixOS/OpenZFS successor is
-[`zfs-unlock`](https://github.com/basnijholt/zfs-unlock), which keeps the
-passphrases on another device and talks to a restricted NAS-side SSH receiver.
+The encrypted roots use ZFS passphrase keys.
+The TrueNAS-era automatic unlock flow used `truenas-unlock` and the TrueNAS API from another device on the LAN.
+The NixOS/OpenZFS successor is [`zfs-unlock`](https://github.com/basnijholt/zfs-unlock), which keeps the passphrases on another device and talks to a restricted NAS-side SSH receiver.
 
 Until that receiver is configured on the NAS, unlock interactively after boot:
 
@@ -230,9 +215,8 @@ sudo zfs mount -a
 sudo systemctl restart nfs-server samba-smbd
 ```
 
-The helper discovers unavailable encrypted roots dynamically and does not
-hardcode private dataset names. It prompts for passphrase-backed roots and skips
-legacy file keylocations that are not expected to exist on NixOS.
+The helper discovers unavailable encrypted roots dynamically and does not hardcode private dataset names.
+It prompts for passphrase-backed roots and skips legacy file keylocations that are not expected to exist on NixOS.
 
 ## First Boot Checks
 
@@ -246,15 +230,14 @@ sudo zfs list
 sudo systemctl status zfs-import-tank.service zfs-import-ssd.service
 ```
 
-The imported data pools are not created by disko. Confirm their ZFS
-`mountpoint` properties match the paths used by NFS, SMB, and Incus:
+The imported data pools are not created by disko.
+Confirm their ZFS `mountpoint` properties match the paths used by NFS, SMB, and Incus:
 
 ```bash
 sudo zfs get mountpoint tank ssd
 ```
 
-If they mounted at `/tank` and `/ssd`, reconcile the persistent ZFS properties
-once:
+If they mounted at `/tank` and `/ssd`, reconcile the persistent ZFS properties once:
 
 ```bash
 sudo zfs set mountpoint=/mnt/tank tank
@@ -279,18 +262,15 @@ Create Samba passwords for users that should authenticate:
 sudo smbpasswd -a USERNAME
 ```
 
-Validate SMB from clients, including Time Machine, photo/media access, guest
-access to the guest-enabled share, and Previous Versions/shadow-copy browsing.
+Validate SMB from clients, including Time Machine, photo/media access, guest access to the guest-enabled share, and Previous Versions/shadow-copy browsing.
 
 ## Incus Recovery
 
-The NixOS config can preseed the Incus daemon storage pool, bridge, and default
-profile on a fresh setup. During this migration the ZFS storage dataset is
-already populated, so `incus-preseed.service` may fail before recovery. The
-container root filesystems still live on the data pool.
+The NixOS config can preseed the Incus daemon storage pool, bridge, and default profile on a fresh setup.
+During this migration the ZFS storage dataset is already populated, so `incus-preseed.service` may fail before recovery.
+The container root filesystems still live on the data pool.
 
-Recover the existing volumes into the fresh Incus database before applying the
-reconciler:
+Recover the existing volumes into the fresh Incus database before applying the reconciler:
 
 ```bash
 sudo systemctl start incus.service
@@ -310,8 +290,8 @@ Would you like to continue with scanning for lost volumes? yes
 Would you like those to be recovered? yes
 ```
 
-Use the ZFS dataset name `ssd/.ix-virt`, not a mounted filesystem path. After
-recovery:
+Use the ZFS dataset name `ssd/.ix-virt`, not a mounted filesystem path.
+After recovery:
 
 ```bash
 sudo nas-apply-incus-config
@@ -323,10 +303,7 @@ incus config show nixos --expanded
 
 Start instances one at a time and validate their services.
 
-If an unprivileged recovered instance fails with `newuidmap` or `newgidmap`,
-confirm `/etc/subuid` and `/etc/subgid` include both Incus's shifted range and
-the explicit passthrough IDs, then switch to the current `nas` config before
-starting it again.
+If an unprivileged recovered instance fails with `newuidmap` or `newgidmap`, confirm `/etc/subuid` and `/etc/subgid` include both Incus's shifted range and the explicit passthrough IDs, then switch to the current `nas` config before starting it again.
 
 ## Replication
 
@@ -339,9 +316,8 @@ Remote replication services are declared but skip until their SSH keys exist:
 /etc/ssh/nas-replication-hetzner-ed25519
 ```
 
-Install the private keys deliberately, restrict file mode to `0600`, and
-authorize the matching public key on each remote before first run. Verify SSH
-access with `BatchMode=yes`, then run:
+Install the private keys deliberately, restrict file mode to `0600`, and authorize the matching public key on each remote before first run.
+Verify SSH access with `BatchMode=yes`, then run:
 
 ```bash
 sudo systemctl start nas-replicate-ssd-to-nuc.service
@@ -352,9 +328,8 @@ Check source and target snapshots before trusting the timers.
 
 ## Inbound Backups
 
-Other NixOS hosts may still push Syncoid backups to this machine. The `nas`
-OpenSSH config allows key-only root login from the LAN for this purpose, but the
-keys are intentionally not stored in this public repo.
+Other NixOS hosts may still push Syncoid backups to this machine.
+The `nas` OpenSSH config allows key-only root login from the LAN for this purpose, but the keys are intentionally not stored in this public repo.
 
 After first boot, install the source host public keys in:
 
@@ -362,16 +337,14 @@ After first boot, install the source host public keys in:
 /etc/ssh/authorized_keys.d/root
 ```
 
-Use `from=` restrictions on each key where possible, keep the file mode at
-`0600`, and reload SSH:
+Use `from=` restrictions on each key where possible, keep the file mode at `0600`, and reload SSH:
 
 ```bash
 sudo install -m 0600 -o root -g root /path/to/prepared-root-authorized-keys /etc/ssh/authorized_keys.d/root
 sudo systemctl reload sshd
 ```
 
-For each pushing host, verify name resolution and host keys before trusting the
-timer again:
+For each pushing host, verify name resolution and host keys before trusting the timer again:
 
 ```bash
 ssh-keygen -R truenas.local
@@ -379,31 +352,30 @@ ssh root@truenas.local true
 systemctl start zfs-replication.service
 ```
 
-Some hosts back up over sftp using a dedicated service account whose
-`authorized_keys` lives on a data pool. For those, only name resolution and the
-new host key need attention on the client side.
+Some hosts back up over sftp using a dedicated service account whose `authorized_keys` lives on a data pool.
+For those, only name resolution and the new host key need attention on the client side.
 
 ## Client Validation
 
-After NFS and SMB are up, validate clients from outside the NAS. For the PC:
+After NFS and SMB are up, validate clients from outside the NAS.
+For the PC:
 
 ```bash
 findmnt -t nfs,nfs4 -o TARGET,SOURCE,FSTYPE,OPTIONS
 ```
 
-Confirm the mounts resolve to the NAS address and that read/write behavior
-matches the old TrueNAS exports. The cutover validated the PC mounts for
-`/opt/stacks`, `/mnt/data`, and the expected `/mnt/tank/...` paths.
+Confirm the mounts resolve to the NAS address and that read/write behavior matches the old TrueNAS exports.
+The cutover validated the PC mounts for `/opt/stacks`, `/mnt/data`, and the expected `/mnt/tank/...` paths.
 
-`truenas.local` remains a compatibility DNS name for existing clients. `nas` and
-`nas.local` should also resolve to the NAS address.
+`truenas.local` remains a compatibility DNS name for existing clients.
+`nas` and `nas.local` should also resolve to the NAS address.
 
-Remove or disable client jobs that depended on the TrueNAS API, such as the old
-PC TrueNAS config-backup timer.
+Remove or disable client jobs that depended on the TrueNAS API, such as the old PC TrueNAS config-backup timer.
 
 ## Tailscale
 
-The TrueNAS Tailscale app is not migrated. NixOS runs host-level Tailscale.
+The TrueNAS Tailscale app is not migrated.
+NixOS runs host-level Tailscale.
 Authenticate the host after first boot:
 
 ```bash
