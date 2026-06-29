@@ -8,6 +8,7 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 
 - Base migration PR: https://github.com/basnijholt/dotfiles/pull/61
 - Follow-up PR: https://github.com/basnijholt/dotfiles/pull/62
+- Backup monitoring / comin follow-up PR: https://github.com/basnijholt/dotfiles/pull/63
 - Base branch: `main`
 - Host name in Nix: `nas`
 - Last updated: `2026-06-29 post-cutover follow-ups`
@@ -136,7 +137,7 @@ The data pools are imported by name and are not described by disko.
 
 ### Deploy
 
-- [ ] Merge and deploy the backup monitoring follow-up PR to `nas`.
+- [ ] Merge and manually deploy the backup monitoring follow-up PR to `nas`; that deployment enables `comin` for future NAS updates.
 
 ### Reboot Validation
 
