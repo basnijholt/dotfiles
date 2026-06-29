@@ -54,6 +54,8 @@ The data pools are imported by name and are not described by disko.
 - Unlocked encrypted datasets interactively with the NixOS helper.
 - Recovered Incus instances from `ssd/.ix-virt` with `incus admin recover`.
 - Applied known Incus instance config and fixed required subordinate UID/GID passthrough ranges.
+- Applied per-instance Incus memory caps (`nixos` 40 GiB, `docker` 6 GiB; `nix-cache` 24 GiB from recovery).
+- Fixed `nas-apply-incus-config` to use the Incus 7 LTS `key=value` syntax (commit `c96eaf1`); the deprecated `key value` form errored on `raw.lxc` and aborted the reconciler under `set -e` before the memory caps were applied.
 - Validated NFS mounts from the PC.
 - Confirmed NFS exports from the NAS.
 - Validated unauthenticated SMB access to the guest-enabled share from a fresh `smbclient` invocation.
@@ -117,6 +119,11 @@ The data pools are imported by name and are not described by disko.
 - [ ] Investigate failed units inside recovered Incus containers: `comin.service`, `github-backup-sync.service`, and `systemd-tmpfiles-clean.service`.
 - [ ] Review PostgreSQL collation warnings inside Docker workloads after the host/container move.
 - [ ] Decide whether the repeated DHCP option warning inside `docker` is harmless or should be fixed.
+
+### Deploy
+
+- [ ] Run `nixos-rebuild switch --flake .#nas` to deploy `c96eaf1`. Until then the
+  Incus memory caps exist only in the live Incus DB, not from declarative config.
 
 ### Reboot Validation
 
