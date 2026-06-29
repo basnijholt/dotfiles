@@ -144,25 +144,26 @@ as the cutover-only staging area for secret material. Do not commit it, copy it
 into this repo, paste its contents into logs, or read it from an agent session
 unless explicitly needed for the cutover step being performed.
 
-Expected secret material may include exported ZFS dataset passphrases, inbound
-replication authorized keys, outbound replication private keys, alerting
-configuration such as `nas-health-alert.env`, and any one-time authentication
-notes needed after first boot.
+Expected secret material may include ZFS dataset passphrases or other off-box
+unlock material, inbound replication authorized keys, outbound replication
+private keys, alerting configuration such as `nas-health-alert.env`, and any
+one-time authentication notes needed after first boot.
 
 During cutover, copy only the specific file needed for the current step into its
 documented destination, set the documented ownership and mode, verify the
 service, then leave the staging directory off-system or remove it once no
 longer needed.
 
-### Export encryption passphrases (do this before shutdown)
+### Confirm encrypted dataset unlock material
 
-The encrypted datasets all use ZFS **passphrase** keys, which TrueNAS auto-loads
-from its own database. That database lives on the boot pool and is destroyed by
-disko. Before shutting down, export and securely record every dataset passphrase
-(TrueNAS UI: Datasets -> root dataset -> *Export All Keys*, saved to a password
-manager). Without them, encrypted datasets cannot be unlocked on NixOS and
-their data is unrecoverable. Confirm whether one shared passphrase or a
-different one per dataset.
+The encrypted roots all use ZFS **passphrase** keys. The passphrases or unlock
+material must be available off-box before shutdown. The current TrueNAS-era
+automatic unlock flow is handled by `truenas-unlock` from another device on the
+LAN; it does not commit keys to this repo.
+
+Before shutting down, confirm the off-box unlock material and a manual recovery
+path are available. NixOS will not have the TrueNAS API, so the existing
+`truenas-unlock` flow does not carry over unchanged.
 
 ## Install NixOS
 
@@ -191,22 +192,21 @@ systemctl status zfs-import-tank.service zfs-import-ssd.service
 ```
 
 Unlock encrypted datasets interactively. Encrypted datasets and any shares backed
-by them stay unavailable until unlocked. You are prompted per passphrase:
+by them stay unavailable until unlocked:
 
 ```bash
 zfs-unlock-encrypted-datasets
 ```
 
-Caveats:
+The helper discovers unavailable encrypted roots dynamically and does not
+hardcode private dataset names. Some encrypted roots have legacy file
+keylocations that will not exist on NixOS; the helper logs those failures and
+continues so other passphrase roots can still be unlocked.
 
-- One legacy encrypted dataset uses `keylocation=file:///tmp/zfs_pass`, which
-  does not exist on NixOS. The batch helper will fail on that key; harden the
-  helper to continue past keys it cannot load (see PLANNING) and decide whether
-  that legacy dataset is still needed.
-- These datasets do **not** auto-unlock on reboot the way TrueNAS did. After any
-  restart (including a power event) the encrypted shares are down until you run
-  the unlock helper again. Decide an auto-unlock strategy if that is not
-  acceptable.
+These datasets do **not** auto-unlock on reboot under the current NixOS config.
+After any restart, encrypted shares stay down until you unlock them manually. If
+you want to preserve the hardware/network-presence behavior from
+`truenas-unlock`, build a NixOS-native replacement after the first cutover.
 
 Confirm shares and health services:
 

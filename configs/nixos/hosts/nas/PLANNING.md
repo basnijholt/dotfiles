@@ -190,21 +190,22 @@ first boot.
 
 ### Task 5: Encryption keys
 
-**Status:** All encrypted datasets are passphrase-keyed; verified read-only.
+**Status:** All encrypted roots are passphrase-keyed; passphrases are backed up
+off-box. TrueNAS-era auto-unlock is handled by `truenas-unlock` from another
+device on the LAN; NixOS currently has an interactive helper and no automatic
+replacement for that TrueNAS API flow.
 
 - [x] Confirm key format: every encrypted root uses `keyformat=passphrase`
   (recoverable with the passphrase; no machine-only raw keys to lose).
-- [ ] Before shutdown, export and store every dataset passphrase; TrueNAS's
-  auto-unlock copy lives on the boot pool and is destroyed by disko.
+- [x] Confirm passphrases are recorded/backed up off-box.
 - [ ] Keep any prepared cutover secrets in `~/nas-cutover/` or another
   non-repo staging location, and copy only the specific file needed for each
   cutover step into its final destination.
-- [ ] Harden `zfs-unlock-encrypted-datasets` to continue past keys it cannot load
+- [x] Harden `zfs-unlock-encrypted-datasets` to continue past keys it cannot load
   (for example a legacy dataset whose `keylocation=file:///tmp/zfs_pass` is
   absent on NixOS) instead of aborting the whole batch under `set -e`.
-- [ ] Decide an auto-unlock strategy: NixOS will not auto-unlock these on boot as
-  TrueNAS did, so encrypted shares stay down after every reboot until unlocked
-  manually.
+- [ ] Decide whether to keep manual post-boot unlocks or build a NixOS-native
+  replacement for the off-box `truenas-unlock` hardware/network-presence flow.
 
 ## Monitoring And Visualization
 
@@ -289,8 +290,7 @@ TrueNAS.
 - [ ] Read `CUTOVER.md` fully in the same context window doing the work.
 - [ ] Confirm the PR branch is up to date with the intended commit.
 - [ ] Confirm backups are acceptable.
-- [ ] Export and securely store all ZFS dataset passphrases from TrueNAS before
-  shutdown; without them the encrypted datasets are unrecoverable.
+- [x] Confirm ZFS dataset passphrases are recorded/backed up off-box.
 - [ ] Perform final read-only TrueNAS health checks.
 - [ ] Shut down TrueNAS cleanly.
 - [ ] Boot NixOS installer.
