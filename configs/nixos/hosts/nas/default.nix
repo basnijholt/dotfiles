@@ -19,12 +19,22 @@
     ./zfs-unlock.nix
   ];
 
-  # This host replaces NAS services, so avoid unattended system switches
-  # until the migration has been exercised manually.
-  services.comin.enable = lib.mkForce false;
-
   # The live workload runs Syncthing in Docker, not as a host-level service.
   services.syncthing.enable = lib.mkForce false;
+
+  security.polkit.extraConfig = ''
+    polkit.addRule(function(action, subject) {
+      if (
+        subject.user == "fwupd-refresh" &&
+        (
+          action.id == "org.freedesktop.fwupd.get-remotes" ||
+          action.id == "org.freedesktop.fwupd.refresh-remote"
+        )
+      ) {
+        return polkit.Result.YES;
+      }
+    });
+  '';
 
   networking.hostId = "4ce3f761";
 }

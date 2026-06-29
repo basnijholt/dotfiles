@@ -35,9 +35,7 @@ in
   environment.systemPackages = [ pkgs.signal-cli ];
 
   nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
-    "openclaw-2026.4.2"
-    "openclaw-2026.4.21"
-    "openclaw-2026.5.7"
+    "openclaw-2026.5.12"
   ];
 
   systemd.tmpfiles.rules = [

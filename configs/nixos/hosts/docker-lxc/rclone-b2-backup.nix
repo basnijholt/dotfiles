@@ -6,9 +6,10 @@
 {
   systemd.services.rclone-b2-backup = {
     description = "Rclone backup to Backblaze B2 (encrypted)";
+    unitConfig.ConditionPathExists = "/home/basnijholt/.config/rclone/rclone.conf";
     path = [ pkgs.rclone ];
     script = ''
-      rclone sync /opt/stacks b2-encrypted:/stacks \
+      rclone sync /mnt/tank/backups/ssd/docker/stacks b2-encrypted:/stacks \
         --config /home/basnijholt/.config/rclone/rclone.conf \
         --verbose \
         --stats 1m \
@@ -16,7 +17,7 @@
         --transfers 4 \
         --fast-list
 
-      rclone sync /mnt/data b2-encrypted:/data \
+      rclone sync /mnt/tank/backups/ssd/docker/data b2-encrypted:/data \
         --config /home/basnijholt/.config/rclone/rclone.conf \
         --verbose \
         --stats 1m \
@@ -33,7 +34,7 @@
   systemd.timers.rclone-b2-backup = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "daily";
+      OnCalendar = "*-*-* 04:00:00";
       Persistent = true;
     };
   };

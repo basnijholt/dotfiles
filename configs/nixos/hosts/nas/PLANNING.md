@@ -8,6 +8,7 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 
 - Base migration PR: https://github.com/basnijholt/dotfiles/pull/61
 - Follow-up PR: https://github.com/basnijholt/dotfiles/pull/62
+- Backup monitoring / comin follow-up PR: https://github.com/basnijholt/dotfiles/pull/63
 - Base branch: `main`
 - Host name in Nix: `nas`
 - Last updated: `2026-06-29 post-cutover follow-ups`
@@ -84,6 +85,7 @@ The data pools are imported by name and are not described by disko.
 - Verified the outbound NAS replication keys authenticate to the NUC and Hetzner targets with `BatchMode=yes`.
 - Verified the inbound root replication keys match the root public-key fingerprints on `hp`, `nuc`, and `pi4`.
 - Confirmed the PC NFS mounts are present and resolve to the NAS address.
+- Merged and deployed follow-up PR #62 so inbound push jobs use the NAS LAN IP instead of `truenas.local`.
 
 ## Remaining Work
 
@@ -106,10 +108,16 @@ The data pools are imported by name and are not described by disko.
 - [x] Install outbound replication SSH keys outside this public repo.
 - [x] Authorize the outbound replication public keys on their remote ends.
 - [x] Verify outbound remote SSH access with `BatchMode=yes`.
-- [ ] Merge and deploy follow-up PR #62 so inbound push jobs use the NAS LAN IP instead of `truenas.local`; `pi4` does not resolve `truenas.local` reliably.
+- [x] Merge and deploy follow-up PR #62 so inbound push jobs use the NAS LAN IP instead of `truenas.local`; `pi4` does not resolve `truenas.local` reliably.
+- [x] Add `OnFailure=` alert hooks to the declared NAS replication units.
+- [x] Exclude `tank/backups` from NAS-local Sanoid snapshots so replicated backup targets are not refreshed by local autosnapshots.
+- [x] Add an hourly snapshot-freshness watchdog for the local SSD mirror, inbound host pushes, and Hetzner website pull target.
 - [ ] Let the first long-running local and NUC Syncoid replications finish, then inspect source/target snapshots.
-- [ ] Reconcile the failed Hetzner website replication target; Syncoid refused because `tank/backups/hetzner` exists but has no snapshots matching `zroot/websites`.
-- [ ] Decide whether old TrueNAS-created snapshots should be aged out manually.
+- [x] Reconcile the failed Hetzner website replication target; the stale NAS target was renamed aside and a fresh pull completed.
+- [x] Reconcile the Backblaze B2 rclone job in config so it skips when rclone config is absent and syncs from the stable local SSD mirror instead of live Docker paths.
+- [x] Deploy the Backblaze B2 rclone change to the Incus container that owns the job, then inspect the next run.
+- [x] Add failure alerting or a freshness check for the authoritative Backblaze B2 job once its owner container and backup method are decided.
+- [ ] Decide whether old TrueNAS-created snapshots and pre-exclusion NAS-local `tank/backups` autosnapshots should be aged out manually.
 
 ### Encryption
 
@@ -124,7 +132,7 @@ The data pools are imported by name and are not described by disko.
 ### Monitoring And Access
 
 - [ ] Decide how Netdata should be reached: SSH tunnel, reverse proxy, or Tailscale-only access.
-- [ ] Add `/etc/nas-health-alert.env` with `NTFY_URL` if wall/syslog is not enough.
+- [x] Configure ntfy alerts declaratively on the `nas-alerts` topic.
 - [x] Validate all disks appear in `smartctl --scan-open` on NixOS.
 - [x] Validate UPS status with `upsc` and the NUT exporter.
 - [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
@@ -132,7 +140,7 @@ The data pools are imported by name and are not described by disko.
 
 ### Deploy
 
-- [ ] Merge PR #62 and deploy the resulting `main` to `nas`, `pi4`, and the inbound backup-pushing hosts.
+- [ ] Merge and manually deploy the backup monitoring follow-up PR to `nas`; that deployment enables `comin` for future NAS updates.
 
 ### Reboot Validation
 

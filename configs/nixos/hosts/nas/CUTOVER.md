@@ -199,7 +199,7 @@ nixos-install --root /mnt --no-root-passwd --flake .#nas
 Keep cutover-only secret material outside this repo.
 A local `~/nas-cutover/` directory may exist, but do not commit it, copy it into this repo, paste its contents into logs, or read it from an agent session unless explicitly needed for the step being performed.
 
-Expected secret material may include ZFS dataset passphrases, off-box unlock material, inbound replication authorized keys, outbound replication private keys, alerting config such as `nas-health-alert.env`, and one-time authentication notes.
+Expected secret material may include ZFS dataset passphrases, off-box unlock material, inbound replication authorized keys, outbound replication private keys, and one-time authentication notes.
 
 ## Encrypted Dataset Unlocks
 
