@@ -85,10 +85,11 @@
     after = [ "zfs.target" ];
     before = [ "samba-smbd.service" ];
     wantedBy = [ "multi-user.target" ];
-    path = [ pkgs.acl ];
+    path = [ pkgs.coreutils ];
     script = ''
-      setfacl -m u:basnijholt:rwx,u:marcella:rwx,m:rwx /mnt/tank/timemachine
-      setfacl -d -m u:basnijholt:rwx,u:marcella:rwx,m:rwx /mnt/tank/timemachine
+      test -d /mnt/tank/timemachine
+      chown root:timemachine /mnt/tank/timemachine
+      chmod 0770 /mnt/tank/timemachine
     '';
     serviceConfig.Type = "oneshot";
   };

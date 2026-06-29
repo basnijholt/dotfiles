@@ -8,6 +8,7 @@
     docker.gid = lib.mkForce 999;
     marcella.gid = 3001;
     restic.gid = 3003;
+    timemachine.gid = 3004;
     containers-share.gid = 3006;
   };
 
@@ -17,6 +18,7 @@
       isSystemUser = true;
       uid = 501;
       group = "basnijholt";
+      extraGroups = [ "timemachine" ];
       home = "/home/basnijholt";
       createHome = true;
     };
@@ -33,6 +35,7 @@
       isSystemUser = true;
       uid = 3000;
       group = "marcella";
+      extraGroups = [ "timemachine" ];
       home = "/var/empty";
       shell = "${pkgs.shadow}/bin/nologin";
     };
