@@ -59,6 +59,7 @@ The data pools are imported by name and are not described by disko.
 - Validated NFS mounts from the PC.
 - Confirmed NFS exports from the NAS.
 - Validated unauthenticated SMB access to the guest-enabled share from a fresh `smbclient` invocation.
+- Validated SMB password authentication and read/write access for `basnijholt` and `marcella`.
 - Removed the obsolete PC TrueNAS API config-backup job from Nix config.
 - Added an explicit `nas` DNS record to avoid wildcard `.local` misrouting.
 - Added faster Nix cache failure behavior for unavailable LAN caches.
@@ -85,9 +86,10 @@ The data pools are imported by name and are not described by disko.
 
 ### SMB
 
-- [ ] Create or verify Samba passwords for intended users with `smbpasswd`.
+- [x] Create or verify Samba passwords for intended users with `smbpasswd`.
 - [ ] Validate Time Machine from a macOS client.
-- [ ] Validate photo/media access from normal client accounts.
+- [x] Validate photo access from normal client accounts.
+- [ ] Validate media access from normal client accounts.
 - [x] Validate guest access from a fresh unauthenticated client.
 - [x] Previous Versions / `shadow_copy2`: not needed — no Windows clients here
   (macOS uses Time Machine). Removed the dead `shadow_copy2` config; restore from
