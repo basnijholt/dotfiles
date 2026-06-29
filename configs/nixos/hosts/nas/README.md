@@ -2,14 +2,16 @@
 
 NixOS host for the NAS services that used to run on TrueNAS.
 
-Start with `PLANNING.md` for current migration status and handoff notes. Use
-`CUTOVER.md` for the completed destructive cutover path and for future reinstall
-reference.
+Start here:
+
+- `PLANNING.md`: current state and remaining operational TODOs.
+- `CUTOVER.md`: the single runbook for the completed cutover and any future
+  reinstall/recovery work.
 
 This config is deliberately conservative:
 
 - It imports existing data pools `tank` and `ssd` by name.
-- Disko manages only the current TrueNAS boot-pool disk. It does not define a
+- Disko manages only the former TrueNAS boot-pool disk. It does not define a
   layout for the data pools.
 - It reproduces the observed NFS paths, SMB share names, UPS client, bridge
   networking, UID/GID, SMART monitoring, ZFS event logging, and local reporting
