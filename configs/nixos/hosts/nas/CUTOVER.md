@@ -204,7 +204,7 @@ Expected secret material may include ZFS dataset passphrases, off-box unlock mat
 ## Encrypted Dataset Unlocks
 
 The encrypted roots use ZFS passphrase keys.
-The TrueNAS-era automatic unlock flow used `truenas-unlock` and the TrueNAS API from another device on the LAN.
+The TrueNAS-era automatic unlock flow used [`truenas-unlock`](https://github.com/basnijholt/truenas-unlock) and the TrueNAS API from another device on the LAN.
 The NixOS/OpenZFS successor is [`zfs-unlock`](https://github.com/basnijholt/zfs-unlock), which keeps the passphrases on another device and talks to a restricted NAS-side SSH receiver.
 
 Until that receiver is configured on the NAS, unlock interactively after boot:
