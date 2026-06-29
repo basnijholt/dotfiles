@@ -23,7 +23,10 @@ let
           local instance="$1"
           local key="$2"
           local value="$3"
-          ${incus} config set "$instance" "$key" "$value"
+          # Use key=value form: the deprecated "key value" form misparses values
+          # that themselves contain "=" (e.g. raw.lxc=lxc.apparmor.profile=unconfined),
+          # which aborted this script under set -e and left memory limits unapplied.
+          ${incus} config set "$instance" "$key=$value"
         }
 
         ensure_device() {
@@ -41,7 +44,7 @@ let
           for assignment in "$@"; do
             key="''${assignment%%=*}"
             value="''${assignment#*=}"
-            ${incus} config device set "$instance" "$device" "$key" "$value"
+            ${incus} config device set "$instance" "$device" "$key=$value"
           done
         }
 
