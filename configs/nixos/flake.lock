@@ -361,7 +361,8 @@
         "home-manager-pi": "home-manager-pi",
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_3",
-        "ragenix": "ragenix"
+        "ragenix": "ragenix",
+        "zfs-unlock": "zfs-unlock"
       }
     },
     "rust-overlay": {
@@ -430,6 +431,26 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "zfs-unlock": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782713132,
+        "narHash": "sha256-M8RFkqnKEpvNtH/KyDGsLPJLNMzbAL4xK/S11+QsPA0=",
+        "owner": "basnijholt",
+        "repo": "zfs-unlock",
+        "rev": "662958d0ec58380de597cae289d25d072e3486e5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "basnijholt",
+        "repo": "zfs-unlock",
         "type": "github"
       }
     }

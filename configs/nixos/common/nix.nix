@@ -5,6 +5,8 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     fallback = true;
+    download-attempts = 1;
+    connect-timeout = 2;
     trusted-users = [ "root" "basnijholt" ];
     substituters = [
       "https://cache.nixos.org/"

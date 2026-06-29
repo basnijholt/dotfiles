@@ -23,6 +23,10 @@
       url = "github:yaxitech/ragenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zfs-unlock = {
+      url = "github:basnijholt/zfs-unlock";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
     # its own forked nixpkgs with boot.loader.raspberryPi support
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
@@ -37,12 +41,14 @@
       disko,
       comin,
       ragenix,
+      zfs-unlock,
       nixos-raspberrypi,
       ...
     }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
 
       commonModules = homeManager: [
         ./configuration.nix
@@ -104,6 +110,16 @@
           ./hosts/hp/disko.nix
           ./hosts/hp/default.nix
           ./hosts/hp/hardware-configuration.nix
+        ];
+
+        # Disko manages only the NAS boot disk. Existing data pools are imported
+        # by name in the host config and must not be described with disko.
+        nas = mkHost [
+          disko.nixosModules.disko
+          zfs-unlock.nixosModules.receiver
+          ./hosts/nas/disko.nix
+          ./hosts/nas/default.nix
+          ./hosts/nas/hardware-configuration.nix
         ];
 
         # Incus VM version of HP - same services/packages, VM-appropriate hardware
@@ -282,10 +298,17 @@
         pc = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
+        nas = (import ./hosts/nas/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
         hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
         hetzner-matrix = (import ./hosts/hetzner-matrix/disko.nix) { inherit lib; };
         paul-wyse = (import ./hosts/paul-wyse/disko.nix) { inherit lib; };
+      };
+
+      checks.${system}.nas-disko-safety = import ./hosts/nas/disko-safety-test.nix {
+        inherit pkgs;
+        nasDiskoDevice = self.diskoConfigurations.nas.disko.devices.disk.main.device;
+        nasDiskoScript = self.nixosConfigurations.nas.config.system.build.diskoScript;
       };
 
     };
