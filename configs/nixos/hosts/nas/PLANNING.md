@@ -114,7 +114,8 @@ The data pools are imported by name and are not described by disko.
 - [x] Add an hourly snapshot-freshness watchdog for the local SSD mirror, inbound host pushes, and Hetzner website pull target.
 - [ ] Let the first long-running local and NUC Syncoid replications finish, then inspect source/target snapshots.
 - [ ] Reconcile the failed Hetzner website replication target; Syncoid refused because `tank/backups/hetzner` exists but has no snapshots matching `zroot/websites`.
-- [ ] Reconcile the Backblaze B2 rclone job in Incus; the `nixos` container has the configured daily job but the latest checked run failed on live-changing files, while the `docker` container has a broken duplicate without rclone config.
+- [x] Reconcile the Backblaze B2 rclone job in config so it skips when rclone config is absent and syncs from the stable local SSD mirror instead of live Docker paths.
+- [ ] Deploy the Backblaze B2 rclone change to the Incus container that owns the job, then inspect the next run.
 - [ ] Add failure alerting or a freshness check for the authoritative Backblaze B2 job once its owner container and backup method are decided.
 - [ ] Decide whether old TrueNAS-created snapshots and pre-exclusion NAS-local `tank/backups` autosnapshots should be aged out manually.
 
