@@ -82,8 +82,9 @@ The data pools are imported by name and are not described by disko.
 - [ ] Validate Time Machine from a macOS client.
 - [ ] Validate photo/media access from normal client accounts.
 - [x] Validate guest access from a fresh unauthenticated client.
-- [ ] Validate Previous Versions/shadow-copy browsing.
-- [ ] Decide whether stock Samba `shadow_copy2` is sufficient long-term.
+- [x] Previous Versions / `shadow_copy2`: not needed — no Windows clients here
+  (macOS uses Time Machine). Removed the dead `shadow_copy2` config; restore from
+  `.zfs/snapshot/` directly if an old file is ever needed.
 
 ### Replication And Backups
 
