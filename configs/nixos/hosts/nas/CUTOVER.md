@@ -192,6 +192,11 @@ remote work, but the default `nixos-anywhere` phases are
 `kexec,disko,install,reboot`, which would run destructive disko immediately
 after the kexec.
 
+Before using this path, confirm you have a fallback console path such as AMT in
+case the temporary installer does not come back on the expected address. The
+installer usually keeps the reachable network setup, but if it instead comes up
+on DHCP you need another way to find or control it.
+
 For this NAS, only use it in separated phases. Run from `configs/nixos`:
 
 ```bash
@@ -218,6 +223,17 @@ cd configs/nixos
 # Run the full preflight from this document before continuing.
 ```
 
+Do not reboot between the two `nixos-anywhere` phases unless you are aborting or
+starting over. A reboot from this point should boot the untouched TrueNAS boot
+pool again, but you will need to re-run the `kexec` phase before continuing.
+
+If `zpool`, `zdb`, or other preflight tools are missing from the kexec installer,
+install them temporarily before running the preflight:
+
+```bash
+nix shell nixpkgs#zfs nixpkgs#util-linux nixpkgs#gptfdisk
+```
+
 Only if the preflight proves that the disko target is the old boot-pool disk and
 does not contain `tank`/`ssd` labels, run the destructive phases from your local
 machine:
@@ -230,7 +246,9 @@ nix run github:nix-community/nixos-anywhere -- \
 ```
 
 Run the second command from the same local branch/commit that you checked in the
-temporary installer.
+temporary installer. The `nas` disko script is built from this flake and its
+locked inputs; do not switch branches or update `flake.lock` between the
+preflight and the destructive phases.
 
 Do **not** run this for the NAS:
 
@@ -242,10 +260,11 @@ nix run github:nix-community/nixos-anywhere -- \
 
 That all-in-one form skips the manual installer preflight gate.
 
-Kexec is not the same as a clean TrueNAS shutdown. Treat it as a committed
-cutover path: make the backup/passphrase decision first, stop or quiesce
-write-heavy clients if needed, and expect to continue from the temporary NixOS
-installer rather than returning to the old TrueNAS runtime.
+Before the `disko` phase, the disks have not been intentionally modified by this
+flow. If the preflight looks wrong, abort and reboot back into TrueNAS. Kexec is
+still not the same as a clean TrueNAS shutdown/export, so make the
+backup/passphrase decision first, stop or quiesce write-heavy clients if needed,
+and treat the `disko,install,reboot` command as the point of no return.
 
 ## First NixOS boot
 
