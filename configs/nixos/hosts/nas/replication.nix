@@ -5,6 +5,7 @@ let
     coreutils
     gawk
     gnugrep
+    lz4
     lzop
     mbuffer
     openssh
@@ -15,7 +16,6 @@ let
   syncoidCommon = [
     "--recursive"
     "--compress=lz4"
-    "--no-sync-snap"
   ];
 
   mkSyncoidArgs = pkgs.lib.escapeShellArgs syncoidCommon;
@@ -104,6 +104,7 @@ in
 {
   environment.systemPackages = with pkgs; [
     sanoid
+    lz4
     lzop
     mbuffer
   ];
@@ -211,7 +212,6 @@ in
       zfs list tank/backups/hetzner >/dev/null
 
       syncoid ${mkSyncoidArgs} \
-        --include-snaps='^zfs-auto-snap_hourly-' \
         --sshkey=/etc/ssh/nas-replication-hetzner-ed25519 \
         --sshport=22 \
         --sshoption=BatchMode=yes \

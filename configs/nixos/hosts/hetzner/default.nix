@@ -18,7 +18,11 @@
   virtualisation.docker.enable = true;
 
   # Google Cloud SDK for deployments
-  environment.systemPackages = [ pkgs.google-cloud-sdk ];
+  environment.systemPackages = with pkgs; [
+    google-cloud-sdk
+    lz4
+    mbuffer
+  ];
 
   # Disable services that aren't needed on a web host
   services.fwupd.enable = lib.mkForce false; # No firmware updates on VPS
