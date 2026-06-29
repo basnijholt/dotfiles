@@ -25,16 +25,20 @@ NUT, Netdata, Prometheus exporters, Docker, and Incus.
 - Draft PR: https://github.com/basnijholt/dotfiles/pull/61
 - Base branch: `main`
 - Host name in Nix: `nas`
-- Last updated from local workspace: `2026-06-28 13:43 PDT`
+- Last updated from local workspace: `2026-06-28 post-cutover`
 
-The scaffold currently builds locally. It is still a migration scaffold, not a
-configuration that has been booted on the real NAS.
+The real NAS has been cut over from TrueNAS to this NixOS host. The destructive
+storage migration is complete. Remaining work is operational follow-up:
+client-side SMB validation, replication key rollout and first-run checks,
+Tailscale authentication, and alerting/UPS validation.
 
 ## Safety Rules
 
-- Do not change the live TrueNAS deployment while validating this PR.
-- SSH to TrueNAS is allowed only for read-only inspection commands.
-- Do not run `disko` while booted into TrueNAS.
+- The live TrueNAS deployment no longer exists as the running OS on this host.
+- Treat the old TrueNAS-era notes below as historical validation context, not
+  instructions for the current running machine.
+- Do not run `disko` on the running NAS unless intentionally reinstalling the
+  boot disk again.
 - Do not add any data-pool member device to `disko.nix`.
 - Do not run the destructive disko command until the remote-only disko preflight
   in `CUTOVER.md` has passed in the installer environment.
@@ -43,7 +47,8 @@ configuration that has been booted on the real NAS.
 - Do not repeat host IDs, disk serials, LAN addresses, MAC addresses, or user
   account names in public planning docs unless they are necessary for executable
   config.
-- Keep `services.comin.enable = false` until a manual cutover has succeeded.
+- Keep `services.comin.enable = false` until post-cutover operations are boring
+  enough to trust unattended switching on this host.
 - Keep unrelated local files out of this PR, especially archive migration notes.
 - The `marcella` identity name is intentional. Do not restore the old longer
   account name or the retired JB Weston identity unless explicitly requested.
@@ -87,7 +92,7 @@ configuration that has been booted on the real NAS.
 - [x] `CUTOVER.md` documents the local `~/nas-cutover/` secret staging
   directory policy without reading or committing its contents.
 
-## Live TrueNAS Facts Observed Read-Only
+## Pre-Cutover TrueNAS Facts Observed Read-Only
 
 - Host ID observed on TrueNAS matches the configured NixOS host ID. The value is
   intentionally not repeated in this public planning doc.
@@ -197,9 +202,12 @@ first boot.
 ### Task 5: Encryption keys
 
 **Status:** All encrypted roots are passphrase-keyed; passphrases are backed up
-off-box. TrueNAS-era auto-unlock is handled by `truenas-unlock` from another
-device on the LAN; NixOS currently has an interactive helper and no automatic
-replacement for that TrueNAS API flow.
+off-box. The TrueNAS-era auto-unlock flow used `truenas-unlock` and the TrueNAS
+API from another device on the LAN. The NixOS/OpenZFS successor is
+`zfs-unlock`, which keeps the same off-box-passphrase idea but uses a restricted
+SSH receiver instead of the TrueNAS API. The cutover itself used the interactive
+NixOS helper first; deploying the automatic `zfs-unlock` receiver is still
+tracked as follow-up until it is configured on the NAS.
 
 - [x] Confirm key format: every encrypted root uses `keyformat=passphrase`
   (recoverable with the passphrase; no machine-only raw keys to lose).
@@ -210,8 +218,8 @@ replacement for that TrueNAS API flow.
 - [x] Harden `zfs-unlock-encrypted-datasets` to continue past keys it cannot load
   (for example a legacy dataset whose `keylocation=file:///tmp/zfs_pass` is
   absent on NixOS) instead of aborting the whole batch under `set -e`.
-- [ ] Decide whether to keep manual post-boot unlocks or build a NixOS-native
-  replacement for the off-box `truenas-unlock` hardware/network-presence flow.
+- [ ] Deploy `zfs-unlock` or keep manual post-boot unlocks as the accepted
+  reboot behavior.
 
 ## Monitoring And Visualization
 
@@ -268,9 +276,11 @@ nix build --no-link --print-out-paths '.#nixosConfigurations.nas.config.system.b
 For generated scripts, build first, then inspect/evaluate the store paths before
 executing anything. Do not run service scripts against the live TrueNAS machine.
 
-## Read-Only TrueNAS Validation Ideas
+## Historical Read-Only TrueNAS Validation Ideas
 
-These are allowed only as inspection commands. Do not change service state.
+These were allowed only as inspection commands before cutover. Do not run them
+against a future appliance OS unless intentionally doing another read-only
+migration inspection.
 
 ```bash
 zpool status
@@ -293,12 +303,16 @@ TrueNAS.
 
 ## Cutover Checklist
 
-- [ ] Read `CUTOVER.md` fully in the same context window doing the work.
+This checklist records what happened during the actual phased `nixos-anywhere`
+cutover and what remains after it. It is not a fresh pre-cutover checklist.
+
+- [x] Read `CUTOVER.md` fully in the same context window doing the work.
 - [x] Confirm the PR branch is up to date with the intended commit.
-- [ ] Confirm backups are acceptable.
+- [x] Confirm backups are acceptable enough for the cutover decision.
 - [x] Confirm ZFS dataset passphrases are recorded/backed up off-box.
-- [ ] Perform final read-only TrueNAS health checks.
-- [ ] Shut down TrueNAS cleanly.
+- [x] Perform final read-only TrueNAS health checks.
+- [x] Kexec from TrueNAS into the temporary NixOS installer. TrueNAS was not
+  shut down through a normal UI shutdown path.
 - [x] Boot NixOS installer.
 - [x] Run the remote-only disko preflight from `CUTOVER.md`.
 - [x] Confirm the disko target is the boot-pool disk and no `tank`/`ssd` labels

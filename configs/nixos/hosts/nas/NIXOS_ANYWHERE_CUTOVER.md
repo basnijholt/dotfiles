@@ -57,6 +57,7 @@ ssh \
   root@truenas \
   "EXPECTED_COMMIT='$NAS_COMMIT' nix --extra-experimental-features 'nix-command flakes' shell nixpkgs#git nixpkgs#zfs nixpkgs#util-linux nixpkgs#gptfdisk --command bash -s" <<'REMOTE_PREFLIGHT'
 set -euo pipefail
+export NIX_CONFIG='experimental-features = nix-command flakes'
 
 test -n "${EXPECTED_COMMIT:-}"
 

@@ -2,15 +2,17 @@
 
 This runbook is for the final migration from TrueNAS to NixOS on the NAS host.
 It assumes the current TrueNAS boot-pool disk will become the NixOS boot disk.
+The actual 2026-06-28 cutover used the phased `nixos-anywhere` path below.
 
 ## Safety boundaries
 
 - Do not run disko while booted into TrueNAS.
 - Do not run disko against any member of the `tank` or `ssd` pools.
-- You do not have physical access to this host, so do not rely on being able to
-  recover by unplugging data disks. Use out-of-band console access and complete
-  the remote-only disko preflight below.
-- Shut TrueNAS down cleanly before booting NixOS with the data disks attached.
+- Do not rely on physically unplugging data disks as a safety mechanism. Use
+  out-of-band console access and complete the remote-only disko preflight below.
+- If using the USB/ISO path, shut TrueNAS down cleanly before booting NixOS with
+  the data disks attached. If using the phased `nixos-anywhere` path, kexec
+  replaces that clean shutdown step.
 - Run only one OS against the data pools at a time.
 - Keep `services.comin.enable = false` until the first manual cutover succeeds.
 - If using `nixos-anywhere`, do not run the default all-in-one phase sequence.
@@ -168,6 +170,12 @@ Before shutting down, confirm the off-box unlock material and a manual recovery
 path are available. NixOS will not have the TrueNAS API, so the existing
 `truenas-unlock` flow does not carry over unchanged.
 
+The NixOS/OpenZFS successor is
+[`zfs-unlock`](https://github.com/basnijholt/zfs-unlock). It keeps the
+passphrases on another device and talks to a restricted NAS-side SSH receiver
+instead of the TrueNAS API. Until that receiver is configured on the NAS, the
+post-boot recovery path is the interactive helper documented below.
+
 ## Install NixOS
 
 Boot a NixOS installer and run from `configs/nixos`:
@@ -184,7 +192,7 @@ nixos-install --root /mnt --no-root-passwd --flake .#nas
 
 Reboot into NixOS.
 
-### Alternative: phased nixos-anywhere
+### Phased nixos-anywhere path used for cutover
 
 `nixos-anywhere` can replace the USB/ISO boot path by kexecing the running
 TrueNAS system into a temporary NixOS installer over SSH. This is convenient for
@@ -310,7 +318,8 @@ legacy file keylocations that are not expected to exist on NixOS.
 These datasets do **not** auto-unlock on reboot under the current NixOS config.
 After any restart, encrypted shares stay down until you unlock them manually. If
 you want to preserve the hardware/network-presence behavior from
-`truenas-unlock`, build a NixOS-native replacement after the first cutover.
+`truenas-unlock`, deploy `zfs-unlock` or another NixOS-native replacement after
+the first cutover.
 
 Confirm shares and health services:
 
