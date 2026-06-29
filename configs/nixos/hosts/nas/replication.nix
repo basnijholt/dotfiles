@@ -48,6 +48,11 @@ let
     }
   ];
 
+  # Keep tank/backups/ssd mounted as a filesystem: the B2 rclone job reads
+  # from this replicated mirror on purpose, instead of racing the live Docker
+  # mounts while they are changing. Do not switch this mirror root to
+  # mountpoint=none without moving the B2 design at the same time.
+
   watchdogChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
     check_dataset ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.dataset} ${toString entry.maxAgeHours}
   '') watchedBackupDatasets;

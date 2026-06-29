@@ -9,6 +9,9 @@
     unitConfig.ConditionPathExists = "/home/basnijholt/.config/rclone/rclone.conf";
     path = [ pkgs.rclone ];
     script = ''
+      # Intentionally sync from the NAS backup mirror, not the live mounts
+      # (/opt/stacks and /mnt/data). The live Docker trees change while rclone
+      # scans/uploads them; the replicated mirror is the stable source for B2.
       rclone sync /mnt/tank/backups/ssd/docker/stacks b2-encrypted:/stacks \
         --config /home/basnijholt/.config/rclone/rclone.conf \
         --verbose \
@@ -25,9 +28,13 @@
         --transfers 4 \
         --fast-list
     '';
+    postStart = ''
+      ${pkgs.coreutils}/bin/date +%s > /var/lib/rclone-b2-backup/last-success-epoch
+    '';
     serviceConfig = {
       Type = "oneshot";
       TimeoutStartSec = "infinity";
+      StateDirectory = "rclone-b2-backup";
     };
   };
 

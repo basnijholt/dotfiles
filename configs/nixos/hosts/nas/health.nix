@@ -83,6 +83,7 @@ let
 
     container="nixos"
     unit="rclone-b2-backup.service"
+    success_stamp="/var/lib/rclone-b2-backup/last-success-epoch"
     max_age_hours=36
 
     if ! ${incus} info "$container" >/dev/null 2>&1; then
@@ -90,6 +91,8 @@ let
       exit 1
     fi
 
+    # Keep this aligned with rclone-b2-backup: B2 reads from the replicated
+    # NAS mirror, not the live mutable Docker mounts.
     for source in /mnt/tank/backups/ssd/docker/stacks /mnt/tank/backups/ssd/docker/data; do
       if ! ${incus} exec "$container" -- /run/current-system/sw/bin/test -d "$source"; then
         echo "MISSING B2 backup source: $container:$source"
@@ -99,21 +102,29 @@ let
 
     result="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p Result --value --no-pager)"
     status="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p ExecMainStatus --value --no-pager)"
-    timestamp="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p ExecMainExitTimestamp --value --no-pager)"
 
     if [ "$result" != "success" ] || [ "$status" != "0" ]; then
       echo "STALE B2 backup: $unit last result=$result status=$status"
       exit 1
     fi
 
-    if [ -z "$timestamp" ]; then
-      echo "STALE B2 backup: $unit has no recorded successful exit timestamp"
+    last="$(${incus} exec "$container" -- /run/current-system/sw/bin/cat "$success_stamp" 2>/dev/null || true)"
+
+    case "$last" in
+      ""|*[!0-9]*)
+        echo "STALE B2 backup: $unit has no persisted success marker; run the backup once"
+        exit 1
+        ;;
+    esac
+
+    if [ "$last" -le 0 ]; then
+      echo "STALE B2 backup: $unit has an invalid persisted success marker: $last"
       exit 1
     fi
 
     now="$(${pkgs.coreutils}/bin/date +%s)"
-    last="$(${pkgs.coreutils}/bin/date -d "$timestamp" +%s)"
     age_hours=$(( (now - last) / 3600 ))
+    timestamp="$(${pkgs.coreutils}/bin/date -d "@$last")"
 
     if [ "$age_hours" -gt "$max_age_hours" ]; then
       echo "STALE B2 backup: $unit last succeeded at $timestamp, ''${age_hours}h ago; limit is ''${max_age_hours}h"
