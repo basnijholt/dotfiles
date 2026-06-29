@@ -4,24 +4,29 @@ let
   unlockEncryptedDatasets = pkgs.writeShellScriptBin "zfs-unlock-encrypted-datasets" ''
     set -euo pipefail
 
-    encrypted_roots="$(
-      ${pkgs.zfs}/bin/zfs list -H -o name,encryptionroot,keystatus -t filesystem,volume |
-        ${pkgs.gawk}/bin/awk '$2 == $1 && $3 == "unavailable" { print $1 }'
+    encrypted_roots_and_keylocations="$(
+      ${pkgs.zfs}/bin/zfs list -H -o name,encryptionroot,keystatus,keylocation -t filesystem,volume |
+        ${pkgs.gawk}/bin/awk '$2 == $1 && $3 == "unavailable" { print $1 "\t" $4 }'
     )"
 
-    if [ -z "$encrypted_roots" ]; then
+    if [ -z "$encrypted_roots_and_keylocations" ]; then
       echo "No unavailable encrypted ZFS roots found"
       exit 0
     fi
 
-    echo "$encrypted_roots" | while IFS= read -r dataset; do
+    while IFS="$(printf '\t')" read -r dataset keylocation; do
+      if [ "$keylocation" != "prompt" ]; then
+        echo "Skipping $dataset: keylocation=$keylocation"
+        continue
+      fi
+
       status="$(${pkgs.zfs}/bin/zfs get -H -o value keystatus "$dataset")"
       if [ "$status" = "unavailable" ]; then
-        # One failure (e.g. jailmaker's stale file:///tmp/zfs_pass keylocation,
-        # or a wrong passphrase) must not abort unlocking the remaining datasets.
-        ${pkgs.zfs}/bin/zfs load-key "$dataset" || echo "WARNING: could not load key for $dataset; skipping" >&2
+        # Read the passphrase from the terminal instead of the dataset list.
+        # One wrong passphrase must not abort unlocking the remaining datasets.
+        ${pkgs.zfs}/bin/zfs load-key "$dataset" </dev/tty || echo "WARNING: could not load key for $dataset; skipping" >&2
       fi
-    done
+    done <<< "$encrypted_roots_and_keylocations"
 
     ${pkgs.zfs}/bin/zfs mount -a >/dev/null 2>&1 || true
   '';

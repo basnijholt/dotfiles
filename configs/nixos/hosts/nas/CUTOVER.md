@@ -276,17 +276,36 @@ zfs list
 systemctl status zfs-import-tank.service zfs-import-ssd.service
 ```
 
+The imported data pools are not created by disko. On first boot, confirm their
+ZFS `mountpoint` properties match the TrueNAS-compatible paths used by NFS, SMB,
+and Incus:
+
+```bash
+zfs get mountpoint tank ssd
+```
+
+If they mounted at `/tank` and `/ssd`, reconcile the persistent ZFS properties
+once:
+
+```bash
+zfs set mountpoint=/mnt/tank tank
+zfs set mountpoint=/mnt/ssd ssd
+zfs mount -a
+systemctl restart nfs-server samba-smbd
+```
+
 Unlock encrypted datasets interactively. Encrypted datasets and any shares backed
 by them stay unavailable until unlocked:
 
 ```bash
 zfs-unlock-encrypted-datasets
+zfs mount -a
+systemctl restart nfs-server samba-smbd
 ```
 
 The helper discovers unavailable encrypted roots dynamically and does not
-hardcode private dataset names. Some encrypted roots have legacy file
-keylocations that will not exist on NixOS; the helper logs those failures and
-continues so other passphrase roots can still be unlocked.
+hardcode private dataset names. It prompts for passphrase-backed roots and skips
+legacy file keylocations that are not expected to exist on NixOS.
 
 These datasets do **not** auto-unlock on reboot under the current NixOS config.
 After any restart, encrypted shares stay down until you unlock them manually. If

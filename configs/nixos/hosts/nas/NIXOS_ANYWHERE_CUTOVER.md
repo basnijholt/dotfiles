@@ -160,7 +160,16 @@ ssh basnijholt@nas
 sudo zpool status
 sudo zfs list
 sudo systemctl status zfs-import-tank.service zfs-import-ssd.service
+
+# One-time reconciliation for imported data pools if they mounted at /tank
+# and /ssd instead of the TrueNAS-compatible /mnt paths used by services.
+sudo zfs set mountpoint=/mnt/tank tank
+sudo zfs set mountpoint=/mnt/ssd ssd
+sudo zfs mount -a
+
 sudo zfs-unlock-encrypted-datasets
+sudo zfs mount -a
+sudo systemctl restart nfs-server samba-smbd
 sudo testparm -s
 sudo exportfs -v
 sudo systemctl status samba-smbd nfs-server smartd netdata upsmon
