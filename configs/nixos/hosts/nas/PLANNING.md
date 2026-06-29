@@ -61,6 +61,16 @@ The data pools are imported by name and are not described by disko.
 - Added an explicit `nas` DNS record to avoid wildcard `.local` misrouting.
 - Added faster Nix cache failure behavior for unavailable LAN caches.
 - Locked down the local `~/nas-cutover` staging directory to mode `0700` without reading its contents.
+- Updated the declarative `truenas.local` SSH known-host key to the post-migration NixOS host key.
+- Switched the real NAS to the config containing that updated compatibility host key.
+- Confirmed the NAS system state is running with no failed host units.
+- Confirmed all ZFS pools are healthy after the post-cutover rebuild.
+- Confirmed Incus containers `docker`, `nix-cache`, and `nixos` are running.
+- Confirmed Netdata, Prometheus node/ZFS/SMART/NUT exporters, smartd, upsmon, and ZED are running.
+- Confirmed host-level Tailscale is authenticated.
+- Confirmed the `zfs-unlock` NAS receiver side is installed as a restricted SSH forced-command account.
+- Confirmed direct `zfs-unlock` SSH access from the PC is denied.
+- Confirmed the `zfs-unlock` client side on `pi4` is not complete yet: the configured private key is missing, no client executable is installed, and no user service is enabled.
 
 ## Remaining Work
 
@@ -88,7 +98,10 @@ The data pools are imported by name and are not described by disko.
 - [x] Confirm encrypted roots use passphrase keys.
 - [x] Confirm passphrases are recorded/backed up off-box.
 - [x] Harden `zfs-unlock-encrypted-datasets` so one skipped key does not abort the whole batch.
-- [ ] Deploy `zfs-unlock` as the NixOS/OpenZFS successor to the old `truenas-unlock` API flow, or accept manual unlocks after reboot.
+- [x] Deploy the NAS-side `zfs-unlock` restricted SSH receiver.
+- [ ] Finish the `pi4` client side of `zfs-unlock`: install the client, install the configured private key, enable the user service, and use a host target that resolves reliably from `pi4`.
+- [ ] Run a non-destructive `zfs-unlock status` check from `pi4` to the NAS receiver.
+- [ ] After the status check works, run one real unlock pass from `pi4` and confirm expected encrypted roots become available.
 
 ### Monitoring And Access
 
@@ -98,6 +111,17 @@ The data pools are imported by name and are not described by disko.
 - [x] Validate UPS status with `upsc` and the NUT exporter.
 - [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
 - [x] Authenticate host-level Tailscale with `tailscale up`.
+
+### Incus Container Cleanup
+
+- [ ] Investigate failed units inside recovered Incus containers: `comin.service`, `github-backup-sync.service`, and `systemd-tmpfiles-clean.service`.
+- [ ] Review PostgreSQL collation warnings inside Docker workloads after the host/container move.
+- [ ] Decide whether the repeated DHCP option warning inside `docker` is harmless or should be fixed.
+
+### Reboot Validation
+
+- [ ] After `zfs-unlock` and replication are sorted, reboot the NAS once.
+- [ ] Confirm pools import, encrypted datasets unlock, NFS/SMB return, and Incus containers auto-start after that reboot.
 
 ## Historical Context
 
