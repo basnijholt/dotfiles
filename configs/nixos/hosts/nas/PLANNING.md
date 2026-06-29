@@ -55,6 +55,8 @@ The data pools are imported by name and are not described by disko.
 - Recovered Incus instances from `ssd/.ix-virt` with `incus admin recover`.
 - Applied known Incus instance config and fixed required subordinate UID/GID passthrough ranges.
 - Validated NFS mounts from the PC.
+- Confirmed NFS exports from the NAS.
+- Validated unauthenticated SMB access to the guest-enabled share from a fresh `smbclient` invocation.
 - Removed the obsolete PC TrueNAS API config-backup job from Nix config.
 - Added an explicit `nas` DNS record to avoid wildcard `.local` misrouting.
 - Added faster Nix cache failure behavior for unavailable LAN caches.
@@ -67,7 +69,7 @@ The data pools are imported by name and are not described by disko.
 - [ ] Create or verify Samba passwords for intended users with `smbpasswd`.
 - [ ] Validate Time Machine from a macOS client.
 - [ ] Validate photo/media access from normal client accounts.
-- [ ] Validate guest access from a fresh unauthenticated client.
+- [x] Validate guest access from a fresh unauthenticated client.
 - [ ] Validate Previous Versions/shadow-copy browsing.
 - [ ] Decide whether stock Samba `shadow_copy2` is sufficient long-term.
 
@@ -92,7 +94,7 @@ The data pools are imported by name and are not described by disko.
 
 - [ ] Decide how Netdata should be reached: SSH tunnel, reverse proxy, or Tailscale-only access.
 - [ ] Add `/etc/nas-health-alert.env` with `NTFY_URL` if wall/syslog is not enough.
-- [ ] Validate all disks appear in `smartctl --scan-open` on NixOS.
+- [x] Validate all disks appear in `smartctl --scan-open` on NixOS.
 - [x] Validate UPS status with `upsc` and the NUT exporter.
 - [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
 - [x] Authenticate host-level Tailscale with `tailscale up`.
