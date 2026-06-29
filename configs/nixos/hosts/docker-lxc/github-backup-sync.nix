@@ -16,12 +16,6 @@
       Type = "oneshot";
       User = "basnijholt";
       TimeoutStartSec = "infinity";
-      # gh's interactive stored auth did not survive the TrueNAS -> NixOS move
-      # (no token on `docker`, expired token on `nixos`). Provide a token
-      # reproducibly via an off-repo env file (`GH_TOKEN=...`), same pattern as
-      # nas-health-alert.env. The leading "-" makes the file optional, so the
-      # unit still builds/runs where the token is not needed.
-      EnvironmentFile = "-/etc/github-backup-sync.env";
     };
   };
 

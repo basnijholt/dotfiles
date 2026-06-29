@@ -115,31 +115,6 @@ The data pools are imported by name and are not described by disko.
 - [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
 - [x] Authenticate host-level Tailscale with `tailscale up`.
 
-### Incus Container Cleanup
-
-Investigated the failed units via read-only journals (2026-06-28). None were
-repo config bugs:
-
-- `github-backup-sync.service` (`docker` + `nixos` instances): fails on GitHub
-  auth — no `gh` token on `docker`, expired token ("Bad credentials") on
-  `nixos`. `gh`'s interactive auth did not survive the move. Declarative fix
-  landed: `github-backup-sync.nix` now loads an optional
-  `/etc/github-backup-sync.env` (`GH_TOKEN=...`), kept off-repo.
-  - [ ] Drop a valid `GH_TOKEN` into `/etc/github-backup-sync.env` on the
-    affected instances (or manage it via ragenix).
-- `comin.service` (`docker`): transient boot-time DNS failure ("Could not
-  resolve host: github.com") during the cutover window; hit the restart limit
-  and stayed failed. Not a config bug.
-  - [ ] Confirm it recovers on the next reboot (covered by Reboot Validation);
-    if it recurs, investigate the container's DNS/`network-online` ordering.
-- `systemd-tmpfiles-clean.service` (`nix-cache` + `nixos`): `statx ... Protocol
-  driver not attached` on `/tmp` under idmapped-container mounts — a benign,
-  cosmetic LXC/idmap quirk, not a repo bug.
-  - [ ] Accept, or mask the unit in the affected instances if the log noise is
-    unwanted.
-- [ ] Review PostgreSQL collation warnings inside Docker workloads after the host/container move.
-- [ ] Decide whether the repeated DHCP option warning inside `docker` is harmless or should be fixed.
-
 ### Deploy
 
 - [ ] Run `nixos-rebuild switch --flake .#nas` to deploy `c96eaf1`. Until then the
