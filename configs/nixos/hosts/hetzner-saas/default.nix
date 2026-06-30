@@ -185,6 +185,8 @@ in
   # Keep the generated zram instance untouched during switch-to-configuration.
   # This must be a drop-in: a concrete systemd-zram-setup@zram0.service would
   # shadow zram-generator's unit and boot without zram swap.
+  # Do not use systemd.services."systemd-zram-setup@zram0" here: that creates
+  # the concrete unit and can reproduce the no-ExecStart/OOM failure mode.
   systemd.units."systemd-zram-setup@zram0.service" = {
     overrideStrategy = "asDropin";
     text = ''
