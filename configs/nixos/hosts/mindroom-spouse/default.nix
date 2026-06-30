@@ -25,12 +25,6 @@ in
     ../../optional/openclaw/services.nix
   ];
 
-  # Passwordless sudo for OpenClaw agent
-  security.sudo.extraRules = [{
-    users = [ "basnijholt" ];
-    commands = [{ command = "ALL"; options = [ "NOPASSWD" ]; }];
-  }];
-
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli ];
 
@@ -81,7 +75,4 @@ in
 
   systemd.services.openclaw-gateway.serviceConfig.UnsetEnvironment = mindroomUnsetEnvironment;
 
-  # Deploy manually while this container is being used as a hands-on MindRoom
-  # runtime.
-  services.comin.enable = lib.mkForce false;
 }

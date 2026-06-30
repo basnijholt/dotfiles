@@ -15,6 +15,20 @@ in
     openssh.authorizedKeys.keys = sshKeys;
   };
 
+  # Colmena deploys over SSH as this user and needs non-interactive privilege
+  # escalation for activation because root SSH login is disabled.
+  security.sudo.extraRules = [
+    {
+      users = [ "basnijholt" ];
+      commands = [
+        {
+          command = "ALL";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
+
   # --- Atuin History Daemon ---
   # Run Atuins history daemon using existing ~/.config/atuin/config.toml
   systemd.user.services."atuin-daemon" = {

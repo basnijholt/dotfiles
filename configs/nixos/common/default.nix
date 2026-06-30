@@ -12,6 +12,5 @@
     ./packages.nix
     ./disk-cleanup.nix
     ./home-manager.nix
-    ./comin.nix
   ];
 }

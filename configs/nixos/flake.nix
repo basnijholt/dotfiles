@@ -15,8 +15,8 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    comin = {
-      url = "github:nlewo/comin";
+    colmena = {
+      url = "github:nix-community/colmena";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ragenix = {
@@ -39,7 +39,7 @@
       home-manager,
       home-manager-pi,
       disko,
-      comin,
+      colmena,
       ragenix,
       zfs-unlock,
       nixos-raspberrypi,
@@ -53,7 +53,6 @@
       commonModules = homeManager: [
         ./configuration.nix
         homeManager.nixosModules.home-manager
-        comin.nixosModules.comin
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
@@ -87,6 +86,24 @@
           specialArgs = { inherit nixos-raspberrypi; };
           modules = [ piModule ] ++ extraModules;
         };
+
+      aarch64Pkgs = import nixpkgs { system = "aarch64-linux"; };
+      piPkgs = import nixos-raspberrypi.inputs.nixpkgs { system = "aarch64-linux"; };
+
+      colmenaConfig = import ./colmena.nix {
+        inherit
+          pkgs
+          aarch64Pkgs
+          piPkgs
+          commonModules
+          home-manager
+          home-manager-pi
+          disko
+          ragenix
+          zfs-unlock
+          nixos-raspberrypi
+          ;
+      };
 
     in
     {
@@ -294,6 +311,11 @@
           ];
         };
       };
+
+      colmena = colmenaConfig;
+      colmenaHive = colmena.lib.makeHive self.outputs.colmena;
+      packages.${system}.colmena = colmena.packages.${system}.colmena;
+      apps.${system}.colmena = colmena.apps.${system}.colmena;
 
       diskoConfigurations = {
         pc = (import ./hosts/pc/disko.nix) { inherit lib; };

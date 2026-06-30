@@ -8,7 +8,7 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 
 - Base migration PR: https://github.com/basnijholt/dotfiles/pull/61
 - Follow-up PR: https://github.com/basnijholt/dotfiles/pull/62
-- Backup monitoring / comin follow-up PR: https://github.com/basnijholt/dotfiles/pull/63
+- Backup monitoring follow-up PR: https://github.com/basnijholt/dotfiles/pull/63
 - Post-PR follow-ups: B2 success marker, `ncps` Cachix proxy fix, B2 running-state watchdog guard, and a narrow SSD replication skip for the rebuildable `nix-cache` Incus dataset.
 - Monitoring dashboard: Grafana scrapes the NAS Prometheus exporters; host Netdata stays localhost-only.
 - Base branch: `main`
@@ -89,7 +89,7 @@ The data pools are imported by name and are not described by disko.
 - Verified the inbound root replication keys match the root public-key fingerprints on `hp`, `nuc`, and `pi4`.
 - Confirmed the PC NFS mounts are present and resolve to the NAS address.
 - Merged and deployed follow-up PR #62 so inbound push jobs use the NAS LAN IP instead of `truenas.local`.
-- Merged and deployed follow-up PR #63 so backup monitoring and `comin` are active on the NAS.
+- Merged and deployed follow-up PR #63 so backup monitoring is active on the NAS.
 - Confirmed `ntfy` notifications work with the `nas-alerts` topic from both a direct `curl` test and a real service alert.
 - Confirmed a real reboot returned the pools, encrypted datasets, SMB/NFS services, and Incus containers.
 - Confirmed `systemd-tmpfiles --clean` succeeds after the systemd 260.2 update.
@@ -156,8 +156,8 @@ The data pools are imported by name and are not described by disko.
 
 ### Deploy
 
-- [x] Merge and manually deploy the backup monitoring follow-up PR to `nas`; that deployment enables `comin` for future NAS updates.
-- [ ] Confirm `comin` deploys the latest post-PR follow-up commits on the NAS after the current long-running replication work is out of the way.
+- [x] Merge and manually deploy the backup monitoring follow-up PR to `nas`.
+- [ ] Switch routine deployments from the pull-based `comin` model to push-based Colmena.
 
 ### Reboot Validation
 

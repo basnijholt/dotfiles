@@ -48,10 +48,24 @@ configs/nixos/
 # Build a system
 nix build .#nixosConfigurations.hp.config.system.build.toplevel
 
+# Build all Colmena deployment nodes
+nix run .#colmena -- build
+
+# Deploy all Colmena deployment nodes
+nix run .#colmena -- apply
+
+# Deploy one node or tag
+nix run .#colmena -- apply --on nas
+nix run .#colmena -- apply --on @home
+
 # Build installer ISO
 nix build .#nixosConfigurations.installer.config.system.build.isoImage
 cp result/iso/*.iso /tmp/nixos.iso
 ```
+
+`colmena apply` is the default push-based deployment path for reachable hosts.
+The default hive currently includes `pc`, `nuc`, `hp`, `nas`, `pi4`, `docker-lxc`, `nix-cache`, `hetzner`, and `hetzner-matrix`.
+The first rollout of the Colmena change itself still needs a manual `nixos-rebuild switch` or the previous pull-based deployment path, because existing hosts need this config once before non-interactive sudo is available for Colmena activation.
 
 ## Install Cheatsheet
 

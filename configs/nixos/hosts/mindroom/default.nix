@@ -20,12 +20,6 @@
     ../../optional/openclaw/services.nix
   ];
 
-  # Allow basnijholt passwordless sudo (for mindroom agent)
-  security.sudo.extraRules = [{
-    users = [ "basnijholt" ];
-    commands = [{ command = "ALL"; options = [ "NOPASSWD" ]; }];
-  }];
-
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli pkgs.ffmpeg-headless pkgs.chromium ];
 
@@ -37,6 +31,4 @@
   # that link against it. Without this, uv run / pytest fail with import errors.
   environment.variables.LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
 
-  # Disable comin on this host — we deploy manually via nixos-rebuild switch.
-  services.comin.enable = lib.mkForce false;
 }
