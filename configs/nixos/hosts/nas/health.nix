@@ -100,6 +100,12 @@ let
       fi
     done
 
+    active="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl is-active "$unit" || true)"
+    if [ "$active" = "active" ] || [ "$active" = "activating" ]; then
+      echo "OK B2 backup: $unit is currently running"
+      exit 0
+    fi
+
     result="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p Result --value --no-pager)"
     status="$(${incus} exec "$container" -- /run/current-system/sw/bin/systemctl show "$unit" -p ExecMainStatus --value --no-pager)"
 
