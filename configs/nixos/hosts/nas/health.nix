@@ -163,12 +163,15 @@ in
 
   services.netdata = {
     enable = true;
+    package = pkgs.netdataCloud;
     enableAnalyticsReporting = false;
     extraNdsudoPackages = with pkgs; [
       nvme-cli
       smartmontools
     ];
-    config.web."bind to" = "127.0.0.1";
+    # Keep localhost for SSH tunnels, and bind the NAS LAN address so the
+    # Docker/Traefik host can proxy the Netdata dashboard.
+    config.web."bind to" = "127.0.0.1 192.168.1.4";
   };
 
   services.prometheus.exporters = {
