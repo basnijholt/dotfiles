@@ -17,6 +17,7 @@ HOSTS=(
   "docker"
   # Cloud hosts
   "nixos-hetzner"
+  "mindroom-hetzner"
 )
 
 # Arrays to track results
