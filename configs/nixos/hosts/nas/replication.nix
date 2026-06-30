@@ -28,6 +28,7 @@ let
   mkSyncoidArgs = extraArgs: pkgs.lib.escapeShellArgs (syncoidCommon ++ extraArgs);
   mkSyncoidCommonArgs = mkSyncoidArgs [ ];
   mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
+  nucReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
 
   watchedBackupDatasets = [
     {
@@ -185,6 +186,7 @@ in
       zfs list ssd >/dev/null
 
       syncoid ${mkSyncoidSsdArgs} \
+        --recvoptions=${nucReceiveOptions} \
         --sshkey=/etc/ssh/nas-replication-nuc-ed25519 \
         --sshport=22 \
         --sshoption=BatchMode=yes \
