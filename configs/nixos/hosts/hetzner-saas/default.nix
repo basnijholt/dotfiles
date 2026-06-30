@@ -182,7 +182,11 @@ in
     enable = true;
     memoryPercent = 50;
   };
-  systemd.services."systemd-zram-setup@zram0".restartIfChanged = false;
+  # Keep the in-use zram device untouched during switch-to-configuration.
+  systemd.services."systemd-zram-setup@zram0" = {
+    restartIfChanged = false;
+    stopIfChanged = false;
+  };
 
   boot.kernelModules = [ "tcp_bbr" ];
   boot.kernel.sysctl = {
