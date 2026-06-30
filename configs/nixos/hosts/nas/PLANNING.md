@@ -9,9 +9,10 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 - Base migration PR: https://github.com/basnijholt/dotfiles/pull/61
 - Follow-up PR: https://github.com/basnijholt/dotfiles/pull/62
 - Backup monitoring / comin follow-up PR: https://github.com/basnijholt/dotfiles/pull/63
+- Post-PR follow-ups: B2 success marker, `ncps` Cachix proxy fix, B2 running-state watchdog guard, and a narrow SSD replication skip for the rebuildable `nix-cache` Incus dataset.
 - Base branch: `main`
 - Host name in Nix: `nas`
-- Last updated: `2026-06-29 post-cutover follow-ups`
+- Last updated: `2026-06-29 post-cutover validation`
 
 The real NAS has been cut over from TrueNAS to NixOS with this host config.
 The destructive storage migration is complete.
@@ -86,6 +87,15 @@ The data pools are imported by name and are not described by disko.
 - Verified the inbound root replication keys match the root public-key fingerprints on `hp`, `nuc`, and `pi4`.
 - Confirmed the PC NFS mounts are present and resolve to the NAS address.
 - Merged and deployed follow-up PR #62 so inbound push jobs use the NAS LAN IP instead of `truenas.local`.
+- Merged and deployed follow-up PR #63 so backup monitoring and `comin` are active on the NAS.
+- Confirmed `ntfy` notifications work with the `nas-alerts` topic from both a direct `curl` test and a real service alert.
+- Confirmed a real reboot returned the pools, encrypted datasets, SMB/NFS services, and Incus containers.
+- Confirmed `systemd-tmpfiles --clean` succeeds after the systemd 260.2 update.
+- Fixed the `ncps` binary-cache proxy so it no longer proxies Cachix-style UUID NAR URLs that trigger `invalid nar hash`.
+- Deployed that `ncps` fix to the `nix-cache` Incus container and smoke-tested both the former 500 path and a normal narinfo hit.
+- Confirmed the Backblaze B2 rclone job completed successfully after the persistent success-marker change.
+- Confirmed the NAS B2 watchdog reports the successful B2 run as fresh.
+- Kept Incus `.ix-virt` in SSD replication for restore fidelity, but committed a narrow Syncoid skip for the rebuildable `ssd/.ix-virt/containers/nix-cache` dataset.
 
 ## Remaining Work
 
@@ -112,11 +122,15 @@ The data pools are imported by name and are not described by disko.
 - [x] Add `OnFailure=` alert hooks to the declared NAS replication units.
 - [x] Exclude `tank/backups` from NAS-local Sanoid snapshots so replicated backup targets are not refreshed by local autosnapshots.
 - [x] Add an hourly snapshot-freshness watchdog for the local SSD mirror, inbound host pushes, and Hetzner website pull target.
-- [ ] Let the first long-running local and NUC Syncoid replications finish, then inspect source/target snapshots.
+- [ ] Let the currently running `ssd -> nuc` catch-up finish, or intentionally restart it after deploying the new exclude if skipping the current `nix-cache` transfer matters.
+- [ ] Inspect source/target snapshots after the `ssd -> nuc` catch-up finishes.
 - [x] Reconcile the failed Hetzner website replication target; the stale NAS target was renamed aside and a fresh pull completed.
 - [x] Reconcile the Backblaze B2 rclone job in config so it skips when rclone config is absent and syncs from the stable local SSD mirror instead of live Docker paths.
 - [x] Deploy the Backblaze B2 rclone change to the Incus container that owns the job, then inspect the next run.
 - [x] Add failure alerting or a freshness check for the authoritative Backblaze B2 job once its owner container and backup method are decided.
+- [x] Confirm the authoritative Backblaze B2 job completed once and wrote a persistent success marker.
+- [x] Confirm the NAS B2 watchdog reports the B2 success marker as fresh.
+- [x] Keep `.ix-virt` backed up for Incus restore fidelity, but skip only the rebuildable `ssd/.ix-virt/containers/nix-cache` dataset in future SSD Syncoid jobs.
 - [ ] Decide whether old TrueNAS-created snapshots and pre-exclusion NAS-local `tank/backups` autosnapshots should be aged out manually.
 
 ### Encryption
@@ -127,7 +141,7 @@ The data pools are imported by name and are not described by disko.
 - [x] Deploy the NAS-side `zfs-unlock` restricted SSH receiver.
 - [x] Finish the `pi4` client side of `zfs-unlock`: install the client, install the configured private key, enable the system service, and use a NAS target that resolves reliably from `pi4`.
 - [x] Run a non-destructive `zfs-unlock status` check from `pi4` to the NAS receiver.
-- [ ] Run one real unlock pass from `pi4` after the managed datasets are intentionally unavailable, and confirm expected encrypted roots become available.
+- [x] Run one real unlock pass from `pi4` after the managed datasets are intentionally unavailable, and confirm expected encrypted roots become available.
 
 ### Monitoring And Access
 
@@ -140,12 +154,13 @@ The data pools are imported by name and are not described by disko.
 
 ### Deploy
 
-- [ ] Merge and manually deploy the backup monitoring follow-up PR to `nas`; that deployment enables `comin` for future NAS updates.
+- [x] Merge and manually deploy the backup monitoring follow-up PR to `nas`; that deployment enables `comin` for future NAS updates.
+- [ ] Confirm `comin` deploys the latest post-PR follow-up commits on the NAS after the current long-running replication work is out of the way.
 
 ### Reboot Validation
 
-- [ ] After `zfs-unlock` and replication are sorted, reboot the NAS once.
-- [ ] Confirm pools import, encrypted datasets unlock, NFS/SMB return, and Incus containers auto-start after that reboot.
+- [x] Reboot the NAS once after the migration.
+- [x] Confirm pools import, encrypted datasets unlock, NFS/SMB return, and Incus containers auto-start after that reboot.
 
 ## Historical Context
 
