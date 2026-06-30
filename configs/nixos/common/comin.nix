@@ -68,6 +68,10 @@ in
   # Fix diverged history on comin start (e.g., after force-push)
   # Use || true to tolerate network unavailability at boot - comin will fetch on its own
   systemd.services = lib.mkIf config.services.comin.enable {
+    # comin must restart when its own config changes. Otherwise a bad running
+    # config can keep failing before it ever deploys the commit that fixes it.
+    comin.restartIfChanged = lib.mkForce true;
+
     comin.preStart = ''
       REPO="/var/lib/comin/repository"
       if [ -d "$REPO/.git" ]; then
