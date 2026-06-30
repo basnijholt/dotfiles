@@ -10,6 +10,7 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 - Follow-up PR: https://github.com/basnijholt/dotfiles/pull/62
 - Backup monitoring / comin follow-up PR: https://github.com/basnijholt/dotfiles/pull/63
 - Post-PR follow-ups: B2 success marker, `ncps` Cachix proxy fix, B2 running-state watchdog guard, and a narrow SSD replication skip for the rebuildable `nix-cache` Incus dataset.
+- Monitoring dashboard: Grafana scrapes the NAS Prometheus exporters; host Netdata stays localhost-only.
 - Base branch: `main`
 - Host name in Nix: `nas`
 - Last updated: `2026-06-29 post-cutover validation`
@@ -75,6 +76,7 @@ The data pools are imported by name and are not described by disko.
 - Confirmed all ZFS pools are healthy after the post-cutover rebuild.
 - Confirmed Incus containers `docker`, `nix-cache`, and `nixos` are running.
 - Confirmed Netdata, Prometheus node/ZFS/SMART/NUT exporters, smartd, upsmon, and ZED are running.
+- Configured a Grafana `NAS health` dashboard backed by the NAS node, ZFS, SMART, and NUT Prometheus exporters.
 - Confirmed host-level Tailscale is authenticated.
 - Confirmed the `zfs-unlock` NAS receiver side is installed as a restricted SSH forced-command account.
 - Confirmed direct `zfs-unlock` SSH access from the PC is denied.
@@ -145,7 +147,7 @@ The data pools are imported by name and are not described by disko.
 
 ### Monitoring And Access
 
-- [ ] Decide how Netdata should be reached: SSH tunnel, reverse proxy, or Tailscale-only access.
+- [x] Keep host Netdata localhost-only and use Grafana plus Prometheus exporters as the normal NAS dashboard.
 - [x] Configure ntfy alerts declaratively on the `nas-alerts` topic.
 - [x] Validate all disks appear in `smartctl --scan-open` on NixOS.
 - [x] Validate UPS status with `upsc` and the NUT exporter.
