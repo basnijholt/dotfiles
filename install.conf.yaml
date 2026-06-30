@@ -82,7 +82,6 @@
       if: '[ "$(uname)" = "Linux" ]'
 - link:
     ~/.config/hypr: configs/hypr
-    ~/.config/waybar: submodules/mechabar
     ~/.config/mako/config: configs/mako/config
 
 # -- Only on PC --
