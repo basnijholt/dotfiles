@@ -50,11 +50,15 @@ in
 {
   services.comin = {
     enable = true;
-    remotes = [{
-      name = "origin";
-      url = "https://github.com/basnijholt/dotfiles.git";
-      branches.main.name = "main";
-    }];
+    submodules = true;
+    exporter.listen_address = "127.0.0.1";
+    remotes = [
+      {
+        name = "origin";
+        url = "https://github.com/basnijholt/dotfiles.git";
+        branches.main.name = "main";
+      }
+    ];
     repositorySubdir = "configs/nixos";
     hostname = config.networking.hostName;
   };
@@ -70,6 +74,8 @@ in
       fi
     '';
 
+    # comin can stay systemd-active while a saturated machine prevents it from
+    # making progress. Watch metrics progress instead of only service state.
     comin-watchdog = {
       description = "Check that comin is still polling and reporting healthy deploys";
       wants = [ "comin.service" ];
@@ -87,9 +93,9 @@ in
   systemd.timers.comin-watchdog = lib.mkIf config.services.comin.enable {
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnCalendar = "hourly";
+      OnCalendar = "*:0/15";
       Persistent = true;
-      RandomizedDelaySec = "10m";
+      RandomizedDelaySec = "2m";
     };
   };
 }
