@@ -6,6 +6,47 @@
   ...
 }:
 
+let
+  cominWatchdog = pkgs.writeShellScript "comin-watchdog" ''
+    set -euo pipefail
+
+    endpoint="http://127.0.0.1:4243/metrics"
+    state="$STATE_DIRECTORY/last-fetch-count"
+
+    metrics="$(${pkgs.curl}/bin/curl -fsS --max-time 10 "$endpoint" 2>/dev/null || true)"
+    if [ -z "$metrics" ]; then
+      echo "comin metrics are unreachable at $endpoint"
+      exit 1
+    fi
+
+    failed="$(printf '%s\n' "$metrics" | ${pkgs.gawk}/bin/awk '$1 ~ /^comin_last_.*_failed/ && $NF != 0 { print; exit }')"
+    if [ -n "$failed" ]; then
+      echo "comin reports failure: $failed"
+      exit 1
+    fi
+
+    suspended="$(printf '%s\n' "$metrics" | ${pkgs.gawk}/bin/awk '$1 == "comin_is_suspended" { print $NF; exit }')"
+    if [ "''${suspended:-0}" = "1" ]; then
+      echo "comin is suspended; skipping progress check"
+      exit 0
+    fi
+
+    current="$(printf '%s\n' "$metrics" | ${pkgs.gawk}/bin/awk '$1 ~ /^comin_fetch_count/ && $0 ~ /status="succeeded"/ { print int($NF); exit }')"
+    previous="$(${pkgs.coreutils}/bin/cat "$state" 2>/dev/null || true)"
+    if [ -z "$current" ]; then
+      echo "could not read comin_fetch_count from metrics"
+      exit 1
+    fi
+
+    printf '%s\n' "$current" > "$state"
+    if [ -n "$previous" ] && [ "$current" = "$previous" ]; then
+      echo "comin fetch_count stuck at $current"
+      exit 1
+    fi
+
+    echo "comin OK: fetch_count=$current, previous=''${previous:-none}"
+  '';
+in
 {
   services.comin = {
     enable = true;
@@ -28,5 +69,27 @@
         ${pkgs.git}/bin/git -C "$REPO" reset --hard origin/main || true
       fi
     '';
+
+    comin-watchdog = {
+      description = "Check that comin is still polling and reporting healthy deploys";
+      wants = [ "comin.service" ];
+      after = [ "comin.service" ];
+      script = ''
+        exec ${cominWatchdog}
+      '';
+      serviceConfig = {
+        Type = "oneshot";
+        StateDirectory = "comin-watchdog";
+      };
+    };
+  };
+
+  systemd.timers.comin-watchdog = lib.mkIf config.services.comin.enable {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "hourly";
+      Persistent = true;
+      RandomizedDelaySec = "10m";
+    };
   };
 }

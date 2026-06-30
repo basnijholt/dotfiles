@@ -226,5 +226,9 @@ in
     };
   };
 
+  systemd.services.comin-watchdog = lib.mkIf config.services.comin.enable {
+    unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
+  };
+
   environment.systemPackages = [ nasHealthAlert ];
 }
