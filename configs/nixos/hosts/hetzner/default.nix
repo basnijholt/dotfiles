@@ -57,10 +57,16 @@
     memoryPercent = 50; # Use up to 50% of RAM for compressed swap
   };
 
-  # Keep the in-use zram device untouched during switch-to-configuration.
-  systemd.services."systemd-zram-setup@zram0" = {
-    restartIfChanged = false;
-    stopIfChanged = false;
+  # Keep the generated zram instance untouched during switch-to-configuration.
+  # This must be a drop-in: a concrete systemd-zram-setup@zram0.service would
+  # shadow zram-generator's unit and boot without zram swap.
+  systemd.units."systemd-zram-setup@zram0.service" = {
+    overrideStrategy = "asDropin";
+    text = ''
+      [Service]
+      X-RestartIfChanged=false
+      X-StopIfChanged=false
+    '';
   };
 
   # Required for ZFS
