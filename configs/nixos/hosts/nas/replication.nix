@@ -18,7 +18,16 @@ let
     "--compress=lz4"
   ];
 
-  mkSyncoidArgs = pkgs.lib.escapeShellArgs syncoidCommon;
+  syncoidSsdExcludes = [
+    # Keep .ix-virt backed up: it is part of Incus recovery fidelity.
+    # The nix-cache container is rebuildable and large, so skip only that
+    # container dataset instead of excluding all Incus storage.
+    "--exclude-datasets=^ssd/\\.ix-virt/containers/nix-cache($|/)"
+  ];
+
+  mkSyncoidArgs = extraArgs: pkgs.lib.escapeShellArgs (syncoidCommon ++ extraArgs);
+  mkSyncoidCommonArgs = mkSyncoidArgs [ ];
+  mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
 
   watchedBackupDatasets = [
     {
@@ -136,7 +145,7 @@ in
       zfs list ssd >/dev/null
       zfs list tank/backups/ssd >/dev/null
 
-      syncoid ${mkSyncoidArgs} ssd tank/backups/ssd
+      syncoid ${mkSyncoidSsdArgs} ssd tank/backups/ssd
     '';
     serviceConfig = {
       Type = "oneshot";
@@ -175,7 +184,7 @@ in
 
       zfs list ssd >/dev/null
 
-      syncoid ${mkSyncoidArgs} \
+      syncoid ${mkSyncoidSsdArgs} \
         --sshkey=/etc/ssh/nas-replication-nuc-ed25519 \
         --sshport=22 \
         --sshoption=BatchMode=yes \
@@ -219,7 +228,7 @@ in
 
       zfs list tank/backups/hetzner >/dev/null
 
-      syncoid ${mkSyncoidArgs} \
+      syncoid ${mkSyncoidCommonArgs} \
         --sshkey=/etc/ssh/nas-replication-hetzner-ed25519 \
         --sshport=22 \
         --sshoption=BatchMode=yes \
