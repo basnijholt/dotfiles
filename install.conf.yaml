@@ -85,6 +85,15 @@
     ~/.config/waybar: submodules/mechabar
     ~/.config/mako/config: configs/mako/config
 
+# -- Only on PC --
+- defaults:
+    link:
+      create: true
+      relink: true
+      if: '[ "$(hostname)" = "pc" ]'
+- link:
+    ~/.gitconfig-sign: configs/git/gitconfig-sign
+
 # -- Only on MacOS --
 - defaults:
     link:
