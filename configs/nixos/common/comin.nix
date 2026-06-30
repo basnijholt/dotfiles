@@ -50,8 +50,10 @@ in
 {
   services.comin = {
     enable = true;
-    submodules = true;
     exporter.listen_address = "127.0.0.1";
+    # Do not enable services.comin.submodules here. That makes Nix evaluate the
+    # flake with ?submodules=1, which tries to fetch private git@github.com
+    # submodules from comin's root context and fails without a deploy SSH key.
     remotes = [
       {
         name = "origin";
