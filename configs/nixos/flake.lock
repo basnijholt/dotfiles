@@ -49,15 +49,16 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1782515413,
-        "narHash": "sha256-Pb5ngiUtJWO7N8hUtv1dXoViv1IuJUIOKLcOprrfUvU=",
-        "owner": "nlewo",
+        "lastModified": 1782847359,
+        "narHash": "sha256-R5rOXhtJhlbds7wYaNwp5Havem2UWlJ0KUIb9UoWfz0=",
+        "owner": "basnijholt",
         "repo": "comin",
-        "rev": "ec4b64a43faf5261ad4dc35b4e008c2bafc2e8db",
+        "rev": "274066905f12d3892a4ff828318acfc5629f0eda",
         "type": "github"
       },
       "original": {
-        "owner": "nlewo",
+        "owner": "basnijholt",
+        "ref": "feat/ssh-commit-signing",
         "repo": "comin",
         "type": "github"
       }

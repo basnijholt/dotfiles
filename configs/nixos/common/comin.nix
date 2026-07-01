@@ -7,6 +7,12 @@
 }:
 
 let
+  sshKeys = import ./ssh-keys.nix;
+
+  cominAllowedSigners = pkgs.writeText "comin-allowed-signers" ''
+    bas@nijho.lt namespaces="git" ${sshKeys.userKeys.bas}
+  '';
+
   cominWatchdog = pkgs.writeShellScript "comin-watchdog" ''
     set -euo pipefail
 
@@ -63,6 +69,7 @@ in
     ];
     repositorySubdir = "configs/nixos";
     hostname = config.networking.hostName;
+    sshAllowedSignersPath = "${cominAllowedSigners}";
   };
 
   # Fix diverged history on comin start (e.g., after force-push)
