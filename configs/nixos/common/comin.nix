@@ -72,8 +72,9 @@ in
     sshAllowedSignersPath = "${cominAllowedSigners}";
   };
 
-  # Fix diverged history on comin start (e.g., after force-push)
-  # Use || true to tolerate network unavailability at boot - comin will fetch on its own
+  # Refresh comin's bare repository on start. This is best-effort because comin
+  # performs its own fetches and intentionally treats force-pushed history as an
+  # operator decision, not something to accept automatically.
   systemd.services = lib.mkIf config.services.comin.enable {
     # Keep comin's self-update behavior conservative. If switch-to-configuration
     # stops comin while comin is running that switch, the deploy can succeed but
@@ -81,9 +82,8 @@ in
 
     comin.preStart = ''
       REPO="/var/lib/comin/repository"
-      if [ -d "$REPO/.git" ]; then
-        ${pkgs.git}/bin/git -C "$REPO" fetch origin || true
-        ${pkgs.git}/bin/git -C "$REPO" reset --hard origin/main || true
+      if [ -d "$REPO" ]; then
+        ${pkgs.git}/bin/git -C "$REPO" fetch --prune origin || true
       fi
     '';
 
