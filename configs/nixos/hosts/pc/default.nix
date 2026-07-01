@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -33,4 +33,13 @@
   ];
 
   local.wakeOnLan.interface = "enp5s0";
+
+  # Required for DDC/CI tools such as ddcutil to read monitor state, including
+  # the active input source. This lets Hyprland automation distinguish between
+  # the Dell being on DisplayPort and the Dell being switched to another input.
+  hardware.i2c.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    ddcutil
+  ];
 }
