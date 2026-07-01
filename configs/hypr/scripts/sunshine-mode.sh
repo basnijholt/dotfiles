@@ -19,6 +19,9 @@ dummy_output="${HYPR_DUMMY_OUTPUT:-HDMI-A-1}"
 # "auto" places the dummy plug next to the real output so they never overlap.
 dummy_rule="${HYPR_DUMMY_RULE:-${dummy_output},3840x2160@60,auto,1}"
 enable_timeout="${SUNSHINE_MODE_TIMEOUT:-10}"
+# Must be a numbered workspace: stop's move-back filter and the SUPER+0
+# keybind both rely on it, so stray windows stay reachable after a stream.
+stream_workspace="${SUNSHINE_MODE_WORKSPACE:-10}"
 
 usage() {
   cat <<EOF
@@ -30,7 +33,10 @@ ${real_output} is the only desktop output; the ${dummy_output} dummy plug is
 enabled only while a Sunshine session is active:
 
   start   Enable ${dummy_output} (${dummy_rule#"${dummy_output}",}) and wait
-          until Hyprland reports it active. ${real_output} stays enabled.
+          until Hyprland reports it active, then focus workspace
+          ${stream_workspace} on it so windows launched by Sunshine apps
+          (e.g. Steam Big Picture) open on the captured output.
+          ${real_output} stays enabled.
   stop    Move any workspaces off ${dummy_output} back to ${real_output},
           then disable ${dummy_output}.
   status  Print 'streaming' if ${dummy_output} is active, 'normal' otherwise.
@@ -62,6 +68,14 @@ start_streaming() {
     fi
     sleep 0.2
   done
+
+  # Sunshine's app commands spawn windows on the focused monitor, so park
+  # focus on the stream workspace of the captured output before returning.
+  # Order matters: the move is a no-op when the workspace doesn't exist yet,
+  # and "workspace" creates missing workspaces on the focused monitor.
+  hyprctl dispatch moveworkspacetomonitor "$stream_workspace $dummy_output" >/dev/null || true
+  hyprctl dispatch focusmonitor "$dummy_output" >/dev/null || true
+  hyprctl dispatch workspace "$stream_workspace" >/dev/null || true
 }
 
 stop_streaming() {
