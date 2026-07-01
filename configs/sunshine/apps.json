@@ -6,33 +6,24 @@
         {
             "name": "Desktop",
             "image-path": "desktop.png",
-            "prep-cmd": [
-                {
-                    "do": "nix run nixpkgs#gnome-monitor-config -- set -L -M DP-1 -m 3840x2160@60.000 -s 1 -p",
-                    "undo": "nix run nixpkgs#gnome-monitor-config -- set -L -M DP-1 -m 5120x2160@120.000 -s 1 -p"
-                }
-            ]
+            "output_name": "HDMI-A-1"
         },
         {
             "name": "Low Res Desktop",
             "image-path": "desktop.png",
-            "prep-cmd": [
-                {
-                    "do": "xrandr --output HDMI-1 --mode 1920x1080",
-                    "undo": "xrandr --output HDMI-1 --mode 1920x1200"
-                }
-            ]
+            "output_name": "HDMI-A-1"
         },
         {
             "name": "Steam Big Picture",
             "image-path": "steam.png",
+            "output_name": "HDMI-A-1",
             "detached": [
-                "gamemoderun steam steam:\/\/open\/bigpicture"
+                "setsid steam steam:\/\/open\/bigpicture"
             ],
             "prep-cmd": [
                 {
-                    "do": "nix run nixpkgs#gnome-monitor-config -- set -L -M DP-1 -m 3840x2160@60.000 -s 1 -p",
-                    "undo": "nix run nixpkgs#gnome-monitor-config -- set -L -M DP-1 -m 5120x2160@120.000 -s 1 -p"
+                    "do": "",
+                    "undo": "setsid steam steam:\/\/close\/bigpicture"
                 }
             ]
         }
