@@ -1,4 +1,0 @@
-# Agent-CLI Hotkeys
-cmd + shift - r : "$HOME/Code/agent-cli/scripts/macos-hotkeys/toggle-transcription.sh"
-cmd + shift - a : "$HOME/Code/agent-cli/scripts/macos-hotkeys/toggle-autocorrect.sh"
-cmd + shift - v : "$HOME/Code/agent-cli/scripts/macos-hotkeys/toggle-voice-edit.sh"
