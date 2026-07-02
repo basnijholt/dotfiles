@@ -3,7 +3,7 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "includeCoAuthoredBy": false,
-  "model": "fable",
+  "model": "claude-fable-5",
   "hooks": {
     "PreToolUse": [
       {
