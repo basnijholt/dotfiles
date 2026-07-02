@@ -159,6 +159,7 @@ CYAN = "\033[36m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
 MAGENTA = "\033[35m"
+BLUE = "\033[34m"
 RESET = "\033[0m"
 
 # Icons (Nerd Font)
@@ -170,7 +171,9 @@ ICON_COST = "\uf155"  # dollar sign
 ICON_GOOGLE = "\uf1a0"
 
 # Model icon
-if "opus" in data.model.id.lower():
+if "fable" in data.model.id.lower():
+    model_icon = f"{BLUE}{RESET}"  # book, fitting for Fable
+elif "opus" in data.model.id.lower():
     model_icon = f"{MAGENTA}󰘨{RESET}"
 elif "sonnet" in data.model.id.lower():
     model_icon = f"{CYAN}󰎈{RESET}"

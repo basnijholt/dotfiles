@@ -1,6 +1,6 @@
 {
   "defaultProvider": "litellm",
-  "defaultModel": "claude-opus-4-8",
+  "defaultModel": "claude-fable-5",
   "lastChangelogVersion": "0.58.0",
   "defaultThinkingLevel": "high",
   "packages": [

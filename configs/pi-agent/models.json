@@ -83,6 +83,14 @@
       "apiKey": "sk-dummy",
       "models": [
         {
+          "id": "claude-fable-5",
+          "name": "Claude Fable 5 (LiteLLM)",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 200000,
+          "maxTokens": 32000
+        },
+        {
           "id": "claude-opus-4-8",
           "name": "Claude Opus 4.8 (LiteLLM)",
           "reasoning": true,
