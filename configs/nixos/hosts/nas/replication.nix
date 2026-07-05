@@ -255,6 +255,7 @@ in
 
   systemd.services.nas-replication-watchdog = {
     description = "Check NAS replication snapshot freshness";
+    restartIfChanged = false;
     wants = [ "zfs.target" ];
     after = [ "zfs.target" ];
     unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];

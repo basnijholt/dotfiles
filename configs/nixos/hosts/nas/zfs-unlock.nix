@@ -1,5 +1,5 @@
 {
-  services.zfsUnlock.receiver = {
+  services.zfs-unlock.receiver = {
     enable = true;
     allowedFrom = [ "192.168.1.7" ];
     authorizedKeys = [

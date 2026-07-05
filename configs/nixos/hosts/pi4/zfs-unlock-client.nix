@@ -1,5 +1,5 @@
 {
-  services.zfsUnlock.client = {
+  services.zfs-unlock.client = {
     enable = true;
     user = "basnijholt";
     group = "users";
