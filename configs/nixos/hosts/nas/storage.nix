@@ -42,6 +42,15 @@ in
     requestEncryptionCredentials = lib.mkForce false;
   };
 
+  # 2026-07-05 outage: the Samsung 990 EVO Plus mirror leg on the ssd pool
+  # produced PCIe AER replay-timeout storms under scrub/replication load, which
+  # stalled ZFS transaction commits. Disable PCIe ASPM and NVMe APST so the
+  # drive/link stay out of the low-power states that trigger this failure mode.
+  boot.kernelParams = [
+    "pcie_aspm=off"
+    "nvme_core.default_ps_max_latency_us=0"
+  ];
+
   zramSwap = {
     enable = true;
     memoryPercent = 25;
