@@ -13,7 +13,7 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 - Monitoring dashboard: Grafana scrapes the NAS Prometheus exporters; host Netdata stays localhost-only.
 - Base branch: `main`
 - Host name in Nix: `nas`
-- Last updated: `2026-06-29 post-cutover validation`
+- Last updated: `2026-07-06 backup-monitoring hardening`
 
 The real NAS has been cut over from TrueNAS to NixOS with this host config.
 The destructive storage migration is complete.
@@ -133,7 +133,11 @@ The data pools are imported by name and are not described by disko.
 - [x] Confirm the authoritative Backblaze B2 job completed once and wrote a persistent success marker.
 - [x] Confirm the NAS B2 watchdog reports the B2 success marker as fresh.
 - [x] Keep `.ix-virt` backed up for Incus restore fidelity, but skip only the rebuildable `ssd/.ix-virt/containers/nix-cache` dataset in future SSD Syncoid jobs.
-- [ ] Decide whether old TrueNAS-created snapshots and pre-exclusion NAS-local `tank/backups` autosnapshots should be aged out manually.
+- [x] Add a prune-only Sanoid policy on `tank/backups` so replicated `autosnap_` snapshots are aged out on the targets instead of accumulating forever.
+- [x] Alert when Sanoid itself fails and when the source pools stop receiving fresh autosnapshots (syncoid sync snaps would otherwise keep the watchdog green).
+- [x] Make the replication watchdog fail when an expected outbound replication key file is missing, so a `ConditionPathExists` skip cannot stay silent after a reinstall.
+- [ ] Decide whether old TrueNAS-created snapshots (not `autosnap_` named, so untouched by the new prune policy) should be aged out manually.
+- [ ] Verify every irreplaceable `tank` dataset (photos, photos-export, syncthing) has an off-machine backup path; the declared jobs only replicate `ssd` off-box.
 
 ### Encryption
 
@@ -153,6 +157,8 @@ The data pools are imported by name and are not described by disko.
 - [x] Validate UPS status with `upsc` and the NUT exporter.
 - [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
 - [x] Authenticate host-level Tailscale with `tailscale up`.
+- [x] Declare a `nas-heartbeat` dead-man's-switch timer that pings an external healthchecks-style URL every 5 minutes.
+- [ ] Create the external healthchecks check and install its private ping URL at `/etc/nas-heartbeat-url` (mode `0600`) on the NAS; the `nas-heartbeat` unit skips until that file exists.
 
 ### Deploy
 

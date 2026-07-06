@@ -30,6 +30,42 @@ let
   mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
   nucReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
 
+  nucReplicationKey = "/etc/ssh/nas-replication-nuc-ed25519";
+  hetznerReplicationKey = "/etc/ssh/nas-replication-hetzner-ed25519";
+
+  # The outbound key files intentionally live outside this repo. Their services
+  # skip via ConditionPathExists while a key is missing (e.g. after a reinstall
+  # before secret staging), which never fails a unit and so never alerts. The
+  # watchdog checks presence so a forgotten key becomes an alert instead of
+  # silently absent replication.
+  watchedReplicationKeys = [
+    {
+      label = "nuc outbound replication key";
+      path = nucReplicationKey;
+    }
+    {
+      label = "hetzner outbound replication key";
+      path = hetznerReplicationKey;
+    }
+  ];
+
+  # Syncoid creates its own sync snapshot on every run, so the backup-target
+  # freshness checks stay green even if sanoid stops autosnapshotting. Check
+  # the source pools for recent sanoid-named snapshots separately. Sanoid runs
+  # every 10 minutes with frequent snapshots enabled, so 2 hours is generous.
+  watchedAutosnapSources = [
+    {
+      label = "tank sanoid autosnaps";
+      dataset = "tank";
+      maxAgeHours = 2;
+    }
+    {
+      label = "ssd sanoid autosnaps";
+      dataset = "ssd";
+      maxAgeHours = 2;
+    }
+  ];
+
   watchedBackupDatasets = [
     {
       label = "local ssd mirror";
@@ -66,6 +102,14 @@ let
   watchdogChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
     check_dataset ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.dataset} ${toString entry.maxAgeHours}
   '') watchedBackupDatasets;
+
+  watchdogAutosnapChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
+    check_autosnap ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.dataset} ${toString entry.maxAgeHours}
+  '') watchedAutosnapSources;
+
+  watchdogKeyChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
+    check_key ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.path}
+  '') watchedReplicationKeys;
 
   replicationWatchdog = pkgs.writeShellScript "nas-replication-watchdog" ''
     set -euo pipefail
@@ -109,7 +153,53 @@ let
       echo "OK $label: newest snapshot $latest_snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
     }
 
+    check_autosnap() {
+      label="$1"
+      dataset="$2"
+      max_age_hours="$3"
+
+      latest="$(
+        zfs list -H -p -t snapshot -d 1 -o creation,name -s creation "$dataset" 2>/dev/null \
+          | ${pkgs.gnugrep}/bin/grep '@autosnap_' \
+          | ${pkgs.coreutils}/bin/tail -n 1 \
+          || true
+      )"
+
+      if [ -z "$latest" ]; then
+        echo "STALE $label: no autosnap snapshots on $dataset"
+        failed=1
+        return
+      fi
+
+      latest_epoch="$(printf '%s\n' "$latest" | ${pkgs.gawk}/bin/awk '{ print $1 }')"
+      latest_snapshot="$(printf '%s\n' "$latest" | ${pkgs.gawk}/bin/awk '{ print $2 }')"
+      age_hours=$(( (now - latest_epoch) / 3600 ))
+
+      if [ "$age_hours" -gt "$max_age_hours" ]; then
+        echo "STALE $label: newest autosnap $latest_snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
+        failed=1
+        return
+      fi
+
+      echo "OK $label: newest autosnap $latest_snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
+    }
+
+    check_key() {
+      label="$1"
+      key_path="$2"
+
+      if [ ! -f "$key_path" ]; then
+        echo "MISSING $label: $key_path does not exist; its replication service is silently skipping"
+        failed=1
+        return
+      fi
+
+      echo "OK $label: $key_path exists"
+    }
+
     ${watchdogChecks}
+    ${watchdogAutosnapChecks}
+    ${watchdogKeyChecks}
 
     if [ "$failed" -ne 0 ]; then
       exit 1
@@ -176,7 +266,7 @@ in
       "zfs.target"
     ];
     unitConfig = {
-      ConditionPathExists = "/etc/ssh/nas-replication-nuc-ed25519";
+      ConditionPathExists = nucReplicationKey;
       OnFailure = [ "nas-health-alert@%n.service" ];
     };
     path = replicationPath;
@@ -187,7 +277,7 @@ in
 
       syncoid ${mkSyncoidSsdArgs} \
         --recvoptions=${nucReceiveOptions} \
-        --sshkey=/etc/ssh/nas-replication-nuc-ed25519 \
+        --sshkey=${nucReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \
@@ -221,7 +311,7 @@ in
       "zfs.target"
     ];
     unitConfig = {
-      ConditionPathExists = "/etc/ssh/nas-replication-hetzner-ed25519";
+      ConditionPathExists = hetznerReplicationKey;
       OnFailure = [ "nas-health-alert@%n.service" ];
     };
     path = replicationPath;
@@ -231,7 +321,7 @@ in
       zfs list tank/backups/hetzner >/dev/null
 
       syncoid ${mkSyncoidCommonArgs} \
-        --sshkey=/etc/ssh/nas-replication-hetzner-ed25519 \
+        --sshkey=${hetznerReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \

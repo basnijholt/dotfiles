@@ -1,66 +1,72 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   ntfyUrl = "http://192.168.1.2:8089/nas-alerts";
   ntfyPriority = "high";
+  heartbeatUrlFile = "/etc/nas-heartbeat-url";
 
   nasHealthAlert = pkgs.writeShellScriptBin "nas-health-alert" ''
-    set -euo pipefail
+        set -euo pipefail
 
-    subject="NAS health alert"
-    args=()
+        subject="NAS health alert"
+        args=()
 
-    while [ "$#" -gt 0 ]; do
-      case "$1" in
-        -s)
-          subject="''${2:-$subject}"
-          shift 2
-          ;;
-        *)
-          args+=("$1")
-          shift
-          ;;
-      esac
-    done
+        while [ "$#" -gt 0 ]; do
+          case "$1" in
+            -s)
+              subject="''${2:-$subject}"
+              shift 2
+              ;;
+            *)
+              args+=("$1")
+              shift
+              ;;
+          esac
+        done
 
-    body=""
-    if [ -n "''${SMARTD_MESSAGE:-}" ]; then
-      subject="''${SMARTD_SUBJECT:-SMARTD alert on nas}"
-      body="$SMARTD_MESSAGE"
-    fi
+        body=""
+        if [ -n "''${SMARTD_MESSAGE:-}" ]; then
+          subject="''${SMARTD_SUBJECT:-SMARTD alert on nas}"
+          body="$SMARTD_MESSAGE"
+        fi
 
-    stdin=""
-    if ! [ -t 0 ]; then
-      stdin="$(${pkgs.coreutils}/bin/cat || true)"
-    fi
-    if [ -n "$stdin" ]; then
-      body="''${body:+$body
+        stdin=""
+        if ! [ -t 0 ]; then
+          stdin="$(${pkgs.coreutils}/bin/cat || true)"
+        fi
+        if [ -n "$stdin" ]; then
+          body="''${body:+$body
 
-}$stdin"
-    fi
-    if [ "''${#args[@]}" -gt 0 ]; then
-      body="''${body:+$body
+    }$stdin"
+        fi
+        if [ "''${#args[@]}" -gt 0 ]; then
+          body="''${body:+$body
 
-}alert arguments: ''${args[*]}"
-    fi
-    if [ -z "$body" ]; then
-      body="NAS health alert hook invoked without a message body."
-    fi
+    }alert arguments: ''${args[*]}"
+        fi
+        if [ -z "$body" ]; then
+          body="NAS health alert hook invoked without a message body."
+        fi
 
-    summary="$(printf '%s' "$body" | ${pkgs.coreutils}/bin/tr '\n' ' ' | ${pkgs.coreutils}/bin/cut -c1-500)"
-    ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "$subject: $summary"
-    printf '%s\n\n%s\n' "$subject" "$body" | ${pkgs.util-linux}/bin/wall || true
+        summary="$(printf '%s' "$body" | ${pkgs.coreutils}/bin/tr '\n' ' ' | ${pkgs.coreutils}/bin/cut -c1-500)"
+        ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "$subject: $summary"
+        printf '%s\n\n%s\n' "$subject" "$body" | ${pkgs.util-linux}/bin/wall || true
 
-    ${pkgs.curl}/bin/curl \
-      --fail \
-      --silent \
-      --show-error \
-      --max-time 10 \
-      -H "Title: $subject" \
-      -H ${lib.escapeShellArg "Priority: ${ntfyPriority}"} \
-      --data-binary "$body" \
-      ${lib.escapeShellArg ntfyUrl} >/dev/null \
-      || ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "failed to send ntfy alert"
+        ${pkgs.curl}/bin/curl \
+          --fail \
+          --silent \
+          --show-error \
+          --max-time 10 \
+          -H "Title: $subject" \
+          -H ${lib.escapeShellArg "Priority: ${ntfyPriority}"} \
+          --data-binary "$body" \
+          ${lib.escapeShellArg ntfyUrl} >/dev/null \
+          || ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "failed to send ntfy alert"
   '';
 
   alertFailedUnit = pkgs.writeShellScript "nas-health-alert-failed-unit" ''
@@ -228,6 +234,39 @@ in
 
   systemd.services.comin-watchdog = lib.mkIf config.services.comin.enable {
     unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
+  };
+
+  # Dead man's switch. Everything above alerts on failure, but nothing alerts
+  # on absence: if the whole NAS hangs, no OnFailure ever fires, and both the
+  # Grafana stack (Incus container on this host) and the ntfy relay (NUC) are
+  # too close to the failure domain. An external healthchecks-style service
+  # alerts when these pings stop arriving. There is deliberately no OnFailure
+  # here: detecting missed pings is the external service's job, and a local
+  # alert on transient egress failure would only add noise.
+  #
+  # The private ping URL is installed manually (mode 0600), like the
+  # replication keys; the unit skips until the file exists:
+  #   echo 'https://hc-ping.com/<uuid>' | sudo install -m 0600 /dev/stdin ${heartbeatUrlFile}
+  systemd.services.nas-heartbeat = {
+    description = "Ping external dead-man's-switch URL";
+    unitConfig.ConditionPathExists = heartbeatUrlFile;
+    script = ''
+      url="$(${pkgs.coreutils}/bin/cat ${heartbeatUrlFile})"
+      ${pkgs.curl}/bin/curl \
+        --fail \
+        --silent \
+        --show-error \
+        --max-time 10 \
+        --retry 2 \
+        --output /dev/null \
+        "$url"
+    '';
+    serviceConfig.Type = "oneshot";
+  };
+
+  systemd.timers.nas-heartbeat = {
+    wantedBy = [ "timers.target" ];
+    timerConfig.OnCalendar = "*:0/5";
   };
 
   environment.systemPackages = [ nasHealthAlert ];
