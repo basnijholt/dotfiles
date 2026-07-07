@@ -168,6 +168,13 @@
           ./optional/lxc-container.nix
         ];
 
+        # Companion bot LXC container for Incus (mom; MindRoom only, no OpenClaw)
+        mindroom-mom = mkHost [
+          ragenix.nixosModules.default
+          ./hosts/mindroom-mom/default.nix
+          ./optional/lxc-container.nix
+        ];
+
         # Lightweight development LXC container for Incus (on HP)
         mindroom = mkHost [
           ragenix.nixosModules.default
