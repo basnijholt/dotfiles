@@ -2,10 +2,8 @@ let
   bas = (import ../../../common/ssh-keys.nix).userKeys.bas;
   mindroomHost = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIjCiCdxVhS5Y2YYHrjM8cg0VUedOIMC4YUvmDfOiIDd root@nixos";
   spouseHost = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAuvyHXxEqBd/egwM5875RhWF1QekxZQWNO/BMn2wZqC root@nixos";
-  # TODO: after the mindroom-mom container first boots, add its host key here
-  # and re-encrypt both files with `ragenix --rules ./secrets.nix -r`.
-  # momHost = "ssh-ed25519 AAAA... root@nixos";
-  recipients = [ bas mindroomHost spouseHost ];
+  momHost = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII3t8iXHYZLXYs1I0Tk6hVi7fRP1xOwqxCnMNE3AeUHZ root@nixos";
+  recipients = [ bas mindroomHost spouseHost momHost ];
 in
 {
   "agent-integrations.env.age".publicKeys = recipients;

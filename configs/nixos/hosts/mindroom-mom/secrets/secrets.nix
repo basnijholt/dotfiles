@@ -1,10 +1,7 @@
 let
   bas = (import ../../../common/ssh-keys.nix).userKeys.bas;
-  # TODO: after the mindroom-mom container first boots, add its host key
-  # (ssh-keyscan or /etc/ssh/ssh_host_ed25519_key.pub) here and re-encrypt
-  # with `ragenix --rules ./secrets.nix -r`.
-  # momHost = "ssh-ed25519 AAAA... root@nixos";
-  recipients = [ bas ];
+  momHost = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII3t8iXHYZLXYs1I0Tk6hVi7fRP1xOwqxCnMNE3AeUHZ root@nixos";
+  recipients = [ bas momHost ];
 in
 {
   "agent-runtime.env.age".publicKeys = recipients;
