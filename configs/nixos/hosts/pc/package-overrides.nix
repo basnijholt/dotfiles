@@ -13,8 +13,8 @@
         ollamaLlamaCppSrc = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b9781";
-          hash = "sha256-AxMidqvx93b80GqDTgR34RCMdjr/UXDdeztxiXf6sEM=";
+          tag = "b9840";
+          hash = "sha256-SlcBqlUSeXgGltk7fz1blp4DobypzkT8cw8a7dkVGiU=";
         };
       in
       {
@@ -22,12 +22,12 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.30.11";
+        version = "0.31.1";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-RQfRnzk5beJqkrK69f3BxK6QdkoEVTkbgEf1DkB6p1U=";
+          hash = "sha256-p4saQimdOVRWcJyrYcCuex7NViKC/u0tHUnLRZh6hwg=";
         };
         vendorHash = "sha256-lZdGzGb9xRjTm1Rm7/wHjqM490gLznLEndmb4mNbCX0=";
         nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [ pkgs.patchelf ];
@@ -91,12 +91,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "9842";
+            version = "9892";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-wtaHsVOyCNCITABe1TvDo/MiWpNlH2YqZewBDxERtt4=";
+              hash = "sha256-De04DT1GG69Vo39s3w75PhIhOGpCEwr5xsMlXzSPjzc=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -129,8 +129,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v232/llama-swap_232_linux_amd64.tar.gz";
-            hash = "sha256-1pBfWe99yXNRrvowf+TNZs9LqgbXB2VX1O1+cjrxWI0=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v235/llama-swap_235_linux_amd64.tar.gz";
+            hash = "sha256-5dv0CH7Q9B6DIYcT8gzIr9UF2F+eSfdQ/vw4STx0T7M=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap

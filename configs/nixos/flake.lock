@@ -49,11 +49,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1782948990,
-        "narHash": "sha256-RR3wiDIXpWxXcGBeHQIQsGEoHxdlPi+S9Udm+mPTHrc=",
+        "lastModified": 1783317127,
+        "narHash": "sha256-QvpYW9y/VY3XhQqLPSszQVMBBDuiHWfnq7sPw6S/KAc=",
         "owner": "basnijholt",
         "repo": "comin",
-        "rev": "31b3f478e69a06ef6f2642f790dbef2b1fe5b41c",
+        "rev": "ded5429aa5c7ad7b695e9e33a5d22d76350bef66",
         "type": "github"
       },
       "original": {
@@ -177,11 +177,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783222121,
-        "narHash": "sha256-E/ElL373TO8lQ2aMvYyzN+k4xkVaUGoRqoa8AtM71tI=",
+        "lastModified": 1783358420,
+        "narHash": "sha256-UEyBpf+XmQe8laXfDzIlo11Er7E0rKrLS8jeMnMj0Ds=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "a1645f40777620c4bd2b6d854b290c2fc354a266",
+        "rev": "0d33882bd46c1f9ef62276700f5e5f2bd6ff6604",
         "type": "github"
       },
       "original": {
@@ -442,11 +442,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783043198,
-        "narHash": "sha256-LukvKNBCCV014dMRDzcSBfNhWksappx1S7dqv5SGMZI=",
+        "lastModified": 1783371752,
+        "narHash": "sha256-LQ0YiboZ3Tbcj/ivKwhS289+0M3Bv2h+8R+VhH4NuTU=",
         "owner": "basnijholt",
         "repo": "zfs-unlock",
-        "rev": "a52d58c1f07aefb82d9be37ea02337eff478274a",
+        "rev": "dd089ab7f033943e04c86266ddc8d7eff6de2338",
         "type": "github"
       },
       "original": {
