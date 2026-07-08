@@ -60,6 +60,7 @@ class StatusInput:
     cost: Cost
     exceeds_200k_tokens: bool
     context_window: ContextWindow | None = None
+    effort_level: str = ""
 
 
 def parse_input(raw: dict) -> StatusInput:
@@ -117,6 +118,7 @@ def parse_input(raw: dict) -> StatusInput:
         ),
         exceeds_200k_tokens=raw.get("exceeds_200k_tokens", False),
         context_window=context_window,
+        effort_level=(raw.get("effort") or {}).get("level", ""),
     )
 
 
@@ -187,6 +189,7 @@ GREEN = "\033[32m"
 YELLOW = "\033[33m"
 MAGENTA = "\033[35m"
 BLUE = "\033[34m"
+RED = "\033[31m"
 RESET = "\033[0m"
 
 # Icons (Nerd Font)
@@ -196,6 +199,7 @@ ICON_FOLDER = "\uf07b"
 ICON_CHART = "\uf080"
 ICON_COST = "\uf155"  # dollar sign
 ICON_GOOGLE = "\uf1a0"
+ICON_BRAIN = "\U000f09d1"  # nf-md-brain
 
 # Model icon
 if "fable" in data.model.id.lower():
@@ -215,6 +219,19 @@ if os.environ.get("CLAUDE_CODE_USE_VERTEX"):
     provider_info = f"{YELLOW}{ICON_GOOGLE}{RESET}"
 
 model_info = f"{model_icon} {provider_info} " if (model_icon and provider_info) else f"{model_icon or provider_info} " if (model_icon or provider_info) else ""
+
+# Thinking effort level
+EFFORT_COLORS = {
+    "low": GREEN,
+    "medium": CYAN,
+    "high": YELLOW,
+    "xhigh": MAGENTA,
+    "max": RED,
+}
+effort_info = ""
+if data.effort_level:
+    color = EFFORT_COLORS.get(data.effort_level, YELLOW)
+    effort_info = f"{color}{ICON_BRAIN} {data.effort_level}{RESET} "
 
 # Build folder info
 # start_folder: where Claude was started (relative to git root)
@@ -256,5 +273,5 @@ if data.cost.total_cost_usd > 0:
 
 project_icon = ICON_GIT if is_git_repo else ICON_FOLDER
 print(
-    f"{model_info}{CYAN}{project_icon} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
+    f"{model_info}{effort_info}{CYAN}{project_icon} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
 )
