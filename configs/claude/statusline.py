@@ -63,10 +63,20 @@ class StatusInput:
 
 
 def parse_input(raw: dict) -> StatusInput:
+    # Only pick the fields we use: the JSON schema gains new keys over time,
+    # and strict **-unpacking into dataclasses breaks on every addition.
     ctx_data = raw.get("context_window", {})
     current_usage = None
-    if ctx_data.get("current_usage"):
-        current_usage = CurrentUsage(**ctx_data["current_usage"])
+    usage_data = ctx_data.get("current_usage")
+    if usage_data:
+        current_usage = CurrentUsage(
+            input_tokens=usage_data.get("input_tokens", 0),
+            output_tokens=usage_data.get("output_tokens", 0),
+            cache_creation_input_tokens=usage_data.get(
+                "cache_creation_input_tokens", 0
+            ),
+            cache_read_input_tokens=usage_data.get("cache_read_input_tokens", 0),
+        )
 
     context_window = (
         ContextWindow(
@@ -79,16 +89,33 @@ def parse_input(raw: dict) -> StatusInput:
         else None
     )
 
+    model_data = raw.get("model", {})
+    workspace_data = raw.get("workspace", {})
+    cost_data = raw.get("cost", {})
+    cwd = raw.get("cwd", os.getcwd())
+
     return StatusInput(
-        session_id=raw["session_id"],
-        transcript_path=raw["transcript_path"],
-        cwd=raw["cwd"],
-        model=Model(**raw["model"]),
-        workspace=Workspace(**raw["workspace"]),
-        version=raw["version"],
-        output_style=OutputStyle(**raw["output_style"]),
-        cost=Cost(**raw["cost"]),
-        exceeds_200k_tokens=raw["exceeds_200k_tokens"],
+        session_id=raw.get("session_id", ""),
+        transcript_path=raw.get("transcript_path", ""),
+        cwd=cwd,
+        model=Model(
+            id=model_data.get("id", ""),
+            display_name=model_data.get("display_name", ""),
+        ),
+        workspace=Workspace(
+            current_dir=workspace_data.get("current_dir", cwd),
+            project_dir=workspace_data.get("project_dir", cwd),
+        ),
+        version=raw.get("version", ""),
+        output_style=OutputStyle(name=raw.get("output_style", {}).get("name", "")),
+        cost=Cost(
+            total_cost_usd=cost_data.get("total_cost_usd", 0.0),
+            total_duration_ms=cost_data.get("total_duration_ms", 0),
+            total_api_duration_ms=cost_data.get("total_api_duration_ms", 0),
+            total_lines_added=cost_data.get("total_lines_added", 0),
+            total_lines_removed=cost_data.get("total_lines_removed", 0),
+        ),
+        exceeds_200k_tokens=raw.get("exceeds_200k_tokens", False),
         context_window=context_window,
     )
 
