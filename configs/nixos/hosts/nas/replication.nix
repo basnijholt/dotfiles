@@ -176,12 +176,14 @@ let
       dataset="$2"
       max_age_hours="$3"
 
-      # With -t snapshot, -d 1 lists only this dataset's own snapshots: child
-      # datasets sit at depth 1, so their snapshots are at depth 2 and
-      # excluded. A fresh child autosnap cannot mask a stale root here.
+      # With -t snapshot, -d 1 lists only this dataset's own snapshots (child
+      # datasets sit at depth 1, so their snapshots are at depth 2; verified
+      # live on the nas). The exact prefix match below keeps a fresh child
+      # autosnap from masking a stale root even if that depth behavior ever
+      # changes, instead of relying on it.
       latest="$(
         zfs list -H -p -t snapshot -d 1 -o creation,name -s creation "$dataset" 2>/dev/null \
-          | ${pkgs.gnugrep}/bin/grep '@autosnap_' \
+          | ${pkgs.gawk}/bin/awk -v prefix="$dataset@autosnap_" 'index($2, prefix) == 1' \
           | ${pkgs.coreutils}/bin/tail -n 1 \
           || true
       )"
