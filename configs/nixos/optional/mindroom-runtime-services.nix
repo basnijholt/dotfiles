@@ -28,6 +28,7 @@ let
       export UV_PROJECT_ENVIRONMENT="${dir}/.venv-python314"
       exec uv run --python ${mindroomPython}/bin/python3 \
         --project "/srv/mindroom" \
+        --extra matrix_calls \
         --directory "${dir}" \
         mindroom ${args}
     '';
