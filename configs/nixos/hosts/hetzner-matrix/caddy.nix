@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain appDomain cinnyDomain pushDomain demoDomain demoTuwunelPort cinnyCurrentPath;
+  inherit (constants) siteDomain appDomain cinnyDomain pushDomain demoDomain demoTuwunelPort cinnyCurrentPath rtcJwtPort;
 in
 {
   systemd.tmpfiles.rules = [
@@ -31,9 +31,17 @@ in
           header Content-Type application/json
           header Access-Control-Allow-Origin "*"
           respond 200 {
-            body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"}}"
+            body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"},\"org.matrix.msc4143.rtc_foci\":[{\"type\":\"livekit\",\"livekit_service_url\":\"https://${siteDomain}/livekit/jwt\"}]}"
             close
           }
+        }
+
+        # MatrixRTC (Element Call) backend, path-routed to avoid extra DNS records.
+        handle_path /livekit/jwt/* {
+          reverse_proxy localhost:${toString rtcJwtPort}
+        }
+        handle_path /livekit/sfu/* {
+          reverse_proxy localhost:7880
         }
 
         handle / {

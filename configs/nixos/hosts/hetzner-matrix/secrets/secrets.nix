@@ -5,6 +5,7 @@ let
 in
 {
   "registration-token.age".publicKeys = recipients;
+  "livekit-keys.age".publicKeys = recipients;
   "sso-google-secret.age".publicKeys = recipients;
   "sso-github-secret.age".publicKeys = recipients;
   "sso-apple-secret.age".publicKeys = recipients;

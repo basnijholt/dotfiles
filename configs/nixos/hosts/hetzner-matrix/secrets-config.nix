@@ -9,6 +9,10 @@
       group = "tuwunel";
       mode = "0400";
     };
+    livekit-keys = {
+      file = ./secrets/livekit-keys.age;
+      mode = "0400";
+    };
     registration-token-provisioning = {
       file = ./secrets/registration-token.age;
       owner = "mindroom-local-provisioning";
