@@ -13,7 +13,7 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 - Monitoring dashboard: Grafana scrapes the NAS Prometheus exporters; host Netdata stays localhost-only.
 - Base branch: `main`
 - Host name in Nix: `nas`
-- Last updated: `2026-07-06 backup-monitoring hardening`
+- Last updated: `2026-07-09 backup-monitoring hardening + pc restic repo watchdog`
 
 The real NAS has been cut over from TrueNAS to NixOS with this host config.
 The destructive storage migration is complete.
@@ -136,6 +136,8 @@ The data pools are imported by name and are not described by disko.
 - [x] Add a prune-only Sanoid policy on `tank/backups` so replicated `autosnap_` snapshots are aged out on the targets instead of accumulating forever.
 - [x] Alert when Sanoid itself fails and when the source pools stop receiving fresh autosnapshots (syncoid sync snaps would otherwise keep the watchdog green).
 - [x] Make the replication watchdog fail when an expected outbound replication key file is missing, so a `ConditionPathExists` skip cannot stay silent after a reinstall.
+- [x] Add a freshness check for the pc restic repo (`tank/backups/pc`) to the replication watchdog; a 2026-07-09 review found pc's hourly restic backups had failed silently since 2026-03-22 on a stale repo lock, and nothing on the NAS watched that repo.
+- [ ] After the stale restic lock on pc is cleared (`restic-truenas unlock` on pc, then `restic-truenas check`), confirm hourly backups resume and the new pc-restic watchdog check reports OK.
 - [ ] Decide whether old TrueNAS-created snapshots (not `autosnap_` named, so untouched by the new prune policy) should be aged out manually.
 - [ ] Verify every irreplaceable `tank` dataset (photos, photos-export, syncthing) has an off-machine backup path; the declared jobs only replicate `ssd` off-box.
 
