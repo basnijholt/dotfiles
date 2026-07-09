@@ -1,7 +1,7 @@
 {
   "defaultProvider": "litellm",
   "defaultModel": "claude-fable-5",
-  "lastChangelogVersion": "0.58.0",
+  "lastChangelogVersion": "0.70.2",
   "defaultThinkingLevel": "high",
   "packages": [
     "https://github.com/basnijholt/pi-multi-agent-review-loop",
