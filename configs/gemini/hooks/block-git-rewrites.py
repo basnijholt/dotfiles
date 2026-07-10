@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gemini CLI adapter for the shared git-guard hook (see shared/hooks/git_guard.py).
+"""Gemini CLI adapter for the shared git-guard hook (see claude/hooks/git_guard.py).
 
 Protocol: JSON output with a decision field. Gemini has no interactive "ask"
 escalation, so the override marker allows the command directly.
@@ -9,7 +9,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shared" / "hooks"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "claude" / "hooks"))
 from git_guard import check_command, has_override, override_hint
 
 

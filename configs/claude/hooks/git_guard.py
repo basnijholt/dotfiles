@@ -6,8 +6,8 @@ OVERRIDE_MARKER (only when the user explicitly approved the action in
 conversation) lets the tool-specific adapter escalate or allow it.
 git add -A/--all is never overridable.
 
-Each tool's block-git-rewrites.py imports this module and adapts the result
-to its own hook protocol (exit codes, permissionDecision JSON, etc.).
+This lives in claude/hooks as the canonical copy; the Codex hook is a symlink
+to the adapter here, and the Gemini adapter imports this module by path.
 """
 
 import re

@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Claude Code adapter for the shared git-guard hook (see shared/hooks/git_guard.py).
+"""Exit-code adapter for the shared git-guard hook (git_guard.py in this dir).
+
+Lives in claude/hooks; Codex uses it too via a symlink from codex/hooks.
 
 Protocol: exit 0 = allow, exit 2 = block with stderr. The override marker
 lifts overridable blocks directly (honor system: the agent must only use it
@@ -10,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "shared" / "hooks"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from git_guard import check_command, has_override, override_hint
 
 
