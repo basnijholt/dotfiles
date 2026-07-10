@@ -164,22 +164,28 @@ def check_command(command: str) -> tuple[str, bool] | None:
     """Check a shell command for dangerous git operations.
 
     Returns (error message, overridable) if blocked, None if allowed.
+    A non-overridable violation anywhere in the command wins over an
+    overridable one, so a chained command can't ride an override past
+    a hard block (e.g. "MARKER git commit --amend && git add -A").
     """
     stripped = strip_quoted_strings(command)
+    first_overridable: tuple[str, bool] | None = None
 
     # Split on shell separators and check each command individually
     for cmd in split_shell_commands(stripped):
         result = check_blocked_patterns(cmd)
+        if result is None:
+            # For branch detection, find corresponding original command segment
+            # Use the full original for -C extraction (it's OK if imprecise)
+            error = check_push_to_protected_branch(cmd, original_command=command)
+            if error:
+                result = error, True
         if result:
-            return result
+            if not result[1]:
+                return result
+            first_overridable = first_overridable or result
 
-        # For branch detection, find corresponding original command segment
-        # Use the full original for -C extraction (it's OK if imprecise)
-        error = check_push_to_protected_branch(cmd, original_command=command)
-        if error:
-            return error, True
-
-    return None
+    return first_overridable
 
 
 def has_override(command: str) -> bool:
