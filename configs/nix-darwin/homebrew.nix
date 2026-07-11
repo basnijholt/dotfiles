@@ -5,10 +5,18 @@
     enable = true;
     onActivation = {
       autoUpdate = true;
-      cleanup = "zap";
-      extraFlags = [ "--force-cleanup" ];
+      # Homebrew 6 deprecated `brew bundle --cleanup`; --force-cleanup is the
+      # supported install-time equivalent. Keep --zap for cask cleanup.
+      cleanup = "none";
+      extraFlags = [ "--force-cleanup" "--zap" ];
       upgrade = true;
     };
+
+    # Homebrew 6 requires explicit trust for third-party formulae. nix-darwin
+    # does not expose Homebrew Bundle's `trusted` option yet.
+    extraConfig = ''
+      brew "hashicorp/tap/terraform", trusted: true
+    '';
 
     # CLI Tools (Part 1)
     brews = [
@@ -28,6 +36,7 @@
       "create-dmg" # DMG creator
       "d2" # Diagram scripting language
       "eza" # ls alternative
+      "fastlane" # Mobile app deployment automation
       "ffmpeg" # Multimedia framework
       "findutils" # GNU find utilities
       "fzf" # Fuzzy finder
@@ -43,7 +52,6 @@
       "gping" # Ping with graph
       "graphviz" # Graph visualization
       "grep" # GNU grep
-      "hashicorp/tap/terraform" # Infrastructure as code
       "htop" # Process viewer
       "hugo" # Static site generator
       "imagemagick" # Image manipulation
@@ -203,7 +211,6 @@
 
     # Additional repositories
     taps = [
-      "gromgit/fuse" # For SSHFS
       "hashicorp/tap" # For Terraform
       "basnijholt/tap" # For agent-cli
       "jackielii/tap" # For skhd-zig
