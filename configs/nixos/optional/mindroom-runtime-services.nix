@@ -147,7 +147,6 @@ in
       ];
       serviceConfig = {
         Type = "oneshot";
-        RemainAfterExit = true;
         User = "basnijholt";
         Group = "users";
         WorkingDirectory = "/var/www/cinny";
