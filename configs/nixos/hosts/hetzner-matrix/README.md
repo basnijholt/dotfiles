@@ -133,7 +133,7 @@ Sygnal runs locally in a Podman container and is exposed via:
 
 `https://push.mindroom.chat/_matrix/push/v1/notify`
 
-It is intentionally startup-gated. The `podman-sygnal` unit is skipped until the agenix secrets below contain real values instead of the committed `CHANGE_ME` placeholders.
+Startup is intentionally gated. The `podman-sygnal` unit is skipped when the APNs key file is empty, either secret contains `CHANGE_ME`, or `SYGNAL_APNS_KEY_ID` is missing. The remaining environment variables below must also be present and valid for push notifications to work.
 
 `sygnal-env.age` should decrypt to:
 
