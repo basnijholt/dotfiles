@@ -135,10 +135,49 @@ in
       extraEnvironment = [ "BACKEND_PORT=8766" ];
     };
 
-    mindroom-cinny = {
-      description = "MindRoom Web UI (Cinny fork)";
+    mindroom-cinny-dependencies = {
+      description = "Install MindRoom Chat dependencies";
       after = [ "network-online.target" "git-checkout-cinny.service" ];
       wants = [ "network-online.target" "git-checkout-cinny.service" ];
+      wantedBy = [ "multi-user.target" ];
+      path = with pkgs; [
+        bash
+        coreutils
+        nodejs_22
+      ];
+      serviceConfig = {
+        Type = "oneshot";
+        User = "basnijholt";
+        Group = "users";
+        WorkingDirectory = "/var/www/cinny";
+      };
+      script = ''
+        set -euo pipefail
+
+        lock_hash="$(sha256sum package-lock.json | cut -d ' ' -f 1)"
+        marker=".git/mindroom-node-modules-lock-hash"
+        if [ -d node_modules ] && [ -f "$marker" ] && [ "$(cat "$marker")" = "$lock_hash" ]; then
+          exit 0
+        fi
+
+        npm ci
+        printf '%s\n' "$lock_hash" > "$marker"
+      '';
+    };
+
+    mindroom-cinny = {
+      description = "MindRoom Chat web UI";
+      after = [
+        "network-online.target"
+        "git-checkout-cinny.service"
+        "mindroom-cinny-dependencies.service"
+      ];
+      wants = [
+        "network-online.target"
+        "git-checkout-cinny.service"
+        "mindroom-cinny-dependencies.service"
+      ];
+      requires = [ "mindroom-cinny-dependencies.service" ];
       wantedBy = [ "multi-user.target" ];
       path = with pkgs; [ bash nodejs_22 ];
       serviceConfig = {

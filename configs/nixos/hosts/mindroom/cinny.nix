@@ -4,7 +4,7 @@
     enable = true;
     repositories.cinny = {
       path = "/var/www/cinny";
-      url = "https://github.com/mindroom-ai/mindroom-cinny.git";
+      url = "https://github.com/mindroom-ai/mindroom-chat.git";
       branch = "dev";
       user = "basnijholt";
       group = "users";

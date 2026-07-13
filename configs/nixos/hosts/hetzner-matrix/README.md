@@ -1,6 +1,6 @@
 # hetzner-matrix
 
-Public Matrix homeserver ([Tuwunel](https://github.com/mindroom-ai/mindroom-tuwunel), MindRoom fork) on Hetzner Cloud ARM VPS with [Cinny](https://github.com/mindroom-ai/mindroom-cinny) web client.
+Public Matrix homeserver ([Tuwunel](https://github.com/mindroom-ai/mindroom-tuwunel), MindRoom fork) on Hetzner Cloud ARM VPS with the [MindRoom Chat](https://github.com/mindroom-ai/mindroom-chat) web client.
 
 Users run [MindRoom](https://github.com/mindroom-ai/mindroom) locally and connect to this server.
 
@@ -22,7 +22,7 @@ Nix-managed:
 
 Manual/runtime-managed:
 
-- Cinny build/deploy from `/var/www/cinny` into the published root at `/var/www/cinny-published/current`.
+- MindRoom Chat build/deploy from `/var/www/cinny` into the published root at `/var/www/cinny-published/current`.
 - Website files in `/var/www/mindroom`.
 - DNS records at your DNS provider.
 
@@ -53,7 +53,7 @@ If a previous failed server already exists, recreate it:
 
 Create A records pointing to the server IP:
 - `mindroom.chat` - website + Matrix `.well-known` delegation
-- `chat.mindroom.chat` - Cinny web client
+- `chat.mindroom.chat` - MindRoom Chat web client
 
 ### Tuwunel config (Nix-managed)
 
@@ -143,9 +143,9 @@ Onboarding flow:
 - DM `WhatsApp Bridge Bot` and send `login`, then scan QR in WhatsApp.
 - For Telegram, first set `MAUTRIX_TELEGRAM_TELEGRAM_API_ID` and `MAUTRIX_TELEGRAM_TELEGRAM_API_HASH` in `telegram-appservice-env.age`, then DM `Telegram Bridge Bot` and send `login`.
 
-### Cinny web client
+### MindRoom Chat web client
 
-Cinny build artifacts are not pinned in Nix.
+MindRoom Chat build artifacts are not pinned in Nix.
 The checkout at `/var/www/cinny` is ensured by the `git-checkout-cinny` systemd service.
 Caddy serves the published symlink at `/var/www/cinny-published/current`, so failed builds do not blank the live site.
 
@@ -157,7 +157,7 @@ sudo systemctl start git-checkout-cinny
 mindroom-publish-cinny v4.10.5-mindroom.X
 ```
 
-No `nixos-rebuild` is needed for Cinny-only updates.
+No `nixos-rebuild` is needed for MindRoom Chat-only updates.
 The publish command also sets a larger Node heap limit for the build and validates
 that `index.html`, `runtime-config.js`, and `assets/` exist before it updates the
 live symlink.
