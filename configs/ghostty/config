@@ -1,0 +1,26 @@
+# Ghostty config — read by cmux for terminal rendering (font, colors, scrollback).
+# https://cmux.com/docs/configuration ("Terminal rendering still lives in Ghostty config")
+# Mirrors the iTerm2 profile in configs/iterm/Profiles.json.
+
+# iTerm: Normal Font = FiraMonoNFM-Regular 12
+font-family = FiraMono Nerd Font Mono
+font-size = 12
+
+# iTerm: Unlimited Scrollback (Ghostty has no unlimited option; this is bytes)
+scrollback-limit = 100000000
+
+# iTerm: Option Key Sends Esc+ (left and right), Treat Option as Alt
+macos-option-as-alt = true
+
+# Ghostty binds cmd+up/down to jump_to_prompt by default, which swallows
+# the cmux workspace-cycling shortcuts (cmd+up/down) in terminal panes.
+keybind = cmd+up=unbind
+keybind = cmd+down=unbind
+
+# TODO: once https://github.com/manaflow-ai/cmux/pull/2639 is merged and
+# released, uncomment these for iTerm-style cycling through ALL panes
+# (and remove the focusLeft/focusRight overrides in configs/cmux/cmux.json).
+# Until then cmux maps goto_split:next/previous to plain left/right and
+# skips vertically stacked panes (manaflow-ai/cmux#2350, #2482).
+# keybind = cmd+]=goto_split:next
+# keybind = cmd+[=goto_split:previous

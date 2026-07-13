@@ -1,0 +1,31 @@
+{
+    "env": {
+        "PATH": "$(PATH):$(HOME)\/.local\/bin"
+    },
+    "apps": [
+        {
+            "name": "Desktop",
+            "image-path": "desktop.png",
+            "output_name": "HDMI-A-1"
+        },
+        {
+            "name": "Low Res Desktop",
+            "image-path": "desktop.png",
+            "output_name": "HDMI-A-1"
+        },
+        {
+            "name": "Steam Big Picture",
+            "image-path": "steam.png",
+            "output_name": "HDMI-A-1",
+            "detached": [
+                "setsid steam steam:\/\/open\/bigpicture"
+            ],
+            "prep-cmd": [
+                {
+                    "do": "",
+                    "undo": "setsid steam steam:\/\/close\/bigpicture"
+                }
+            ]
+        }
+    ]
+}

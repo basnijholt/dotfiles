@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import subprocess
 import sys
@@ -60,13 +62,24 @@ class StatusInput:
     cost: Cost
     exceeds_200k_tokens: bool
     context_window: ContextWindow | None = None
+    effort_level: str = ""
 
 
 def parse_input(raw: dict) -> StatusInput:
+    # Only pick the fields we use: the JSON schema gains new keys over time,
+    # and strict **-unpacking into dataclasses breaks on every addition.
     ctx_data = raw.get("context_window", {})
     current_usage = None
-    if ctx_data.get("current_usage"):
-        current_usage = CurrentUsage(**ctx_data["current_usage"])
+    usage_data = ctx_data.get("current_usage")
+    if usage_data:
+        current_usage = CurrentUsage(
+            input_tokens=usage_data.get("input_tokens", 0),
+            output_tokens=usage_data.get("output_tokens", 0),
+            cache_creation_input_tokens=usage_data.get(
+                "cache_creation_input_tokens", 0
+            ),
+            cache_read_input_tokens=usage_data.get("cache_read_input_tokens", 0),
+        )
 
     context_window = (
         ContextWindow(
@@ -79,17 +92,35 @@ def parse_input(raw: dict) -> StatusInput:
         else None
     )
 
+    model_data = raw.get("model", {})
+    workspace_data = raw.get("workspace", {})
+    cost_data = raw.get("cost", {})
+    cwd = raw.get("cwd", os.getcwd())
+
     return StatusInput(
-        session_id=raw["session_id"],
-        transcript_path=raw["transcript_path"],
-        cwd=raw["cwd"],
-        model=Model(**raw["model"]),
-        workspace=Workspace(**raw["workspace"]),
-        version=raw["version"],
-        output_style=OutputStyle(**raw["output_style"]),
-        cost=Cost(**raw["cost"]),
-        exceeds_200k_tokens=raw["exceeds_200k_tokens"],
+        session_id=raw.get("session_id", ""),
+        transcript_path=raw.get("transcript_path", ""),
+        cwd=cwd,
+        model=Model(
+            id=model_data.get("id", ""),
+            display_name=model_data.get("display_name", ""),
+        ),
+        workspace=Workspace(
+            current_dir=workspace_data.get("current_dir", cwd),
+            project_dir=workspace_data.get("project_dir", cwd),
+        ),
+        version=raw.get("version", ""),
+        output_style=OutputStyle(name=raw.get("output_style", {}).get("name", "")),
+        cost=Cost(
+            total_cost_usd=cost_data.get("total_cost_usd", 0.0),
+            total_duration_ms=cost_data.get("total_duration_ms", 0),
+            total_api_duration_ms=cost_data.get("total_api_duration_ms", 0),
+            total_lines_added=cost_data.get("total_lines_added", 0),
+            total_lines_removed=cost_data.get("total_lines_removed", 0),
+        ),
+        exceeds_200k_tokens=raw.get("exceeds_200k_tokens", False),
         context_window=context_window,
+        effort_level=(raw.get("effort") or {}).get("level", ""),
     )
 
 
@@ -159,6 +190,8 @@ CYAN = "\033[36m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
 MAGENTA = "\033[35m"
+BLUE = "\033[34m"
+RED = "\033[31m"
 RESET = "\033[0m"
 
 # Icons (Nerd Font)
@@ -168,9 +201,12 @@ ICON_FOLDER = "\uf07b"
 ICON_CHART = "\uf080"
 ICON_COST = "\uf155"  # dollar sign
 ICON_GOOGLE = "\uf1a0"
+ICON_BRAIN = "\U000f09d1"  # nf-md-brain
 
 # Model icon
-if "opus" in data.model.id.lower():
+if "fable" in data.model.id.lower():
+    model_icon = f"{BLUE}{RESET}"  # book, fitting for Fable
+elif "opus" in data.model.id.lower():
     model_icon = f"{MAGENTA}󰘨{RESET}"
 elif "sonnet" in data.model.id.lower():
     model_icon = f"{CYAN}󰎈{RESET}"
@@ -185,6 +221,19 @@ if os.environ.get("CLAUDE_CODE_USE_VERTEX"):
     provider_info = f"{YELLOW}{ICON_GOOGLE}{RESET}"
 
 model_info = f"{model_icon} {provider_info} " if (model_icon and provider_info) else f"{model_icon or provider_info} " if (model_icon or provider_info) else ""
+
+# Thinking effort level
+EFFORT_COLORS = {
+    "low": GREEN,
+    "medium": CYAN,
+    "high": YELLOW,
+    "xhigh": MAGENTA,
+    "max": RED,
+}
+effort_info = ""
+if data.effort_level:
+    color = EFFORT_COLORS.get(data.effort_level, YELLOW)
+    effort_info = f"{color}{ICON_BRAIN} {data.effort_level}{RESET} "
 
 # Build folder info
 # start_folder: where Claude was started (relative to git root)
@@ -226,5 +275,5 @@ if data.cost.total_cost_usd > 0:
 
 project_icon = ICON_GIT if is_git_repo else ICON_FOLDER
 print(
-    f"{model_info}{CYAN}{project_icon} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
+    f"{model_info}{effort_info}{CYAN}{project_icon} {repo_name}{branch}{RESET}{folder_info} {GREEN}{os_icon} {hostname}{RESET}{context_info}{cost_info}"
 )

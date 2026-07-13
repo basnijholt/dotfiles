@@ -5,6 +5,8 @@
 #
 # - nofail: Don't block boot if NAS is down
 # - bg: Retry in background if mount fails at boot
+# - wait-online@br0: Don't try TrueNAS before the wired bridge has IPv4,
+#   otherwise the request can leave over Wi-Fi and be denied by TrueNAS ACLs.
 # - soft: Return errors instead of hanging when NAS unreachable
 # - NFSv4 handles reconnection automatically when NAS comes back
 { ... }:
@@ -17,6 +19,8 @@ let
     "soft"
     "timeo=50"
     "_netdev"
+    "x-systemd.requires=systemd-networkd-wait-online@br0.service"
+    "x-systemd.after=systemd-networkd-wait-online@br0.service"
   ];
 in
 {

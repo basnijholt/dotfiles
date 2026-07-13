@@ -20,6 +20,7 @@
       device = "nodev";
       efiSupport = true;
       copyKernels = true;
+      configurationLimit = 5;
     };
     efi.canTouchEfiVariables = true;
   };

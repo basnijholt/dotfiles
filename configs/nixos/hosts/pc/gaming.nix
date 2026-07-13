@@ -27,6 +27,22 @@
   # --- Steam ---
   programs.steam.enable = true;
 
+  # --- GameMode ---
+  # Gives games launched through `gamemoderun` higher CPU scheduling priority
+  # and asks the system to switch into a performance-oriented profile while
+  # the game is active.
+  programs.gamemode = {
+    enable = true;
+    enableRenice = true;
+    settings.general = {
+      renice = 10;
+      ioprio = 0;
+      softrealtime = "auto";
+      desiredgov = "performance";
+      inhibit_screensaver = 1;
+    };
+  };
+
   # --- Sunshine (Game Streaming) ---
   # Note: Had to change per https://discourse.nixos.org/t/give-user-cap-sys-admin-p-capabillity/62611/2
   # In Sunshine Steam App use `sudo -u myuser setsid steam steam://open/bigpicture` as Detached Command.

@@ -19,6 +19,8 @@ let
     cups # lp command for network printing
     docker
     devbox
+    devenv
+    delta
     dnsutils # Provides dig, nslookup, host
     duf
     eza
@@ -58,6 +60,7 @@ let
     rclone
     ripgrep
     rsync
+    sqlite
     starship
     tealdeer
     terraform
@@ -87,10 +90,10 @@ let
     gcc
     gnumake
     meson
-    nodejs_20
+    nodejs_22
     pkg-config
     portaudio
-    (python3.withPackages (ps: [ ps.pipx ]))
+    python3
   ];
 in
 {

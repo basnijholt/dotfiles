@@ -27,7 +27,7 @@ if [[ $- == *i* ]]; then
     alias gcaia="${HOME}/dotfiles/scripts/commit.py --edit --all "
     alias c='code'
     alias cl='claude --dangerously-skip-permissions '
-    alias vcl='CLAUDE_CODE_USE_VERTEX=1 ANTHROPIC_MODEL="claude-opus-4-6" ANTHROPIC_SMALL_FAST_MODEL="claude-haiku-4-5" claude --dangerously-skip-permissions '
+    alias vcl='CLAUDE_CODE_USE_VERTEX=1 CLOUD_ML_REGION=global ANTHROPIC_MODEL="claude-fable-5" ANTHROPIC_SMALL_FAST_MODEL="claude-haiku-4-5" claude --dangerously-skip-permissions '
     alias cr='coder --dangerously-bypass-approvals-and-sandbox '
     alias cx='codex --dangerously-bypass-approvals-and-sandbox '
     alias oc='opencode '
@@ -41,9 +41,16 @@ if [[ $- == *i* ]]; then
         alias ci='code-insiders'
         alias s='/usr/local/bin/subl'
         alias ss='open -b com.apple.ScreenSaver.Engine'
+        alias switch-agent-cli-ip="${HOME}/dotfiles/scripts/switch-agent-cli-ip.py"
         alias tun='autossh -N -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -L 8888:localhost:9999 cw'
-        alias nixswitch="darwin-rebuild switch --flake ~/dotfiles/configs/nix-darwin"
-
+        alias nixswitch="sudo darwin-rebuild switch --flake ~/dotfiles/configs/nix-darwin"
+        alias nixupdate="cd ~/dotfiles/configs/nix-darwin && nix flake update --extra-experimental-features nix-command --extra-experimental-features flakes && nixswitch && cd -"
+        nosleep() {
+            sudo pmset -a disablesleep 1
+        }
+        sleepok() {
+            sudo pmset -a disablesleep 0
+        }
         # Relies on having installed x86 brew like:
         # arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
         alias x86brew="arch -x86_64 /usr/local/bin/brew"
@@ -51,30 +58,30 @@ if [[ $- == *i* ]]; then
     fi
     if [[ `uname` == 'Linux' ]]; then
         alias pbcopy='wl-copy'  # Just because of muscle memory...
+
+        nixswitch() {
+            local args=()
+            if [[ -n "$1" && "$1" =~ ^[0-9]+$ ]]; then
+                args=(--option max-jobs "$1" --option cores "$1")
+                shift
+            fi
+            if [[ "$1" == "--no-local" ]]; then
+                args+=(--option substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://cache.nixos-cuda.org https://nixos-raspberrypi.cachix.org")
+                shift
+            fi
+            sudo nixos-rebuild switch --flake ~/dotfiles/configs/nixos#$(hostname) "${args[@]}"
+        }
+
+        nixupdate() {
+            local args=()
+            if [[ -n "$1" ]]; then
+                args=(--option max-jobs "$1" --option cores "$1")
+            fi
+            cd ~/dotfiles/configs/nixos && nix flake update && sudo nixos-rebuild switch --flake .#$(hostname) "${args[@]}" && cd -
+        }
+
+        alias nixcacheupdate="~/dotfiles/configs/nixos/scripts/upgrade-from-cache.sh"
     fi
-
-    nixswitch() {
-        local args=()
-        if [[ -n "$1" && "$1" =~ ^[0-9]+$ ]]; then
-            args=(--option max-jobs "$1" --option cores "$1")
-            shift
-        fi
-        if [[ "$1" == "--no-local" ]]; then
-            args+=(--option substituters "https://cache.nixos.org/ https://nix-community.cachix.org https://cache.nixos-cuda.org https://nixos-raspberrypi.cachix.org")
-            shift
-        fi
-        sudo nixos-rebuild switch --flake ~/dotfiles/configs/nixos#$(hostname) "${args[@]}"
-    }
-    
-    nixupdate() {
-        local args=()
-        if [[ -n "$1" ]]; then
-            args=(--option max-jobs "$1" --option cores "$1")
-        fi
-        cd ~/dotfiles/configs/nixos && nix flake update && sudo nixos-rebuild switch --flake .#$(hostname) "${args[@]}" && cd -
-    }
-
-    alias nixcacheupdate="~/dotfiles/configs/nixos/scripts/upgrade-from-cache.sh"
 
     zyolo() {
         export ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic

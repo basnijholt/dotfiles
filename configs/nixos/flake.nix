@@ -7,16 +7,24 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    home-manager-pi = {
+      url = "github:nix-community/home-manager/release-25.11";
+      inputs.nixpkgs.follows = "nixos-raspberrypi/nixpkgs";
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     comin = {
-      url = "github:nlewo/comin";
+      url = "github:basnijholt/comin/feat/ssh-commit-signing";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ragenix = {
       url = "github:yaxitech/ragenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    zfs-unlock = {
+      url = "github:basnijholt/zfs-unlock";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
@@ -24,14 +32,27 @@
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
   };
 
-  outputs = { self, nixpkgs, home-manager, disko, comin, ragenix, nixos-raspberrypi, ... }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      home-manager-pi,
+      disko,
+      comin,
+      ragenix,
+      zfs-unlock,
+      nixos-raspberrypi,
+      ...
+    }:
     let
       lib = nixpkgs.lib;
       system = "x86_64-linux";
+      pkgs = import nixpkgs { inherit system; };
 
-      commonModules = [
+      commonModules = homeManager: [
         ./configuration.nix
-        home-manager.nixosModules.home-manager
+        homeManager.nixosModules.home-manager
         comin.nixosModules.comin
         {
           home-manager.useGlobalPkgs = true;
@@ -39,31 +60,36 @@
         }
       ];
 
-      mkHost = extraModules:
+      mkHost =
+        extraModules:
         lib.nixosSystem {
           inherit system;
-          modules = commonModules ++ extraModules;
+          modules = commonModules home-manager ++ extraModules;
         };
 
-      mkHostArm = extraModules:
+      mkHostArm =
+        extraModules:
         lib.nixosSystem {
           system = "aarch64-linux";
-          modules = commonModules ++ extraModules;
+          modules = commonModules home-manager ++ extraModules;
         };
 
-      mkPi = piModule: extraModules:
+      mkPi =
+        piModule: extraModules:
         nixos-raspberrypi.lib.nixosSystem {
           specialArgs = { inherit nixos-raspberrypi; };
-          modules = [ piModule ] ++ commonModules ++ extraModules;
+          modules = [ piModule ] ++ commonModules home-manager-pi ++ extraModules;
         };
 
-      mkPiInstaller = piModule: extraModules:
+      mkPiInstaller =
+        piModule: extraModules:
         nixos-raspberrypi.lib.nixosInstaller {
           specialArgs = { inherit nixos-raspberrypi; };
           modules = [ piModule ] ++ extraModules;
         };
 
-    in {
+    in
+    {
       nixosConfigurations = {
         pc = mkHost [
           disko.nixosModules.disko
@@ -84,6 +110,16 @@
           ./hosts/hp/disko.nix
           ./hosts/hp/default.nix
           ./hosts/hp/hardware-configuration.nix
+        ];
+
+        # Disko manages only the NAS boot disk. Existing data pools are imported
+        # by name in the host config and must not be described with disko.
+        nas = mkHost [
+          disko.nixosModules.disko
+          zfs-unlock.nixosModules.receiver
+          ./hosts/nas/disko.nix
+          ./hosts/nas/default.nix
+          ./hosts/nas/hardware-configuration.nix
         ];
 
         # Incus VM version of HP - same services/packages, VM-appropriate hardware
@@ -127,12 +163,21 @@
 
         # Companion bot LXC container for Incus
         mindroom-spouse = mkHost [
+          ragenix.nixosModules.default
           ./hosts/mindroom-spouse/default.nix
+          ./optional/lxc-container.nix
+        ];
+
+        # Companion bot LXC container for Incus (mom; MindRoom only, no OpenClaw)
+        mindroom-mom = mkHost [
+          ragenix.nixosModules.default
+          ./hosts/mindroom-mom/default.nix
           ./optional/lxc-container.nix
         ];
 
         # Lightweight development LXC container for Incus (on HP)
         mindroom = mkHost [
+          ragenix.nixosModules.default
           ./hosts/mindroom/default.nix
           ./optional/lxc-container.nix
         ];
@@ -177,6 +222,29 @@
           ./hosts/hetzner/hardware-configuration.nix
         ];
 
+        # Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS
+        hetzner-saas = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/hetzner-saas/disko.nix
+            ./hosts/hetzner-saas/default.nix
+            ./hosts/hetzner-saas/hardware-configuration.nix
+          ];
+        };
+
+        # Minimal first-stage config for nixos-anywhere in rescue mode.
+        hetzner-saas-bootstrap = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            disko.nixosModules.disko
+            ./hosts/hetzner-saas/disko.nix
+            ./hosts/hetzner-saas/networking.nix
+            ./hosts/hetzner-saas/hardware-configuration.nix
+            ./hosts/hetzner/bootstrap.nix
+          ];
+        };
+
         # Paul's Wyse 5070 - gateway to home services via Tailscale
         paul-wyse = mkHost [
           disko.nixosModules.disko
@@ -196,6 +264,7 @@
         # Raspberry Pi 4 - uses nixos-raspberrypi for hardware + ZFS on SSD
         pi4 = mkPi nixos-raspberrypi.nixosModules.raspberry-pi-4.base [
           disko.nixosModules.disko
+          zfs-unlock.nixosModules.client
           ./hosts/pi4/disko.nix
           ./hosts/pi4/default.nix
           ./hosts/pi4/hardware-configuration.nix
@@ -237,10 +306,17 @@
         pc = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
+        nas = (import ./hosts/nas/disko.nix) { inherit lib; };
         dev-vm = (import ./hosts/dev-vm/disko.nix) { inherit lib; };
         hetzner = (import ./hosts/hetzner/disko.nix) { inherit lib; };
         hetzner-matrix = (import ./hosts/hetzner-matrix/disko.nix) { inherit lib; };
         paul-wyse = (import ./hosts/paul-wyse/disko.nix) { inherit lib; };
+      };
+
+      checks.${system}.nas-disko-safety = import ./hosts/nas/disko-safety-test.nix {
+        inherit pkgs;
+        nasDiskoDevice = self.diskoConfigurations.nas.disko.devices.disk.main.device;
+        nasDiskoScript = self.nixosConfigurations.nas.config.system.build.diskoScript;
       };
 
     };

@@ -9,8 +9,8 @@
   # --- System Stability ---
   services.earlyoom = {
     enable = true;
-    freeSwapThreshold = 2;
-    freeMemThreshold = 2;
+    freeSwapThreshold = 10;
+    freeMemThreshold = 10;
   };
 
   # --- SSH ---
@@ -37,8 +37,14 @@
 
   # --- Known Hosts ---
   programs.ssh.knownHosts = {
-    "truenas.local" = {
-      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJBFtTkkcsQ1KKBJ1ne2Q2COhfBSxs3H0ppO/HEirJt4";
+    "nas" = {
+      hostNames = [
+        "nas"
+        "nas.local"
+        "truenas.local"
+        "192.168.1.4"
+      ];
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBVVgr3VXPWMUMtvTatRBBmnvfMfAhBH9qvNjv0Kl7sD";
     };
   };
 }

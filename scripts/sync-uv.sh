@@ -22,7 +22,7 @@ pygount
 rsync-time-machine
 ruff
 smassh
-truenas-unlock
+zfs-unlock
 tuitorial
 unidep[all]
 EOF

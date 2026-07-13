@@ -33,6 +33,9 @@
     ];
   };
 
+  # Do not fail a system switch when the WiFi printer is offline/asleep.
+  systemd.services.ensure-printers.serviceConfig.SuccessExitStatus = "1";
+
   # Avahi for AirPrint / network discovery
   services.avahi = {
     enable = true;

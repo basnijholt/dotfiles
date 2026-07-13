@@ -9,10 +9,20 @@
       group = "tuwunel";
       mode = "0400";
     };
+    livekit-keys = {
+      file = ./secrets/livekit-keys.age;
+      mode = "0400";
+    };
     registration-token-provisioning = {
       file = ./secrets/registration-token.age;
       owner = "mindroom-local-provisioning";
       group = "mindroom-local-provisioning";
+      mode = "0400";
+    };
+    registration-token-demo = {
+      file = ./secrets/registration-token.age;
+      owner = "tuwunel-demo";
+      group = "tuwunel-demo";
       mode = "0400";
     };
     sso-google-secret = {

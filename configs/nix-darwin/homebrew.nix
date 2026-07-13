@@ -6,6 +6,7 @@
     onActivation = {
       autoUpdate = true;
       cleanup = "zap";
+      extraFlags = [ "--force-cleanup" ];
       upgrade = true;
     };
 
@@ -23,7 +24,6 @@
       "cloudflared" # Cloudflare tunnel
       "cmake" # Build system
       "cmatrix" # Matrix-style screen animation
-      "cointop" # Cryptocurrency tracker
       "coreutils" # GNU core utilities
       "create-dmg" # DMG creator
       "d2" # Diagram scripting language
@@ -43,6 +43,7 @@
       "gping" # Ping with graph
       "graphviz" # Graph visualization
       "grep" # GNU grep
+      "hashicorp/tap/terraform" # Infrastructure as code
       "htop" # Process viewer
       "hugo" # Static site generator
       "imagemagick" # Image manipulation
@@ -76,14 +77,12 @@
       "rsync" # File sync tool
       "ruby" # Ruby programming language
       "rustup" # Rust toolchain installer
-      "skhd-zig" # Hotkey daemon
       "ssh-copy-id" # SSH public key installer
       "starship" # Shell prompt
       "superfile" # Modern terminal file manager
       "swiftformat" # Swift code formatter
       "tealdeer" # Fast alternative to tldr
       "terminal-notifier" # macOS notification tool
-      "terraform" # Infrastructure as code
       "tokei" # Code statistics
       "tmux" # Terminal multiplexer
       "tre-command" # Tree command, improved
@@ -92,10 +91,11 @@
       "vsftpd" # FTP server
       "wget" # File downloader
       "yq" # YAML processor
+      "zellij" # Terminal workspace
       "zsh" # Shell
     ] ++ (
       if config.isPersonal then
-        []
+        [ ]
       else
         [
           "llvm@17" # LLVM toolchain
@@ -108,20 +108,17 @@
     casks = [
       "1password-cli" # 1Password CLI
       "adobe-creative-cloud" # Adobe suite
-      "adobe-digital-editions" # E-book reader
+      "basnijholt/tap/agent-cli" # AI agent CLI
       "airflow" # Video transcoder
-      "avast-security" # Antivirus
       "balenaetcher" # USB image writer
       "block-goose" # open source AI agent
       "brave-browser" # Web browser
-      "calibre" # E-book manager
       "chromedriver" # Chrome automation
       "cryptomator" # File encryption
       "cursor" # Cursor editor
       "cyberduck" # FTP client
       "db-browser-for-sqlite" # SQLite browser
       "disk-inventory-x" # Disk space visualizer
-      "docker-desktop" # Container platform
       "dropbox" # Cloud storage
       "eqmac" # Audio equalizer
       "filebot" # File renamer
@@ -138,17 +135,14 @@
       "inkscape" # Vector graphics editor
       "istat-menus" # System monitor
       "iterm2" # Terminal emulator
-      "jabref" # Reference manager
       "thaw" # Menu bar manager
       "karabiner-elements" # Keyboard customizer
       "keepingyouawake" # Prevent sleep
       "keyboard-maestro" # Automation tool
       "licecap" # Screen recorder
       "lulu" # Firewall
-      "lyx" # Document processor
       "macfuse" # Filesystem in userspace
       "mactracker" # Apple product database
-      "mendeley" # Reference manager
       "microsoft-auto-update" # Microsoft updater
       "microsoft-azure-storage-explorer" # Azure storage tool
       "microsoft-office" # Office suite
@@ -161,11 +155,12 @@
       "onyx" # System maintenance
       "proton-mail-bridge" # ProtonMail bridge
       "qbittorrent" # Torrent client
-      "qlvideo" # Video QuickLook
+      "quicklook-video" # Video QuickLook
       "raycast" # Productivity tool
       "rectangle" # Window manager
       "rotki" # Portfolio tracker
       "sabnzbd" # Usenet client
+      "jackielii/tap/skhd-zig" # Hotkey daemon
       "scroll-reverser" # Scroll direction control
       "selfcontrol" # Website blocker
       "signal" # Secure messenger
@@ -209,7 +204,9 @@
     # Additional repositories
     taps = [
       "gromgit/fuse" # For SSHFS
-      "jackielii/tap" # for skhd-zig
+      "hashicorp/tap" # For Terraform
+      "basnijholt/tap" # For agent-cli
+      "jackielii/tap" # For skhd-zig
     ];
   };
 }

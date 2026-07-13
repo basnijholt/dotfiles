@@ -7,8 +7,9 @@ packages=(
     @google/gemini-cli@latest
     @just-every/code@latest
     @openai/codex@latest
-    @anthropic-ai/claude-code@latest
     @mariozechner/pi-coding-agent@latest
     opencode-ai@latest
+    @anthropic-ai/claude-code@latest
+    t3@latest
 )
 bun install -g "${packages[@]}"

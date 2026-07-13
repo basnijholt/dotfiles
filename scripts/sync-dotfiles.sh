@@ -10,18 +10,14 @@ HOSTS=(
   "nuc"
   "pc"
   "hp"
-  "pi3"
   "pi4"
-  # systemd-nspawn hosts
-  "docker-truenas"
-  "debian-truenas"
+  "nas"
   # VM/LXC hosts
   "nix-cache"
   "docker"
-  "docker-truenas-2"
   # Cloud hosts
-  "ubuntu-hetzner"
   "nixos-hetzner"
+  "mindroom-hetzner"
 )
 
 # Arrays to track results

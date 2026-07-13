@@ -3,7 +3,11 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "includeCoAuthoredBy": false,
-  "model": "opus",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "model": "claude-fable-5",
   "hooks": {
     "PreToolUse": [
       {
@@ -27,9 +31,11 @@
     "claude-code-wakatime@wakatime": true,
     "agent-cli-dev@agent-cli": true
   },
-  "alwaysThinkingEnabled": true,
+  "alwaysThinkingEnabled": false,
+  "effortLevel": "xhigh",
+  "fastMode": true,
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.41",
   "skipDangerousModePermissionPrompt": true,
-  "fastMode": true
+  "switchModelsOnFlag": false
 }

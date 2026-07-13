@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain cinnyDomain pushDomain;
+  inherit (constants) siteDomain appDomain cinnyDomain pushDomain demoDomain demoTuwunelPort cinnyCurrentPath rtcJwtPort;
 in
 {
   systemd.tmpfiles.rules = [
@@ -20,6 +20,7 @@ in
 
         handle /.well-known/matrix/server {
           header Content-Type application/json
+          header Access-Control-Allow-Origin "*"
           respond 200 {
             body "{\"m.server\":\"${siteDomain}:443\"}"
             close
@@ -28,10 +29,23 @@ in
 
         handle /.well-known/matrix/client {
           header Content-Type application/json
+          header Access-Control-Allow-Origin "*"
           respond 200 {
-            body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"}}"
+            body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"},\"org.matrix.msc4143.rtc_foci\":[{\"type\":\"livekit\",\"livekit_service_url\":\"https://${siteDomain}/livekit/jwt\"}]}"
             close
           }
+        }
+
+        # MatrixRTC (Element Call) backend, path-routed to avoid extra DNS records.
+        handle_path /livekit/jwt/* {
+          reverse_proxy localhost:${toString rtcJwtPort}
+        }
+        handle_path /livekit/sfu/* {
+          reverse_proxy localhost:7880
+        }
+
+        handle / {
+          redir https://${appDomain}/ 308
         }
 
         root * /var/www/mindroom
@@ -40,15 +54,49 @@ in
       '';
     };
 
+    # Demo Matrix homeserver for TestFlight/App Review password-only testing.
+    virtualHosts."${demoDomain}" = {
+      extraConfig = ''
+        @demoRegistration path /_matrix/client/r0/register* /_matrix/client/v3/register* /_matrix/client/unstable/register*
+        respond @demoRegistration 403
+
+        reverse_proxy /_matrix/* localhost:${toString demoTuwunelPort}
+
+        handle /.well-known/matrix/server {
+          header Content-Type application/json
+          header Access-Control-Allow-Origin "*"
+          respond 200 {
+            body "{\"m.server\":\"${demoDomain}:443\"}"
+            close
+          }
+        }
+
+        handle /.well-known/matrix/client {
+          header Content-Type application/json
+          header Access-Control-Allow-Origin "*"
+          respond 200 {
+            body "{\"m.homeserver\":{\"base_url\":\"https://${demoDomain}\"}}"
+            close
+          }
+        }
+
+        @demoRoot path /
+        respond @demoRoot 200 {
+          body "MindRoom demo Matrix homeserver"
+        }
+      '';
+    };
+
     # Cinny web client (SPA)
     virtualHosts."${cinnyDomain}" = {
       extraConfig = ''
-        root * /var/www/cinny/dist
+        root * ${cinnyCurrentPath}
         try_files {path} /index.html
         file_server
       '';
     };
 
+    # Matrix push gateway for native mobile clients.
     virtualHosts."${pushDomain}" = {
       extraConfig = ''
         reverse_proxy localhost:5000

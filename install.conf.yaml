@@ -15,17 +15,23 @@
     ~/.config/amp/settings.json: configs/amp/settings.json
     ~/.config/atuin: configs/atuin
     ~/.config/bat/config: configs/bat/config
+    ~/.config/cmux/cmux.json: configs/cmux/cmux.json
     ~/.config/codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.config/codex/config.toml: configs/codex/config.toml
+    ~/.codex/hooks: configs/codex/hooks
+    ~/.codex/hooks.json: configs/codex/hooks.json
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
     ~/.config/git/attributes: configs/git/attributes
+    ~/.config/ghostty/config: configs/ghostty/config
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin
     ~/.config/nvim: configs/nvim
     ~/.config/opencode/opencode.json: configs/opencode/opencode.json
     ~/.config/opencode/plugins: configs/opencode/plugins
     ~/.config/starship.toml: configs/starship/starship.toml
+    ~/.config/sunshine/apps.json: configs/sunshine/apps.json
+    ~/.config/sunshine/sunshine.conf: configs/sunshine/sunshine.conf
     ~/.config/wezterm/wezterm.lua: configs/wezterm/wezterm.lua
     ~/.config/yazi: configs/yazi
     ~/.config/zellij/config.kdl: configs/zellij/config.kdl
@@ -36,6 +42,8 @@
     ~/.gemini/settings.json: configs/gemini/settings.json
     ~/.gitconfig-personal: configs/git/gitconfig-personal
     ~/.gitconfig: configs/git/gitconfig
+    ~/.local/bin/git-credential-portable: scripts/git-credential-portable.sh
+    ~/.local/bin/git-credential-gitea: scripts/git-credential-gitea.sh
     ~/.local/bin/git-fixup-file: scripts/git-fixup-file.sh
     ~/.local/bin/pypi-sha256: scripts/pypi-sha256.sh
     ~/.nanorc: configs/nano/nanorc
@@ -61,6 +69,7 @@
 - shell:
   - bash scripts/sync-uv.sh
   - bash scripts/sync-bun.sh
+  - bash scripts/install-nano-syntax.sh
   - git submodule update --init --recursive
   - command: '[[ "$(uname)" = "Darwin" ]] && [ -f ./secrets/install ] && (echo "SECRETS" && ./secrets/install) || true'
     stdout: true
@@ -73,8 +82,16 @@
       if: '[ "$(uname)" = "Linux" ]'
 - link:
     ~/.config/hypr: configs/hypr
-    ~/.config/waybar: submodules/mechabar
     ~/.config/mako/config: configs/mako/config
+
+# -- Only on PC --
+- defaults:
+    link:
+      create: true
+      relink: true
+      if: '[ "$(hostname)" = "pc" ]'
+- link:
+    ~/.gitconfig-sign: configs/git/gitconfig-sign
 
 # -- Only on MacOS --
 - defaults:

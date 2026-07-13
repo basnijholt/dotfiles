@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   # Required for current nix-darwin
   nixpkgs.hostPlatform = "aarch64-darwin"; # for Apple Silicon
@@ -11,10 +11,32 @@
 
   # Add system packages
   environment.systemPackages = with pkgs; [
+    colima # Container runtime for macOS
+    lima # VM manager used by Colima; provides limactl for standalone VMs
     cups # lp command for network printing
     devbox
+    docker # Docker CLI
+    docker-buildx # Docker Buildx CLI plugin
+    docker-compose # Docker Compose CLI plugin
+    kubernetes-helm # Helm 3 Kubernetes package manager
     nixpkgs-fmt
+    sops # Secrets editor
+    cocoapods # required for Capacitor iOS builds (pod install)
   ];
+
+  # Start the Docker-compatible Colima VM at login, without Docker Desktop.
+  launchd.user.agents.colima = {
+    command = "${pkgs.colima}/bin/colima start";
+    serviceConfig = {
+      RunAtLoad = true;
+      EnvironmentVariables.PATH = "${lib.makeBinPath [
+        pkgs.colima
+        pkgs.docker
+        pkgs.docker-buildx
+        pkgs.docker-compose
+      ]}:/usr/bin:/bin:/usr/sbin:/sbin";
+    };
+  };
 
   # Configure sudo password timeout (in minutes)
   security.sudo.extraConfig = ''

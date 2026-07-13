@@ -32,6 +32,7 @@
   # Our root datasets are unencrypted; only replicated backup datasets from TrueNAS are encrypted
   # Without this, replicated encrypted datasets block boot waiting for a passphrase
   boot.zfs.requestEncryptionCredentials = false;
+  boot.zfs.forceImportRoot = lib.mkDefault false;
 
   boot.kernel.sysctl = {
     "kernel.sysrq" = 1; # Enable Magic SysRq key for recovery
@@ -71,5 +72,6 @@
     nerd-fonts.droid-sans-mono
     nerd-fonts.jetbrains-mono
     libertine # Linux Libertine fonts
+    noto-fonts-color-emoji # Color emoji for headless browser screenshots
   ];
 }

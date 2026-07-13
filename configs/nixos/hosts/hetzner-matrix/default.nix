@@ -6,15 +6,17 @@
 
 {
   imports = [
+    ../../optional/git-repo-checkouts.nix
     ../../optional/zfs-auto-snapshot.nix
     ./networking.nix
     ./local_mindroom_provisioning_service.nix
-    ./git-repo-checkouts.nix
 
     # Service-focused modules
     ./secrets-config.nix
     ./tuwunel.nix
+    ./tuwunel-demo.nix
     ./caddy.nix
+    ./matrix-rtc.nix
     ./cinny.nix
     ./provisioning.nix
     ./sygnal.nix
@@ -45,8 +47,11 @@
     "https://nix-community.cachix.org"
   ];
 
-  # Required by nixpkgs' current mautrix-signal package.
+  # Required by current mautrix bridge packages that still depend on libolm.
   nixpkgs.config.permittedInsecurePackages = [ "olm-3.2.16" ];
+
+  # Keep live switches compatible with the currently running generation.
+  services.dbus.implementation = "dbus";
 
   # Limit build parallelism on small VPS
   nix.settings.max-jobs = 2;

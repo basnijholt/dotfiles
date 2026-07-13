@@ -36,6 +36,7 @@ let
     *               3600  IN  A     ${wildcardIP}
     nuc             3600  IN  A     192.168.1.2
     hp              3600  IN  A     192.168.1.3
+    nas             3600  IN  A     192.168.1.4
     truenas         3600  IN  A     192.168.1.4
     pc              3600  IN  A     192.168.1.5
     docker          3600  IN  A     192.168.1.6

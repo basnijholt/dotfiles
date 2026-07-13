@@ -1,6 +1,22 @@
 # zsh_plugins.sh - meant to be sourced in .zshrc
 
 if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
+    _update_starship_config_for_slow_repos() {
+        local default_config="$HOME/dotfiles/configs/starship/starship.toml"
+        local slow_repo_config="$HOME/dotfiles/configs/starship/starship-no-git.toml"
+
+        if [[ "$PWD" == /opt/stacks(|/*) ]]; then
+            export STARSHIP_CONFIG="$slow_repo_config"
+        else
+            export STARSHIP_CONFIG="$default_config"
+        fi
+    }
+
+    autoload -Uz add-zsh-hook
+    add-zsh-hook chpwd _update_starship_config_for_slow_repos
+    add-zsh-hook precmd _update_starship_config_for_slow_repos
+    _update_starship_config_for_slow_repos
+
     # -- completions (fpath before omz runs compinit)
     [[ -d ~/.zfunc ]] && fpath+=~/.zfunc
 
@@ -20,6 +36,46 @@ if [[ ($- == *i*) && -n "$ZSH_VERSION" ]]; then
     # -- fix Atuin [Ctrl-r] key binding
     if command -v atuin &> /dev/null; then
         bindkey -M emacs '^r' atuin-search  # Rebind after omz/lib/key-bindings.zsh
+    fi
+
+    if command -v zoxide >/dev/null 2>&1 && command -v git >/dev/null 2>&1; then
+        zwt() {
+            local current_root target root rel rewritten
+            local current_common root_common
+
+            current_root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+                z "$@"
+                return
+            }
+
+            target=$(zoxide query --exclude "$PWD" -- "$@") || return
+            root=$(git -C "$target" rev-parse --show-toplevel 2>/dev/null) || {
+                cd "$target"
+                return
+            }
+
+            current_common=$(git -C "$current_root" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
+                cd "$target"
+                return
+            }
+            root_common=$(git -C "$root" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
+                cd "$target"
+                return
+            }
+
+            # If zoxide picked another worktree of the same repo, preserve the relative path.
+            if [[ "$root_common" == "$current_common" ]]; then
+                if [[ "$target" == "$root" ]]; then
+                    rewritten="$current_root"
+                else
+                    rel=${target#$root/}
+                    rewritten="$current_root/$rel"
+                fi
+                [[ -d "$rewritten" ]] && cd "$rewritten" && return
+            fi
+
+            cd "$target"
+        }
     fi
 
     # -- if on Linux

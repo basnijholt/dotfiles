@@ -18,6 +18,30 @@ let
     install -m 0755 "$bin_path" "$out/bin/tuwunel"
   '';
 
+  tuwunelHealthcheck = pkgs.writeShellScript "tuwunel-healthcheck" ''
+    set -euo pipefail
+
+    check() {
+      ${pkgs.curl}/bin/curl \
+        --fail \
+        --silent \
+        --show-error \
+        --max-time 10 \
+        --output /dev/null \
+        http://127.0.0.1:8008/_matrix/client/versions
+    }
+
+    for _ in 1 2; do
+      if check; then
+        exit 0
+      fi
+      sleep 5
+    done
+
+    echo "Tuwunel healthcheck failed twice; restarting tuwunel.service" >&2
+    ${pkgs.systemd}/bin/systemctl restart tuwunel.service
+  '';
+
   tuwunelConfigTemplate = pkgs.writeText "tuwunel.toml" ''
     [global]
     server_name = "${siteDomain}"
@@ -32,14 +56,16 @@ let
     mindroom_edit_purge_enabled = true
     mindroom_edit_purge_min_age_secs = 86400
     mindroom_edit_purge_interval_secs = 3600
-    mindroom_edit_purge_batch_size = 1000
+    mindroom_edit_purge_batch_size = 10000
     max_request_size = 25165824
 
+    # Keep one-off OAuth repair commands out of this public repository.
     [global.well_known]
     client = "https://${siteDomain}"
     server = "${siteDomain}:443"
 
     [[global.identity_provider]]
+    # Keep Google identities independent from GitHub-backed Matrix accounts.
     brand = "Google"
     client_id = "974295579207-8d3ippmssoiaibuu04id02sb66rgi1h3.apps.googleusercontent.com"
     client_secret_file = "${config.age.secrets.sso-google-secret.path}"
@@ -50,18 +76,22 @@ let
     brand = "GitHub"
     client_id = "Ov23li6wDSuBsiVjYWar"
     client_secret_file = "${config.age.secrets.sso-github-secret.path}"
+    issuer_url = "https://github.com/login/oauth"
+    base_path = ""
     callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/Ov23li6wDSuBsiVjYWar"
 
     [[global.identity_provider]]
     brand = "AppleOIDC"
     name = "Apple"
     client_id = "chat.mindroom.matrix.apple"
+    native_client_ids = ["chat.mindroom.app"]
     client_secret_file = "${config.age.secrets.sso-apple-secret.path}"
     issuer_url = "https://appleid.apple.com"
     callback_url = "https://${siteDomain}/_matrix/client/unstable/login/sso/callback/chat.mindroom.matrix.apple"
     scope = ["openid"]
 
     [global.appservice.signal]
+    id = "signal"
     url = "http://localhost:29328"
     as_token = "$TUWUNEL_SIGNAL_AS_TOKEN"
     hs_token = "$TUWUNEL_SIGNAL_HS_TOKEN"
@@ -78,6 +108,7 @@ let
     exclusive = true
 
     [global.appservice.whatsapp]
+    id = "whatsapp"
     url = "http://localhost:29318"
     as_token = "$TUWUNEL_WHATSAPP_AS_TOKEN"
     hs_token = "$TUWUNEL_WHATSAPP_HS_TOKEN"
@@ -94,6 +125,7 @@ let
     exclusive = true
 
     [global.appservice.telegram]
+    id = "telegram"
     url = "http://localhost:29317"
     as_token = "$TUWUNEL_TELEGRAM_AS_TOKEN"
     hs_token = "$TUWUNEL_TELEGRAM_HS_TOKEN"
@@ -164,6 +196,29 @@ in
     environment = {
       CONDUWUIT_CONFIG = "/run/tuwunel/tuwunel.toml";
       LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.liburing ];
+    };
+  };
+
+  systemd.services.tuwunel-healthcheck = {
+    description = "Restart Tuwunel when the Matrix client endpoint hangs";
+    after = [ "network-online.target" "tuwunel.service" ];
+    wants = [ "network-online.target" "tuwunel.service" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${tuwunelHealthcheck}";
+    };
+  };
+
+  systemd.timers.tuwunel-healthcheck = {
+    description = "Run Tuwunel HTTP healthcheck";
+    wantedBy = [ "timers.target" ];
+
+    timerConfig = {
+      OnBootSec = "2min";
+      OnUnitActiveSec = "1min";
+      AccuracySec = "10s";
+      Unit = "tuwunel-healthcheck.service";
     };
   };
 }

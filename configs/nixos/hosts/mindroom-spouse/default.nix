@@ -1,8 +1,14 @@
-{ pkgs, ... }:
+{
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports = [
+    ../../optional/mindroom-companion.nix
     ./networking.nix
+    ../../optional/openclaw/services.nix
   ];
 
   # Passwordless sudo for OpenClaw agent
@@ -13,4 +19,17 @@
 
   # signal-cli for OpenClaw Signal channel
   environment.systemPackages = [ pkgs.signal-cli ];
+
+  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
+    "openclaw-2026.6.5"
+  ];
+
+  systemd.services.openclaw-gateway.serviceConfig.UnsetEnvironment = [
+    "OPENCLAW_TELEGRAM_BOT_TOKEN"
+    "TELEGRAM_BOT_TOKEN"
+  ];
+
+  # Deploy manually while this container is being used as a hands-on MindRoom
+  # runtime.
+  services.comin.enable = lib.mkForce false;
 }

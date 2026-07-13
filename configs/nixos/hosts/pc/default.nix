@@ -1,4 +1,4 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -25,12 +25,21 @@
     ./debugging.nix
     ./ai.nix
     ./agent-cli.nix
+    ./t3code.nix
     ./backup.nix
-    ./truenas-config-backup.nix
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix
     ./slurm.nix
   ];
 
   local.wakeOnLan.interface = "enp5s0";
+
+  # Required for DDC/CI tools such as ddcutil to read monitor state (e.g. the
+  # active input source) for manual diagnostics. Display automation no longer
+  # depends on it; Sunshine drives dummy-output switching via sunshine-mode.sh.
+  hardware.i2c.enable = true;
+
+  environment.systemPackages = with pkgs; [
+    ddcutil
+  ];
 }

@@ -18,7 +18,11 @@
   virtualisation.docker.enable = true;
 
   # Google Cloud SDK for deployments
-  environment.systemPackages = [ pkgs.google-cloud-sdk ];
+  environment.systemPackages = with pkgs; [
+    google-cloud-sdk
+    lz4
+    mbuffer
+  ];
 
   # Disable services that aren't needed on a web host
   services.fwupd.enable = lib.mkForce false; # No firmware updates on VPS
@@ -51,6 +55,20 @@
   zramSwap = {
     enable = true;
     memoryPercent = 50; # Use up to 50% of RAM for compressed swap
+  };
+
+  # Keep the generated zram instance untouched during switch-to-configuration.
+  # This must be a drop-in: a concrete systemd-zram-setup@zram0.service would
+  # shadow zram-generator's unit and boot without zram swap.
+  # Do not use systemd.services."systemd-zram-setup@zram0" here: that creates
+  # the concrete unit and can reproduce the no-ExecStart/OOM failure mode.
+  systemd.units."systemd-zram-setup@zram0.service" = {
+    overrideStrategy = "asDropin";
+    text = ''
+      [Service]
+      X-RestartIfChanged=false
+      X-StopIfChanged=false
+    '';
   };
 
   # Required for ZFS

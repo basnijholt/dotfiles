@@ -60,6 +60,10 @@ Why not?
 
 ### Prerequisites
 
+- On macOS, install Homebrew first if it is not already available:
+  ```bash
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  ```
 - Git and Git LFS installed (on macOS `brew install git git-lfs` or `apt install git git-lfs` on Debian/Ubuntu)
 - SSH key set up with GitHub (submodules use SSH)
 
@@ -479,8 +483,11 @@ dscacheutil -flushcache
 The repository includes nix-darwin configuration for a reproducible macOS setup:
 
 ```bash
-# Install Nix
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+# Install Homebrew first if this is a fresh macOS machine
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Determinate Nix
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 
 # Apply nix-darwin configuration
 nixswitch  # Alias for darwin-rebuild switch --flake ~/dotfiles/configs/nix-darwin

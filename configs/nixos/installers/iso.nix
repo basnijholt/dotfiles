@@ -17,4 +17,12 @@ in
     initialPassword = "nixos"; # default console password
     openssh.authorizedKeys.keys = sshKeys;
   };
+
+  # Make the ISO self-sufficient for flake-based installs run headless over SSH
+  # (e.g. the NAS cutover: `nix run …disko` + `nixos-install --flake`).
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
+  environment.systemPackages = with pkgs; [ git ];
 }

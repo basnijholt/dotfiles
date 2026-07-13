@@ -1,6 +1,6 @@
 # hetzner-matrix
 
-Public Matrix homeserver ([Tuwunel](https://github.com/mindroom-ai/mindroom-tuwunel), MindRoom fork) on Hetzner Cloud ARM VPS with [Cinny](https://github.com/mindroom-ai/mindroom-cinny) web client.
+Public Matrix homeserver ([Tuwunel](https://github.com/mindroom-ai/mindroom-tuwunel), MindRoom fork) on Hetzner Cloud ARM VPS with the [MindRoom Chat](https://github.com/mindroom-ai/mindroom-chat) web client.
 
 Users run [MindRoom](https://github.com/mindroom-ai/mindroom) locally and connect to this server.
 
@@ -22,7 +22,7 @@ Nix-managed:
 
 Manual/runtime-managed:
 
-- Cinny build/deploy from `/var/www/cinny` into `/var/www/cinny/dist`.
+- MindRoom Chat build/deploy from `/var/www/cinny` into the published root at `/var/www/cinny-published/current`.
 - Website files in `/var/www/mindroom`.
 - DNS records at your DNS provider.
 
@@ -53,7 +53,7 @@ If a previous failed server already exists, recreate it:
 
 Create A records pointing to the server IP:
 - `mindroom.chat` - website + Matrix `.well-known` delegation
-- `chat.mindroom.chat` - Cinny web client
+- `chat.mindroom.chat` - MindRoom Chat web client
 - `push.mindroom.chat` - Matrix push gateway (`/_matrix/push/v1/notify`)
 
 ### Tuwunel config (Nix-managed)
@@ -140,7 +140,7 @@ It is intentionally startup-gated. The `podman-sygnal` unit is skipped until the
 ```bash
 SYGNAL_APNS_KEY_ID=CHANGE_ME
 SYGNAL_APNS_TEAM_ID=CHANGE_ME
-SYGNAL_APNS_TOPIC=com.mindroom-ai.app
+SYGNAL_APNS_TOPIC=chat.mindroom.app
 SYGNAL_APNS_PLATFORM=production
 ```
 
@@ -157,8 +157,8 @@ journalctl -u podman-sygnal -n 100 --no-pager
 MindRoom iOS client values:
 
 - `push.ios.gatewayUrl=https://push.mindroom.chat/_matrix/push/v1/notify`
-- `push.ios.appId=com.mindroom-ai.app.ios`
-- APNs topic / bundle ID: `com.mindroom-ai.app`
+- `push.ios.appId=chat.mindroom.app`
+- APNs topic / bundle ID: `chat.mindroom.app`
 
 ### Matrix bridges
 
@@ -179,22 +179,24 @@ Onboarding flow:
 - DM `WhatsApp Bridge Bot` and send `login`, then scan QR in WhatsApp.
 - For Telegram, first set `MAUTRIX_TELEGRAM_TELEGRAM_API_ID` and `MAUTRIX_TELEGRAM_TELEGRAM_API_HASH` in `telegram-appservice-env.age`, then DM `Telegram Bridge Bot` and send `login`.
 
-### Cinny web client
+### MindRoom Chat web client
 
-Cinny build artifacts are not pinned in Nix.
-The checkout at `/var/www/cinny` is ensured by the `git-checkout-cinny` systemd service, and Caddy serves `/var/www/cinny/dist`.
+MindRoom Chat build artifacts are not pinned in Nix.
+The checkout at `/var/www/cinny` is ensured by the `git-checkout-cinny` systemd service.
+Caddy serves the published symlink at `/var/www/cinny-published/current`, so failed builds do not blank the live site.
 
 ```bash
 # Refresh checkout to configured branch tip (skips pull if local changes exist)
 sudo systemctl start git-checkout-cinny
 
-# Build and publish static files
-cd /var/www/cinny
-npm ci
-npm run build
+# Build in a detached worktree and atomically publish the result
+mindroom-publish-cinny v4.10.5-mindroom.X
 ```
 
-No `nixos-rebuild` is needed for Cinny-only updates.
+No `nixos-rebuild` is needed for MindRoom Chat-only updates.
+The publish command also sets a larger Node heap limit for the build and validates
+that `index.html`, `runtime-config.js`, and `assets/` exist before it updates the
+live symlink.
 
 ### Local provisioning service code
 
