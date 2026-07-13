@@ -15,6 +15,18 @@ in
     # Primary domain website + Matrix API + Matrix well-known
     virtualHosts."${siteDomain}" = {
       extraConfig = ''
+        # Element Call discovers MatrixRTC transports through MSC4143. This
+        # metadata endpoint is intentionally public: current clients request it
+        # before attaching Matrix authentication.
+        handle /_matrix/client/unstable/org.matrix.msc4143/rtc/transports {
+          header Content-Type application/json
+          header Access-Control-Allow-Origin "*"
+          respond 200 {
+            body "{\"rtc_transports\":[{\"type\":\"livekit\",\"livekit_service_url\":\"https://${siteDomain}/livekit/jwt\"}]}"
+            close
+          }
+        }
+
         reverse_proxy /_matrix/* localhost:8008
         reverse_proxy /v1/local-mindroom/* localhost:8776
 
