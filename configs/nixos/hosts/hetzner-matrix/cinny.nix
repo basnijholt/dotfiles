@@ -72,20 +72,20 @@ EOF
       ln -s "$release_dir" "$next_link"
       mv -Tf "$next_link" "$current_link"
 
-      echo "Published Cinny ref $ref ($short_sha) to $release_dir"
+      echo "Published MindRoom Chat ref $ref ($short_sha) to $release_dir"
       echo "Live root now points at $current_link"
     '';
   };
 in
 {
-  # MindRoom Cinny fork checkout is Nix-managed. Published static assets live
+  # MindRoom Chat checkout is Nix-managed. Published static assets live
   # outside the checkout so a failed build cannot blank the live site.
   # Build/update remains operator-triggered via `mindroom-publish-cinny`.
   services.git-repo-checkouts = {
     enable = true;
     repositories.cinny = {
       path = cinnyCheckoutPath;
-      url = "https://github.com/mindroom-ai/mindroom-cinny.git";
+      url = "https://github.com/mindroom-ai/mindroom-chat.git";
       branch = "dev";
       user = "basnijholt";
       group = "users";

@@ -136,7 +136,7 @@ in
     };
 
     mindroom-cinny = {
-      description = "MindRoom Web UI (Cinny fork)";
+      description = "MindRoom Chat web UI";
       after = [ "network-online.target" "git-checkout-cinny.service" ];
       wants = [ "network-online.target" "git-checkout-cinny.service" ];
       wantedBy = [ "multi-user.target" ];
