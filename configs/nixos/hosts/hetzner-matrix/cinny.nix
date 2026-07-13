@@ -34,7 +34,8 @@ EOF
 
       ${pkgs.git}/bin/git -C "$checkout" fetch --prune origin --tags
 
-      short_sha="$(${pkgs.git}/bin/git -C "$checkout" rev-parse --short "$ref")"
+      full_sha="$(${pkgs.git}/bin/git -C "$checkout" rev-parse "$ref^{commit}")"
+      short_sha="$(${pkgs.git}/bin/git -C "$checkout" rev-parse --short "$full_sha")"
       ref_safe="$(printf '%s' "$ref" | tr '/:@ ' '____')"
       timestamp="$(date +%Y%m%d-%H%M%S)"
       worktree="$(mktemp -d /tmp/cinny-publish-worktree.XXXXXX)"
@@ -58,6 +59,7 @@ EOF
       else
         export NODE_OPTIONS="--max-old-space-size=4096"
       fi
+      export MINDROOM_BUILD_VERSION="$full_sha"
 
       npm ci
       npm run build
@@ -65,6 +67,22 @@ EOF
       test -s dist/index.html
       test -d dist/assets
       test -s dist/runtime-config.js
+      test -s dist/version.json
+
+      built_version="$(
+        ${pkgs.nodejs}/bin/node -e '
+const fs = require("node:fs");
+const manifest = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+if (typeof manifest.version !== "string") {
+  throw new TypeError("version.json must contain a string version");
+}
+process.stdout.write(manifest.version);
+' dist/version.json
+      )"
+      if [ "$built_version" != "$full_sha" ]; then
+        echo "Refusing to publish: dist/version.json contains '$built_version', expected '$full_sha'." >&2
+        exit 1
+      fi
 
       mkdir -p "$release_dir"
       rsync -a --delete dist/ "$release_dir/"
