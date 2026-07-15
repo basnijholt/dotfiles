@@ -19,6 +19,12 @@
       group = "mindroom-local-provisioning";
       mode = "0400";
     };
+    google-oauth-client-secret = {
+      file = ./secrets/google-oauth-client-secret.age;
+      owner = "mindroom-local-provisioning";
+      group = "mindroom-local-provisioning";
+      mode = "0400";
+    };
     registration-token-demo = {
       file = ./secrets/registration-token.age;
       owner = "tuwunel-demo";

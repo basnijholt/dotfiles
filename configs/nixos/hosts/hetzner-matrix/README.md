@@ -101,6 +101,7 @@ Secrets are stored as encrypted `.age` files in:
 Current managed secrets:
 
 - `registration-token.age`
+- `google-oauth-client-secret.age`
 - `sso-google-secret.age`
 - `sso-github-secret.age`
 - `sso-apple-secret.age`
@@ -126,6 +127,7 @@ https://mindroom.chat/_matrix/client/unstable/login/sso/callback/<client_id>
 ```
 
 Provider IDs and callback URLs are in Nix config, while client secrets are read from decrypted agenix files at runtime.
+The MindRoom provisioning service reads the Google desktop OAuth client secret from `google-oauth-client-secret.age`; the corresponding non-secret client ID is configured in `provisioning.nix`.
 
 ### Push gateway (Sygnal)
 
