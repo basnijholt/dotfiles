@@ -20,6 +20,8 @@ in
     matrixHomeserver = "https://${siteDomain}";
     matrixServerName = siteDomain;
     matrixRegistrationTokenFile = config.age.secrets.registration-token-provisioning.path;
+    googleOAuthClientId = "974295579207-fmhj520f8af1afjkphr7omfcfla417bt.apps.googleusercontent.com";
+    googleOAuthClientSecretFile = config.age.secrets.google-oauth-client-secret.path;
     listenHost = "127.0.0.1";
     listenPort = 8776;
     corsOrigins = [ "https://${cinnyDomain}" ];
