@@ -32,6 +32,15 @@ let
 
   nucReplicationKey = "/etc/ssh/nas-replication-nuc-ed25519";
   hetznerReplicationKey = "/etc/ssh/nas-replication-hetzner-ed25519";
+  hetznerMatrixReplicationKey = "/etc/ssh/nas-replication-hetzner-matrix-ed25519";
+
+  # hetzner-matrix (mindroom.chat), via its tailnet IP. Both ends have stable
+  # tailscale addresses, so the from= pin in root's authorized_keys there is
+  # the NAS's tailnet IP (100.64.0.1) and survives home WAN IP changes. A
+  # DDNS name cannot serve as that pin: sshd from= matches the connecting
+  # IP's reverse DNS, never a forward lookup. If the server is recreated and
+  # rejoins the tailnet as a new node, update this IP and the remote pin.
+  hetznerMatrixHost = "100.64.0.36";
 
   # The outbound key files intentionally live outside this repo. Their services
   # skip via ConditionPathExists while a key is missing (e.g. after a reinstall
@@ -46,6 +55,10 @@ let
     {
       label = "hetzner outbound replication key";
       path = hetznerReplicationKey;
+    }
+    {
+      label = "hetzner-matrix outbound replication key";
+      path = hetznerMatrixReplicationKey;
     }
   ];
 
@@ -104,6 +117,19 @@ let
     {
       label = "hetzner websites";
       dataset = "tank/backups/hetzner";
+      maxAgeHours = 48;
+    }
+    # Watch the hetzner-matrix children separately: both come from the same
+    # pull job, but a per-dataset check keeps a fresh var snapshot from
+    # masking a stale tuwunel one (or vice versa).
+    {
+      label = "hetzner-matrix tuwunel";
+      dataset = "tank/backups/hetzner-matrix/tuwunel";
+      maxAgeHours = 48;
+    }
+    {
+      label = "hetzner-matrix var";
+      dataset = "tank/backups/hetzner-matrix/var";
       maxAgeHours = 48;
     }
   ];
@@ -381,7 +407,12 @@ in
 
       zfs list tank/backups/hetzner >/dev/null
 
+      # Hetzner snapshots are zfs-auto-snap_* named (services.zfs.autoSnapshot,
+      # not sanoid), so the nas-backup-prune policy never matches them and the
+      # mirror would accumulate every source snapshot forever. Trim the target
+      # to the source's retention instead, like the hp/nuc/pi4 push jobs do.
       syncoid ${mkSyncoidCommonArgs} \
+        --delete-target-snapshots \
         --sshkey=${hetznerReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
@@ -399,6 +430,59 @@ in
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* 00:45:00";
+      Persistent = true;
+      RandomizedDelaySec = "15m";
+    };
+  };
+
+  systemd.services.nas-replicate-hetzner-matrix = {
+    description = "Pull hetzner-matrix (mindroom) backups over SSH";
+    restartIfChanged = false;
+    wants = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    after = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    unitConfig = {
+      ConditionPathExists = hetznerMatrixReplicationKey;
+      OnFailure = [ "nas-health-alert@%n.service" ];
+    };
+    path = replicationPath;
+    script = ''
+      set -euo pipefail
+
+      zfs list tank/backups/hetzner-matrix >/dev/null
+
+      # zroot/tuwunel is the Matrix RocksDB; zroot/var holds the mautrix
+      # bridge state and secrets under /var/lib. The rest of zroot (root,
+      # nix, home) is rebuildable from this repo.
+      # The source snapshots are zfs-auto-snap_* named (zfs.autoSnapshot, not
+      # sanoid), so trim the targets with --delete-target-snapshots like the
+      # websites pull; the sanoid prune policy never matches that naming.
+      for dataset in tuwunel var; do
+        syncoid ${mkSyncoidCommonArgs} \
+          --delete-target-snapshots \
+          --sshkey=${hetznerMatrixReplicationKey} \
+          --sshport=22 \
+          --sshoption=BatchMode=yes \
+          --sshoption=ConnectTimeout=10 \
+          root@${hetznerMatrixHost}:zroot/"$dataset" tank/backups/hetzner-matrix/"$dataset"
+      done
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      TimeoutStartSec = "infinity";
+    };
+  };
+
+  systemd.timers.nas-replicate-hetzner-matrix = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "*-*-* 00:55:00";
       Persistent = true;
       RandomizedDelaySec = "15m";
     };
