@@ -83,14 +83,32 @@ in
       weekly = 52;
       monthly = 1;
     };
+    # Replication targets under tank/backups: never snapshot here, but prune
+    # the autosnap_ snapshots that replication delivers — otherwise the
+    # mirrors accumulate every source snapshot forever. In practice only
+    # tank/backups/ssd receives sanoid-named autosnap_ snapshots (from this
+    # host's own ssd pool); hp/nuc/pi4/hetzner use zfs-auto-snap_* naming,
+    # which sanoid never prunes — those mirrors are trimmed by syncoid's
+    # --delete-target-snapshots instead. Retention here is a superset of
+    # nas-default above, so the ssd mirror always keeps at least as much
+    # history as its source. Sanoid only prunes snapshots it named itself;
+    # syncoid sync snaps and TrueNAS-era snapshots are untouched.
+    templates.nas-backup-prune = {
+      autosnap = false;
+      autoprune = true;
+      frequently = 12;
+      hourly = 48;
+      daily = 31;
+      weekly = 52;
+      monthly = 12;
+    };
     datasets = {
       tank = {
         useTemplate = [ "nas-default" ];
         recursive = true;
       };
       "tank/backups" = {
-        autosnap = false;
-        autoprune = false;
+        useTemplate = [ "nas-backup-prune" ];
         recursive = true;
       };
       ssd = {
@@ -99,6 +117,11 @@ in
       };
     };
   };
+
+  # Sanoid failures must alert: syncoid's own sync snapshots keep the
+  # replication watchdog green even when autosnapshots have stopped, so a
+  # silently failing sanoid would otherwise go unnoticed.
+  systemd.services.sanoid.unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
 
   environment.systemPackages = with pkgs; [
     hdparm

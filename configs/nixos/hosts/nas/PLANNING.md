@@ -13,7 +13,7 @@ Commands for reinstalling or repeating the migration belong in `CUTOVER.md`.
 - Monitoring dashboard: Grafana scrapes the NAS Prometheus exporters; host Netdata stays localhost-only.
 - Base branch: `main`
 - Host name in Nix: `nas`
-- Last updated: `2026-06-29 post-cutover validation`
+- Last updated: `2026-07-09 backup-monitoring hardening + pc restic repo watchdog`
 
 The real NAS has been cut over from TrueNAS to NixOS with this host config.
 The destructive storage migration is complete.
@@ -133,7 +133,20 @@ The data pools are imported by name and are not described by disko.
 - [x] Confirm the authoritative Backblaze B2 job completed once and wrote a persistent success marker.
 - [x] Confirm the NAS B2 watchdog reports the B2 success marker as fresh.
 - [x] Keep `.ix-virt` backed up for Incus restore fidelity, but skip only the rebuildable `ssd/.ix-virt/containers/nix-cache` dataset in future SSD Syncoid jobs.
-- [ ] Decide whether old TrueNAS-created snapshots and pre-exclusion NAS-local `tank/backups` autosnapshots should be aged out manually.
+- [x] Add a prune-only Sanoid policy on `tank/backups` so replicated `autosnap_` snapshots are aged out on the targets instead of accumulating forever.
+- [x] Trim `tank/backups/hetzner` with syncoid `--delete-target-snapshots`: hetzner's snapshots are `zfs-auto-snap_*` named (zfs.autoSnapshot, not sanoid), so the prune policy never matches them and 700+ had accumulated. The first run after deploy will delete the ~670 target snapshots that no longer exist on the source.
+- [x] Alert when Sanoid itself fails and when the source pools stop receiving fresh autosnapshots (syncoid sync snaps would otherwise keep the watchdog green).
+- [x] Make the replication watchdog fail when an expected outbound replication key file is missing, so a `ConditionPathExists` skip cannot stay silent after a reinstall.
+- [x] Add a freshness check for the pc restic repo (`tank/backups/pc`) to the replication watchdog; a 2026-07-09 review found pc's hourly restic backups had failed silently since 2026-03-22 on a stale repo lock, and nothing on the NAS watched that repo.
+- [ ] After the stale restic lock on pc is cleared (`restic-truenas unlock` on pc, then `restic-truenas check`), confirm hourly backups resume and the new pc-restic watchdog check reports OK.
+- [ ] Decide whether old TrueNAS-created snapshots (not `autosnap_` named, so untouched by the new prune policy) should be aged out manually.
+- [ ] Verify every irreplaceable `tank` dataset (photos, photos-export, syncthing) has an off-machine backup path; the declared jobs only replicate `ssd` off-box.
+- [ ] Close the fleet backup gaps found in the 2026-07-21 audit: `hetzner-saas` (k3s SaaS state, `/var/lib/mindroom-saas`) has no backup at all; the `mindroom` LXC (and `mindroom-mom`/`mindroom-spouse` companions) run on an undetermined Incus host and are at best covered by pc's broken restic job; the `hetzner` websites host only replicates `zroot/websites`, so Docker named volumes under `/var/lib/docker` (if any) are not covered.
+- [x] Declare a nightly pull of hetzner-matrix (mindroom.chat, 46.225.140.219) into `tank/backups/hetzner-matrix`: `zroot/tuwunel` (Matrix RocksDB) and `zroot/var` (bridge state, secrets). A 2026-07-21 review found the host had only same-box `zfs-auto-snapshot` and no off-machine backup at all. Includes watchdog freshness checks per child dataset and a key-presence check.
+- [x] hetzner-matrix backup manual setup (2026-07-21): created `tank/backups/hetzner-matrix`, generated `/etc/ssh/nas-replication-hetzner-matrix-ed25519`, installed the public key for root on hetzner-matrix pinned to the NAS tailnet IP (`from="100.64.0.1"`, stable across home WAN IP changes; a DDNS name cannot serve as the pin because sshd `from=` matches reverse DNS), and accepted host keys into root's known_hosts. The declared pull goes over tailscale to 100.64.0.36.
+- [ ] Confirm the manually started initial syncoid pull of `zroot/tuwunel` (~15G) and `zroot/var` (~6G) completed into `tank/backups/hetzner-matrix`.
+- [ ] Remove the temporary `from="50.35.43.98"` (public path) line from root's authorized_keys on hetzner-matrix; it only exists so the in-flight initial pull, which started against the public IP, can finish.
+- [ ] After deploying this branch: confirm the `nas-replicate-hetzner-matrix` timer runs and the watchdog reports both `hetzner-matrix` datasets and the key check OK.
 
 ### Encryption
 
@@ -153,6 +166,8 @@ The data pools are imported by name and are not described by disko.
 - [x] Validate UPS status with `upsc` and the NUT exporter.
 - [x] Confirm the configured UPS name matches the name exposed by the remote NUT server.
 - [x] Authenticate host-level Tailscale with `tailscale up`.
+- [x] Declare a `nas-heartbeat` dead-man's-switch timer that pings an external healthchecks-style URL every 5 minutes.
+- [ ] Create the external healthchecks check and install its private ping URL at `/etc/nas-heartbeat-url` (mode `0600`) on the NAS; the `nas-heartbeat` unit skips until that file exists.
 
 ### Deploy
 

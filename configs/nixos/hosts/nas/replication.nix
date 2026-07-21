@@ -30,6 +30,69 @@ let
   mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
   nucReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
 
+  nucReplicationKey = "/etc/ssh/nas-replication-nuc-ed25519";
+  hetznerReplicationKey = "/etc/ssh/nas-replication-hetzner-ed25519";
+  hetznerMatrixReplicationKey = "/etc/ssh/nas-replication-hetzner-matrix-ed25519";
+
+  # hetzner-matrix (mindroom.chat), via its tailnet IP. Both ends have stable
+  # tailscale addresses, so the from= pin in root's authorized_keys there is
+  # the NAS's tailnet IP (100.64.0.1) and survives home WAN IP changes. A
+  # DDNS name cannot serve as that pin: sshd from= matches the connecting
+  # IP's reverse DNS, never a forward lookup. If the server is recreated and
+  # rejoins the tailnet as a new node, update this IP and the remote pin.
+  hetznerMatrixHost = "100.64.0.36";
+
+  # The outbound key files intentionally live outside this repo. Their services
+  # skip via ConditionPathExists while a key is missing (e.g. after a reinstall
+  # before secret staging), which never fails a unit and so never alerts. The
+  # watchdog checks presence so a forgotten key becomes an alert instead of
+  # silently absent replication.
+  watchedReplicationKeys = [
+    {
+      label = "nuc outbound replication key";
+      path = nucReplicationKey;
+    }
+    {
+      label = "hetzner outbound replication key";
+      path = hetznerReplicationKey;
+    }
+    {
+      label = "hetzner-matrix outbound replication key";
+      path = hetznerMatrixReplicationKey;
+    }
+  ];
+
+  # Syncoid creates its own sync snapshot on every run, so the backup-target
+  # freshness checks stay green even if sanoid stops autosnapshotting. Check
+  # the source pools for recent sanoid-named snapshots separately. Sanoid runs
+  # every 10 minutes with frequent snapshots enabled, so 2 hours is generous.
+  watchedAutosnapSources = [
+    {
+      label = "tank sanoid autosnaps";
+      dataset = "tank";
+      maxAgeHours = 2;
+    }
+    {
+      label = "ssd sanoid autosnaps";
+      dataset = "ssd";
+      maxAgeHours = 2;
+    }
+  ];
+
+  # The pc restic backup is file-based (hourly sftp push into tank/backups/pc),
+  # so no dataset snapshot check can see it. Restic writes one file per
+  # completed snapshot into the repo's snapshots/ directory; the newest file
+  # mtime is the last successful backup. Added 2026-07-09 after finding pc's
+  # backups had failed silently since 2026-03-22 on a stale repo lock —
+  # nothing watched this repo. pc backs up hourly; 26h absorbs downtime.
+  watchedResticRepos = [
+    {
+      label = "pc restic repo";
+      path = "/mnt/tank/backups/pc";
+      maxAgeHours = 26;
+    }
+  ];
+
   watchedBackupDatasets = [
     {
       label = "local ssd mirror";
@@ -56,6 +119,19 @@ let
       dataset = "tank/backups/hetzner";
       maxAgeHours = 48;
     }
+    # Watch the hetzner-matrix children separately: both come from the same
+    # pull job, but a per-dataset check keeps a fresh var snapshot from
+    # masking a stale tuwunel one (or vice versa).
+    {
+      label = "hetzner-matrix tuwunel";
+      dataset = "tank/backups/hetzner-matrix/tuwunel";
+      maxAgeHours = 48;
+    }
+    {
+      label = "hetzner-matrix var";
+      dataset = "tank/backups/hetzner-matrix/var";
+      maxAgeHours = 48;
+    }
   ];
 
   # Keep tank/backups/ssd mounted as a filesystem: the B2 rclone job reads
@@ -66,6 +142,18 @@ let
   watchdogChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
     check_dataset ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.dataset} ${toString entry.maxAgeHours}
   '') watchedBackupDatasets;
+
+  watchdogAutosnapChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
+    check_autosnap ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.dataset} ${toString entry.maxAgeHours}
+  '') watchedAutosnapSources;
+
+  watchdogKeyChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
+    check_key ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.path}
+  '') watchedReplicationKeys;
+
+  watchdogResticChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
+    check_restic_repo ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.path} ${toString entry.maxAgeHours}
+  '') watchedResticRepos;
 
   replicationWatchdog = pkgs.writeShellScript "nas-replication-watchdog" ''
     set -euo pipefail
@@ -109,7 +197,96 @@ let
       echo "OK $label: newest snapshot $latest_snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
     }
 
+    check_autosnap() {
+      label="$1"
+      dataset="$2"
+      max_age_hours="$3"
+
+      # With -t snapshot, -d 1 lists only this dataset's own snapshots (child
+      # datasets sit at depth 1, so their snapshots are at depth 2; verified
+      # live on the nas). The exact prefix match below keeps a fresh child
+      # autosnap from masking a stale root even if that depth behavior ever
+      # changes, instead of relying on it.
+      latest="$(
+        zfs list -H -p -t snapshot -d 1 -o creation,name -s creation "$dataset" 2>/dev/null \
+          | ${pkgs.gawk}/bin/awk -v prefix="$dataset@autosnap_" 'index($2, prefix) == 1' \
+          | ${pkgs.coreutils}/bin/tail -n 1 \
+          || true
+      )"
+
+      if [ -z "$latest" ]; then
+        echo "STALE $label: no autosnap snapshots on $dataset"
+        failed=1
+        return
+      fi
+
+      latest_epoch="$(printf '%s\n' "$latest" | ${pkgs.gawk}/bin/awk '{ print $1 }')"
+      latest_snapshot="$(printf '%s\n' "$latest" | ${pkgs.gawk}/bin/awk '{ print $2 }')"
+      age_hours=$(( (now - latest_epoch) / 3600 ))
+
+      if [ "$age_hours" -gt "$max_age_hours" ]; then
+        echo "STALE $label: newest autosnap $latest_snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
+        failed=1
+        return
+      fi
+
+      echo "OK $label: newest autosnap $latest_snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
+    }
+
+    check_key() {
+      label="$1"
+      key_path="$2"
+
+      if [ ! -f "$key_path" ]; then
+        echo "MISSING $label: $key_path does not exist; its replication service is silently skipping"
+        failed=1
+        return
+      fi
+
+      echo "OK $label: $key_path exists"
+    }
+
+    check_restic_repo() {
+      label="$1"
+      repo_path="$2"
+      max_age_hours="$3"
+
+      snapshot_dir="$repo_path/snapshots"
+
+      if [ ! -d "$snapshot_dir" ]; then
+        echo "MISSING $label: $snapshot_dir does not exist"
+        failed=1
+        return
+      fi
+
+      latest_epoch="$(
+        ${pkgs.findutils}/bin/find "$snapshot_dir" -maxdepth 1 -type f -printf '%T@\n' 2>/dev/null \
+          | ${pkgs.coreutils}/bin/sort -n \
+          | ${pkgs.coreutils}/bin/tail -n 1 \
+          | ${pkgs.coreutils}/bin/cut -d . -f 1
+      )"
+
+      if [ -z "$latest_epoch" ]; then
+        echo "STALE $label: no snapshot files in $snapshot_dir"
+        failed=1
+        return
+      fi
+
+      age_hours=$(( (now - latest_epoch) / 3600 ))
+
+      if [ "$age_hours" -gt "$max_age_hours" ]; then
+        echo "STALE $label: newest restic snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
+        failed=1
+        return
+      fi
+
+      echo "OK $label: newest restic snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
+    }
+
     ${watchdogChecks}
+    ${watchdogAutosnapChecks}
+    ${watchdogKeyChecks}
+    ${watchdogResticChecks}
 
     if [ "$failed" -ne 0 ]; then
       exit 1
@@ -176,7 +353,7 @@ in
       "zfs.target"
     ];
     unitConfig = {
-      ConditionPathExists = "/etc/ssh/nas-replication-nuc-ed25519";
+      ConditionPathExists = nucReplicationKey;
       OnFailure = [ "nas-health-alert@%n.service" ];
     };
     path = replicationPath;
@@ -187,7 +364,7 @@ in
 
       syncoid ${mkSyncoidSsdArgs} \
         --recvoptions=${nucReceiveOptions} \
-        --sshkey=/etc/ssh/nas-replication-nuc-ed25519 \
+        --sshkey=${nucReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \
@@ -221,7 +398,7 @@ in
       "zfs.target"
     ];
     unitConfig = {
-      ConditionPathExists = "/etc/ssh/nas-replication-hetzner-ed25519";
+      ConditionPathExists = hetznerReplicationKey;
       OnFailure = [ "nas-health-alert@%n.service" ];
     };
     path = replicationPath;
@@ -230,8 +407,13 @@ in
 
       zfs list tank/backups/hetzner >/dev/null
 
+      # Hetzner snapshots are zfs-auto-snap_* named (services.zfs.autoSnapshot,
+      # not sanoid), so the nas-backup-prune policy never matches them and the
+      # mirror would accumulate every source snapshot forever. Trim the target
+      # to the source's retention instead, like the hp/nuc/pi4 push jobs do.
       syncoid ${mkSyncoidCommonArgs} \
-        --sshkey=/etc/ssh/nas-replication-hetzner-ed25519 \
+        --delete-target-snapshots \
+        --sshkey=${hetznerReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \
@@ -248,6 +430,59 @@ in
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* 00:45:00";
+      Persistent = true;
+      RandomizedDelaySec = "15m";
+    };
+  };
+
+  systemd.services.nas-replicate-hetzner-matrix = {
+    description = "Pull hetzner-matrix (mindroom) backups over SSH";
+    restartIfChanged = false;
+    wants = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    after = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    unitConfig = {
+      ConditionPathExists = hetznerMatrixReplicationKey;
+      OnFailure = [ "nas-health-alert@%n.service" ];
+    };
+    path = replicationPath;
+    script = ''
+      set -euo pipefail
+
+      zfs list tank/backups/hetzner-matrix >/dev/null
+
+      # zroot/tuwunel is the Matrix RocksDB; zroot/var holds the mautrix
+      # bridge state and secrets under /var/lib. The rest of zroot (root,
+      # nix, home) is rebuildable from this repo.
+      # The source snapshots are zfs-auto-snap_* named (zfs.autoSnapshot, not
+      # sanoid), so trim the targets with --delete-target-snapshots like the
+      # websites pull; the sanoid prune policy never matches that naming.
+      for dataset in tuwunel var; do
+        syncoid ${mkSyncoidCommonArgs} \
+          --delete-target-snapshots \
+          --sshkey=${hetznerMatrixReplicationKey} \
+          --sshport=22 \
+          --sshoption=BatchMode=yes \
+          --sshoption=ConnectTimeout=10 \
+          root@${hetznerMatrixHost}:zroot/"$dataset" tank/backups/hetzner-matrix/"$dataset"
+      done
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      TimeoutStartSec = "infinity";
+    };
+  };
+
+  systemd.timers.nas-replicate-hetzner-matrix = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "*-*-* 00:55:00";
       Persistent = true;
       RandomizedDelaySec = "15m";
     };

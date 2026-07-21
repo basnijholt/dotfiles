@@ -28,7 +28,16 @@
   # ── General server config ──────────────────────────────────────────
 
   # Packages needed for release pin updates and operational debugging.
-  environment.systemPackages = with pkgs; [ git curl jq ffmpeg-headless ];
+  # lz4 and mbuffer serve the NAS syncoid pull (nas-replicate-hetzner-matrix);
+  # without them the transfer falls back to uncompressed and unbuffered.
+  environment.systemPackages = with pkgs; [
+    git
+    curl
+    jq
+    ffmpeg-headless
+    lz4
+    mbuffer
+  ];
 
   # Disable services not needed on a Matrix server
   services.fwupd.enable = lib.mkForce false;
