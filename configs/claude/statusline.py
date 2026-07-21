@@ -253,7 +253,7 @@ if folder_parts:
 
 # Calculate context usage
 context_info = ""
-if data.context_window and data.context_window.context_window_size > 0:
+if data.context_window:
     ctx = data.context_window
     if ctx.current_usage:
         tokens = (
@@ -265,8 +265,13 @@ if data.context_window and data.context_window.context_window_size > 0:
         tokens = ctx.total_input_tokens + ctx.total_output_tokens
 
     if tokens > 0:
-        pct = tokens * 100 // ctx.context_window_size
-        context_info = f" {MAGENTA}{ICON_CHART} {pct}%{RESET}"
+        if tokens >= 1_000_000:
+            tok_str = f"{tokens / 1_000_000:.2f}M"
+        elif tokens >= 1_000:
+            tok_str = f"{tokens / 1_000:.0f}k"
+        else:
+            tok_str = str(tokens)
+        context_info = f" {MAGENTA}{ICON_CHART} {tok_str}{RESET}"
 
 # Calculate cost
 cost_info = ""
