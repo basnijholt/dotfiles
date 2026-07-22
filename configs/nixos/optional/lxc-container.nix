@@ -28,5 +28,9 @@
 
   networking.useDHCP = lib.mkDefault true;
 
+  # Containers redeploy via comin near-daily; keeping the fleet's 30 days of
+  # rollback generations would pin ~30 full closures. A week is plenty here.
+  nix.gc.options = "--delete-older-than 7d";
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }
