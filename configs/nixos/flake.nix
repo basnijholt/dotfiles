@@ -16,7 +16,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     comin = {
-      url = "github:basnijholt/comin/feat/ssh-commit-signing";
+      url = "github:nlewo/comin/v0.14.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ragenix = {
