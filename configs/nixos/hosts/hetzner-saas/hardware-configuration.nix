@@ -21,6 +21,8 @@
     "net.ifnames=0"
   ];
 
+  boot.supportedFilesystems = [ "zfs" ];
+
   boot.loader = {
     systemd-boot = {
       enable = true;

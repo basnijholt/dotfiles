@@ -229,16 +229,16 @@
           ./hosts/hetzner/hardware-configuration.nix
         ];
 
-        # Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS
-        hetzner-saas = lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            disko.nixosModules.disko
-            ./hosts/hetzner-saas/disko.nix
-            ./hosts/hetzner-saas/default.nix
-            ./hosts/hetzner-saas/hardware-configuration.nix
-          ];
-        };
+        # Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS.
+        # mkHost (not raw nixosSystem) since the 2026-07 ZFS reinstall, so it
+        # gets the common stack (tailscale, comin, user, packages) like every
+        # other host.
+        hetzner-saas = mkHost [
+          disko.nixosModules.disko
+          ./hosts/hetzner-saas/disko.nix
+          ./hosts/hetzner-saas/default.nix
+          ./hosts/hetzner-saas/hardware-configuration.nix
+        ];
 
         # Minimal first-stage config for nixos-anywhere in rescue mode.
         hetzner-saas-bootstrap = lib.nixosSystem {

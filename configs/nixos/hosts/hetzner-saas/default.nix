@@ -1,3 +1,9 @@
+# Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS.
+#
+# Uses mkHost since the 2026-07 ZFS reinstall, so the common stack
+# (user, packages, tailscale, comin GitOps, disk-cleanup) comes from
+# common/; this file only keeps cloud overrides and the k3s workload.
+# The NAS pulls this host's backups; see hosts/nas/replication.nix.
 { lib, pkgs, ... }:
 
 let
@@ -7,32 +13,22 @@ let
 in
 {
   imports = [
-    ../../common/disk-cleanup.nix
+    ../../optional/zfs-sanoid.nix
     ./networking.nix
   ];
 
   system.stateVersion = "25.05";
-  networking.hostName = lib.mkForce "hetzner-saas";
 
-  time.timeZone = "America/Los_Angeles";
-  i18n.defaultLocale = "en_US.UTF-8";
-  nixpkgs.config.allowUnfree = true;
+  # Required for ZFS
+  networking.hostId = "5aa5c0de";
 
+  # Cloud overrides of the common stack (no LAN cache, no reverse DNS).
   nix.settings = {
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
-    trusted-users = [
-      "root"
-      "basnijholt"
-    ];
-    fallback = true;
-    substituters = [
+    substituters = lib.mkForce [
       "https://cache.nixos.org/"
       "https://nix-community.cachix.org"
     ];
-    trusted-public-keys = [
+    trusted-public-keys = lib.mkForce [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
@@ -40,36 +36,15 @@ in
     cores = 2;
   };
 
-  users.users.basnijholt = {
-    isNormalUser = true;
-    description = "Bas Nijholt";
-    extraGroups = [
-      "wheel"
-      "docker"
-    ];
-    shell = pkgs.zsh;
-    openssh.authorizedKeys.keys = sshKeys;
+  services.openssh.settings = {
+    PermitRootLogin = lib.mkForce "prohibit-password";
+    UseDns = lib.mkForce false;
   };
+
+  # Root key access: nixos-anywhere installs, manual deploys, and the NAS
+  # backup pull all connect as root.
   users.users.root.openssh.authorizedKeys.keys = sshKeys;
   security.sudo.wheelNeedsPassword = false;
-
-  programs.zsh.enable = true;
-
-  services.openssh = {
-    enable = true;
-    openFirewall = true;
-    settings = {
-      PasswordAuthentication = false;
-      PermitRootLogin = lib.mkForce "prohibit-password";
-      UseDns = lib.mkForce false;
-    };
-  };
-
-  services.earlyoom = {
-    enable = true;
-    freeSwapThreshold = 10;
-    freeMemThreshold = 10;
-  };
 
   services.k3s = {
     enable = true;
@@ -165,15 +140,9 @@ in
   };
 
   environment.systemPackages = with pkgs; [
-    curl
-    git
-    htop
-    jq
     kubectl
     kubernetes-helm
     k9s
-    ripgrep
-    vim
   ];
 
   virtualisation.docker.enable = true;
@@ -196,9 +165,5 @@ in
     '';
   };
 
-  boot.kernelModules = [ "tcp_bbr" ];
-  boot.kernel.sysctl = {
-    "kernel.sysrq" = 1;
-    "net.ipv4.tcp_congestion_control" = "bbr";
-  };
+  # bbr + sysrq sysctls and the tcp_bbr module come from common/core.nix.
 }
