@@ -34,12 +34,11 @@
   # Allow root SSH for the NAS ZFS pull replication.
   services.openssh.settings.PermitRootLogin = lib.mkForce "prohibit-password";
   users.users.root.openssh.authorizedKeys.keys = [
-    # TrueNAS-era RSA pull key; its private half lives on the NAS at
-    # /etc/ssh/nas-replication-hetzner-ed25519 (misleading name — it is
-    # this RSA key, not ed25519; rotation is tracked cleanup). Pinned to
-    # the NAS's tailnet IP: the pull connects via 100.64.0.32 since
-    # 2026-07, so only the NAS can use this key.
-    "from=\"100.64.0.1\" ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDIq7zPtq0+tNrz1xbX+Fo7fVnfMtbmEHeiKclcicK7b0qz/LunbYDA/dfKi2EgrFbbkQuMoUBsb8HcEP+KCuzZqepGl3r0aRL3wC+ZMSMeoVMOrjpoI7NAQtGD5IJ1Aa5jIMi+FWzHydNG7QVMMSA+AiIUIkfQxCqji/xGaDK0HiPu86CGqMsBDLLpAsYmCdoivqkaGYEi9ifZreOO9508gP7ph//7MriKw1A9KOUdOMfJkpGLs69bFz54s7Dl7L5QhxWOPpI3yrJZpP5kM8rW5uc74wdUkhH4x03mU0zUF48H+SdUe4xtVjKc7DAhgERXNVjzmfSY0kD2AjxbEJzfFl2c2s7rd+i9AOUvn7vgRLcbMbFY5O24qFxdPEcynJGAvbTQG388ZACcSBFc/uXZJXMeupzTXjbjBjyL2gODwnMG9r52Wuzs4tuhTPjoCltU67yT5Ya+ZLM20Pp1NpiAZq4Bfp6xIKtnm3tfciaeiOTSaAaOyNc1skDsbjW8Qg0= root@truenas hetzner-key"
+    # NAS pull key (rotated 2026-07-21 from the unrestricted TrueNAS-era
+    # RSA key). Private half: /etc/ssh/nas-replication-hetzner-ed25519 on
+    # the NAS. Pinned to the NAS's tailnet IP; the pull connects via
+    # 100.64.0.32, so only the NAS can use this key.
+    "from=\"100.64.0.1\" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJtU9lEnbLj47AtqXyQRFDwepZpoqUUFy6VkrepFfA7l nas-replication-hetzner"
   ];
 
   # Override local LAN DNS servers (not reachable from Hetzner)
