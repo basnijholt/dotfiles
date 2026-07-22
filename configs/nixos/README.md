@@ -16,15 +16,16 @@ configs/nixos/
 | Config | Type | Description |
 |--------|------|-------------|
 | `pc` | Physical | Desktop/workstation (NVIDIA, Hyprland, AI services) |
-| `nuc` | Physical | Media box (Kodi, Btrfs, desktop + power management) |
+| `nuc` | Physical | Media box (Kodi, ZFS, desktop + power management) |
 | `hp` | Physical | Headless server (ZFS, virtualization + power management) |
-| `nas` | Physical | NixOS replacement scaffold for NAS services |
+| `nas` | Physical | Primary NAS: ZFS pools, fleet backup target, replication + watchdogs |
 | `hp-incus` | Incus VM | HP config for Incus VM testing |
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
 | `mindroom-spouse` | Incus LXC | Companion bot / MindRoom runtime container |
+| `mindroom-mom` | Incus LXC | Companion container for mom (MindRoom only, hands-off, comin-deployed) |
 | `mindroom` | Incus LXC | MindRoom lab/runtime container with local Matrix and web services |
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
