@@ -426,7 +426,13 @@ in
 
       zfs list ssd >/dev/null
 
+      # Nothing on the nuc prunes this mirror's replicated autosnap_*
+      # snapshots (nuc's sanoid deliberately excludes zroot/backups), so
+      # trim it to the source's retention here — without this the mirror
+      # accumulates every ssd snapshot forever, the same bug the hetzner
+      # pull had.
       syncoid ${mkSyncoidSsdArgs} \
+        --delete-target-snapshots \
         --recvoptions=${nucReceiveOptions} \
         --sshkey=${nucReplicationKey} \
         --sshport=22 \
@@ -471,10 +477,10 @@ in
 
       zfs list tank/backups/hetzner >/dev/null
 
-      # Hetzner snapshots are zfs-auto-snap_* named (services.zfs.autoSnapshot,
-      # not sanoid), so the nas-backup-prune policy never matches them and the
-      # mirror would accumulate every source snapshot forever. Trim the target
-      # to the source's retention instead, like the hp/nuc/pi4 push jobs do.
+      # Trim the target to the source's snapshot set, like the hp/nuc/pi4
+      # push jobs do. This also cleans up the legacy zfs-auto-snap_*
+      # snapshots that accumulated before the 2026-07 sanoid migration,
+      # which no prune policy ever matched.
       syncoid ${mkSyncoidCommonArgs} \
         --delete-target-snapshots \
         --sshkey=${hetznerReplicationKey} \
@@ -523,9 +529,9 @@ in
       # zroot/tuwunel is the Matrix RocksDB; zroot/var holds the mautrix
       # bridge state and secrets under /var/lib. The rest of zroot (root,
       # nix, home) is rebuildable from this repo.
-      # The source snapshots are zfs-auto-snap_* named (zfs.autoSnapshot, not
-      # sanoid), so trim the targets with --delete-target-snapshots like the
-      # websites pull; the sanoid prune policy never matches that naming.
+      # --delete-target-snapshots keeps the mirror matched to the source's
+      # retention and cleans up legacy zfs-auto-snap_* snapshots from
+      # before the 2026-07 sanoid migration.
       for dataset in tuwunel var; do
         syncoid ${mkSyncoidCommonArgs} \
           --delete-target-snapshots \

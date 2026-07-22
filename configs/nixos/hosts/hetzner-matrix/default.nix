@@ -7,7 +7,7 @@
 {
   imports = [
     ../../optional/git-repo-checkouts.nix
-    ../../optional/zfs-auto-snapshot.nix
+    ../../optional/zfs-sanoid.nix
     ./networking.nix
     ./local_mindroom_provisioning_service.nix
 

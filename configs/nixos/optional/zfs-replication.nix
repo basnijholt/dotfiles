@@ -1,10 +1,10 @@
 # ZFS replication to the NAS via syncoid
-# Imports zfs-auto-snapshot.nix for local snapshots (required for syncoid)
+# Imports zfs-sanoid.nix for local snapshots (required for syncoid)
 { config, pkgs, ... }:
 
 {
   imports = [
-    ./zfs-auto-snapshot.nix
+    ./zfs-sanoid.nix
   ];
 
   environment.systemPackages = with pkgs; [

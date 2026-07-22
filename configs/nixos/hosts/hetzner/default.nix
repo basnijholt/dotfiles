@@ -7,7 +7,7 @@
 {
   imports = [
     # Optional modules
-    ../../optional/zfs-auto-snapshot.nix
+    ../../optional/zfs-sanoid.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix

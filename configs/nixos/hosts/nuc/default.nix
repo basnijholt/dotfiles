@@ -25,6 +25,16 @@
   networking.hostId = "8a5b2c1f";
   boot.zfs.forceImportRoot = false;
 
+  # zroot/backups is the received mirror of the NAS ssd pool. Sanoid must
+  # neither snapshot it (pollutes the replica) nor prune it (its autosnap_*
+  # history belongs to the source's retention, enforced by the NAS push
+  # job's --delete-target-snapshots).
+  services.sanoid.datasets."zroot/backups" = {
+    autosnap = false;
+    autoprune = false;
+    recursive = true;
+  };
+
   local.wakeOnLan.interface = "eno1";
 
   systemd.services.nuc-backup-zfs-policy = {
