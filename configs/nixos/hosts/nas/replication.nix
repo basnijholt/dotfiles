@@ -480,13 +480,16 @@ in
       # push jobs do. This also cleans up the legacy zfs-auto-snap_*
       # snapshots that accumulated before the 2026-07 sanoid migration,
       # which no prune policy ever matched.
+      # Pull over the tailnet (hetzner = 100.64.0.32) so the from= pin in
+      # its authorized_keys is the NAS's stable tailnet IP instead of the
+      # dynamic home WAN address, matching the other cloud pulls.
       syncoid ${mkSyncoidCommonArgs} \
         --delete-target-snapshots \
         --sshkey=${hetznerReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \
-        root@46.224.10.245:zroot/websites tank/backups/hetzner
+        root@100.64.0.32:zroot/websites tank/backups/hetzner
     '';
     serviceConfig = {
       Type = "oneshot";
