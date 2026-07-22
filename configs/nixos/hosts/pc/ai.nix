@@ -23,8 +23,6 @@
     sha256 = "sha256-UUaKD9kBuoWITv/AV6Nh9t0z5LPJnq1F8mc9L9eaiUM=";
   };
 
-  environment.etc."llama-templates/apriel-thinker.jinja".source = ./apriel-thinker.jinja;
-
   # Harness-friendly fork of Qwen's Qwen3.6 chat template, tuned for agentic
   # coding harnesses (preserve_thinking + unwrap_tool_envelope defaults flipped).
   # Source: https://gist.github.com/jscott3201/e4b155885cc68c038d6ac8909a3bd9fe
