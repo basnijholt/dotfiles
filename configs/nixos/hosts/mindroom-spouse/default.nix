@@ -21,7 +21,7 @@
   environment.systemPackages = [ pkgs.signal-cli ];
 
   nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
-    "openclaw-2026.6.5"
+    "openclaw-2026.6.11"
   ];
 
   systemd.services.openclaw-gateway.serviceConfig.UnsetEnvironment = [
