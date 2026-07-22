@@ -32,7 +32,19 @@ if [[ $- == *i* ]]; then
     alias cx='codex --dangerously-bypass-approvals-and-sandbox '
     alias oc='opencode '
     alias ge='gemini --yolo --model gemini-3-pro-preview'
-    alias ze='zellij attach --create $(hostname)'
+    ze() {
+        # If a zellij server exists whose socket is gone (e.g. after a mosh
+        # drop), `attach --create` would silently fork a second session.
+        local name=$(hostname)
+        local n=$(pgrep -cf "zellij --server .*/${name}\$")
+        local live=$(zellij list-sessions -n 2>/dev/null | grep "^${name} " | grep -vc EXITED)
+        if (( n > live )); then
+            echo "$n zellij servers named '$name' but only $live reachable — kill the orphan (usually the oldest) first:" >&2
+            pgrep -af "zellij --server .*/${name}\$" >&2
+            return 1
+        fi
+        zellij attach --create "$name"
+    }
     alias killagent="pkill -9 -f '[a]gent-cli'"
     alias y='yazi '
 
