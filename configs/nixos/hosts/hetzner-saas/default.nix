@@ -1,9 +1,9 @@
 # Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS.
 #
-# Uses mkHost since the 2026-07 ZFS reinstall, so the common stack
-# (user, packages, tailscale, comin GitOps, disk-cleanup) comes from
-# common/; this file only keeps cloud overrides and the k3s workload.
-# The NAS pulls this host's backups; see hosts/nas/replication.nix.
+# The common stack (user, packages, tailscale, comin GitOps, disk-cleanup)
+# comes from common/ via mkHost; this file only keeps cloud overrides and
+# the k3s workload. The NAS pulls this host's backups; see
+# hosts/nas/replication.nix.
 { lib, pkgs, ... }:
 
 let
@@ -139,10 +139,14 @@ in
     '';
   };
 
+  # lz4 and mbuffer serve the NAS syncoid pull; without them the transfer
+  # falls back to uncompressed and unbuffered.
   environment.systemPackages = with pkgs; [
     kubectl
     kubernetes-helm
     k9s
+    lz4
+    mbuffer
   ];
 
   virtualisation.docker.enable = true;

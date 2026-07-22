@@ -36,10 +36,8 @@ let
 
   hetznerSaasKey = "/etc/ssh/nas-replication-hetzner-saas-ed25519";
 
-  # hetzner-saas, via its tailnet IP since the 2026-07 ZFS reinstall put it
-  # on the common stack; the from= pin in root's authorized_keys there is
-  # the NAS's stable tailnet IP (100.64.0.1). The k3s state tarball pull
-  # remains until the follow-up switch to a syncoid pull of zroot/var.
+  # hetzner-saas via its tailnet IP; the from= pin in root's
+  # authorized_keys there is the NAS's stable tailnet IP (100.64.0.1).
   hetznerSaasHost = "100.64.0.2";
 
   # hetzner-matrix (mindroom.chat), via its tailnet IP. Both ends have stable
@@ -71,16 +69,6 @@ let
     {
       label = "hetzner-saas outbound backup key";
       path = hetznerSaasKey;
-    }
-  ];
-
-  # File-based backups that are neither ZFS datasets nor restic repos: watch
-  # the newest dump file's age. 48h absorbs one missed nightly run.
-  watchedDumpDirs = [
-    {
-      label = "hetzner-saas k3s state dump";
-      path = "/mnt/tank/backups/hetzner-saas";
-      maxAgeHours = 48;
     }
   ];
 
@@ -154,6 +142,11 @@ let
       dataset = "tank/backups/hetzner-matrix/var";
       maxAgeHours = 48;
     }
+    {
+      label = "hetzner-saas var";
+      dataset = "tank/backups/hetzner-saas/var";
+      maxAgeHours = 48;
+    }
   ];
 
   # Keep tank/backups/ssd mounted as a filesystem: the B2 rclone job reads
@@ -176,10 +169,6 @@ let
   watchdogResticChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
     check_restic_repo ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.path} ${toString entry.maxAgeHours}
   '') watchedResticRepos;
-
-  watchdogDumpChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
-    check_dump ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.path} ${toString entry.maxAgeHours}
-  '') watchedDumpDirs;
 
   replicationWatchdog = pkgs.writeShellScript "nas-replication-watchdog" ''
     set -euo pipefail
@@ -309,47 +298,10 @@ let
       echo "OK $label: newest restic snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
     }
 
-    check_dump() {
-      label="$1"
-      dump_dir="$2"
-      max_age_hours="$3"
-
-      if [ ! -d "$dump_dir" ]; then
-        echo "MISSING $label: $dump_dir does not exist"
-        failed=1
-        return
-      fi
-
-      latest_epoch="$(
-        ${pkgs.findutils}/bin/find "$dump_dir" -maxdepth 1 -type f -name '*.tar.gz' -printf '%T@\n' 2>/dev/null \
-          | ${pkgs.coreutils}/bin/sort -n \
-          | ${pkgs.coreutils}/bin/tail -n 1 \
-          | ${pkgs.coreutils}/bin/cut -d . -f 1 \
-          || true
-      )"
-
-      if [ -z "$latest_epoch" ]; then
-        echo "STALE $label: no dump files in $dump_dir"
-        failed=1
-        return
-      fi
-
-      age_hours=$(( (now - latest_epoch) / 3600 ))
-
-      if [ "$age_hours" -gt "$max_age_hours" ]; then
-        echo "STALE $label: newest dump is ''${age_hours}h old; limit is ''${max_age_hours}h"
-        failed=1
-        return
-      fi
-
-      echo "OK $label: newest dump is ''${age_hours}h old; limit is ''${max_age_hours}h"
-    }
-
     ${watchdogChecks}
     ${watchdogAutosnapChecks}
     ${watchdogKeyChecks}
     ${watchdogResticChecks}
-    ${watchdogDumpChecks}
 
     if [ "$failed" -ne 0 ]; then
       exit 1
@@ -560,8 +512,8 @@ in
     };
   };
 
-  systemd.services.nas-backup-hetzner-saas = {
-    description = "Pull hetzner-saas k3s state tarball over SSH";
+  systemd.services.nas-replicate-hetzner-saas = {
+    description = "Replicate hetzner-saas zroot/var over SSH";
     restartIfChanged = false;
     wants = [
       "network-online.target"
@@ -581,39 +533,30 @@ in
 
       zfs list tank/backups/hetzner-saas >/dev/null
 
-      dump_dir=/mnt/tank/backups/hetzner-saas
-      out="$dump_dir/k3s-state-$(date +%Y-%m-%d).tar.gz"
-      tmp="$out.partial"
-
-      # k3s server state (sqlite DB, join token, TLS, manifests), the
-      # mindroom-saas hcloud token, and /etc/rancher. The containerd cache
-      # under rancher/k3s/agent is rebuildable and huge, so it is skipped.
-      # Customer PVC data lives on Hetzner Cloud Volumes via the hcloud CSI
-      # and is NOT inside these paths; this dump covers cluster
-      # reconstruction, not PVC contents.
-      #
-      # tar exits 1 for "file changed as we read it" (live sqlite writes);
-      # accept that, fail on anything worse.
-      ssh -i ${hetznerSaasKey} \
-        -o BatchMode=yes \
-        -o ConnectTimeout=10 \
-        root@${hetznerSaasHost} \
-        'tar czf - --warning=no-file-changed -C / var/lib/rancher/k3s/server var/lib/mindroom-saas etc/rancher' \
-        > "$tmp" || [ "$?" -eq 1 ]
-
-      test -s "$tmp"
-      mv "$tmp" "$out"
-
-      ${pkgs.findutils}/bin/find "$dump_dir" -maxdepth 1 -name 'k3s-state-*.tar.gz' -mtime +30 -delete
+      # zroot/var carries everything that matters on this host: the k3s
+      # server state (sqlite DB, join token, TLS, manifests) under
+      # /var/lib/rancher plus the mindroom-saas hcloud token. /etc/rancher
+      # is regenerated by k3s on start; the rest of zroot is rebuildable
+      # from this repo. Customer PVC data lives on Hetzner Cloud Volumes
+      # via the hcloud CSI and is NOT inside this dataset.
+      # The k3s-state-*.tar.gz files in the parent dataset are leftovers
+      # from the earlier tarball approach, not produced anymore.
+      syncoid ${mkSyncoidCommonArgs} \
+        --delete-target-snapshots \
+        --sshkey=${hetznerSaasKey} \
+        --sshport=22 \
+        --sshoption=BatchMode=yes \
+        --sshoption=ConnectTimeout=10 \
+        root@${hetznerSaasHost}:zroot/var tank/backups/hetzner-saas/var
     '';
     serviceConfig = {
       Type = "oneshot";
       User = "root";
-      TimeoutStartSec = "1h";
+      TimeoutStartSec = "infinity";
     };
   };
 
-  systemd.timers.nas-backup-hetzner-saas = {
+  systemd.timers.nas-replicate-hetzner-saas = {
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* 01:05:00";
