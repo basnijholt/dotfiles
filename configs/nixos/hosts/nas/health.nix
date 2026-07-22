@@ -57,6 +57,16 @@ let
         ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "$subject: $summary"
         printf '%s\n\n%s\n' "$subject" "$body" | ${pkgs.util-linux}/bin/wall || true
 
+        # ntfy rejects messages over ~4 KB with HTTP 400, and alert bodies
+        # embed full systemctl status output, so send a truncated body —
+        # the full text is always in the journal. Without this, exactly
+        # the alerts that matter (unit failures) are the ones that fail
+        # to deliver.
+        ntfy_body="$(printf '%s' "$body" | ${pkgs.coreutils}/bin/head -c 3500)"
+        if [ "''${#body}" -gt 3500 ]; then
+          ntfy_body="$(printf '%s\n%s' "$ntfy_body" "[truncated; full alert in the NAS journal]")"
+        fi
+
         ${pkgs.curl}/bin/curl \
           --fail \
           --silent \
@@ -64,7 +74,7 @@ let
           --max-time 10 \
           -H "Title: $subject" \
           -H ${lib.escapeShellArg "Priority: ${ntfyPriority}"} \
-          --data-binary "$body" \
+          --data-binary "$ntfy_body" \
           ${lib.escapeShellArg ntfyUrl} >/dev/null \
           || ${pkgs.util-linux}/bin/logger -t nas-health-alert -- "failed to send ntfy alert"
   '';
