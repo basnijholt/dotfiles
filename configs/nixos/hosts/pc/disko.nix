@@ -1,68 +1,10 @@
-{ lib, ... }:
-
-let
-  # Shared mount options that balance performance and drive health on NVMe.
-  mountOpts = [
-    "compress=zstd"
-    "noatime"
-    "discard=async"
-    "space_cache=v2"
-  ];
-in
-{
-  disko.devices = {
-    disk = {
-      nvme1 = {
-        type = "disk";
-        device = "/dev/nvme1n1";
-        content = {
-          type = "gpt";
-          partitions = {
-            esp = {
-              label = "EFI-NVME1";
-              size = "512M";
-              type = "EF00";
-              content = {
-                type = "filesystem";
-                format = "vfat";
-                mountpoint = "/boot2";
-                mountOptions = [ "umask=0077" ];
-              };
-            };
-
-            root = {
-              label = "ROOT-NVME1";
-              size = "100%";
-              content = {
-                type = "btrfs";
-                extraArgs = [ "-f" "-L" "NVME1-BTRFS" ];
-                subvolumes = {
-                  "@root" = {
-                    mountpoint = "/";
-                    mountOptions = mountOpts;
-                  };
-                  "@nix" = {
-                    mountpoint = "/nix";
-                    mountOptions = mountOpts;
-                  };
-                "@var" = {
-                  mountpoint = "/var";
-                  mountOptions = mountOpts;
-                };
-                "@home" = {
-                  mountpoint = "/home";
-                  mountOptions = mountOpts;
-                };
-                "@snapshots" = {
-                  mountpoint = "/.snapshots";
-                  mountOptions = mountOpts;
-                };
-                };
-              };
-            };
-          };
-        };
-      };
-    };
-  };
+{ ... }:
+(import ../../common/disko-zfs.nix) {
+  # The NixOS root disk (Samsung 990 EVO Plus 4TB, /dev/nvme1n1 today).
+  # by-id so the destructive disko run can never pick the wrong disk.
+  device = "/dev/disk/by-id/nvme-Samsung_SSD_990_EVO_Plus_4TB_S7U8NJ0Y206553P";
+  espLabel = "EFI-PC";
+  # pc actively swaps under AI workloads; swapfiles do not work on ZFS,
+  # so this becomes a dedicated partition (was a 96G btrfs swapfile).
+  swapSize = "96G";
 }

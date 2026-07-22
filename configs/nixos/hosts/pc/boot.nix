@@ -7,6 +7,10 @@
     efiSupport = true;
     useOSProber = true;
     device = "nodev";
+    # /boot is a 512M vfat ESP: kernels must be copied there (vfat cannot
+    # symlink into the store) and generations capped so it cannot fill up.
+    copyKernels = true;
+    configurationLimit = 10;
     memtest86.enable = true;
     theme = pkgs.sleek-grub-theme.override {
       withStyle = "orange";
@@ -15,7 +19,7 @@
   };
   boot.loader.efi = {
     canTouchEfiVariables = true;
-    efiSysMountPoint = "/boot2";
+    efiSysMountPoint = "/boot";
   };
 
   # Enable aarch64 emulation for building Raspberry Pi images

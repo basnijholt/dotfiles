@@ -1,4 +1,4 @@
-{ device, espLabel ? "ESP", ... }:
+{ device, espLabel ? "ESP", swapSize ? null, ... }:
 {
   disko.devices = {
     disk = {
@@ -26,7 +26,20 @@
                 pool = "zroot";
               };
             };
-          };
+          }
+          # Hosts that need swap get a real partition: swapfiles are not
+          # supported on ZFS and swap-on-zvol is deadlock-prone.
+          // (
+            if swapSize != null then
+              {
+                swap = {
+                  size = swapSize;
+                  content.type = "swap";
+                };
+              }
+            else
+              { }
+          );
         };
       };
     };

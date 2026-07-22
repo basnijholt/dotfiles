@@ -12,6 +12,7 @@
     ../../optional/ups-client.nix
     ../../optional/wake-on-lan.nix
     ../../optional/nfs-docker.nix
+    ../../optional/zfs-replication.nix
 
     # Host-specific modules (Tier 3)
     ./boot.nix
