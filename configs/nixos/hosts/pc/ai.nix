@@ -1,5 +1,5 @@
 # AI and machine learning services (Ollama, llama-swap, Wyoming, Qdrant)
-{ pkgs, ... }:
+{ pkgs, nixpkgs-qdrant, ... }:
 
 {
   # --- Ollama ---
@@ -643,6 +643,10 @@
   # --- Qdrant Vector Database ---
   services.qdrant = {
     enable = true;
+    # Pinned: qdrant fails to compile on current nixpkgs (LLVM error on
+    # avx512 intrinsic during fat-LTO link) and no cache has it. See the
+    # nixpkgs-qdrant input in flake.nix; drop both once upstream builds again.
+    package = nixpkgs-qdrant.legacyPackages.${pkgs.stdenv.hostPlatform.system}.qdrant;
     settings = {
       storage = {
         storage_path = "/var/lib/qdrant/storage";
