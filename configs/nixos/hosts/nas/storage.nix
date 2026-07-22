@@ -108,6 +108,19 @@ in
         useTemplate = [ "nas-default" ];
         recursive = true;
       };
+      # Irreplaceable low-churn datasets: extend monthly retention so local
+      # restore points reach ~2 years back (the template's weekly=52 caps
+      # history at ~1 year). Near-free for data that barely changes.
+      "tank/photos" = {
+        useTemplate = [ "nas-default" ];
+        recursive = true;
+        monthly = 24;
+      };
+      "tank/syncthing" = {
+        useTemplate = [ "nas-default" ];
+        recursive = true;
+        monthly = 24;
+      };
       "tank/backups" = {
         useTemplate = [ "nas-backup-prune" ];
         recursive = true;
