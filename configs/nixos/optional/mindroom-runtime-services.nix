@@ -114,6 +114,11 @@ in
           "MINDROOM_LOG_FORMAT=json"
           "MINDROOM_TIMING=1"
           "BACKEND_PORT=8766"
+          # Public origin this runtime is reachable at (Caddy on host mindroom
+          # routes the catch-all of mindroom.lab.mindroom.chat to this API on
+          # :8766). Lets publish_report / OAuth / CORS emit absolute public URLs
+          # instead of bare relative paths.
+          "MINDROOM_PUBLIC_URL=https://mindroom.lab.mindroom.chat"
         ];
         ExecStart = "${mindroom-uv "/home/basnijholt/.mindroom-chat" "run --api-port 8766"}";
         Restart = "always";
