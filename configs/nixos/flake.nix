@@ -105,6 +105,23 @@
           ./hosts/pc/hardware-configuration.nix
         ];
 
+        # Local-only variant for `nixos-anywhere --vm-test`: the test harness
+        # installs GRUB as removable, which asserts canTouchEfiVariables off.
+        pc-vmtest = mkHost [
+          disko.nixosModules.disko
+          ./hosts/pc/disko.nix
+          ./hosts/pc/default.nix
+          ./hosts/pc/hardware-configuration.nix
+          {
+            boot.loader.efi.canTouchEfiVariables = lib.mkForce false;
+            # pc's debugging.nix value collides with test-instrumentation.nix
+            boot.kernel.sysctl."kernel.hung_task_timeout_secs" = lib.mkForce 600;
+            # disko's test harness hardcodes 4GiB virtual disks; shrink swap so
+            # the layout fits. The partition logic is identical, only the size.
+            disko.devices.disk.main.content.partitions.swap.size = lib.mkForce "1G";
+          }
+        ];
+
         nuc = mkHost [
           disko.nixosModules.disko
           ./hosts/nuc/disko.nix
