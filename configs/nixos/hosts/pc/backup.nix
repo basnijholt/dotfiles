@@ -29,7 +29,10 @@
       "sftp.command='ssh -i /root/.ssh/restic-backup -o StrictHostKeyChecking=no restic@192.168.1.4 -s sftp'"
     ];
     timerConfig = {
-      OnCalendar = "hourly";
+      # Every 6 hours: a full scan walks ~98M files and takes ~1h25, so the
+      # old hourly timer just meant back-to-back scanning for ~200 MiB of
+      # changes per run.
+      OnCalendar = "*-*-* 00/6:00:00";
       Persistent = true;
     };
     pruneOpts = [
