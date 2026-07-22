@@ -1,9 +1,15 @@
-# Backup configuration (Restic to TrueNAS)
+# Backup configuration (Restic to the NAS)
+#
+# The NAS address is its static LAN IP like the fleet's syncoid jobs;
+# truenas.local stopped resolving at the 2026-06 TrueNAS -> NixOS cutover,
+# which silently broke these backups (stacked on a stale repo lock from
+# 2026-03-22). The restic user and its authorized_keys live on the tank
+# pool and survived the cutover unchanged.
 { ... }:
 
 {
   services.restic.backups.truenas = {
-    repository = "sftp:restic@truenas.local:/mnt/tank/backups/pc";
+    repository = "sftp:restic@192.168.1.4:/mnt/tank/backups/pc";
     paths = [
       "/home"
       "/etc/nixos"
@@ -22,7 +28,7 @@
     ];
     passwordFile = "/root/.restic-password";
     extraOptions = [
-      "sftp.command='ssh -i /root/.ssh/restic-backup -o StrictHostKeyChecking=no restic@truenas.local -s sftp'"
+      "sftp.command='ssh -i /root/.ssh/restic-backup -o StrictHostKeyChecking=no restic@192.168.1.4 -s sftp'"
     ];
     timerConfig = {
       OnCalendar = "hourly";
