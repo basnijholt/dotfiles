@@ -28,8 +28,4 @@
     "OPENCLAW_TELEGRAM_BOT_TOKEN"
     "TELEGRAM_BOT_TOKEN"
   ];
-
-  # Deploy manually while this container is being used as a hands-on MindRoom
-  # runtime.
-  services.comin.enable = lib.mkForce false;
 }

@@ -18,7 +18,9 @@
   # --- Disable services not needed on a gateway ---
   services.fwupd.enable = lib.mkForce false;
   services.syncthing.enable = lib.mkForce false;
-  services.comin.enable = lib.mkForce false; # Manual updates only (low RAM)
+  # Deliberately NOT comin-managed: 4 GB box where nix eval risks OOM, at
+  # someone else's house where a wedged deploy is hard to fix.
+  services.comin.enable = lib.mkForce false;
 
   # --- Tailscale for secure tunnel to home network ---
   services.tailscale.enable = lib.mkForce true;

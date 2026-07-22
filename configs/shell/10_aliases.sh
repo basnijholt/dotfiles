@@ -72,6 +72,9 @@ if [[ $- == *i* ]]; then
         alias pbcopy='wl-copy'  # Just because of muscle memory...
 
         nixswitch() {
+            if systemctl is-enabled comin.service &>/dev/null; then
+                echo "note: this host is comin-managed; a local switch is superseded by the next GitOps deploy" >&2
+            fi
             local args=()
             if [[ -n "$1" && "$1" =~ ^[0-9]+$ ]]; then
                 args=(--option max-jobs "$1" --option cores "$1")

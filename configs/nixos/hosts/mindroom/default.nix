@@ -37,9 +37,6 @@
   # that link against it. Without this, uv run / pytest fail with import errors.
   environment.variables.LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
 
-  # Disable comin on this host — we deploy manually via nixos-rebuild switch.
-  services.comin.enable = lib.mkForce false;
-
   # Root CA of the Agent Vault instance at https://agent-vault.lab.nijho.lt
   # (docker-lxc host). The agent-vault-bridge MindRoom plugin routes agent
   # GitHub calls through its MITM proxy; this trust anchor validates the
