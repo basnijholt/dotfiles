@@ -30,6 +30,7 @@
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix
     ./slurm.nix
+    ./migration-root-ssh.nix # TEMPORARY — remove after the ZFS migration
   ];
 
   local.wakeOnLan.interface = "enp5s0";
