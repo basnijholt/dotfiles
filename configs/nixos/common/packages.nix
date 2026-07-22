@@ -17,7 +17,11 @@ let
     btop
     coreutils
     cups # lp command for network printing
-    docker
+    # docker_29 instead of the docker alias: nixos-raspberrypi's pinned
+    # nixpkgs (pi4) still aliases docker to the insecure-flagged docker_28,
+    # which refuses to evaluate. Same 29.x the alias gives on main nixpkgs.
+    # Revert to plain docker once that pin catches up.
+    docker_29
     devbox
     devenv
     delta
