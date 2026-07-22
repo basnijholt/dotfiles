@@ -92,9 +92,8 @@ let
   # The pc restic backup is file-based (hourly sftp push into tank/backups/pc),
   # so no dataset snapshot check can see it. Restic writes one file per
   # completed snapshot into the repo's snapshots/ directory; the newest file
-  # mtime is the last successful backup. Added 2026-07-09 after finding pc's
-  # backups had failed silently since 2026-03-22 on a stale repo lock —
-  # nothing watched this repo. pc backs up hourly; 26h absorbs downtime.
+  # mtime is the last successful backup. pc backs up hourly; 26h absorbs
+  # downtime.
   watchedResticRepos = [
     {
       label = "pc restic repo";
@@ -380,8 +379,7 @@ in
       # Nothing on the nuc prunes this mirror's replicated autosnap_*
       # snapshots (nuc's sanoid deliberately excludes zroot/backups), so
       # trim it to the source's retention here — without this the mirror
-      # accumulates every ssd snapshot forever, the same bug the hetzner
-      # pull had.
+      # accumulates every ssd snapshot forever.
       syncoid ${mkSyncoidSsdArgs} \
         --delete-target-snapshots \
         --recvoptions=${nucReceiveOptions} \
@@ -429,9 +427,8 @@ in
       zfs list tank/backups/hetzner >/dev/null
 
       # Trim the target to the source's snapshot set, like the hp/nuc/pi4
-      # push jobs do. This also cleans up the legacy zfs-auto-snap_*
-      # snapshots that accumulated before the 2026-07 sanoid migration,
-      # which no prune policy ever matched.
+      # push jobs do; this also clears foreign-named snapshots (legacy
+      # zfs-auto-snap_*), which no prune policy matches.
       # Pull over the tailnet (hetzner = 100.64.0.32) so the from= pin in
       # its authorized_keys is the NAS's stable tailnet IP instead of the
       # dynamic home WAN address, matching the other cloud pulls.
@@ -484,8 +481,7 @@ in
       # bridge state and secrets under /var/lib. The rest of zroot (root,
       # nix, home) is rebuildable from this repo.
       # --delete-target-snapshots keeps the mirror matched to the source's
-      # retention and cleans up legacy zfs-auto-snap_* snapshots from
-      # before the 2026-07 sanoid migration.
+      # retention.
       for dataset in tuwunel var; do
         syncoid ${mkSyncoidCommonArgs} \
           --delete-target-snapshots \

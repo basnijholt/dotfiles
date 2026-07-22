@@ -230,9 +230,8 @@
         ];
 
         # Hetzner Cloud VPS (x86_64) - single-node K3s host for MindRoom SaaS.
-        # mkHost (not raw nixosSystem) since the 2026-07 ZFS reinstall, so it
-        # gets the common stack (tailscale, comin, user, packages) like every
-        # other host.
+        # mkHost so it gets the common stack (tailscale, comin, user,
+        # packages) like every other host.
         hetzner-saas = mkHost [
           disko.nixosModules.disko
           ./hosts/hetzner-saas/disko.nix

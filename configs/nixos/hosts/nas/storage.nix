@@ -85,16 +85,15 @@ in
     };
     # Replication targets under tank/backups: never snapshot here, but prune
     # the autosnap_ snapshots that replication delivers — otherwise the
-    # mirrors accumulate every source snapshot forever. Since the 2026-07
-    # fleet migration to sanoid every source delivers autosnap_* names, so
-    # this policy covers all mirrors; the push/pull jobs additionally trim
-    # targets to the source's snapshot set with --delete-target-snapshots.
-    # Retention here is a superset of every source policy (nas-default
-    # above, zfs-default elsewhere), so a target never keeps less history
-    # than its source intends. Sanoid only prunes snapshots it named
-    # itself; syncoid sync snaps, legacy zfs-auto-snap_* snapshots (until
-    # their one-time manual cleanup), and TrueNAS-era snapshots are
-    # untouched.
+    # mirrors accumulate every source snapshot forever. Every source
+    # delivers sanoid-named autosnap_* snapshots, so this policy covers all
+    # mirrors; the push/pull jobs additionally trim targets to the source's
+    # snapshot set with --delete-target-snapshots. Retention here is a
+    # superset of every source policy (nas-default above, zfs-default
+    # elsewhere), so a target never keeps less history than its source
+    # intends. Sanoid only prunes snapshots it named itself; syncoid sync
+    # snaps and foreign-named snapshots (legacy zfs-auto-snap_*,
+    # TrueNAS-era) are untouched.
     templates.nas-backup-prune = {
       autosnap = false;
       autoprune = true;

@@ -1,10 +1,8 @@
 # Backup configuration (Restic to the NAS)
 #
-# The NAS address is its static LAN IP like the fleet's syncoid jobs;
-# truenas.local stopped resolving at the 2026-06 TrueNAS -> NixOS cutover,
-# which silently broke these backups (stacked on a stale repo lock from
-# 2026-03-22). The restic user and its authorized_keys live on the tank
-# pool and survived the cutover unchanged.
+# The NAS address is deliberately its static LAN IP, not a hostname: name
+# resolution failures break this job silently. The restic user and its
+# authorized_keys live on the NAS tank pool.
 { ... }:
 
 {

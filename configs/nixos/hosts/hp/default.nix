@@ -23,9 +23,7 @@
   # Required for ZFS
   networking.hostId = "37a1d4a7";
 
-  # Incus manages its own snapshots; keep sanoid away from its datasets
-  # (replaces the com.sun:auto-snapshot=false property the old
-  # zfs-auto-snapshot module set).
+  # Incus manages its own snapshots; keep sanoid away from its datasets.
   services.sanoid.datasets."zroot/incus" = {
     autosnap = false;
     autoprune = false;

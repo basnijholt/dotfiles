@@ -1,19 +1,14 @@
 # ZFS automated local snapshots via Sanoid.
 #
-# Fleet standard since 2026-07: sanoid everywhere, one `autosnap_*` naming
-# scheme, so target-side retention policies (like the NAS's nas-backup-prune)
-# can reason about every replicated snapshot. This replaced
-# services.zfs.autoSnapshot (`zfs-auto-snap_*` naming), which sanoid can
-# never prune — that split is what let the hetzner mirror accumulate 700+
-# snapshots unnoticed.
+# Fleet standard: sanoid everywhere with one `autosnap_*` naming scheme, so
+# target-side retention policies (like the NAS's nas-backup-prune) can
+# reason about every replicated snapshot. Sanoid never prunes names it did
+# not create, so any second snapshot tool in the fleet would make its
+# snapshots invisible to every prune policy and accumulate on the mirrors.
 #
 # Covers zroot recursively; zroot/nix is rebuildable and excluded. Hosts
 # with datasets sanoid must not touch add their own exclusions (hp:
 # zroot/incus, nuc: zroot/backups).
-#
-# Legacy zfs-auto-snap_* snapshots stopped being created at the migration
-# and are destroyed manually on each source once; targets self-clean because
-# every replication job runs --delete-target-snapshots.
 { pkgs, ... }:
 
 {
