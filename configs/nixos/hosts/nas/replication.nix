@@ -36,12 +36,11 @@ let
 
   hetznerSaasKey = "/etc/ssh/nas-replication-hetzner-saas-ed25519";
 
-  # hetzner-saas is ext4 (no ZFS) and not on the tailnet, so its backup is a
-  # nightly tarball of the k3s state pulled over the public IP (see
-  # nas-backup-hetzner-saas below). The from= pin on its authorized_keys
-  # entry is the home WAN IP and needs updating if that changes; the
-  # OnFailure alert and dump-age watchdog check catch the breakage.
-  hetznerSaasHost = "46.62.174.103";
+  # hetzner-saas, via its tailnet IP since the 2026-07 ZFS reinstall put it
+  # on the common stack; the from= pin in root's authorized_keys there is
+  # the NAS's stable tailnet IP (100.64.0.1). The k3s state tarball pull
+  # remains until the follow-up switch to a syncoid pull of zroot/var.
+  hetznerSaasHost = "100.64.0.2";
 
   # hetzner-matrix (mindroom.chat), via its tailnet IP. Both ends have stable
   # tailscale addresses, so the from= pin in root's authorized_keys there is
