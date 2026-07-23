@@ -1,57 +1,22 @@
-# Storage configuration (Btrfs snapshots, swap)
+# Storage configuration (ZFS maintenance, service dirs)
+#
+# Snapshots come from sanoid (optional/zfs-sanoid.nix via zfs-replication.nix,
+# imported in default.nix) — the snapper configs died with btrfs. Swap is a
+# 96G partition from disko.nix: swapfiles are not supported on ZFS.
 { ... }:
 
 {
-  services.fstrim.enable = true;
+  # --- ZFS Maintenance ---
+  # Pool-level autotrim is on (common/disko-zfs.nix); these add the periodic
+  # scrub for bitrot detection and a weekly full trim pass.
+  services.zfs.autoScrub.enable = true;
+  services.zfs.trim.enable = true;
 
-  # --- Snapper Btrfs Policies ---
-  services.snapper.configs = {
-    root = {
-      SUBVOLUME = "/";
-      ALLOW_USERS = [ "basnijholt" ];
-      TIMELINE_CREATE = true;
-      TIMELINE_CLEANUP = true;
-      TIMELINE_LIMIT_HOURLY = 6;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_LIMIT_WEEKLY = 4;
-      TIMELINE_LIMIT_MONTHLY = 6;
-      TIMELINE_LIMIT_YEARLY = 2;
-      NUMBER_CLEANUP = true;
-      NUMBER_MIN_AGE = 1800;
-      NUMBER_LIMIT = 10;
-    };
-    home = {
-      SUBVOLUME = "/home";
-      ALLOW_USERS = [ "basnijholt" ];
-      TIMELINE_CREATE = true;
-      TIMELINE_CLEANUP = true;
-      TIMELINE_LIMIT_HOURLY = 6;
-      TIMELINE_LIMIT_DAILY = 7;
-      TIMELINE_LIMIT_WEEKLY = 2;
-      TIMELINE_LIMIT_MONTHLY = 0;
-      TIMELINE_LIMIT_YEARLY = 0;
-      NUMBER_CLEANUP = true;
-      NUMBER_MIN_AGE = 1800;
-      NUMBER_LIMIT = 20;
-    };
-  };
-
-  # Snapper snapshot roots must exist with correct permissions
   systemd.tmpfiles.rules = [
-    "d /.snapshots 0755 root root -"
-    "d /home/.snapshots 0755 basnijholt users -"
     "d /var/lib/club-3090-vllm 0755 root root -"
     "d /var/lib/club-3090-vllm/models 0755 root root -"
     "d /var/lib/club-3090-vllm/cache 0755 root root -"
     "d /var/lib/club-3090-vllm/cache/torch_compile 0755 root root -"
     "d /var/lib/club-3090-vllm/cache/triton 0755 root root -"
-  ];
-
-  # --- Swap ---
-  swapDevices = [
-    {
-      device = "/swapfile";
-      size = 96 * 1024; # 96GB
-    }
   ];
 }
