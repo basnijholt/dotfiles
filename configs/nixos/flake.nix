@@ -3,11 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # Last nixpkgs rev where qdrant compiles; qdrant on newer revs dies with
-    # rustc-LLVM "Cannot select: intrinsic llvm.x86.avx512.vpdpwssd.512"
-    # during its fat-LTO link and is not in any binary cache. Drop this input
-    # (and services.qdrant.package in hosts/pc/ai.nix) once upstream builds again.
-    nixpkgs-qdrant.url = "github:NixOS/nixpkgs/d407951447dcd00442e97087bf374aad70c04cea";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -41,7 +36,6 @@
     {
       self,
       nixpkgs,
-      nixpkgs-qdrant,
       home-manager,
       home-manager-pi,
       disko,
@@ -70,7 +64,6 @@
         extraModules:
         lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit nixpkgs-qdrant; };
           modules = commonModules home-manager ++ extraModules;
         };
 

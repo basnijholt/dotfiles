@@ -1,5 +1,5 @@
-# AI and machine learning services (Ollama, llama-swap, Wyoming, Qdrant)
-{ pkgs, nixpkgs-qdrant, ... }:
+# AI and machine learning services (Ollama, llama-swap, Wyoming)
+{ pkgs, ... }:
 
 {
   # --- Ollama ---
@@ -636,25 +636,5 @@
   services.wyoming.openwakeword = {
     enable = false; # Temporarily disabled
     uri = "tcp://0.0.0.0:10400";
-  };
-
-  # --- Qdrant Vector Database ---
-  services.qdrant = {
-    enable = true;
-    # Pinned: qdrant fails to compile on current nixpkgs (LLVM error on
-    # avx512 intrinsic during fat-LTO link) and no cache has it. See the
-    # nixpkgs-qdrant input in flake.nix; drop both once upstream builds again.
-    package = nixpkgs-qdrant.legacyPackages.${pkgs.stdenv.hostPlatform.system}.qdrant;
-    settings = {
-      storage = {
-        storage_path = "/var/lib/qdrant/storage";
-        snapshots_path = "/var/lib/qdrant/snapshots";
-      };
-      service = {
-        host = "0.0.0.0";
-        http_port = 6333;
-      };
-      telemetry_disabled = true;
-    };
   };
 }
