@@ -9,7 +9,7 @@
     ../../optional/gui-packages.nix
     ../../optional/large-packages.nix
     ../../optional/power.nix
-    ../../optional/zfs-replication.nix
+    ../../optional/zfs-replication-source.nix
     ../../optional/nfs-docker.nix
     ../../optional/ups-client.nix
     ../../optional/wake-on-lan.nix
@@ -36,6 +36,7 @@
   };
 
   local.wakeOnLan.interface = "eno1";
+  local.zfsReplicationSource.nasPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIBVT4xCHl6p6NAJpFjhW+tw29fj1ZrqOUIWRuuwPmZ3 nas-replication-nuc-pull";
 
   systemd.services.nuc-backup-zfs-policy = {
     description = "Keep replicated NAS backup datasets from auto-mounting";

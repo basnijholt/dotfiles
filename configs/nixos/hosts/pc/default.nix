@@ -12,7 +12,7 @@
     ../../optional/ups-client.nix
     ../../optional/wake-on-lan.nix
     ../../optional/nfs-docker.nix
-    ../../optional/zfs-replication.nix
+    ../../optional/zfs-replication-source.nix
 
     # Host-specific modules (Tier 3)
     ./boot.nix
@@ -34,6 +34,7 @@
   ];
 
   local.wakeOnLan.interface = "enp5s0";
+  local.zfsReplicationSource.nasPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFf8RpaZe1lGYuLI9ASLGLd6zNlkhIlRXK8hpuXiq+Os nas-replication-pc";
 
   # Required for DDC/CI tools such as ddcutil to read monitor state (e.g. the
   # active input source) for manual diagnostics. Display automation no longer

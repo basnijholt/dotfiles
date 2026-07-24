@@ -1,7 +1,8 @@
 # Backup configuration (Restic to the NAS)
 #
-# TODO: restic is being phased out in favor of ZFS replication (sanoid +
-# syncoid, see optional/zfs-replication.nix). Once a few clean syncoid runs
+# TODO: restic is being phased out in favor of ZFS replication (sanoid here,
+# syncoid pull from the NAS, see hosts/nas/replication.nix). Once a few clean
+# pull runs
 # have landed on the NAS and one restore drill from the replicas has passed:
 # demote this timer to daily, and retire or relax the "pc restic repo"
 # freshness check in hosts/nas/replication.nix in the same change. Keep the

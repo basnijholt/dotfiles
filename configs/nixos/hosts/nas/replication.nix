@@ -28,9 +28,104 @@ let
   mkSyncoidArgs = extraArgs: pkgs.lib.escapeShellArgs (syncoidCommon ++ extraArgs);
   mkSyncoidCommonArgs = mkSyncoidArgs [ ];
   mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
-  nucReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
+  unmountedReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
 
   nucReplicationKey = "/etc/ssh/nas-replication-nuc-ed25519";
+
+  # The always-on LAN hosts are replicated by pull, not push: sources hold
+  # no NAS credentials at all. The NAS connects to a dedicated non-root
+  # user with delegated zfs send rights on each source
+  # (optional/zfs-replication-source.nix), so even a fully compromised
+  # source cannot reach this pool or the NAS-side snapshots protecting its
+  # own backups. Keys are generated on the NAS and never leave it; the
+  # addresses are router-pinned DHCP leases, static on purpose (name
+  # resolution failures must not break replication).
+  pullSources = {
+    pc = {
+      addr = "192.168.1.5";
+      key = "/etc/ssh/nas-replication-pc-ed25519";
+      onCalendar = "*-*-* 01:15:00";
+    };
+    nuc = {
+      addr = "192.168.1.2";
+      # Not nas-replication-nuc-ed25519: that is the legacy RSA key the
+      # ssd-mirror push job uses to reach root@nuc.
+      key = "/etc/ssh/nas-replication-nuc-pull-ed25519";
+      onCalendar = "*-*-* 01:25:00";
+    };
+    hp = {
+      addr = "192.168.1.3";
+      key = "/etc/ssh/nas-replication-hp-ed25519";
+      onCalendar = "*-*-* 01:35:00";
+    };
+    pi4 = {
+      addr = "192.168.1.7";
+      key = "/etc/ssh/nas-replication-pi4-ed25519";
+      onCalendar = "*-*-* 01:45:00";
+    };
+  };
+
+  # Pull one host's zroot datasets into tank/backups/<host>. home, var and
+  # root are the restore set; zroot/nix is rebuildable. incus joins
+  # automatically once a source grows a zroot/incus dataset.
+  mkPullService = host: src: {
+    description = "Pull ${host} zroot datasets over SSH";
+    restartIfChanged = false;
+    wants = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    after = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    unitConfig = {
+      ConditionPathExists = src.key;
+      OnFailure = [ "nas-health-alert@%n.service" ];
+    };
+    path = replicationPath;
+    script = ''
+      set -euo pipefail
+
+      zfs list tank/backups/${host} >/dev/null
+
+      # --no-privilege-elevation: the remote user is non-root on purpose
+      # and must never attempt sudo; its zfs rights are delegated.
+      # --delete-target-snapshots keeps the mirror matched to the source's
+      # retention, like every other mirror here.
+      datasets="home var root"
+      if ssh -i ${src.key} -o BatchMode=yes -o ConnectTimeout=10 \
+          nas-replication@${src.addr} zfs list zroot/incus >/dev/null 2>&1; then
+        datasets="$datasets incus"
+      fi
+
+      for dataset in $datasets; do
+        syncoid ${mkSyncoidCommonArgs} \
+          --no-privilege-elevation \
+          --delete-target-snapshots \
+          --recvoptions=${unmountedReceiveOptions} \
+          --sshkey=${src.key} \
+          --sshport=22 \
+          --sshoption=BatchMode=yes \
+          --sshoption=ConnectTimeout=10 \
+          nas-replication@${src.addr}:zroot/"$dataset" tank/backups/${host}/"$dataset"
+      done
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      TimeoutStartSec = "infinity";
+    };
+  };
+
+  mkPullTimer = src: {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = src.onCalendar;
+      Persistent = true;
+      RandomizedDelaySec = "15m";
+    };
+  };
   hetznerReplicationKey = "/etc/ssh/nas-replication-hetzner-ed25519";
   hetznerMatrixReplicationKey = "/etc/ssh/nas-replication-hetzner-matrix-ed25519";
 
@@ -55,7 +150,7 @@ let
   # silently absent replication.
   watchedReplicationKeys = [
     {
-      label = "nuc outbound replication key";
+      label = "nuc outbound ssd-mirror key";
       path = nucReplicationKey;
     }
     {
@@ -70,7 +165,11 @@ let
       label = "hetzner-saas outbound backup key";
       path = hetznerSaasKey;
     }
-  ];
+  ]
+  ++ pkgs.lib.mapAttrsToList (host: src: {
+    label = "${host} outbound pull key";
+    path = src.key;
+  }) pullSources;
 
   # Syncoid creates its own sync snapshot on every run, so the backup-target
   # freshness checks stay green even if sanoid stops autosnapshotting. Check
@@ -87,7 +186,16 @@ let
       dataset = "ssd";
       maxAgeHours = 2;
     }
-  ];
+  ]
+  # A replicated autosnap_* check detects a dead sanoid on a pull source:
+  # the pull job's own sync snapshots keep the mirror freshness checks
+  # green even if the source stops snapshotting. Hourly snaps plus a daily
+  # pull put the newest replicated autosnap at ~26h worst case.
+  ++ pkgs.lib.mapAttrsToList (host: src: {
+    label = "${host} replicated autosnaps";
+    dataset = "tank/backups/${host}/home";
+    maxAgeHours = 30;
+  }) pullSources;
 
   # The pc restic backup is file-based (hourly sftp push into tank/backups/pc),
   # so no dataset snapshot check can see it. Restic writes one file per
@@ -107,21 +215,6 @@ let
       label = "local ssd mirror";
       dataset = "tank/backups/ssd";
       maxAgeHours = 36;
-    }
-    {
-      label = "hp inbound push";
-      dataset = "tank/backups/hp";
-      maxAgeHours = 48;
-    }
-    {
-      label = "nuc inbound push";
-      dataset = "tank/backups/nuc";
-      maxAgeHours = 48;
-    }
-    {
-      label = "pi4 inbound push";
-      dataset = "tank/backups/pi4";
-      maxAgeHours = 48;
     }
     {
       label = "hetzner websites";
@@ -146,7 +239,20 @@ let
       dataset = "tank/backups/hetzner-saas/var";
       maxAgeHours = 48;
     }
-  ];
+  ]
+  # Pull-source mirrors, watched per dataset like hetzner-matrix so one
+  # fresh dataset cannot mask a stale sibling. incus mirrors are
+  # conditional datasets and deliberately unwatched.
+  ++ pkgs.lib.concatLists (
+    pkgs.lib.mapAttrsToList (
+      host: src:
+      map (d: {
+        label = "${host} ${d} mirror";
+        dataset = "tank/backups/${host}/${d}";
+        maxAgeHours = 48;
+      }) [ "home" "var" "root" ]
+    ) pullSources
+  );
 
   # Keep tank/backups/ssd mounted as a filesystem: the B2 rclone job reads
   # from this replicated mirror on purpose, instead of racing the live Docker
@@ -315,14 +421,10 @@ in
     mbuffer
   ];
 
-  # Existing NixOS hosts push Syncoid backups as root. Keep the shared default
-  # root-login denial, but allow key-only root SSH from the LAN for replication.
-  # Install source host keys at cutover in /etc/ssh/authorized_keys.d/root with
-  # from= restrictions; do not commit those keys to the public repo.
-  services.openssh.extraConfig = ''
-    Match User root Address 192.168.1.0/24
-      PermitRootLogin prohibit-password
-  '';
+  # No inbound root SSH: since the LAN hosts moved from push (root@nas) to
+  # pull, nothing legitimate logs in to this machine as root anymore, so
+  # the former "Match User root Address 192.168.1.0/24" carve-out is gone
+  # and the shared default root-login denial applies unconditionally.
 
   systemd.services.nas-replicate-ssd-local = {
     description = "Replicate local ssd pool into tank backup dataset";
@@ -382,7 +484,7 @@ in
       # accumulates every ssd snapshot forever.
       syncoid ${mkSyncoidSsdArgs} \
         --delete-target-snapshots \
-        --recvoptions=${nucReceiveOptions} \
+        --recvoptions=${unmountedReceiveOptions} \
         --sshkey=${nucReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
@@ -558,6 +660,16 @@ in
       RandomizedDelaySec = "15m";
     };
   };
+
+  systemd.services.nas-replicate-pc = mkPullService "pc" pullSources.pc;
+  systemd.services.nas-replicate-nuc = mkPullService "nuc" pullSources.nuc;
+  systemd.services.nas-replicate-hp = mkPullService "hp" pullSources.hp;
+  systemd.services.nas-replicate-pi4 = mkPullService "pi4" pullSources.pi4;
+
+  systemd.timers.nas-replicate-pc = mkPullTimer pullSources.pc;
+  systemd.timers.nas-replicate-nuc = mkPullTimer pullSources.nuc;
+  systemd.timers.nas-replicate-hp = mkPullTimer pullSources.hp;
+  systemd.timers.nas-replicate-pi4 = mkPullTimer pullSources.pi4;
 
   systemd.services.nas-replication-watchdog = {
     description = "Check NAS replication snapshot freshness";

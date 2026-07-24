@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Merge a GitHub PR with a LOCAL signed merge commit, then push main.
+#
+# Why not the web merge button: comin verifies SSH signatures on the main
+# tip against my key, and GitHub's web merges are GPG-signed by GitHub's
+# web-flow key instead. Every web merge therefore freezes fleet deploys
+# until a signed commit lands on main. This script is the paved road.
+#
+# Usage: merge-pr.sh <pr-number>
+set -euo pipefail
+
+pr="${1:?usage: merge-pr.sh <pr-number>}"
+
+state="$(gh pr view "$pr" --json state -q .state)"
+if [ "$state" != "OPEN" ]; then
+  echo "PR #$pr is $state, not OPEN" >&2
+  exit 1
+fi
+
+branch="$(gh pr view "$pr" --json headRefName -q .headRefName)"
+title="$(gh pr view "$pr" --json title -q .title)"
+
+git fetch origin main "$branch"
+git switch main
+git merge --ff-only origin/main
+git merge --squash "origin/$branch"
+git commit -S -m "$title (#$pr)"
+git push origin main
+
+# A local squash never marks the PR merged on GitHub; close it explicitly.
+gh pr close "$pr" --comment "Squash-merged locally as $(git rev-parse --short HEAD)."
+
+echo "Squash-merged and pushed. comin fetches within ~1 min; verify with:"
+echo "  comin status   # Fetcher should show the new tip, signed"
