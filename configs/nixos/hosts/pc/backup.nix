@@ -16,6 +16,7 @@
       "/var/lib/munge"   # Munge authentication
       "/var/lib/private/ollama" # AI models
       "/var/lib/libvirt" # Libvirt VMs
+      "/var/lib/systemd/credential.secret" # host key for systemd-creds — without it every host-sealed credential (e.g. libvirt secrets-encryption-key) dies with the machine
     ];
     exclude = [
       "/home/*/.cache"
