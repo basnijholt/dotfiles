@@ -1,5 +1,13 @@
 # Backup configuration (Restic to the NAS)
 #
+# TODO: restic is being phased out in favor of ZFS replication (sanoid +
+# syncoid, see optional/zfs-replication.nix). Once a few clean syncoid runs
+# have landed on the NAS and one restore drill from the replicas has passed:
+# demote this timer to daily, and retire or relax the "pc restic repo"
+# freshness check in hosts/nas/replication.nix in the same change. Keep the
+# repository on the NAS either way — it is the only file-level history and
+# the only restore path exercised end-to-end.
+#
 # The NAS address is deliberately its static LAN IP, not a hostname: name
 # resolution failures break this job silently. The restic user and its
 # authorized_keys live on the NAS tank pool.
