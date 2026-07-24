@@ -32,5 +32,9 @@
   # rollback generations would pin ~30 full closures. A week is plenty here.
   nix.gc.options = "--delete-older-than 7d";
 
+  # In Incus LXC, udevd is already running from the kernel socket. Starting the
+  # control socket during switch can fail with "Socket service already active".
+  systemd.sockets.systemd-udevd-control.enable = lib.mkForce false;
+
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
 }
