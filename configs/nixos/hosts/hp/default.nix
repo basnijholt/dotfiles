@@ -7,7 +7,7 @@
     ../../optional/virtualization.nix
     ../../optional/large-packages.nix
     ../../optional/power.nix
-    ../../optional/zfs-replication.nix
+    ../../optional/zfs-replication-source.nix
     ../../optional/nfs-docker.nix
     ../../optional/print-server.nix
     (import ../../optional/coredns.nix { listenIP = "192.168.1.3"; })
@@ -22,6 +22,8 @@
 
   # Required for ZFS
   networking.hostId = "37a1d4a7";
+
+  local.zfsReplicationSource.nasPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINLaIVBmPIbB7Ot1V2bYKMnoLKj9Ga5LeMBafLzPfg7L nas-replication-hp";
 
   # Incus manages its own snapshots; keep sanoid away from its datasets.
   services.sanoid.datasets."zroot/incus" = {
