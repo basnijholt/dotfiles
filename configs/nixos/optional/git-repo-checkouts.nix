@@ -105,7 +105,10 @@ in
               fi
 
               git -C "$repo_path" remote set-url origin "$repo_url"
-              git -C "$repo_path" fetch --prune origin "$repo_branch"
+              if ! git -C "$repo_path" fetch --prune origin "$repo_branch"; then
+                echo "Fetch failed; leaving existing checkout untouched: $repo_path" >&2
+                exit 0
+              fi
 
               if git -C "$repo_path" show-ref --verify --quiet "refs/heads/$repo_branch"; then
                 git -C "$repo_path" checkout "$repo_branch"
