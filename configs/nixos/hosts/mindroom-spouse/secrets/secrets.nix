@@ -5,4 +5,5 @@ let
 in
 {
   "agent-runtime.env.age".publicKeys = recipients;
+  "spouse-dawarich.env.age".publicKeys = recipients;
 }
