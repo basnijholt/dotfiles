@@ -7,6 +7,7 @@
 - link:
     ~/.bash_profile: configs/bash/bash_profile
     ~/.bashrc: configs/bash/bashrc
+    ~/.claude/CLAUDE.md: configs/claude/CLAUDE.md
     ~/.claude/hooks: configs/claude/hooks
     ~/.claude/settings.json: configs/claude/settings.json
     ~/.claude/statusline.py: configs/claude/statusline.py
