@@ -48,8 +48,7 @@
     };
     # Pull replication connects as root@nas with BatchMode=yes, which
     # hard-fails on unknown host keys, so every source must be pinned here.
-    # pc's key survives reinstalls (it rides in the recovery kit); a
-    # reinstalled nuc/hp/pi4 must update its entry.
+    # Reinstalled host gets new keys — update its entry here.
     "pc" = {
       hostNames = [ "pc" "192.168.1.5" ];
       publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjiKKO6ajlHe5oZa9fGI1v9yLvjvuBH3ZZlYlCIlREt";
