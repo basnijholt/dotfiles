@@ -2,7 +2,7 @@
 # Merge a GitHub PR with a LOCAL signed merge commit, then push main.
 #
 # Why not the web merge button: comin verifies SSH signatures on the main
-# tip against bas' key, and GitHub's web merges are GPG-signed by GitHub's
+# tip against my key, and GitHub's web merges are GPG-signed by GitHub's
 # web-flow key instead. Every web merge therefore freezes fleet deploys
 # until a signed commit lands on main. This script is the paved road.
 #
