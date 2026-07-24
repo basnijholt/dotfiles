@@ -15,7 +15,9 @@ from rich.console import Console
 from rich.table import Table
 
 HOME_IP = "192.168.1.5"
-TAILSCALE_IP = "100.64.0.26"
+TAILSCALE_IP = "100.64.0.3"
+# Dead IPs from previous headscale registrations, still migrated away from.
+LEGACY_IPS = ("100.64.0.26",)
 PROBE_PORTS = (11434, 9292, 8880, 10302)
 DEFAULT_CONFIG = Path.home() / ".config" / "agent-cli" / "config.toml"
 
@@ -78,8 +80,8 @@ def update_config(text: str, target_ip: str) -> str:
         if line.lstrip().startswith("#"):
             lines.append(line)
             continue
-        line = line.replace(HOME_IP, target_ip)
-        line = line.replace(TAILSCALE_IP, target_ip)
+        for ip in (HOME_IP, TAILSCALE_IP, *LEGACY_IPS):
+            line = line.replace(ip, target_ip)
         lines.append(line)
     return "".join(lines)
 
