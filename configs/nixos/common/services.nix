@@ -46,5 +46,24 @@
       ];
       publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBVVgr3VXPWMUMtvTatRBBmnvfMfAhBH9qvNjv0Kl7sD";
     };
+    # Pull replication connects as root@nas with BatchMode=yes, which
+    # hard-fails on unknown host keys, so every source must be pinned here.
+    # Reinstalled host gets new keys — update its entry here.
+    "pc" = {
+      hostNames = [ "pc" "192.168.1.5" ];
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjiKKO6ajlHe5oZa9fGI1v9yLvjvuBH3ZZlYlCIlREt";
+    };
+    "nuc" = {
+      hostNames = [ "nuc" "192.168.1.2" ];
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPRL54JIesy0f1FtG81ABXq/xbNNyUFXTA5qZWNoW097";
+    };
+    "hp" = {
+      hostNames = [ "hp" "192.168.1.3" ];
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM5ZinYz3ul3fbg/+eA95t0dq0yBQw4UxBMyFKUihSTQ";
+    };
+    "pi4" = {
+      hostNames = [ "pi4" "192.168.1.7" ];
+      publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGJO+VhVe+mC9mQa0dyOT6fPmIxkTHeM5X0IdcpF4mGY";
+    };
   };
 }
