@@ -23,9 +23,4 @@
   nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
     "openclaw-2026.6.11"
   ];
-
-  systemd.services.openclaw-gateway.serviceConfig.UnsetEnvironment = [
-    "OPENCLAW_TELEGRAM_BOT_TOKEN"
-    "TELEGRAM_BOT_TOKEN"
-  ];
 }
