@@ -25,3 +25,6 @@ git switch main
 git merge --ff-only origin/main
 git merge --no-ff -S -m "$title (#$pr)" "origin/$branch"
 git push origin main
+
+echo "Merged and pushed. comin fetches within ~1 min; verify with:"
+echo "  comin status   # Fetcher should show the new tip, signed"

@@ -44,8 +44,13 @@
 
     # ZFS delegation is pool state, not config, so reapply it every boot.
     # snapshot/hold/release/destroy cover syncoid's sync snapshots on the
-    # source side; destroy requires mount on Linux. None of this grants any
-    # write access to the datasets' contents.
+    # source side; destroy requires mount on Linux. Honest blast radius:
+    # destroy on zroot means the key holder can delete every dataset on
+    # this machine — ZFS has no snapshot-only destroy grant. That is the
+    # chosen trust direction: a compromised NAS can destroy its sources,
+    # but the NAS already holds every backup, so that compromise was
+    # always fatal. The reverse (source compromise reaching the NAS) is
+    # what this design eliminates.
     systemd.services.zfs-delegate-nas-replication = {
       description = "Delegate zfs send rights on zroot to nas-replication";
       wantedBy = [ "multi-user.target" ];
