@@ -46,12 +46,10 @@
       ];
       publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBVVgr3VXPWMUMtvTatRBBmnvfMfAhBH9qvNjv0Kl7sD";
     };
-    # Sources of the NAS pull replication (PR #75): root@nas connects with
-    # BatchMode=yes, which hard-fails on unknown host keys — the first pull
-    # to each host died exactly that way. Keys read from each host's
-    # /etc/ssh/ssh_host_ed25519_key.pub over authenticated SSH, 2026-07-24.
-    # pc's survives reinstalls by design (host keys ride in the recovery
-    # kit); a reinstalled hp/pi4/nuc must update its entry here.
+    # Pull replication connects as root@nas with BatchMode=yes, which
+    # hard-fails on unknown host keys, so every source must be pinned here.
+    # pc's key survives reinstalls (it rides in the recovery kit); a
+    # reinstalled nuc/hp/pi4 must update its entry.
     "pc" = {
       hostNames = [ "pc" "192.168.1.5" ];
       publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjiKKO6ajlHe5oZa9fGI1v9yLvjvuBH3ZZlYlCIlREt";
