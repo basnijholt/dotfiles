@@ -19,4 +19,5 @@ if [[ $- == *i* ]] && command -v squeue &> /dev/null; then
         squeue -u $USER | grep $1 | awk '{print $1}' | xargs -n 1 scancel
     }
     export TMPDIR=~/.tmp/  # for VScode ssh tmp files
+    mkdir -p "$TMPDIR"     # zellij (and others) panic if TMPDIR does not exist
 fi
