@@ -23,11 +23,21 @@ let
   openclawConfigPath = "${openclawStateDir}/openclaw.json";
   openclawLogPath = "${openclawStateDir}/logs/gateway.log";
   openclawPackage = pkgs.openclaw;
+  openclawNodeCompileCache = "${openclawStateDir}/node-compile-cache";
   openclawRuntimePolicyPatch = pkgs.writeText "openclaw-runtime-policy.json" ''
     {
       "tools": {
         "exec": {
           "host": "gateway"
+        }
+      },
+      "channels": {
+        "telegram": {
+          "webhookUrl": null,
+          "webhookSecret": null,
+          "webhookPath": null,
+          "webhookHost": null,
+          "webhookPort": null
         }
       }
     }
@@ -43,6 +53,9 @@ let
     export OPENCLAW_CONFIG_PATH=${lib.escapeShellArg openclawConfigPath}
     export OPENCLAW_NIX_MODE=0
     export OPENCLAW_STATE_DIR=${lib.escapeShellArg openclawStateDir}
+    export NODE_COMPILE_CACHE=${lib.escapeShellArg openclawNodeCompileCache}
+    export OPENCLAW_NO_RESPAWN=1
+    mkdir -p "$NODE_COMPILE_CACHE"
 
     for env_file in \
       ${lib.escapeShellArg agentRuntimeEnvPath} \
@@ -76,6 +89,7 @@ in
     systemd.tmpfiles.rules = [
       "d ${openclawStateDir} 0750 basnijholt users - -"
       "d ${openclawStateDir}/logs 0750 basnijholt users - -"
+      "d ${openclawNodeCompileCache} 0750 basnijholt users - -"
     ];
 
     systemd.services = {
@@ -89,6 +103,8 @@ in
           OPENCLAW_CONFIG_PATH = openclawConfigPath;
           OPENCLAW_NIX_MODE = "0";
           OPENCLAW_STATE_DIR = openclawStateDir;
+          NODE_COMPILE_CACHE = openclawNodeCompileCache;
+          OPENCLAW_NO_RESPAWN = "1";
         };
         path = with pkgs; [ bash coreutils docker git openssh signal-cli uv ];
         serviceConfig = {
