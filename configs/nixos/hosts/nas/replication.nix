@@ -28,9 +28,17 @@ let
   mkSyncoidArgs = extraArgs: pkgs.lib.escapeShellArgs (syncoidCommon ++ extraArgs);
   mkSyncoidCommonArgs = mkSyncoidArgs [ ];
   mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
-  nucReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
+  unmountedReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
 
   nucReplicationKey = "/etc/ssh/nas-replication-nuc-ed25519";
+
+  # pc is pull-only on purpose: it runs agentic AI all day, so it holds no
+  # NAS credentials. The NAS connects to a dedicated non-root user with
+  # delegated zfs send rights (hosts/pc/replication-source.nix), so even a
+  # fully compromised pc cannot reach this pool or the NAS-side snapshots
+  # protecting its own restic repo.
+  pcReplicationKey = "/etc/ssh/nas-replication-pc-ed25519";
+  pcHost = "192.168.1.5";
   hetznerReplicationKey = "/etc/ssh/nas-replication-hetzner-ed25519";
   hetznerMatrixReplicationKey = "/etc/ssh/nas-replication-hetzner-matrix-ed25519";
 
@@ -70,6 +78,10 @@ let
       label = "hetzner-saas outbound backup key";
       path = hetznerSaasKey;
     }
+    {
+      label = "pc outbound replication key";
+      path = pcReplicationKey;
+    }
   ];
 
   # Syncoid creates its own sync snapshot on every run, so the backup-target
@@ -86,6 +98,15 @@ let
       label = "ssd sanoid autosnaps";
       dataset = "ssd";
       maxAgeHours = 2;
+    }
+    # A replicated autosnap_* check detects a dead sanoid on pc: the pull
+    # job's own sync snapshots keep the mirror freshness checks green even
+    # if pc stops snapshotting. Hourly snaps plus a daily pull put the
+    # newest replicated autosnap at ~26h worst case.
+    {
+      label = "pc replicated autosnaps";
+      dataset = "tank/backups/pc/home";
+      maxAgeHours = 30;
     }
   ];
 
@@ -144,6 +165,24 @@ let
     {
       label = "hetzner-saas var";
       dataset = "tank/backups/hetzner-saas/var";
+      maxAgeHours = 48;
+    }
+    # pc mirrors come from the nas-replicate-pc pull job. Watched per
+    # dataset like hetzner-matrix, so one fresh dataset cannot mask a
+    # stale sibling.
+    {
+      label = "pc home mirror";
+      dataset = "tank/backups/pc/home";
+      maxAgeHours = 48;
+    }
+    {
+      label = "pc var mirror";
+      dataset = "tank/backups/pc/var";
+      maxAgeHours = 48;
+    }
+    {
+      label = "pc root mirror";
+      dataset = "tank/backups/pc/root";
       maxAgeHours = 48;
     }
   ];
@@ -382,7 +421,7 @@ in
       # accumulates every ssd snapshot forever.
       syncoid ${mkSyncoidSsdArgs} \
         --delete-target-snapshots \
-        --recvoptions=${nucReceiveOptions} \
+        --recvoptions=${unmountedReceiveOptions} \
         --sshkey=${nucReplicationKey} \
         --sshport=22 \
         --sshoption=BatchMode=yes \
@@ -554,6 +593,68 @@ in
     wantedBy = [ "timers.target" ];
     timerConfig = {
       OnCalendar = "*-*-* 01:05:00";
+      Persistent = true;
+      RandomizedDelaySec = "15m";
+    };
+  };
+
+  systemd.services.nas-replicate-pc = {
+    description = "Pull pc zroot datasets over SSH";
+    restartIfChanged = false;
+    wants = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    after = [
+      "network-online.target"
+      "zfs.target"
+    ];
+    unitConfig = {
+      ConditionPathExists = pcReplicationKey;
+      OnFailure = [ "nas-health-alert@%n.service" ];
+    };
+    path = replicationPath;
+    script = ''
+      set -euo pipefail
+
+      zfs list tank/backups/pc >/dev/null
+
+      # home, var and root are the restore set; zroot/nix is rebuildable.
+      # incus joins automatically once pc grows a zroot/incus dataset (the
+      # planned move of its local mindroom container).
+      # --no-privilege-elevation: the remote user is non-root on purpose
+      # and must never attempt sudo; its zfs rights are delegated.
+      # --delete-target-snapshots keeps the mirror matched to the source's
+      # retention, like every other mirror here.
+      datasets="home var root"
+      if ssh -i ${pcReplicationKey} -o BatchMode=yes -o ConnectTimeout=10 \
+          nas-replication@${pcHost} zfs list zroot/incus >/dev/null 2>&1; then
+        datasets="$datasets incus"
+      fi
+
+      for dataset in $datasets; do
+        syncoid ${mkSyncoidCommonArgs} \
+          --no-privilege-elevation \
+          --delete-target-snapshots \
+          --recvoptions=${unmountedReceiveOptions} \
+          --sshkey=${pcReplicationKey} \
+          --sshport=22 \
+          --sshoption=BatchMode=yes \
+          --sshoption=ConnectTimeout=10 \
+          nas-replication@${pcHost}:zroot/"$dataset" tank/backups/pc/"$dataset"
+      done
+    '';
+    serviceConfig = {
+      Type = "oneshot";
+      User = "root";
+      TimeoutStartSec = "infinity";
+    };
+  };
+
+  systemd.timers.nas-replicate-pc = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "*-*-* 01:15:00";
       Persistent = true;
       RandomizedDelaySec = "15m";
     };
