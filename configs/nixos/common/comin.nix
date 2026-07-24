@@ -62,14 +62,20 @@ let
     if [ -d "$repo" ] && [ -x "$comin_bin" ]; then
       tip="$(${pkgs.git}/bin/git -C "$repo" rev-parse origin/main 2>/dev/null || true)"
       tip_epoch="$(${pkgs.git}/bin/git -C "$repo" log -1 --format=%ct origin/main 2>/dev/null || true)"
-      if [ -n "$tip" ] && [ -n "$tip_epoch" ]; then
-        tip_age_hours=$(( ($(${pkgs.coreutils}/bin/date +%s) - tip_epoch) / 3600 ))
-        if [ "$tip_age_hours" -gt "$lag_max_hours" ]; then
-          known="$("$comin_bin" status 2>/dev/null | ${pkgs.gnugrep}/bin/grep -oE 'Commit (ID )?[0-9a-f]{7,}' | ${pkgs.gawk}/bin/awk '{ print $NF }' || true)"
-          if ! printf '%s\n' "$known" | ${pkgs.gnugrep}/bin/grep -qx "$tip"; then
-            echo "comin lag: origin/main tip $tip is ''${tip_age_hours}h old but was never verified, built, or deployed"
-            exit 1
-          fi
+      if [ -z "$tip" ] || [ -z "$tip_epoch" ]; then
+        # An existing clone whose origin/main cannot be read is itself a
+        # wedge (corrupt packs made signature verification fail for weeks
+        # on one host); recovery: stop comin, remove the repository
+        # directory, start comin — it re-clones.
+        echo "comin clone at $repo exists but origin/main is unreadable"
+        exit 1
+      fi
+      tip_age_hours=$(( ($(${pkgs.coreutils}/bin/date +%s) - tip_epoch) / 3600 ))
+      if [ "$tip_age_hours" -gt "$lag_max_hours" ]; then
+        known="$("$comin_bin" status 2>/dev/null | ${pkgs.gnugrep}/bin/grep -oE 'Commit (ID )?[0-9a-f]{7,}' | ${pkgs.gawk}/bin/awk '{ print $NF }' || true)"
+        if ! printf '%s\n' "$known" | ${pkgs.gnugrep}/bin/grep -qx "$tip"; then
+          echo "comin lag: origin/main tip $tip is ''${tip_age_hours}h old but was never verified, built, or deployed"
+          exit 1
         fi
       fi
     fi
