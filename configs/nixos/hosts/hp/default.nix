@@ -38,6 +38,6 @@
   services.sanoid.datasets.zroot = {
     daily = 5;
     weekly = 2;
-    monthly = 2;
+    monthly = 1;
   };
 }
