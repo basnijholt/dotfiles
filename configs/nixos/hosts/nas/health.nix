@@ -174,7 +174,10 @@ in
     ZED_EMAIL_PROG = "${nasHealthAlert}/bin/nas-health-alert";
     ZED_EMAIL_OPTS = "-s '@SUBJECT@' @ADDRESS@";
     ZED_NOTIFY_INTERVAL_SECS = 3600;
-    ZED_NOTIFY_VERBOSE = true;
+    # Verbose makes zed notify on every clean scrub/resilver finish; off means
+    # scrub_finish only alerts when the pool has errors. Faults, state changes,
+    # and checksum/data errors alert regardless of this setting.
+    ZED_NOTIFY_VERBOSE = false;
   };
 
   services.netdata = {
