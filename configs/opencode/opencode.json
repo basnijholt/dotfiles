@@ -11,6 +11,10 @@
         "apiKey": "sk-dummy"
       },
       "models": {
+        "claude-opus-5": {
+          "name": "Claude Opus 5 (LiteLLM)",
+          "limit": { "context": 200000, "output": 32000 }
+        },
         "claude-fable-5": {
           "name": "Claude Fable 5 (LiteLLM)",
           "limit": { "context": 200000, "output": 32000 }
@@ -173,5 +177,5 @@
       }
     }
   },
-  "model": "litellm/claude-fable-5"
+  "model": "litellm/claude-opus-5"
 }

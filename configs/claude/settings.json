@@ -2,12 +2,12 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "includeCoAuthoredBy": false,
   "attribution": {
     "commit": "",
     "pr": ""
   },
-  "model": "claude-fable-5",
+  "includeCoAuthoredBy": false,
+  "model": "claude-opus-5[1m]",
   "hooks": {
     "PreToolUse": [
       {
