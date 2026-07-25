@@ -31,4 +31,13 @@
     autoprune = false;
     recursive = true;
   };
+
+  # Small pool: long-lived snapshots pin churn the disk can't afford. Keep
+  # short-term rollback, cut the long tail; the NAS mirror holds deep history.
+  # Dataset-level values override the zfs-default template.
+  services.sanoid.datasets.zroot = {
+    daily = 5;
+    weekly = 2;
+    monthly = 2;
+  };
 }
