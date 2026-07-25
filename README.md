@@ -189,7 +189,6 @@ This will give you an interactive Zsh session within an Ubuntu container, config
 │   ├── gemini                       # Gemini settings
 │   ├── git                          # Git configuration
 │   ├── hypr                         # Hyprland window manager config
-│   ├── hyprpanel                    # Hyprpanel configuration
 │   ├── iterm                        # iTerm2 profiles
 │   ├── karabiner                    # Keyboard customization for macOS
 │   ├── keyboard-maestro             # Keyboard Maestro macros and configurations

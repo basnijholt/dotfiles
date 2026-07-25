@@ -22,7 +22,7 @@ let
   hyprlandEssentials = with pkgs; [
     polkit_gnome
     waybar
-    hyprpanel
+    wayle
     wofi
     mako
     awww

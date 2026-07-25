@@ -14,7 +14,6 @@ configs/agent-cli/config.toml
 configs/atuin/zfs
 configs/git/gitconfig-personal
 configs/hypr
-configs/hyprpanel
 configs/karabiner
 configs/keyboard-maestro
 configs/mako
