@@ -36,6 +36,13 @@
   local.wakeOnLan.interface = "enp5s0";
   local.zfsReplicationSource.nasPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFf8RpaZe1lGYuLI9ASLGLd6zNlkhIlRXK8hpuXiq+Os nas-replication-pc";
 
+  # Incus manages its own snapshots; keep sanoid away from its datasets.
+  services.sanoid.datasets."zroot/incus" = {
+    autosnap = false;
+    autoprune = false;
+    recursive = true;
+  };
+
   # Required for DDC/CI tools such as ddcutil to read monitor state (e.g. the
   # active input source) for manual diagnostics. Display automation no longer
   # depends on it; Sunshine drives dummy-output switching via sunshine-mode.sh.
