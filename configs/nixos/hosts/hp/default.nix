@@ -25,13 +25,6 @@
 
   local.zfsReplicationSource.nasPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINLaIVBmPIbB7Ot1V2bYKMnoLKj9Ga5LeMBafLzPfg7L nas-replication-hp";
 
-  # Incus manages its own snapshots; keep sanoid away from its datasets.
-  services.sanoid.datasets."zroot/incus" = {
-    autosnap = false;
-    autoprune = false;
-    recursive = true;
-  };
-
   # Small pool: long-lived snapshots pin churn the disk can't afford. Keep
   # short-term rollback, cut the long tail; the NAS mirror holds deep history.
   # Dataset-level values override the zfs-default template.
