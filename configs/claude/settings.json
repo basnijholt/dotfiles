@@ -7,10 +7,13 @@
     "pr": ""
   },
   "includeCoAuthoredBy": false,
-  "model": "claude-opus-5[1m]",
   "permissions": {
-    "deny": ["Skill(claude-api)"]
+    "deny": [
+      "Skill(claude-api)"
+    ]
   },
+  "model": "opus[1m]",
+  "outputStyle": "caveman",
   "hooks": {
     "PreToolUse": [
       {
@@ -19,6 +22,16 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/block-git-rewrites.py"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"suppressOutput\":true,\"hookSpecificOutput\":{\"hookEventName\":\"UserPromptSubmit\",\"additionalContext\":\"STYLE REMINDER (~/.claude/CLAUDE.md, caveman mode is ON): be terse. Drop articles, filler, hedging, pleasantries. Fragments fine. Keep every bit of technical substance; exact terms, code, errors verbatim. Emoji/bold/tables only when they carry signal. No self-reference, never name the style. Write normally only for: security warnings, irreversible-action confirmations, multi-step sequences where fragment order risks misreading, or where compression creates ambiguity.\"}}'"
           }
         ]
       }
@@ -32,9 +45,10 @@
   "enabledPlugins": {
     "rust-analyzer-lsp@claude-plugins-official": true,
     "claude-code-wakatime@wakatime": true,
-    "agent-cli-dev@agent-cli": true
+    "agent-cli-dev@agent-cli": true,
+    "swift-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": false,
   "effortLevel": "xhigh",
   "fastMode": true,
   "autoUpdatesChannel": "stable",

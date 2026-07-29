@@ -9,6 +9,7 @@
     ~/.bashrc: configs/bash/bashrc
     ~/.claude/CLAUDE.md: configs/claude/CLAUDE.md
     ~/.claude/hooks: configs/claude/hooks
+    ~/.claude/output-styles: configs/claude/output-styles
     ~/.claude/settings.json: configs/claude/settings.json
     ~/.claude/statusline.py: configs/claude/statusline.py
     ~/.condarc: configs/conda/condarc
