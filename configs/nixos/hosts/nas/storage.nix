@@ -69,7 +69,10 @@ in
       "ssd"
       "tank"
     ];
-    interval = "Sun *-*-* 00:00:00";
+    # Monthly, not weekly: a tank scrub takes ~2d7h, so a weekly schedule kept
+    # the array under full seek load roughly a third of the time and pushed
+    # drive temps from ~51C to 60C, the Ultrastar spec ceiling.
+    interval = "*-*-01 03:00:00";
   };
 
   services.sanoid = {

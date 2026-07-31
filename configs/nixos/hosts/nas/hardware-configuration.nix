@@ -25,6 +25,9 @@
   boot.kernelModules = [
     "i915"
     "kvm-intel"
+    # Exposes SATA drive temperatures as hwmon sensors, readable without
+    # waking a spun-down disk the way a smartctl poll does.
+    "drivetemp"
   ];
   boot.extraModulePackages = [ ];
 
