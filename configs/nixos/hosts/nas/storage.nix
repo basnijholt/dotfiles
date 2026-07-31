@@ -158,6 +158,10 @@ in
   systemd.services.sanoid.unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
 
   environment.systemPackages = with pkgs; [
+    # Read-only surface scans of a failing member: unlike smartctl -t long,
+    # which stops at the first uncorrectable sector, ddrescue maps every bad
+    # extent in one pass and keeps a resumable mapfile.
+    ddrescue
     hdparm
     lzop
     mbuffer
