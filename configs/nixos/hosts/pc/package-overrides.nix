@@ -13,8 +13,8 @@
         ollamaLlamaCppSrc = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b9840";
-          hash = "sha256-SlcBqlUSeXgGltk7fz1blp4DobypzkT8cw8a7dkVGiU=";
+          tag = "b10091";
+          hash = "sha256-ZHQ9hBnE9GayZRt0jgO4svzaAUfhRUg6cFu5dSe8J1w=";
         };
       in
       {
@@ -22,14 +22,14 @@
         # Only build for RTX 3090 (sm_86) instead of all 7 default architectures
         cudaArches = [ "sm_86" ];
       }).overrideAttrs (oldAttrs: rec {
-        version = "0.31.1";
+        version = "0.32.5";
         src = pkgs.fetchFromGitHub {
           owner = "ollama";
           repo = "ollama";
           rev = "v${version}";
-          hash = "sha256-p4saQimdOVRWcJyrYcCuex7NViKC/u0tHUnLRZh6hwg=";
+          hash = "sha256-SqxFMKTGu5e6FdB5abuYez8Aejf7JY7C6e6GuOMYd4w=";
         };
-        vendorHash = "sha256-lZdGzGb9xRjTm1Rm7/wHjqM490gLznLEndmb4mNbCX0=";
+        vendorHash = "sha256-HMwoaFBMbpoy8f0I+O+i7kIa9BslLu3FcVWeaIOkpvs=";
         nativeBuildInputs = (oldAttrs.nativeBuildInputs or []) ++ [ pkgs.patchelf ];
         excludedPackages = (oldAttrs.excludedPackages or []) ++ [ "./integration" ];
         postPatch = ''
@@ -91,12 +91,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "9892";
+            version = "10199";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-De04DT1GG69Vo39s3w75PhIhOGpCEwr5xsMlXzSPjzc=";
+              hash = "sha256-MCNII4uCNIyyHF6S36Yp/tN/GysQaTn8I61a+5PTj2g=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -104,7 +104,7 @@
               '';
             };
             npmRoot = "tools/ui";
-            npmDepsHash = "sha256-X1DZgmhS/zHTqDT5zq0kywwntthcJ9vRXeqyO3zz6UU=";
+            npmDepsHash = "sha256-B7uEynAG70a3xauBKc20RuFa9cnWaWzVBCh+LPLBnIM=";
             # Enable native CPU optimizations for massively better CPU performance
             # This enables AVX, AVX2, AVX-512, FMA, etc. for your specific CPU
             # NOTE: This is intentionally opposite of nixpkgs (which uses -DGGML_NATIVE=off
@@ -129,8 +129,8 @@
         mkdir -p $out/bin
         tar -xzf ${
           pkgs.fetchurl {
-            url = "https://github.com/mostlygeek/llama-swap/releases/download/v235/llama-swap_235_linux_amd64.tar.gz";
-            hash = "sha256-5dv0CH7Q9B6DIYcT8gzIr9UF2F+eSfdQ/vw4STx0T7M=";
+            url = "https://github.com/mostlygeek/llama-swap/releases/download/v244/llama-swap_244_linux_amd64.tar.gz";
+            hash = "sha256-0qUshAc1fKRjHduXZMjEkoAED9T59OEw8mbS0NNTuW8=";
           }
         } -C $out/bin
         chmod +x $out/bin/llama-swap
