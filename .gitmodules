@@ -1,9 +1,6 @@
 [submodule "submodules/rsync-time-backup"]
 	path = submodules/rsync-time-backup
 	url = git@github.com:basnijholt/backups.git
-[submodule "secrets"]
-	path = secrets
-	url = git@github.com:basnijholt/dotfiles-secrets.git
 [submodule "submodules/dotbot"]
 	path = submodules/dotbot
 	url = https://github.com/anishathalye/dotbot

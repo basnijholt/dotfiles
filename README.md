@@ -78,7 +78,7 @@ ssh-add -l >/dev/null 2>&1 || ssh-add ~/.ssh/id_ed25519
 ### Install the Public Branch
 
 If you’re not me and just want a clean version without private bits, use the always-up-to-date [`public` branch](https://github.com/basnijholt/dotfiles/tree/public).
-CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.publicignore), like the `secrets` submodule, personal machine configs, etc.
+CI rebuilds it from `main` and removes anything listed in [`.publicignore`](./.publicignore), like the private secrets sync script, personal machine configs, etc.
 
 ```bash
 # Clone the sanitized branch with submodules (shallow)
@@ -127,12 +127,12 @@ export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agen
 </details>
 
 ```bash
-# Clone the repository with submodules
+# Clone the repository with public submodules
 git lfs install
 git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
 cd dotfiles
 
-# Run the installation script
+# Run the installer. Approved hosts also clone/update dotfiles-secrets.
 ./install
 ```
 
@@ -517,19 +517,14 @@ The repository includes scripts to easily sync your dotfiles to remote machines:
 
 Sensitive information is stored in a separate private repository with additional encryption using GPG and [git-secret](https://github.com/sobolevn/git-secret). The structure is as follows:
 
-```
-secrets/             # Private git submodule
-└── install          # Installation script for secrets
-```
-
-This submodule requires SSH authentication to access, which is why setting up SSH keys as described in the prerequisites is essential.
+On approved hostnames, `scripts/sync-secrets.sh` clones the private repository into `secrets/` or fast-forwards its existing `main` checkout, then Dotbot runs `secrets/install`. Other hosts skip it without contacting the private repository. GitHub SSH authentication and the appropriate GPG key are still required.
 
 ## 🔍 Customization
 
 Pick one path:
 
 - Recommended (most users): start from the sanitized [`public` branch](https://github.com/basnijholt/dotfiles/tree/public) — see “Install the Public Branch” above. It excludes private bits via [`.publicignore`](.publicignore) and the installer is auto-patched accordingly.
-- Advanced (maintainers/power users): start from `main` if you need the full repo and plan to manage your own secrets.
+- Advanced (maintainers/power users): start from `main`. Its installer only fetches the private secrets repository on explicitly approved hostnames.
 
 Steps common to both:
 - Update your details in `configs/git/gitconfig-personal` (copy from `gitconfig-personal.example`).
@@ -541,11 +536,6 @@ Details: starting from `main` (advanced)
 # Clone with submodules
 git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-
-# Remove the private secrets submodule (you won't have access)
-git submodule deinit -f secrets || true
-git rm -f secrets || true
-git config -f .gitmodules --remove-section submodule.secrets || true
 
 # Personalize Git (edit the file afterward)
 cp configs/git/gitconfig-personal.example configs/git/gitconfig-personal
