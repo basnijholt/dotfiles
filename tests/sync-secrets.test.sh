@@ -28,7 +28,12 @@ create_secrets_remote() {
   git -C "$source_repo" config user.name Test
   git -C "$source_repo" config user.email test@example.com
   printf 'one\n' > "$source_repo/version"
-  git -C "$source_repo" add version
+  cat > "$source_repo/install" <<'EOF'
+#!/usr/bin/env bash
+touch "$(dirname "$0")/.installed"
+EOF
+  chmod +x "$source_repo/install"
+  git -C "$source_repo" add version install
   git -C "$source_repo" commit -qm initial
   git clone -q --bare "$source_repo" "$bare_repo" >&2
   printf '%s\n' "$bare_repo"
@@ -50,6 +55,21 @@ EOF
   [[ ! -e "$home/dotfiles/secrets" ]] || fail "unapproved host created secrets checkout"
 }
 
+test_unapproved_host_does_not_run_retained_installer() {
+  local home="$TEST_ROOT/unapproved-retained"
+  stub_hostname "$home/bin" "other-host"
+  mkdir -p "$home/dotfiles/secrets"
+  cat > "$home/dotfiles/secrets/install" <<EOF
+#!/usr/bin/env bash
+touch "$home/installer-ran"
+EOF
+  chmod +x "$home/dotfiles/secrets/install"
+
+  PATH="$home/bin:$PATH" DOTFILES_ROOT="$home/dotfiles" "$SYNC_SCRIPT"
+
+  [[ ! -e "$home/installer-ran" ]] || fail "unapproved host ran retained secrets installer"
+}
+
 test_approved_host_clones_main() {
   local remote home
   remote="$(create_secrets_remote clone)"
@@ -62,6 +82,7 @@ test_approved_host_clones_main() {
 
   [[ "$(cat "$home/dotfiles/secrets/version")" == "one" ]] || fail "main was not cloned"
   [[ "$(git -C "$home/dotfiles/secrets" branch --show-current)" == "main" ]] || fail "checkout is not on main"
+  [[ -e "$home/dotfiles/secrets/.installed" ]] || fail "cloned secrets were not installed"
 }
 
 test_existing_checkout_fast_forwards_to_latest_main() {
@@ -99,6 +120,7 @@ test_plain_directory_inside_git_repo_is_rejected() {
 }
 
 test_unapproved_host_skips_without_git_contact
+test_unapproved_host_does_not_run_retained_installer
 test_approved_host_clones_main
 test_existing_checkout_fast_forwards_to_latest_main
 test_plain_directory_inside_git_repo_is_rejected

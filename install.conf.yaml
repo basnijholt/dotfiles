@@ -72,7 +72,7 @@
   - bash scripts/sync-uv.sh
   - bash scripts/sync-bun.sh
   - bash scripts/install-nano-syntax.sh
-  - command: 'bash scripts/sync-secrets.sh && { [ ! -f ./secrets/install ] || (echo "SECRETS" && ./secrets/install); }'
+  - command: bash scripts/sync-secrets.sh
     stdout: true
   - git submodule update --init --recursive
 

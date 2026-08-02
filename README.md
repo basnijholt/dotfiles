@@ -517,7 +517,7 @@ The repository includes scripts to easily sync your dotfiles to remote machines:
 
 Sensitive information is stored in a separate private repository with additional encryption using GPG and [git-secret](https://github.com/sobolevn/git-secret). The structure is as follows:
 
-On approved hostnames, `scripts/sync-secrets.sh` clones the private repository into `secrets/` or fast-forwards its existing `main` checkout, then Dotbot runs `secrets/install`. Other hosts skip it without contacting the private repository. GitHub SSH authentication and the appropriate GPG key are still required.
+On approved hostnames, `scripts/sync-secrets.sh` clones the private repository into `secrets/` or fast-forwards its existing `main` checkout, then runs `secrets/install`. Other hosts skip it without contacting the private repository or running a retained installer. GitHub SSH authentication and the appropriate GPG key are still required.
 
 ## 🔍 Customization
 
