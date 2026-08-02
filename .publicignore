@@ -4,8 +4,9 @@
 # Paths are repo-root relative; exact matches only (no globs).
 ###############################################
 
-# Private submodule with secrets
+# Private secrets checkout and its host-gated sync script
 secrets
+scripts/sync-secrets.sh
 
 .cursorignore
 .github
