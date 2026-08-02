@@ -3,7 +3,7 @@
 Generic NixOS configuration for a private Google Compute Engine workstation.
 Cloud resources remain outside this public repository.
 
-The VM must initially run x86_64 Ubuntu, allow passwordless sudo for the configured SSH user, expose SSH through IAP, and attach a blank persistent disk with device name `agent-work`.
+The VM must initially run x86_64 Ubuntu, allow passwordless sudo for the configured SSH user, expose SSH through IAP, use boot-disk device name `agent-boot`, and attach a blank persistent disk with device name `agent-work`.
 
 Install NixOS:
 

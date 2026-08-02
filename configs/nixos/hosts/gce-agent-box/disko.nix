@@ -5,7 +5,7 @@
   # never appear here: agent-work-disk initializes it interactively as LUKS2.
   disko.devices.disk.main = {
     type = "disk";
-    device = "/dev/sda";
+    device = "/dev/disk/by-id/google-agent-boot";
     content = {
       type = "gpt";
       partitions = {
