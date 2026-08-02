@@ -95,4 +95,10 @@ in
   # its passphrase. The helper creates and owns this otherwise-empty directory.
   systemd.tmpfiles.rules = [ "d ${mountPoint} 0700 basnijholt users - -" ];
 
+  # The first Home Manager activation clones the public dotfiles repository.
+  systemd.services.home-manager-basnijholt = {
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+  };
+
 }
