@@ -1,7 +1,7 @@
 { lib, pkgs, ... }:
 
 let
-  workDevice = "/dev/disk/by-id/google-agent-work";
+  workDevice = "/dev/disk/by-id/scsi-0Google_PersistentDisk_agent-work";
   mapperName = "agent-work";
   mapperDevice = "/dev/mapper/${mapperName}";
   mountPoint = "/work";

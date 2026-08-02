@@ -7,7 +7,9 @@
   # google-compute-config's legacy singular device and disko both add a target.
   # Keep one canonical GRUB target so mirroredBoots contains no duplicate.
   boot.loader.grub.device = lib.mkForce "";
-  boot.loader.grub.devices = lib.mkForce [ "/dev/disk/by-id/google-agent-boot" ];
+  boot.loader.grub.devices = lib.mkForce [
+    "/dev/disk/by-id/scsi-0Google_PersistentDisk_agent-boot"
+  ];
 
   # Disko mounts by stable GPT partition label; override the image module's
   # filesystem-label assumption used only for prebuilt GCE images.
