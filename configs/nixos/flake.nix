@@ -172,6 +172,14 @@
           ./hosts/dev-vm/hardware-configuration.nix
         ];
 
+        # Private GCE workstation for running coding-agent workloads.
+        gce-agent-box = mkHost [
+          disko.nixosModules.disko
+          ./hosts/gce-agent-box/disko.nix
+          ./hosts/gce-agent-box/default.nix
+          ./hosts/gce-agent-box/hardware-configuration.nix
+        ];
+
         # Lightweight development LXC container for Incus
         dev-lxc = mkHost [
           ./hosts/dev-lxc/default.nix
