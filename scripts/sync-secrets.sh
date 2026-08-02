@@ -5,7 +5,7 @@ set -euo pipefail
 DOTFILES_ROOT="${DOTFILES_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SECRETS_DIR="$DOTFILES_ROOT/secrets"
 SECRETS_REPO_URL="${SECRETS_REPO_URL:-git@github.com:basnijholt/dotfiles-secrets.git}"
-HOSTNAME="${SYNC_SECRETS_HOSTNAME:-$(hostname -s)}"
+HOSTNAME="$(hostname -s)"
 
 case "$HOSTNAME" in
   basnijholt-macbook-pro-2|basnijholt-macbook-pro|pc)
@@ -22,7 +22,8 @@ if [[ ! -e "$SECRETS_DIR" ]]; then
   exit 0
 fi
 
-if ! git -C "$SECRETS_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+if [[ ! -e "$SECRETS_DIR/.git" ]] \
+    || ! git -C "$SECRETS_DIR" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo "Secrets path is not a Git checkout: $SECRETS_DIR" >&2
   exit 1
 fi
