@@ -21,12 +21,6 @@
     "uas"             # USB Attached SCSI
   ];
 
-  # Wait for USB devices to enumerate before ZFS import
-  boot.initrd.postDeviceCommands = lib.mkBefore ''
-    echo "Waiting for USB devices to settle..."
-    sleep 3
-  '';
-
   # Kernel params for ZFS boot
   boot.kernelParams = [
     "zfs_force=1"           # Force ZFS import regardless of hostid

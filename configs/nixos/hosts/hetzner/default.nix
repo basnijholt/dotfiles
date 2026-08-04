@@ -75,7 +75,6 @@
 
   # Required for ZFS
   networking.hostId = "027a1bbc";
-  # ZFS 2.4.0 pin is in hardware-configuration.nix
 
   # Enable Tailscale for Headscale connection (manually configured)
   services.tailscale.enable = lib.mkForce true;

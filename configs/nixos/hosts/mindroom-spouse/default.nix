@@ -25,7 +25,7 @@ in
   environment.systemPackages = [ pkgs.signal-cli ];
 
   nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
-    "openclaw-2026.6.11"
+    "openclaw-2026.6.33"
   ];
 
   age.secrets.spouse-dawarich-env = {
