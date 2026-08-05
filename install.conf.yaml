@@ -86,6 +86,15 @@
     ~/.config/hypr: configs/hypr
     ~/.config/mako/config: configs/mako/config
 
+# -- Only when compose-farm stacks are present --
+- defaults:
+    link:
+      create: true
+      relink: true
+      if: '[ -e /opt/stacks/compose-farm.yaml ]'
+- link:
+    ~/.config/compose-farm/compose-farm.yaml: /opt/stacks/compose-farm.yaml
+
 # -- Only on PC --
 - defaults:
     link:
