@@ -19,5 +19,9 @@ common_subcommands = [
 [theme]
 name = "autumn"
 
+[daemon]
+enabled = true
+autostart = true
+
 [ai]
 enabled = false

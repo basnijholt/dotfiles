@@ -339,7 +339,6 @@ scripts
 ├── remove-box.py                 # Strip box-drawing characters from copied code snippets
 ├── rsync-time-machine.sh         # Create incremental Time Machine-like backups using rsync
 ├── run.sh                        # Run a command from .dotbins platform bin directory
-├── setup-atuin-daemon.sh         # Setup Atuin as a user systemd service
 ├── signature.html
 ├── sync-dotfiles.sh              # Push updater to hosts and trigger sync/install
 ├── sync-local-dotfiles.sh        # On a host: pull latest and optionally run ./install

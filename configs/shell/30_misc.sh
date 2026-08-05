@@ -5,16 +5,17 @@ if [ -f "/opt/homebrew/bin/brew" ]; then
    eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# -- Atuin daemon management
-# On ZFS filesystems, we need to use Atuin's daemon mode to avoid the SQLite/ZFS 
-# performance bug (https://github.com/atuinsh/atuin/issues/952).
-# If the Atuin daemon process is running, we point to a ZFS-specific
-# config that has daemon=true enabled. This ensures that all Atuin commands
-# communicate with the running daemon rather than attempting direct database access.
-# The setup-atuin-daemon.sh script should be run on ZFS systems to create and 
-# start the systemd service for the daemon.
-if pgrep -f "atuin daemon" > /dev/null; then
-  export ATUIN_CONFIG_DIR="$HOME/.config/atuin/zfs"
+# Clear the config override inherited from the retired ZFS daemon setup.
+if [ "${ATUIN_CONFIG_DIR:-}" = "$HOME/.config/atuin/zfs" ]; then
+  unset ATUIN_CONFIG_DIR
+fi
+
+# Prefer NixOS's Atuin so the shell client and its daemon use the same package.
+# Dotbins remains the provider on non-NixOS machines.
+if [ -x /run/current-system/sw/bin/atuin ]; then
+  atuin() {
+    /run/current-system/sw/bin/atuin "$@"
+  }
 fi
 
 # -- Dotbins
