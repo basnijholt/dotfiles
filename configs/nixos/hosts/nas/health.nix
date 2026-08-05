@@ -97,7 +97,7 @@ let
   b2BackupWatchdog = pkgs.writeShellScript "nas-b2-backup-watchdog" ''
     set -euo pipefail
 
-    container="nixos"
+    container="docker"
     unit="rclone-b2-backup.service"
     success_stamp="/var/lib/rclone-b2-backup/last-success-epoch"
     max_age_hours=36
