@@ -40,6 +40,11 @@
 
   systemd.services.nuc-backup-zfs-policy = {
     description = "Keep replicated NAS backup datasets from auto-mounting";
+    unitConfig.DefaultDependencies = false;
+    after = [
+      "systemd-modules-load.service"
+      "zfs-import.target"
+    ];
     before = [ "zfs-mount.service" ];
     wantedBy = [ "zfs-mount.service" ];
     path = with pkgs; [
