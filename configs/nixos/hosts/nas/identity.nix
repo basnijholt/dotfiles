@@ -1,10 +1,10 @@
-# UID/GID mapping copied from the current NAS so existing dataset ownership
-# keeps resolving to the same names after migration.
+# UID/GID mapping copied from the current NAS.  The primary user deliberately
+# uses UID 1000 and the standard users group (GID 100), matching other hosts
+# and the Docker LXC.
 { lib, pkgs, ... }:
 
 {
   users.groups = {
-    basnijholt.gid = 3000;
     docker.gid = lib.mkForce 999;
     marcella.gid = 3001;
     restic.gid = 3003;
@@ -14,21 +14,11 @@
 
   users.users = {
     basnijholt = {
-      isNormalUser = lib.mkForce false;
-      isSystemUser = true;
-      uid = 501;
-      group = "basnijholt";
+      uid = 1000;
+      group = "users";
       extraGroups = [ "timemachine" ];
       home = "/home/basnijholt";
       createHome = true;
-    };
-
-    docker = {
-      isSystemUser = true;
-      uid = 1000;
-      group = "docker";
-      home = "/var/empty";
-      shell = "${pkgs.shadow}/bin/nologin";
     };
 
     marcella = {
