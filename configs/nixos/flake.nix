@@ -172,20 +172,12 @@
           ./hosts/dev-vm/hardware-configuration.nix
         ];
 
-        # Private GCE workstation for running coding-agent workloads.
-        gce-agent-box = mkHost [
+        # Private Arm cloud workstation for running coding-agent workloads.
+        gce-vm = mkHostArm [
           disko.nixosModules.disko
-          ./hosts/gce-agent-box/disko.nix
-          ./hosts/gce-agent-box/default.nix
-          ./hosts/gce-agent-box/hardware-configuration.nix
-        ];
-
-        # Arm variant of the same workstation; only boot layout and platform differ.
-        gce-agent-box-arm = mkHostArm [
-          disko.nixosModules.disko
-          ./hosts/gce-agent-box-arm/disko.nix
-          ./hosts/gce-agent-box-arm/hardware-configuration.nix
-          ./hosts/gce-agent-box/default.nix
+          ./hosts/gce-vm/disko.nix
+          ./hosts/gce-vm/default.nix
+          ./hosts/gce-vm/hardware-configuration.nix
         ];
 
         # Lightweight development LXC container for Incus

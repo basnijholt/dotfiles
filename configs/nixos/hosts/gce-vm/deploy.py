@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install and operate a NixOS coding-agent box through GCP IAP."""
+"""Install and operate a NixOS coding-agent VM through GCP IAP."""
 
 from __future__ import annotations
 
@@ -8,10 +8,10 @@ import shlex
 import subprocess
 from pathlib import Path
 
-DEFAULT_ZONE = "us-east1-c"
-DEFAULT_INSTANCE = "agent-box"
+DEFAULT_ZONE = "us-east1-b"
+DEFAULT_INSTANCE = "gce-vm"
 # Resolved over the network, so local edits need pushing first.
-FLAKE_REF = "github:basnijholt/dotfiles?dir=configs/nixos#gce-agent-box"
+FLAKE_REF = "github:basnijholt/dotfiles?dir=configs/nixos#gce-vm"
 
 
 def run(
