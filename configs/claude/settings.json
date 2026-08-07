@@ -12,8 +12,7 @@
       "Skill(claude-api)"
     ]
   },
-  "model": "claude-opus-5[1m]",
-  "outputStyle": "caveman",
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -49,10 +48,11 @@
     "swift-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
   },
+  "outputStyle": "caveman",
   "effortLevel": "xhigh",
-  "fastMode": true,
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.41",
   "skipDangerousModePermissionPrompt": true,
-  "switchModelsOnFlag": false
+  "switchModelsOnFlag": false,
+  "fastMode": true
 }
