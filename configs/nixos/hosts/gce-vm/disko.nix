@@ -2,10 +2,11 @@
 
 {
   # Arm variant: UEFI only, so an ESP replaces the BIOS boot partition.
-  # google-* aliases resolve for both SCSI and NVMe attachments.
+  # The google-* aliases come from guest udev rules absent in the installer,
+  # so this uses the raw node. The boot disk is always the first namespace.
   disko.devices.disk.main = {
     type = "disk";
-    device = "/dev/disk/by-id/google-agent-boot";
+    device = "/dev/nvme0n1";
     content = {
       type = "gpt";
       partitions = {
