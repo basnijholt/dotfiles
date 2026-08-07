@@ -10,6 +10,7 @@ from pathlib import Path
 
 DEFAULT_ZONE = "us-east1-c"
 DEFAULT_INSTANCE = "agent-box"
+# Resolved over the network, so local edits need pushing first.
 FLAKE_REF = "github:basnijholt/dotfiles?dir=configs/nixos#gce-agent-box"
 
 
@@ -33,6 +34,8 @@ def nixos_anywhere_command(
     instance: str,
     ssh_user: str,
     identity_file: Path,
+    flake: str,
+    build_on_remote: bool,
 ) -> list[str]:
     return [
         "nix",
@@ -40,7 +43,8 @@ def nixos_anywhere_command(
         "github:nix-community/nixos-anywhere",
         "--",
         "--flake",
-        FLAKE_REF,
+        flake,
+        *(["--build-on-remote"] if build_on_remote else []),
         "--target-host",
         f"{ssh_user}@{instance}",
         "--ssh-option",
@@ -104,6 +108,8 @@ def deploy(
     instance: str,
     ssh_user: str,
     identity_file: Path,
+    flake: str,
+    build_on_remote: bool,
 ) -> None:
     if not identity_file.exists():
         raise FileNotFoundError(f"SSH identity file does not exist: {identity_file}")
@@ -114,6 +120,8 @@ def deploy(
             instance=instance,
             ssh_user=ssh_user,
             identity_file=identity_file,
+            flake=flake,
+            build_on_remote=build_on_remote,
         )
     )
 
@@ -128,6 +136,16 @@ def parse_args() -> argparse.Namespace:
         "--identity-file",
         type=Path,
         default=Path("~/.ssh/id_ed25519").expanduser(),
+    )
+    parser.add_argument(
+        "--flake",
+        default=FLAKE_REF,
+        help="Flake reference to install.",
+    )
+    parser.add_argument(
+        "--build-on-remote",
+        action="store_true",
+        help="Build on the target instead of locally.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("deploy", help="Install NixOS through IAP")
@@ -149,6 +167,8 @@ def main() -> None:
             args.instance,
             args.ssh_user,
             args.identity_file,
+            args.flake,
+            args.build_on_remote,
         )
     elif args.command == "ssh":
         run(

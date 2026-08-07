@@ -1,7 +1,8 @@
 { lib, pkgs, ... }:
 
 let
-  workDevice = "/dev/disk/by-id/scsi-0Google_PersistentDisk_agent-work";
+  # google-* resolves for both SCSI and NVMe; scsi-0Google_* only for SCSI.
+  workDevice = "/dev/disk/by-id/google-agent-work";
   mapperName = "agent-work";
   mapperDevice = "/dev/mapper/${mapperName}";
   mountPoint = "/work";
@@ -84,6 +85,15 @@ in
     google-cloud-sdk
     uv
     workDisk
+  ];
+
+  # Link-local addresses on container veths steal the 169.254.0.0/16 route and
+  # hide the metadata endpoint, which breaks DNS and host key publishing.
+  networking.dhcpcd.denyInterfaces = [
+    "veth*"
+    "docker*"
+    "br-*"
+    "incusbr*"
   ];
 
   # Coding agents may legitimately consume most memory. Avoid killing them

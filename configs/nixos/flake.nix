@@ -180,6 +180,14 @@
           ./hosts/gce-agent-box/hardware-configuration.nix
         ];
 
+        # Arm variant of the same workstation; only boot layout and platform differ.
+        gce-agent-box-arm = mkHostArm [
+          disko.nixosModules.disko
+          ./hosts/gce-agent-box-arm/disko.nix
+          ./hosts/gce-agent-box-arm/hardware-configuration.nix
+          ./hosts/gce-agent-box/default.nix
+        ];
+
         # Lightweight development LXC container for Incus
         dev-lxc = mkHost [
           ./hosts/dev-lxc/default.nix
