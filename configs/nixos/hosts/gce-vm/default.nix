@@ -1,8 +1,9 @@
 { lib, pkgs, ... }:
 
 let
-  # google-* resolves for both SCSI and NVMe; scsi-0Google_* only for SCSI.
-  workDevice = "/dev/disk/by-id/google-agent-work";
+  # Guest udev rules do not expose the attachment name on NVMe, so address the
+  # raw node. The work disk is always the second namespace.
+  workDevice = "/dev/nvme0n2";
   mapperName = "agent-work";
   mapperDevice = "/dev/mapper/${mapperName}";
   mountPoint = "/work";
