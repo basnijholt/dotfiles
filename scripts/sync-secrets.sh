@@ -8,7 +8,7 @@ SECRETS_REPO_URL="${SECRETS_REPO_URL:-git@github.com:basnijholt/dotfiles-secrets
 HOSTNAME="$(hostname -s)"
 
 case "$HOSTNAME" in
-  basnijholt-macbook-pro-2|basnijholt-macbook-pro|pc)
+  basnijholt-macbook-pro-2|basnijholt-macbook-pro|pc|pi4)
     ;;
   *)
     echo "Skipping secrets on $HOSTNAME"
