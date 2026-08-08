@@ -27,6 +27,7 @@
   "worktree": {
     "bgIsolation": "none"
   },
+  "workflowKeywordTriggerEnabled": false,
   "feedbackDrafts": "off",
   "agentPushNotifEnabled": false,
   "inputNeededNotifEnabled": false,
