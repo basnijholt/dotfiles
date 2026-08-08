@@ -21,6 +21,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/block-git-rewrites.py"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-sleep.py"
           }
         ]
       }
