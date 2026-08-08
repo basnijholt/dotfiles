@@ -9,9 +9,31 @@
   "includeCoAuthoredBy": false,
   "permissions": {
     "deny": [
-      "Skill(claude-api)"
+      "EnterPlanMode",
+      "ExitPlanMode",
+      "DesignSync",
+      "PushNotification",
+      "RemoteTrigger",
+      "ReportFindings",
+      "AskUserQuestion",
+      "EnterWorktree",
+      "ExitWorktree",
+      "ScheduleWakeup",
+      "ListMcpResourcesTool",
+      "ReadMcpResourceTool",
+      "ReadMcpResourceDirTool"
     ]
   },
+  "worktree": {
+    "bgIsolation": "none"
+  },
+  "feedbackDrafts": "off",
+  "agentPushNotifEnabled": false,
+  "inputNeededNotifEnabled": false,
+  "disableBundledSkills": true,
+  "disableRemoteControl": true,
+  "disableClaudeAiConnectors": true,
+  "disableArtifact": true,
   "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
@@ -46,10 +68,8 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "rust-analyzer-lsp@claude-plugins-official": true,
     "claude-code-wakatime@wakatime": true,
     "agent-cli-dev@agent-cli": true,
-    "swift-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
   },
   "outputStyle": "caveman",
