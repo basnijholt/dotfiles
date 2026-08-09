@@ -202,6 +202,12 @@ in
 
   environment.systemPackages = [ applyIncusConfig ];
 
+  # compose-farm executes stacks inside the Docker Incus container, but parses
+  # their labels on this host when regenerating Traefik configuration.
+  systemd.tmpfiles.rules = [
+    "L+ /opt/stacks - - - - /mnt/ssd/docker/stacks"
+  ];
+
   systemd.services.nas-apply-incus-config = {
     description = "Apply NAS Incus config to imported instances";
     wants = [
