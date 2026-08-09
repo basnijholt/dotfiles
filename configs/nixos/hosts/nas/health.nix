@@ -165,8 +165,9 @@ in
     # Short weekly plus long monthly. Short tests only scan a few hundred MB,
     # so they passed 21 times in a row while sdf had unreadable sectors at
     # ~15.85 TB; only a long test covers the full surface. Long runs ~30h on a
-    # 16 TB drive, hence monthly rather than weekly.
-    defaults.autodetected = "-a -o on -S on -s (S/../../7/00|L/../01/./03) -m root -M exec ${nasHealthAlert}/bin/nas-health-alert";
+    # 16 TB drive, hence monthly rather than weekly. Run long tests on the sixth
+    # so the monthly scrub can finish and the disks get two full days to cool.
+    defaults.autodetected = "-a -o on -S on -s (S/../../7/00|L/../06/./03) -m root -M exec ${nasHealthAlert}/bin/nas-health-alert";
     notifications = {
       mail.enable = false;
       wall.enable = true;
