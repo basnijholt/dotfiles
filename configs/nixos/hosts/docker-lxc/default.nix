@@ -10,6 +10,9 @@
   ];
 
   networking.hostName = lib.mkForce "docker-lxc";
+  # Docker veth interfaces must not inherit the Incus uplink's DHCP policy.
+  networking.useDHCP = lib.mkForce false;
+  networking.interfaces.eth0.useDHCP = true;
   networking.firewall.allowedTCPPorts = [ 9001 ];
   hardware.graphics.enable = true;
   services.syncthing.enable = lib.mkForce false;
