@@ -197,6 +197,12 @@ in
     config.web."bind to" = "127.0.0.1 192.168.1.4";
   };
 
+  # br0 must own the LAN address before Netdata binds its listener.
+  systemd.services.netdata = {
+    wants = [ "systemd-networkd-wait-online@br0.service" ];
+    after = [ "systemd-networkd-wait-online@br0.service" ];
+  };
+
   services.prometheus.exporters = {
     node = {
       enable = true;
