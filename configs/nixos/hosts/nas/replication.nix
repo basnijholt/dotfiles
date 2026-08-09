@@ -226,12 +226,14 @@ let
       label = "local ssd mirror";
       dataset = "tank/backups/ssd";
       maxAgeHours = 36;
+      deferDuringTankScan = true;
     }
     {
       # Check the child separately; a fresh sibling can mask its stale state.
       label = "local ssd docker container mirror";
       dataset = "tank/backups/ssd/.ix-virt/containers/docker";
       maxAgeHours = 36;
+      deferDuringTankScan = true;
     }
     {
       label = "hetzner websites";
@@ -263,11 +265,17 @@ let
   ++ pkgs.lib.concatLists (
     pkgs.lib.mapAttrsToList (
       host: src:
-      map (d: {
-        label = "${host} ${d} mirror";
-        dataset = "tank/backups/${host}/${d}";
-        maxAgeHours = 48;
-      }) [ "home" "var" "root" ]
+      map
+        (d: {
+          label = "${host} ${d} mirror";
+          dataset = "tank/backups/${host}/${d}";
+          maxAgeHours = 48;
+        })
+        [
+          "home"
+          "var"
+          "root"
+        ]
     ) pullSources
   );
 
@@ -277,7 +285,9 @@ let
   # mountpoint=none without moving the B2 design at the same time.
 
   watchdogChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
-    check_dataset ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.dataset} ${toString entry.maxAgeHours}
+    check_dataset ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.dataset} ${toString entry.maxAgeHours} ${
+      if entry.deferDuringTankScan or false then "1" else "0"
+    }
   '') watchedBackupDatasets;
 
   watchdogAutosnapChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
@@ -298,10 +308,15 @@ let
     now="$(${pkgs.coreutils}/bin/date +%s)"
     failed=0
 
+    tank_scan_active() {
+      zpool status tank 2>/dev/null | ${pkgs.gnugrep}/bin/grep -Eq 'scan: (scrub|resilver) in progress'
+    }
+
     check_dataset() {
       label="$1"
       dataset="$2"
       max_age_hours="$3"
+      defer_during_tank_scan="''${4:-0}"
 
       if ! zfs list -H -o name "$dataset" >/dev/null 2>&1; then
         echo "MISSING $label: $dataset does not exist"
@@ -326,6 +341,11 @@ let
       age_hours=$(( (now - latest_epoch) / 3600 ))
 
       if [ "$age_hours" -gt "$max_age_hours" ]; then
+        if [ "$defer_during_tank_scan" = 1 ] && tank_scan_active; then
+          echo "DEFERRED $label freshness alert: $dataset is ''${age_hours}h old while tank is scrubbing or resilvering"
+          return
+        fi
+
         echo "STALE $label: newest snapshot $latest_snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
         failed=1
         return
@@ -455,6 +475,16 @@ in
 
       zfs list ssd >/dev/null
       zfs list tank/backups/ssd >/dev/null
+
+      tank_health="$(zpool list -H -o health tank)"
+      if [ "$tank_health" != ONLINE ]; then
+        echo "DEFERRED local SSD replication: tank health is $tank_health"
+        exit 0
+      fi
+      if zpool status tank | grep -Eq 'scan: (scrub|resilver) in progress'; then
+        echo "DEFERRED local SSD replication: tank is scrubbing or resilvering"
+        exit 0
+      fi
 
       # Both SSD mirrors create and prune snapshots on the same source tree.
       exec 9>/run/lock/nas-ssd-replication.lock
