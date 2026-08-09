@@ -10,6 +10,7 @@ let
     mbuffer
     openssh
     sanoid
+    util-linux
     zfs
   ];
 
@@ -99,8 +100,11 @@ let
         datasets="$datasets incus"
       fi
 
+      failed=0
       for dataset in $datasets; do
-        syncoid ${mkSyncoidCommonArgs} \
+        # Replicate independent siblings after a failure, then fail the unit so
+        # the notification still reports the incomplete run.
+        if ! syncoid ${mkSyncoidCommonArgs} \
           --no-privilege-elevation \
           --delete-target-snapshots \
           --recvoptions=${unmountedReceiveOptions} \
@@ -108,8 +112,15 @@ let
           --sshport=22 \
           --sshoption=BatchMode=yes \
           --sshoption=ConnectTimeout=10 \
-          nas-replication@${src.addr}:zroot/"$dataset" tank/backups/${host}/"$dataset"
+          --sshoption=ServerAliveInterval=30 \
+          --sshoption=ServerAliveCountMax=3 \
+          nas-replication@${src.addr}:zroot/"$dataset" tank/backups/${host}/"$dataset"; then
+          echo "ERROR: ${host} replication failed for zroot/$dataset" >&2
+          failed=1
+        fi
       done
+
+      exit "$failed"
     '';
     serviceConfig = {
       Type = "oneshot";
@@ -214,6 +225,12 @@ let
     {
       label = "local ssd mirror";
       dataset = "tank/backups/ssd";
+      maxAgeHours = 36;
+    }
+    {
+      # Check the child separately; a fresh sibling can mask its stale state.
+      label = "local ssd docker container mirror";
+      dataset = "tank/backups/ssd/.ix-virt/containers/docker";
       maxAgeHours = 36;
     }
     {
@@ -439,6 +456,10 @@ in
       zfs list ssd >/dev/null
       zfs list tank/backups/ssd >/dev/null
 
+      # Both SSD mirrors create and prune snapshots on the same source tree.
+      exec 9>/run/lock/nas-ssd-replication.lock
+      flock 9
+
       syncoid ${mkSyncoidSsdArgs} ssd tank/backups/ssd
 
       # syncoid gives newly received .ix-virt children canmount=on and a real
@@ -491,6 +512,10 @@ in
 
       zfs list ssd >/dev/null
 
+      # Serialize with nas-replicate-ssd-local; see the matching comment there.
+      exec 9>/run/lock/nas-ssd-replication.lock
+      flock 9
+
       # Nothing on the nuc prunes this mirror's replicated autosnap_*
       # snapshots (nuc's sanoid deliberately excludes zroot/backups), so
       # trim it to the source's retention here — without this the mirror
@@ -502,6 +527,8 @@ in
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \
+        --sshoption=ServerAliveInterval=30 \
+        --sshoption=ServerAliveCountMax=3 \
         ssd root@192.168.1.2:zroot/backups
     '';
     serviceConfig = {
@@ -553,6 +580,8 @@ in
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \
+        --sshoption=ServerAliveInterval=30 \
+        --sshoption=ServerAliveCountMax=3 \
         root@100.64.0.32:zroot/websites tank/backups/hetzner
     '';
     serviceConfig = {
@@ -604,6 +633,8 @@ in
           --sshport=22 \
           --sshoption=BatchMode=yes \
           --sshoption=ConnectTimeout=10 \
+          --sshoption=ServerAliveInterval=30 \
+          --sshoption=ServerAliveCountMax=3 \
           root@${hetznerMatrixHost}:zroot/"$dataset" tank/backups/hetzner-matrix/"$dataset"
       done
     '';
@@ -656,6 +687,8 @@ in
         --sshport=22 \
         --sshoption=BatchMode=yes \
         --sshoption=ConnectTimeout=10 \
+        --sshoption=ServerAliveInterval=30 \
+        --sshoption=ServerAliveCountMax=3 \
         root@${hetznerSaasHost}:zroot/var tank/backups/hetzner-saas/var
     '';
     serviceConfig = {
