@@ -227,10 +227,12 @@ in
   };
 
   systemd.services."nas-health-alert@" = {
-    description = "Send NAS health alert for failed unit %I";
+    description = "Send NAS health alert for failed unit %i";
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${alertFailedUnit} %I";
+      # Keep systemd's escaped instance intact. %I unescapes hyphens into
+      # slashes and turns nas-replicate-hp.service into a nonexistent unit.
+      ExecStart = "${alertFailedUnit} %i";
     };
   };
 
