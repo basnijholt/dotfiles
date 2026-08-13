@@ -155,7 +155,13 @@ in
   # Sanoid failures must alert: syncoid's own sync snapshots keep the
   # replication watchdog green even when autosnapshots have stopped, so a
   # silently failing sanoid would otherwise go unnoticed.
-  systemd.services.sanoid.unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
+  systemd.services.sanoid = {
+    unitConfig.OnFailure = [ "nas-health-alert@%n.service" ];
+    # The generated default is only 90 seconds. Pool-wide zfs allow checks and
+    # snapshotting can take several minutes while a large scrub or resilver is
+    # active, which otherwise produces a false failure alert.
+    serviceConfig.TimeoutStartSec = "15m";
+  };
 
   environment.systemPackages = with pkgs; [
     # Read-only surface scans of a failing member: unlike smartctl -t long,
