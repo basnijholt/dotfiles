@@ -19,6 +19,8 @@ let
     "--compress=lz4"
   ];
 
+  syncoidVolume = [ "--compress=lz4" ];
+
   syncoidSsdExcludes = [
     # Keep .ix-virt backed up: it is part of Incus recovery fidelity.
     # The nix-cache container is rebuildable and large, so skip only that
@@ -29,7 +31,9 @@ let
   mkSyncoidArgs = extraArgs: pkgs.lib.escapeShellArgs (syncoidCommon ++ extraArgs);
   mkSyncoidCommonArgs = mkSyncoidArgs [ ];
   mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
+  mkSyncoidVolumeArgs = pkgs.lib.escapeShellArgs syncoidVolume;
   unmountedReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
+  unmountedVolumeReceiveOptions = pkgs.lib.escapeShellArg "u o readonly=on";
 
   nucReplicationKey = "/etc/ssh/nas-replication-nuc-ed25519";
 
@@ -102,9 +106,28 @@ let
 
       failed=0
       for dataset in $datasets; do
+        dataset_args=()
+        volumes=""
+        if [ "$dataset" = incus ]; then
+          # Incus ZFS VM disks are ZVOLs named *.block. A ZVOL cannot accept
+          # the mountpoint=none receive override used to keep filesystem
+          # backups unmounted, so exclude disks from the recursive filesystem
+          # pass and replicate each one separately with volume-safe options.
+          dataset_args+=(--exclude-datasets='\.block$')
+          if ! volumes="$(
+            ssh -i ${src.key} -o BatchMode=yes -o ConnectTimeout=10 \
+              nas-replication@${src.addr} \
+              zfs list -H -r -t volume -o name zroot/incus
+          )"; then
+            echo "ERROR: ${host} could not list ZVOLs below zroot/incus" >&2
+            failed=1
+          fi
+        fi
+
         # Replicate independent siblings after a failure, then fail the unit so
         # the notification still reports the incomplete run.
         if ! syncoid ${mkSyncoidCommonArgs} \
+          "''${dataset_args[@]}" \
           --no-privilege-elevation \
           --delete-target-snapshots \
           --recvoptions=${unmountedReceiveOptions} \
@@ -117,6 +140,27 @@ let
           nas-replication@${src.addr}:zroot/"$dataset" tank/backups/${host}/"$dataset"; then
           echo "ERROR: ${host} replication failed for zroot/$dataset" >&2
           failed=1
+        fi
+
+        if [ "$dataset" = incus ]; then
+          while IFS= read -r volume; do
+            [ -n "$volume" ] || continue
+            target_volume="tank/backups/${host}/''${volume#zroot/}"
+            if ! syncoid ${mkSyncoidVolumeArgs} \
+              --no-privilege-elevation \
+              --delete-target-snapshots \
+              --recvoptions=${unmountedVolumeReceiveOptions} \
+              --sshkey=${src.key} \
+              --sshport=22 \
+              --sshoption=BatchMode=yes \
+              --sshoption=ConnectTimeout=10 \
+              --sshoption=ServerAliveInterval=30 \
+              --sshoption=ServerAliveCountMax=3 \
+              nas-replication@${src.addr}:"$volume" "$target_volume"; then
+              echo "ERROR: ${host} replication failed for $volume" >&2
+              failed=1
+            fi
+          done <<< "$volumes"
         fi
       done
 
