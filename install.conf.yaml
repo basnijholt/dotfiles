@@ -20,6 +20,7 @@
     ~/.config/cmux/cmux.json: configs/cmux/cmux.json
     ~/.config/codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.config/codex/config.toml: configs/codex/config.toml
+    ~/.codex/AGENTS.md: configs/codex/AGENTS.md
     ~/.codex/hooks: configs/codex/hooks
     ~/.codex/hooks.json: configs/codex/hooks.json
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
@@ -75,6 +76,7 @@
   - command: bash scripts/sync-secrets.sh
     stdout: true
   - git submodule update --init --recursive
+  - bash scripts/sync-codex-superpowers.sh
 
 # -- Only on Linux --
 - defaults:
