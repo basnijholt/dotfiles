@@ -11,9 +11,25 @@
 # zroot/incus, nuc: zroot/backups).
 { pkgs, ... }:
 
+let
+  sanoidWithCacheFix = pkgs.sanoid.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [
+      (pkgs.fetchurl {
+        url = "https://github.com/jimsalterjrs/sanoid/commit/393a4672e5695af5a5a8c82faed455e5689e0c69.patch";
+        hash = "sha256-H0KmC4od6fkCizAm66aDVcGvv2ImBBu4Wn20FU4XzBE=";
+      })
+      (pkgs.fetchurl {
+        url = "https://github.com/jimsalterjrs/sanoid/commit/2343089a0809740d0dad27c74e54f43153e558fd.patch";
+        hash = "sha256-EfHBZePKpdGwkaYCXYltzds6zXBeIH/6MFlmo+dlapY=";
+      })
+    ];
+  });
+in
+
 {
   services.sanoid = {
     enable = true;
+    package = sanoidWithCacheFix;
     interval = "*:0/10";
     templates.zfs-default = {
       autosnap = true;
@@ -38,5 +54,5 @@
     };
   };
 
-  environment.systemPackages = [ pkgs.sanoid ];
+  environment.systemPackages = [ sanoidWithCacheFix ];
 }
