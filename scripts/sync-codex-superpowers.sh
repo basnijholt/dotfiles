@@ -11,7 +11,14 @@ if [[ ! -f "$plugin_root/.agents/plugins/marketplace.json" ]]; then
 fi
 
 plugins=$("$codex_bin" plugin list --json)
-if grep -Fq '"pluginId":"superpowers@superpowers-dev"' <<<"${plugins//[[:space:]]/}"; then
+compact_plugins=${plugins//[[:space:]]/}
+if grep -Fq '"pluginId":"superpowers@superpowers-dev"' <<<"$compact_plugins" &&
+  ! grep -Fq '"pluginId":"superpowers@openai-curated"' <<<"$compact_plugins"; then
+  # Keep a working fallback installed until the local replacement validates.
+  "$codex_bin" plugin add superpowers@openai-curated
+fi
+
+if grep -Fq '"pluginId":"superpowers@superpowers-dev"' <<<"$compact_plugins"; then
   "$codex_bin" plugin remove superpowers@superpowers-dev
 fi
 

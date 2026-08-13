@@ -48,7 +48,14 @@ case "$*" in
     ;;
   "plugin add superpowers@superpowers-dev")
     printf '%s\n' "$*" >>"$log"
+    if [[ -e "$state/fail_local_add" ]]; then
+      exit 1
+    fi
     touch "$state/local"
+    ;;
+  "plugin add superpowers@openai-curated")
+    printf '%s\n' "$*" >>"$log"
+    rm -f "$state/official_removed"
     ;;
   "plugin remove superpowers@openai-curated")
     printf '%s\n' "$*" >>"$log"
@@ -84,13 +91,22 @@ actual=$(cat "$log")
 : >"$log"
 bash "$script"
 expected=$(cat <<EOF
+plugin add superpowers@openai-curated
 plugin remove superpowers@superpowers-dev
 plugin marketplace remove superpowers-dev
 plugin marketplace add $repo_root/submodules/superpowers
 plugin add superpowers@superpowers-dev
+plugin remove superpowers@openai-curated
 EOF
 )
 actual=$(cat "$log")
 [[ "$actual" == "$expected" ]]
+
+touch "$state/fail_local_add"
+if bash "$script"; then
+  printf 'sync unexpectedly succeeded when local plugin add failed\n' >&2
+  exit 1
+fi
+[[ ! -e "$state/official_removed" ]]
 
 printf 'sync-codex-superpowers tests passed\n'
