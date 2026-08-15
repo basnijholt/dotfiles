@@ -7,17 +7,23 @@ echo "🛠️ Running in ${INSTALL_MODE} mode"
 # List of hosts to connect to
 HOSTS=(
   # Physical hosts
-  "nuc"
   "pc"
+  "nuc"
   "hp"
-  "pi4"
   "nas"
+  "pi3"
+  "pi4"
   # VM/LXC hosts
   "nix-cache"
-  "docker"
+  "docker-lxc"
+  "gce-vm"
+  "mindroom"
+  "mindroom-spouse"
+  "mindroom-mon"
   # Cloud hosts
-  "nixos-hetzner"
-  "mindroom-hetzner"
+  "hetzner-matrix"
+  "hetzner"
+  "hetzner-saas"
 )
 
 # Arrays to track results
