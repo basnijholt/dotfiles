@@ -15,6 +15,7 @@
 	fscache = true
 	editor = nano
 	fsmonitor = false
+	hooksPath = ~/.config/git/hooks
 [gc]
 	auto = 256
 [lfs]
