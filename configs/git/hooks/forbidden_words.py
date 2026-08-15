@@ -247,19 +247,41 @@ def local_hook_path(hook_name: str) -> Path | None:
     return path / "hooks" / hook_name
 
 
-def run_local_hook(hook_name: str, arguments: list[str], current_hook: Path) -> int:
+def run_local_hook(
+    hook_name: str, arguments: list[str], current_hook: Path
+) -> tuple[bool, int]:
     local_hook = local_hook_path(hook_name)
     if local_hook is None or not os.access(local_hook, os.X_OK):
-        return 0
+        return False, 0
     if local_hook.resolve() == current_hook.resolve():
+        return False, 0
+    status = subprocess.run([str(local_hook), *arguments], check=False).returncode
+    return True, status
+
+
+def run_pre_commit_framework(hook_name: str, arguments: list[str]) -> int:
+    if hook_name not in {"pre-commit", "commit-msg"}:
         return 0
-    return subprocess.run([str(local_hook), *arguments], check=False).returncode
+    if not Path(".pre-commit-config.yaml").is_file():
+        return 0
+    command = ["pre-commit", "run", "--hook-stage", hook_name]
+    if hook_name == "commit-msg" and arguments:
+        command.extend(["--commit-msg-filename", arguments[0]])
+    try:
+        return subprocess.run(command, check=False).returncode
+    except OSError as error:
+        print(f"Cannot run repository pre-commit checks: {error}", file=sys.stderr)
+        return 1
 
 
 def run_hook(hook_name: str, arguments: list[str], current_hook: Path) -> int:
-    local_status = run_local_hook(hook_name, arguments, current_hook)
+    local_hook_found, local_status = run_local_hook(hook_name, arguments, current_hook)
     if local_status != 0:
         return local_status
+    if not local_hook_found:
+        framework_status = run_pre_commit_framework(hook_name, arguments)
+        if framework_status != 0:
+            return framework_status
     if repository_visibility() not in PRIVATE_VISIBILITIES:
         try:
             rules = load_rules()

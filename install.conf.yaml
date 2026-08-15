@@ -26,7 +26,9 @@
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
     ~/.config/git/attributes: configs/git/attributes
     ~/.config/git/forbidden-words: configs/git/forbidden-words
-    ~/.config/git/hooks: configs/git/hooks
+    ~/.config/git/hooks/commit-msg: configs/git/hooks/commit-msg
+    ~/.config/git/hooks/forbidden_words.py: configs/git/hooks/forbidden_words.py
+    ~/.config/git/hooks/pre-commit: configs/git/hooks/pre-commit
     ~/.config/ghostty/config: configs/ghostty/config
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin

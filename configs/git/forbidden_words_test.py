@@ -208,6 +208,46 @@ class ForbiddenWordsHookTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 42)
 
+    def test_pre_commit_framework_runs_when_repo_hook_is_missing(self) -> None:
+        self._stage(".pre-commit-config.yaml", "repos: []\n")
+        self._stage("source.txt", "safe\n")
+        marker = self.root / "pre-commit-called"
+        fake_pre_commit = self.bin_dir / "pre-commit"
+        fake_pre_commit.write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" > "$PRE_COMMIT_MARKER"\nexit 23\n'
+        )
+        fake_pre_commit.chmod(0o755)
+
+        result = self._hook(
+            "pre-commit", env=self.env | {"PRE_COMMIT_MARKER": str(marker)}
+        )
+
+        self.assertEqual(result.returncode, 23)
+        self.assertEqual(marker.read_text(), "run --hook-stage pre-commit\n")
+
+    def test_commit_msg_framework_receives_message_file(self) -> None:
+        self._stage(".pre-commit-config.yaml", "repos: []\n")
+        message = self.root / "COMMIT_EDITMSG"
+        message.write_text("safe message\n")
+        marker = self.root / "pre-commit-called"
+        fake_pre_commit = self.bin_dir / "pre-commit"
+        fake_pre_commit.write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" > "$PRE_COMMIT_MARKER"\nexit 24\n'
+        )
+        fake_pre_commit.chmod(0o755)
+
+        result = self._hook(
+            "commit-msg",
+            str(message),
+            env=self.env | {"PRE_COMMIT_MARKER": str(marker)},
+        )
+
+        self.assertEqual(result.returncode, 24)
+        self.assertEqual(
+            marker.read_text(),
+            f"run --hook-stage commit-msg --commit-msg-filename {message}\n",
+        )
+
     def test_repo_local_pre_commit_cannot_stage_forbidden_content_after_scan(
         self,
     ) -> None:
