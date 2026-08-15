@@ -12,7 +12,7 @@
     handbrake
     inkscape
     llama-cpp
-    moonlight-qt
+    (moonlight-qt.override { ffmpeg = ffmpeg_8; })
     mullvad-vpn
     nvtopPackages.full
     obs-studio
