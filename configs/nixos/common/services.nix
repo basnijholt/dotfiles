@@ -18,6 +18,8 @@
     enable = true;
     openFirewall = true;
     settings = {
+      AuthenticationMethods = "publickey";
+      KbdInteractiveAuthentication = false;
       PasswordAuthentication = false;
       PermitRootLogin = "no";
       UseDns = false;
