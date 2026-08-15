@@ -19,7 +19,7 @@ HOSTS=(
   "gce-vm"
   "mindroom"
   "mindroom-spouse"
-  "mindroom-mon"
+  "mindroom-mom"
   # Cloud hosts
   "hetzner-matrix"
   "hetzner"
