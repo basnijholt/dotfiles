@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   unlockEncryptedDatasets = pkgs.writeShellScriptBin "zfs-unlock-encrypted-datasets" ''
@@ -160,7 +165,12 @@ in
     # The generated default is only 90 seconds. Pool-wide zfs allow checks and
     # snapshotting can take several minutes while a large scrub or resilver is
     # active, which otherwise produces a false failure alert.
-    serviceConfig.TimeoutStartSec = "15m";
+    serviceConfig = {
+      TimeoutStartSec = "15m";
+      # Syncoid holds source snapshots while sending; skip this cycle instead
+      # of racing Sanoid pruning against the replication hold.
+      ExecStart = lib.mkForce "${pkgs.util-linux}/bin/flock --nonblock --conflict-exit-code 0 /run/lock/nas-ssd-replication.lock ${config.services.sanoid.package}/bin/sanoid --cron --configdir /etc/sanoid";
+    };
   };
 
   environment.systemPackages = with pkgs; [
