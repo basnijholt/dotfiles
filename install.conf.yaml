@@ -73,6 +73,7 @@
     ~/dotfiles/submodules/oh-my-zsh/themes/mytheme.zsh-theme: configs/zsh/mytheme.zsh-theme
 
 - shell:
+  - python3 scripts/install-git-hooks.py
   - bash scripts/sync-uv.sh
   - bash scripts/sync-bun.sh
   - bash scripts/install-nano-syntax.sh

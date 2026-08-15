@@ -1,5 +1,13 @@
 #!/usr/bin/env sh
+# git-forbidden-words-hook
 set -eu
 
-config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
-exec "${config_home}/git/forbidden-words-hook" commit-msg "$@"
+case "$0" in
+    *.legacy) local_hook="${0%.legacy}.local" ;;
+    *) local_hook="${0}.local" ;;
+esac
+if [ -x "${local_hook}" ]; then
+    "${local_hook}" "$@"
+fi
+
+"${HOME}/.config/git/forbidden-words-hook" commit-msg "$@"
