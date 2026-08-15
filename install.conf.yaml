@@ -25,6 +25,9 @@
     ~/.config/dask/distributed.yaml: configs/dask/distributed.yaml
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
     ~/.config/git/attributes: configs/git/attributes
+    ~/.config/git/forbidden-words: configs/git/forbidden-words
+    ~/.config/git/forbidden-words-hook: configs/git/forbidden_words.py
+    ~/.config/git/template: configs/git/template
     ~/.config/ghostty/config: configs/ghostty/config
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin

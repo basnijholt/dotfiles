@@ -1,0 +1,6 @@
+# One case-insensitive literal per line: word<TAB>reason
+# Blank lines and comments are ignored.
+# Optional private rules: ~/.config/git/forbidden-words.private
+# Visibility cache TTL defaults to 86400 seconds; set
+# GIT_FORBIDDEN_WORDS_VISIBILITY_TTL=0 to force a refresh for one commit.
+# example-name<TAB>Explain why this name must not enter a public repository.
