@@ -71,7 +71,7 @@
   "enabledPlugins": {
     "claude-code-wakatime@wakatime": true,
     "agent-cli-dev@agent-cli": true,
-    "superpowers@claude-plugins-official": true
+    "baspowers@baspowers-dev": true
   },
   "outputStyle": "caveman",
   "effortLevel": "xhigh",
