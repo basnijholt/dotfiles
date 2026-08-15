@@ -256,7 +256,8 @@ def run_hook(hook_name: str, arguments: list[str]) -> int:
         if hook_name == "pre-commit":
             violations = find_staged_violations(rules)
         elif hook_name == "commit-msg" and arguments:
-            violations = find_message_violations(Path(arguments[0]), rules)
+            violations = find_staged_violations(rules)
+            violations.extend(find_message_violations(Path(arguments[0]), rules))
         else:
             violations = []
         if violations:
