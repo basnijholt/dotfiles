@@ -60,6 +60,7 @@ class ForbiddenWordsHookTest(unittest.TestCase):
         *,
         env: dict[str, str] | None = None,
         check: bool = True,
+        input_text: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             command,
@@ -67,6 +68,7 @@ class ForbiddenWordsHookTest(unittest.TestCase):
             env=env or self.env,
             check=check,
             capture_output=True,
+            input=input_text,
             text=True,
         )
 
@@ -100,6 +102,22 @@ class ForbiddenWordsHookTest(unittest.TestCase):
             [str(HOOKS_DIR / hook_name), *arguments],
             env=env,
             check=False,
+        )
+
+    def _forward_hook(
+        self,
+        hook_name: str,
+        *arguments: str,
+        env: dict[str, str] | None = None,
+        input_text: str | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        entrypoint = self.root / hook_name
+        entrypoint.symlink_to(HOOKS_DIR / "forward_hook.py")
+        return self._run(
+            [str(entrypoint), *arguments],
+            env=env,
+            check=False,
+            input_text=input_text,
         )
 
     def test_public_repo_blocks_forbidden_word_in_added_lines_with_reason(self) -> None:
@@ -299,6 +317,47 @@ class ForbiddenWordsHookTest(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1)
         self.assertIn("commit message", result.stderr)
+
+    def test_generic_forwarder_runs_matching_repo_local_hook(self) -> None:
+        marker = self.root / "local-hook-stdin"
+        local_hook = self.repo / ".git" / "hooks" / "pre-push"
+        local_hook.write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" > "$LOCAL_HOOK_MARKER"\n'
+            'cat >> "$LOCAL_HOOK_MARKER"\nexit 43\n'
+        )
+        local_hook.chmod(0o755)
+
+        result = self._forward_hook(
+            "pre-push",
+            "origin",
+            "https://example.com/repo.git",
+            env=self.env | {"LOCAL_HOOK_MARKER": str(marker)},
+            input_text="refs\n",
+        )
+
+        self.assertEqual(result.returncode, 43)
+        self.assertEqual(
+            marker.read_text(), "origin https://example.com/repo.git\nrefs\n"
+        )
+
+    def test_generic_forwarder_runs_git_lfs_when_local_hook_is_missing(self) -> None:
+        marker = self.root / "git-lfs-called"
+        fake_git_lfs = self.bin_dir / "git-lfs"
+        fake_git_lfs.write_text(
+            '#!/bin/sh\nprintf "%s\\n" "$*" > "$GIT_LFS_MARKER"\nexit 0\n'
+        )
+        fake_git_lfs.chmod(0o755)
+
+        result = self._forward_hook(
+            "post-checkout",
+            "old-oid",
+            "new-oid",
+            "1",
+            env=self.env | {"GIT_LFS_MARKER": str(marker)},
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(marker.read_text(), "post-checkout old-oid new-oid 1\n")
 
     def test_rules_file_can_contain_the_forbidden_word(self) -> None:
         rules = self.repo / "configs" / "git" / "forbidden-words"

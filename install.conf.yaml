@@ -26,9 +26,35 @@
     ~/.config/dotbins/config.yaml: submodules/dotbins/dotbins.yaml
     ~/.config/git/attributes: configs/git/attributes
     ~/.config/git/forbidden-words: configs/git/forbidden-words
+    ~/.config/git/hooks/applypatch-msg: configs/git/hooks/forward_hook.py
     ~/.config/git/hooks/commit-msg: configs/git/hooks/commit-msg
-    ~/.config/git/hooks/forbidden_words.py: configs/git/hooks/forbidden_words.py
+    ~/.config/git/hooks/fsmonitor-watchman: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/p4-changelist: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/p4-post-changelist: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/p4-pre-submit: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/p4-prepare-changelist: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-applypatch: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-checkout: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-commit: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-index-change: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-merge: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-receive: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-rewrite: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/post-update: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/pre-applypatch: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/pre-auto-gc: configs/git/hooks/forward_hook.py
     ~/.config/git/hooks/pre-commit: configs/git/hooks/pre-commit
+    ~/.config/git/hooks/pre-merge-commit: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/pre-push: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/pre-rebase: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/pre-receive: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/prepare-commit-msg: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/proc-receive: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/push-to-checkout: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/reference-transaction: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/sendemail-validate: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/update: configs/git/hooks/forward_hook.py
+    ~/.config/git/hooks/forbidden_words.py: configs/git/hooks/forbidden_words.py
     ~/.config/ghostty/config: configs/ghostty/config
     ~/.config/lazygit/config.yml: configs/lazygit/config.yml
     ~/.config/nix-darwin: configs/nix-darwin
@@ -76,7 +102,6 @@
   - bash scripts/sync-uv.sh
   - bash scripts/sync-bun.sh
   - bash scripts/install-nano-syntax.sh
-  - git lfs install
   - command: bash scripts/sync-secrets.sh
     stdout: true
   - git submodule update --init --recursive
