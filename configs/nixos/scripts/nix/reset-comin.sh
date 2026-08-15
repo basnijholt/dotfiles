@@ -4,8 +4,9 @@
 
 set -euo pipefail
 
-# Default hosts with comin enabled
-DEFAULT_HOSTS=(nuc pc pi4 hp nixos-hetzner)
+# Deployed hosts with comin enabled. These are SSH aliases where the alias and
+# NixOS hostname differ (for example, mindroom-mon is mindroom-mom).
+DEFAULT_HOSTS=(pc nuc hp nas pi3 pi4 nix-cache docker-lxc gce-vm hetzner-matrix hetzner hetzner-saas mindroom mindroom-spouse mindroom-mon)
 
 HOSTS=("${@:-${DEFAULT_HOSTS[@]}}")
 
