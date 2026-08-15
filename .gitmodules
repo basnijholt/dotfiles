@@ -30,3 +30,7 @@
 [submodule "submodules/tmux"]
 	path = submodules/tmux
 	url = https://github.com/gpakosz/.tmux.git
+[submodule "submodules/baspowers"]
+	path = submodules/baspowers
+	url = git@github.com:basnijholt/baspowers.git
+	branch = bas/autonomous-workflow
