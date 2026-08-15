@@ -3,96 +3,48 @@ set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 plugin_root="$repo_root/submodules/baspowers"
-codex_bin=${CODEX_BASPOWERS_CODEX_BIN:-codex}
-claude_bin=${CODEX_BASPOWERS_CLAUDE_BIN:-claude}
-legacy_name='super''powers'
-codex_local=baspowers@baspowers-dev
-codex_fallback="$legacy_name@openai-curated"
-claude_local=baspowers@baspowers-dev
-claude_fallback="$legacy_name@claude-plugins-official"
-legacy_local="$legacy_name@$legacy_name-dev"
-legacy_marketplace="$legacy_name-dev"
+codex_bin=${BASPOWERS_CODEX_BIN:-codex}
+claude_bin=${BASPOWERS_CLAUDE_BIN:-claude}
+local_plugin=baspowers@baspowers-dev
+legacy='super''powers'
 
 if [[ ! -f "$plugin_root/.agents/plugins/marketplace.json" ]]; then
   printf 'Baspowers submodule is missing. Run git submodule update --init submodules/baspowers.\n' >&2
   exit 1
 fi
 
-plugins=$("$codex_bin" plugin list --json)
-compact_plugins=${plugins//[[:space:]]/}
-if { grep -Fq "\"pluginId\":\"$codex_local\"" <<<"$compact_plugins" ||
-  grep -Fq "\"pluginId\":\"$legacy_local\"" <<<"$compact_plugins"; } &&
-  ! grep -Fq "\"pluginId\":\"$codex_fallback\"" <<<"$compact_plugins"; then
-  # Keep a working fallback installed until the local replacement validates.
-  "$codex_bin" plugin add "$codex_fallback"
-fi
+ignore_failure() {
+  "$@" >/dev/null 2>&1 || true
+}
 
-if grep -Fq "\"pluginId\":\"$codex_local\"" <<<"$compact_plugins"; then
-  "$codex_bin" plugin remove "$codex_local"
-fi
-if grep -Fq "\"pluginId\":\"$legacy_local\"" <<<"$compact_plugins"; then
-  "$codex_bin" plugin remove "$legacy_local"
-fi
-
-marketplaces=$("$codex_bin" plugin marketplace list --json)
-compact_marketplaces=${marketplaces//[[:space:]]/}
-if grep -Fq '"name":"baspowers-dev"' <<<"$compact_marketplaces"; then
-  "$codex_bin" plugin marketplace remove baspowers-dev
-fi
-if grep -Fq "\"name\":\"$legacy_marketplace\"" <<<"$compact_marketplaces"; then
-  "$codex_bin" plugin marketplace remove "$legacy_marketplace"
-fi
-
+ignore_failure "$codex_bin" plugin remove "$local_plugin"
+ignore_failure "$codex_bin" plugin marketplace remove baspowers-dev
 "$codex_bin" plugin marketplace add "$plugin_root"
-"$codex_bin" plugin add "$codex_local"
+"$codex_bin" plugin add "$local_plugin"
 
 plugins=$("$codex_bin" plugin list --json)
-if ! grep -Fq "\"pluginId\":\"$codex_local\"" <<<"${plugins//[[:space:]]/}"; then
-  printf 'Local Baspowers plugin did not install successfully.\n' >&2
+if ! grep -Fq '"pluginId":"baspowers@baspowers-dev"' <<<"${plugins//[[:space:]]/}"; then
+  printf 'Codex did not install the local Baspowers plugin.\n' >&2
   exit 1
 fi
 
-if grep -Fq "\"pluginId\":\"$codex_fallback\"" <<<"${plugins//[[:space:]]/}"; then
-  "$codex_bin" plugin remove "$codex_fallback"
-fi
-
+ignore_failure "$codex_bin" plugin remove "$legacy@$legacy-dev"
+ignore_failure "$codex_bin" plugin marketplace remove "$legacy-dev"
+ignore_failure "$codex_bin" plugin remove "$legacy@openai-curated"
 printf 'Codex Baspowers plugin uses %s\n' "$plugin_root"
 
-plugins=$("$claude_bin" plugin list --json)
-compact_plugins=${plugins//[[:space:]]/}
-if { grep -Fq "\"id\":\"$claude_local\"" <<<"$compact_plugins" ||
-  grep -Fq "\"id\":\"$legacy_local\"" <<<"$compact_plugins"; } &&
-  ! grep -Fq "\"id\":\"$claude_fallback\"" <<<"$compact_plugins"; then
-  "$claude_bin" plugin install "$claude_fallback"
-fi
-
-if grep -Fq "\"id\":\"$claude_local\"" <<<"$compact_plugins"; then
-  "$claude_bin" plugin uninstall "$claude_local"
-fi
-if grep -Fq "\"id\":\"$legacy_local\"" <<<"$compact_plugins"; then
-  "$claude_bin" plugin uninstall "$legacy_local"
-fi
-
-marketplaces=$("$claude_bin" plugin marketplace list --json)
-compact_marketplaces=${marketplaces//[[:space:]]/}
-if grep -Fq '"name":"baspowers-dev"' <<<"$compact_marketplaces"; then
-  "$claude_bin" plugin marketplace remove baspowers-dev
-fi
-if grep -Fq "\"name\":\"$legacy_marketplace\"" <<<"$compact_marketplaces"; then
-  "$claude_bin" plugin marketplace remove "$legacy_marketplace"
-fi
-
+ignore_failure "$claude_bin" plugin uninstall "$local_plugin"
+ignore_failure "$claude_bin" plugin marketplace remove baspowers-dev
 "$claude_bin" plugin marketplace add "$plugin_root"
-"$claude_bin" plugin install "$claude_local"
+"$claude_bin" plugin install "$local_plugin"
 
 plugins=$("$claude_bin" plugin list --json)
-if ! grep -Fq "\"id\":\"$claude_local\"" <<<"${plugins//[[:space:]]/}"; then
-  printf 'Local Baspowers plugin did not install successfully in Claude.\n' >&2
+if ! grep -Fq '"id":"baspowers@baspowers-dev"' <<<"${plugins//[[:space:]]/}"; then
+  printf 'Claude did not install the local Baspowers plugin.\n' >&2
   exit 1
 fi
 
-if grep -Fq "\"id\":\"$claude_fallback\"" <<<"${plugins//[[:space:]]/}"; then
-  "$claude_bin" plugin uninstall "$claude_fallback"
-fi
-
+ignore_failure "$claude_bin" plugin uninstall "$legacy@$legacy-dev"
+ignore_failure "$claude_bin" plugin marketplace remove "$legacy-dev"
+ignore_failure "$claude_bin" plugin uninstall "$legacy@claude-plugins-official"
 printf 'Claude Baspowers plugin uses %s\n' "$plugin_root"
