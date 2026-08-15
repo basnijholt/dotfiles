@@ -223,18 +223,36 @@ def get_new_hash(pkg_attribute: str) -> str | None:
     print(f"Building {pkg_attribute} to capture hash...")
     result = subprocess.run(
         [
-            "nix", "build",
+            "nix",
+            "build",
             f".#nixosConfigurations.pc.pkgs.{pkg_attribute}",
-            "--no-link", "--cores", "1",
+            "--no-link",
+            "--cores",
+            "1",
         ],
         capture_output=True,
         text=True,
+        check=False,
     )
 
-    if match := re.search(r"\s+got:\s+(sha256-\S+)", result.stderr):
-        return match.group(1)
+    for stream_content in (result.stdout, result.stderr):
+        if match := re.search(
+            r"\bgot:\s+(sha256-[A-Za-z0-9+/=]+)", stream_content
+        ):
+            return match.group(1)
 
-    print(f"Could not extract hash for {pkg_attribute}.")
+    print(
+        f"Could not extract hash for {pkg_attribute}; "
+        f"nix build exited with status {result.returncode}.",
+        file=sys.stderr,
+    )
+    for stream_name, stream_content in (
+        ("stdout", result.stdout),
+        ("stderr", result.stderr),
+    ):
+        if stream_content.strip():
+            print(f"--- nix build {stream_name} ---", file=sys.stderr)
+            print(stream_content.rstrip(), file=sys.stderr)
     return None
 
 
