@@ -10,13 +10,19 @@ DEFAULT_HOSTS=(pc nuc hp nas pi3 pi4 nix-cache docker-lxc gce-vm hetzner-matrix 
 
 HOSTS=("${@:-${DEFAULT_HOSTS[@]}}")
 
+read -r -s -p "Sudo password: " sudo_password
+echo >&2
+
 for host in "${HOSTS[@]}"; do
   echo "=== $host ==="
   if ssh -o ConnectTimeout=5 "$host" "true" 2>/dev/null; then
-    ssh -t "$host" "sudo rm -f /var/lib/comin/store.json && sudo systemctl restart comin" && \
+    printf '%s\n' "$sudo_password" | ssh -T "$host" \
+      "sudo -S -p '' -- sh -c 'rm -f /var/lib/comin/store.json && systemctl restart comin'" && \
       echo "✓ Reset comin on $host" || \
       echo "✗ Failed to reset comin on $host"
   else
     echo "✗ Cannot connect to $host"
   fi
 done
+
+unset sudo_password
