@@ -14,6 +14,7 @@ from pathlib import Path
 DEFAULT_VISIBILITY_TTL = 24 * 60 * 60
 RULES_REPOSITORY_PATH = "configs/git/forbidden-words"
 PRIVATE_VISIBILITIES = {"PRIVATE", "INTERNAL"}
+SKIP_VISIBILITIES = PRIVATE_VISIBILITIES | {"LOCAL"}
 KNOWN_VISIBILITIES = PRIVATE_VISIBILITIES | {"PUBLIC"}
 
 
@@ -77,17 +78,19 @@ def load_rules() -> list[Rule]:
     return rules
 
 
-def remote_url() -> str | None:
+def remote_url() -> tuple[str | None, bool]:
     origin = git("remote", "get-url", "origin")
     if origin.returncode == 0 and origin.stdout.strip():
-        return origin.stdout.strip()
+        return origin.stdout.strip(), False
     remotes = git("remote")
-    if remotes.returncode != 0 or not remotes.stdout.splitlines():
-        return None
+    if remotes.returncode != 0:
+        return None, False
+    if not remotes.stdout.splitlines():
+        return None, True
     fallback = git("remote", "get-url", remotes.stdout.splitlines()[0])
     if fallback.returncode != 0:
-        return None
-    return fallback.stdout.strip() or None
+        return None, False
+    return fallback.stdout.strip() or None, False
 
 
 def visibility_ttl() -> int:
@@ -132,7 +135,9 @@ def write_cached_visibility(path: Path, visibility: str, now: int) -> None:
 
 
 def repository_visibility() -> str:
-    remote = remote_url()
+    remote, is_local = remote_url()
+    if is_local:
+        return "LOCAL"
     if remote is None:
         return "UNKNOWN"
     path = cache_path(remote)
@@ -286,7 +291,7 @@ def run_hook(hook_name: str, arguments: list[str], current_hook: Path) -> int:
         framework_status = run_pre_commit_framework(hook_name, arguments)
         if framework_status != 0:
             return framework_status
-    if repository_visibility() not in PRIVATE_VISIBILITIES:
+    if repository_visibility() not in SKIP_VISIBILITIES:
         try:
             rules = load_rules()
         except (OSError, UnicodeError, ValueError) as error:
