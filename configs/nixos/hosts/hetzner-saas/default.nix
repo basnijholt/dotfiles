@@ -44,6 +44,8 @@ in
   # Root key access: nixos-anywhere installs, manual deploys, and the NAS
   # backup pull all connect as root.
   users.users.root.openssh.authorizedKeys.keys = sshKeys;
+  users.groups.k3s-admin = { };
+  users.users.basnijholt.extraGroups = [ "k3s-admin" ];
   security.sudo.wheelNeedsPassword = false;
 
   services.k3s = {
@@ -51,7 +53,9 @@ in
     role = "server";
     extraFlags = [
       "--disable=traefik"
-      "--write-kubeconfig-mode=0644"
+      "--tls-san=100.64.0.2"
+      "--write-kubeconfig-mode=0640"
+      "--write-kubeconfig-group=k3s-admin"
     ];
     autoDeployCharts = {
       ingress-nginx = {

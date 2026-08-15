@@ -41,9 +41,8 @@
       22
       80
       443
-      6443
     ];
-    allowedUDPPorts = [ 8472 ];
+    interfaces.tailscale0.allowedTCPPorts = [ 6443 ];
     checkReversePath = "loose";
   };
 }
