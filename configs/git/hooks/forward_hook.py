@@ -27,20 +27,18 @@ def git_common_hook(hook_name: str) -> Path | None:
 
 
 def run_forwarder(hook_name: str, arguments: list[str], current_hook: Path) -> int:
-    stdin = sys.stdin.buffer.read()
     local_hook = git_common_hook(hook_name)
     if (
         local_hook is not None
         and os.access(local_hook, os.X_OK)
         and local_hook.resolve() != current_hook.resolve()
     ):
-        return subprocess.run(
-            [str(local_hook), *arguments], check=False, input=stdin
-        ).returncode
+        return subprocess.run([str(local_hook), *arguments], check=False).returncode
     if hook_name in GIT_LFS_HOOKS and shutil.which("git-lfs") is not None:
         return subprocess.run(
-            ["git", "lfs", hook_name, *arguments], check=False, input=stdin
+            ["git", "lfs", hook_name, *arguments], check=False
         ).returncode
+    sys.stdin.buffer.read()
     return 0
 
 
