@@ -84,6 +84,12 @@ class ForbiddenWordsHookTest(unittest.TestCase):
         target.write_text(contents)
         self._run(["git", "add", "--", path])
 
+    def _stage_bytes(self, path: str, contents: bytes) -> None:
+        target = self.repo / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(contents)
+        self._run(["git", "add", "--", path])
+
     def _hook(
         self,
         hook_name: str,
@@ -118,6 +124,23 @@ class ForbiddenWordsHookTest(unittest.TestCase):
 
     def test_added_line_starting_with_two_pluses_is_checked(self) -> None:
         self._stage("source.txt", "++ acme-secret\n")
+
+        result = self._hook("pre-commit")
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Use the public placeholder instead.", result.stderr)
+
+    def test_forbidden_word_in_staged_path_is_checked(self) -> None:
+        self._stage("acme-secret/source.txt", "safe\n")
+
+        result = self._hook("pre-commit")
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("Use the public placeholder instead.", result.stderr)
+        self.assertIn("acme-secret/source.txt", result.stderr)
+
+    def test_forbidden_word_in_binary_classified_addition_is_checked(self) -> None:
+        self._stage_bytes("asset.bin", b"\xffacme-secret\n")
 
         result = self._hook("pre-commit")
 

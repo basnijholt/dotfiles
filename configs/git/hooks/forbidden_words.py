@@ -36,6 +36,7 @@ def git(
         ["git", *arguments],
         check=False,
         capture_output=True,
+        errors="surrogateescape",
         input=input_text,
         text=True,
     )
@@ -182,6 +183,7 @@ def added_text(path: str) -> str:
         "--cached",
         "--unified=0",
         "--no-color",
+        "--text",
         "--diff-filter=ACMR",
         "--",
         path,
@@ -203,9 +205,11 @@ def find_staged_violations(rules: list[Rule]) -> list[Violation]:
     for path in staged_paths():
         if Path(path).as_posix() == RULES_REPOSITORY_PATH:
             continue
+        folded_path = path.casefold()
         folded_text = added_text(path).casefold()
         for rule in rules:
-            if rule.word.casefold() in folded_text:
+            folded_word = rule.word.casefold()
+            if folded_word in folded_path or folded_word in folded_text:
                 violations.append(Violation(location=path, rule=rule))
     return violations
 
