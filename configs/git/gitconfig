@@ -15,7 +15,6 @@
 	fscache = true
 	editor = nano
 	fsmonitor = false
-	hooksPath = ~/.config/git/hooks
 [gc]
 	auto = 256
 [lfs]
@@ -27,6 +26,7 @@
 	autoStash = true
 [init]
 	defaultBranch = main
+	templateDir = ~/.config/git/template
 [alias]
 	permission-reset = !git diff -p -R --no-ext-diff --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
 [filter "lfs"]

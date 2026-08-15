@@ -246,51 +246,7 @@ def print_violations(violations: list[Violation]) -> None:
         )
 
 
-def local_hook_path(hook_name: str) -> Path | None:
-    common_dir = git("rev-parse", "--git-common-dir")
-    if common_dir.returncode != 0:
-        return None
-    path = Path(common_dir.stdout.strip())
-    if not path.is_absolute():
-        path = Path.cwd() / path
-    return path / "hooks" / hook_name
-
-
-def run_local_hook(
-    hook_name: str, arguments: list[str], current_hook: Path
-) -> tuple[bool, int]:
-    local_hook = local_hook_path(hook_name)
-    if local_hook is None or not os.access(local_hook, os.X_OK):
-        return False, 0
-    if local_hook.resolve() == current_hook.resolve():
-        return False, 0
-    status = subprocess.run([str(local_hook), *arguments], check=False).returncode
-    return True, status
-
-
-def run_pre_commit_framework(hook_name: str, arguments: list[str]) -> int:
-    if hook_name not in {"pre-commit", "commit-msg"}:
-        return 0
-    if not Path(".pre-commit-config.yaml").is_file():
-        return 0
-    command = ["pre-commit", "run", "--hook-stage", hook_name]
-    if hook_name == "commit-msg" and arguments:
-        command.extend(["--commit-msg-filename", arguments[0]])
-    try:
-        return subprocess.run(command, check=False).returncode
-    except OSError as error:
-        print(f"Cannot run repository pre-commit checks: {error}", file=sys.stderr)
-        return 1
-
-
-def run_hook(hook_name: str, arguments: list[str], current_hook: Path) -> int:
-    local_hook_found, local_status = run_local_hook(hook_name, arguments, current_hook)
-    if local_status != 0:
-        return local_status
-    if not local_hook_found:
-        framework_status = run_pre_commit_framework(hook_name, arguments)
-        if framework_status != 0:
-            return framework_status
+def run_hook(hook_name: str, arguments: list[str]) -> int:
     if repository_visibility() not in SKIP_VISIBILITIES:
         try:
             rules = load_rules()
@@ -307,3 +263,17 @@ def run_hook(hook_name: str, arguments: list[str], current_hook: Path) -> int:
             print_violations(violations)
             return 1
     return 0
+
+
+def main(arguments: list[str]) -> int:
+    if not arguments or arguments[0] not in {"pre-commit", "commit-msg"}:
+        print(
+            "usage: forbidden-words-hook {pre-commit|commit-msg} [hook arguments]",
+            file=sys.stderr,
+        )
+        return 2
+    return run_hook(arguments[0], arguments[1:])
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

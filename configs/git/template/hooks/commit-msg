@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+set -eu
+
+config_home="${XDG_CONFIG_HOME:-${HOME}/.config}"
+exec "${config_home}/git/forbidden-words-hook" commit-msg "$@"
