@@ -167,6 +167,13 @@ in
     # active, which otherwise produces a false failure alert.
     serviceConfig = {
       TimeoutStartSec = "15m";
+      # OpenZFS cannot resolve systemd's transient sanoid account for `zfs
+      # allow`, so the generated DynamicUser service cannot prune snapshots.
+      DynamicUser = lib.mkForce false;
+      User = lib.mkForce "root";
+      Group = lib.mkForce "root";
+      ExecStartPre = lib.mkForce [ ];
+      ExecStopPost = lib.mkForce [ ];
       # Syncoid holds source snapshots while sending; skip this cycle instead
       # of racing Sanoid pruning against the replication hold.
       ExecStart = lib.mkForce "${pkgs.util-linux}/bin/flock --nonblock --conflict-exit-code 0 /run/lock/nas-ssd-replication.lock ${config.services.sanoid.package}/bin/sanoid --cron --configdir /etc/sanoid";
