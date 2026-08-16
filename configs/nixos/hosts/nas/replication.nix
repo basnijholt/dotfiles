@@ -252,19 +252,6 @@ let
     maxAgeHours = 30;
   }) pullSources;
 
-  # The pc restic backup is file-based (hourly sftp push into tank/backups/pc),
-  # so no dataset snapshot check can see it. Restic writes one file per
-  # completed snapshot into the repo's snapshots/ directory; the newest file
-  # mtime is the last successful backup. pc backs up hourly; 26h absorbs
-  # downtime.
-  watchedResticRepos = [
-    {
-      label = "pc restic repo";
-      path = "/mnt/tank/backups/pc";
-      maxAgeHours = 26;
-    }
-  ];
-
   watchedBackupDatasets = [
     {
       label = "local ssd mirror";
@@ -341,10 +328,6 @@ let
   watchdogKeyChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
     check_key ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.path}
   '') watchedReplicationKeys;
-
-  watchdogResticChecks = pkgs.lib.concatMapStringsSep "\n" (entry: ''
-    check_restic_repo ${pkgs.lib.escapeShellArg entry.label} ${pkgs.lib.escapeShellArg entry.path} ${toString entry.maxAgeHours}
-  '') watchedResticRepos;
 
   replicationWatchdog = pkgs.writeShellScript "nas-replication-watchdog" ''
     set -euo pipefail
@@ -447,47 +430,9 @@ let
       echo "OK $label: $key_path exists"
     }
 
-    check_restic_repo() {
-      label="$1"
-      repo_path="$2"
-      max_age_hours="$3"
-
-      snapshot_dir="$repo_path/snapshots"
-
-      if [ ! -d "$snapshot_dir" ]; then
-        echo "MISSING $label: $snapshot_dir does not exist"
-        failed=1
-        return
-      fi
-
-      latest_epoch="$(
-        ${pkgs.findutils}/bin/find "$snapshot_dir" -maxdepth 1 -type f -printf '%T@\n' 2>/dev/null \
-          | ${pkgs.coreutils}/bin/sort -n \
-          | ${pkgs.coreutils}/bin/tail -n 1 \
-          | ${pkgs.coreutils}/bin/cut -d . -f 1
-      )"
-
-      if [ -z "$latest_epoch" ]; then
-        echo "STALE $label: no snapshot files in $snapshot_dir"
-        failed=1
-        return
-      fi
-
-      age_hours=$(( (now - latest_epoch) / 3600 ))
-
-      if [ "$age_hours" -gt "$max_age_hours" ]; then
-        echo "STALE $label: newest restic snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
-        failed=1
-        return
-      fi
-
-      echo "OK $label: newest restic snapshot is ''${age_hours}h old; limit is ''${max_age_hours}h"
-    }
-
     ${watchdogChecks}
     ${watchdogAutosnapChecks}
     ${watchdogKeyChecks}
-    ${watchdogResticChecks}
 
     if [ "$failed" -ne 0 ]; then
       exit 1

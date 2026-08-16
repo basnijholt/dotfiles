@@ -133,14 +133,9 @@ in
         useTemplate = [ "nas-backup-prune" ];
         recursive = true;
       };
-      # The pc restic repo is the one backup its source can destroy: pc
-      # pushes over sftp as the restic user, which owns every file in the
-      # repo, so a compromised pc could delete or encrypt it remotely.
-      # Local snapshots make the repo rollbackable; pc cannot touch ZFS
-      # snapshots. Retention is modest because restic prune churn makes
-      # old snapshots pin dead pack files. (The other file-based backup,
-      # hetzner-saas, needs none of this: it is pull-only — the source
-      # holds no NAS credentials — and keeps 30 dated tarballs anyway.)
+      # Preserve the retired pc Restic repository as file-level history.
+      # NAS-side snapshots keep the frozen archive rollbackable while ZFS
+      # replication is the active backup path.
       "tank/backups/pc" = {
         autosnap = true;
         autoprune = true;
