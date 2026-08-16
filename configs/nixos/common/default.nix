@@ -9,6 +9,7 @@
     ./nixpkgs.nix
     ./user.nix
     ./services.nix
+    ./t3code.nix
     ./packages.nix
     ./disk-cleanup.nix
     ./home-manager.nix

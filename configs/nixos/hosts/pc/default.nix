@@ -26,7 +26,6 @@
     ./debugging.nix
     ./ai.nix
     ./agent-cli.nix
-    ./t3code.nix
     ./backup.nix
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix
@@ -35,6 +34,10 @@
 
   local.wakeOnLan.interface = "enp5s0";
   local.zfsReplicationSource.nasPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFf8RpaZe1lGYuLI9ASLGLd6zNlkhIlRXK8hpuXiq+Os nas-replication-pc";
+  local.t3code = {
+    enable = true;
+    host = "0.0.0.0";
+  };
 
   # Required for DDC/CI tools such as ddcutil to read monitor state (e.g. the
   # active input source) for manual diagnostics. Display automation no longer
