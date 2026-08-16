@@ -13,3 +13,10 @@ packages=(
     t3@latest
 )
 bun install -g "${packages[@]}"
+
+# T3's node-pty dependency has no Linux prebuild, so build its native addon.
+bun install -g node-gyp@latest
+(
+    cd "$HOME/.bun/install/global/node_modules/t3/node_modules/node-pty"
+    node-gyp rebuild
+)
