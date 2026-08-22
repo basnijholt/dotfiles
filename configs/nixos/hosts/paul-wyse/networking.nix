@@ -40,10 +40,10 @@
   # --- Firewall ---
   networking.firewall.trustedInterfaces = [ "br0" "incusbr0" "tailscale0" ];
   networking.firewall.allowedTCPPorts = [
-    53   # DNS (CoreDNS)
-    80   # HTTP (Caddy reverse proxy)
-    8096 # Media server (Caddy proxy)
-    8880 # Librespeed (Caddy proxy)
+    53    # DNS (CoreDNS)
+    80    # HTTP (Caddy reverse proxy)
+    8880  # Speed test - local (LibreSpeed)
+    8881  # Speed test - Seattle (Caddy proxy)
   ];
   networking.firewall.allowedUDPPorts = [
     53   # DNS (CoreDNS)

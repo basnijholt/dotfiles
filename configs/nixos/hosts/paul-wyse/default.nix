@@ -13,6 +13,8 @@
     ./networking.nix
     ./coredns.nix
     ./caddy.nix
+    ./jellyfin.nix
+    ./librespeed.nix
   ];
 
   # --- Disable services not needed on a gateway ---

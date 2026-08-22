@@ -7,31 +7,19 @@
   services.caddy = {
     enable = true;
     virtualHosts = {
-      # DNS-based access (requires CoreDNS)
-      "media.local:80" = {
+      # Speed test - Seattle (home server via Tailscale)
+      ":8881" = {
         extraConfig = ''
-          reverse_proxy 100.64.0.28:8096 {
-            flush_interval -1
-            transport http {
-              read_buffer 128MB
-              write_buffer 128MB
-            }
-          }
+          reverse_proxy 100.64.0.28:8880
         '';
       };
-      # Direct IP access (no DNS needed)
-      ":8096" = {
+      # Speed test domains
+      "speed.local:80" = {
         extraConfig = ''
-          reverse_proxy 100.64.0.28:8096 {
-            flush_interval -1
-            transport http {
-              read_buffer 128MB
-              write_buffer 128MB
-            }
-          }
+          reverse_proxy 127.0.0.1:8880
         '';
       };
-      ":8880" = {
+      "speed-sea.local:80" = {
         extraConfig = ''
           reverse_proxy 100.64.0.28:8880
         '';
