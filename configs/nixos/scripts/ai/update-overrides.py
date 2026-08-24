@@ -10,12 +10,12 @@
 import re
 import subprocess
 import sys
+from base64 import b64encode
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 
 import requests
-
-DUMMY_HASH = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
 
 @dataclass
@@ -115,17 +115,46 @@ def compare_versions(current: str, latest: str, semver: bool) -> bool:
     return int(latest) > int(current)
 
 
-def replace_hashes_in_block(content: str, start: int, count: int) -> str:
+def dummy_hash(package_name: str, slot: int) -> str:
+    """Return a stable, valid, package-specific placeholder hash."""
+    digest = sha256(f"update-overrides:{package_name}:{slot}".encode()).digest()
+    return f"sha256-{b64encode(digest).decode()}"
+
+
+def replace_hashes_in_block(
+    content: str,
+    start: int,
+    count: int,
+    package_name: str = "block",
+    slot_offset: int = 0,
+) -> str:
     """Replace `count` hash occurrences after `start` position with dummy hash."""
     hash_pattern = re.compile(
         r'((?:hash|vendorHash|npmDepsHash)\s*=\s*")(sha256-[^"]*)(";)'
     )
-    pos = start
-    for _ in range(count):
-        match = hash_pattern.search(content, pos)
-        if match:
-            content = content[: match.start(2)] + DUMMY_HASH + content[match.end(2) :]
-            pos = match.start(2) + len(DUMMY_HASH)
+    package_pattern = re.compile(r"^        [A-Za-z][\w-]*\s*=", re.MULTILINE)
+    target_pattern = re.compile(
+        rf"^        {re.escape(package_name)}\s*=", re.MULTILINE
+    )
+    enclosing_packages = [
+        match for match in target_pattern.finditer(content) if match.start() <= start
+    ]
+    if not enclosing_packages:
+        raise ValueError(f"Could not find the start of the {package_name} block.")
+    current_package = enclosing_packages[-1]
+    next_package = package_pattern.search(content, current_package.end())
+    end = next_package.start() if next_package else len(content)
+
+    matches = list(hash_pattern.finditer(content, start, end))
+    if len(matches) < count:
+        raise ValueError(
+            f"Expected {count} hashes in the {package_name} block, found {len(matches)}."
+        )
+
+    slots = range(slot_offset, slot_offset + count)
+    for match, slot in reversed(list(zip(matches[:count], slots, strict=True))):
+        placeholder = dummy_hash(package_name, slot)
+        content = content[: match.start(2)] + placeholder + content[match.end(2) :]
     return content
 
 
@@ -156,14 +185,14 @@ def update_ollama_llama_cpp_pin(content: str, ollama_version: str) -> str:
     print(f"Ollama {ollama_version} pins llama.cpp {llama_tag}.")
 
     pattern = re.compile(
-        r'(ollamaLlamaCppSrc\s*=\s*pkgs\.fetchFromGitHub\s*\{'
-        r'(?:(?!\n\s*\};).)*?'
+        r"(ollamaLlamaCppSrc\s*=\s*pkgs\.fetchFromGitHub\s*\{"
+        r"(?:(?!\n\s*\};).)*?"
         r'tag\s*=\s*")([^"]+)(";'
-        r'(?:(?!\n\s*\};).)*?'
+        r"(?:(?!\n\s*\};).)*?"
         r'hash\s*=\s*")([^"]+)(";)',
         re.DOTALL,
     )
-    replacement = rf"\g<1>{llama_tag}\g<3>{DUMMY_HASH}\g<5>"
+    replacement = rf"\g<1>{llama_tag}\g<3>{dummy_hash('ollama', 0)}\g<5>"
     updated, count = pattern.subn(replacement, content, count=1)
     if count != 1:
         print("Could not update ollamaLlamaCppSrc pin.")
@@ -197,9 +226,7 @@ def update_version(content: str, pkg: Package) -> tuple[str, bool]:
 
     # Replace version - handle llama-swap special case (version appears twice in URL)
     if pkg.name == "llama-swap":
-        content = pkg.version_pattern.sub(
-            rf"\g<1>{latest}\g<3>{latest}\g<5>", content
-        )
+        content = pkg.version_pattern.sub(rf"\g<1>{latest}\g<3>{latest}\g<5>", content)
     else:
         content = pkg.version_pattern.sub(rf"\g<1>{latest}\g<3>", content)
 
@@ -213,13 +240,16 @@ def update_version(content: str, pkg: Package) -> tuple[str, bool]:
         print(f"Could not find updated {pkg.name} version definition.")
         return content, False
     block_hash_count = 2 if pkg.name == "ollama" else pkg.hash_count
-    content = replace_hashes_in_block(content, updated_match.start(), block_hash_count)
+    slot_offset = 1 if pkg.name == "ollama" else 0
+    content = replace_hashes_in_block(
+        content, updated_match.start(), block_hash_count, pkg.name, slot_offset
+    )
 
     return content, True
 
 
-def get_new_hash(pkg_attribute: str) -> str | None:
-    """Build package to extract correct hash from error message."""
+def get_hash_mismatch(pkg_attribute: str) -> tuple[str, str] | None:
+    """Build package and return its specified and actual hash mismatch."""
     print(f"Building {pkg_attribute} to capture hash...")
     result = subprocess.run(
         [
@@ -237,9 +267,12 @@ def get_new_hash(pkg_attribute: str) -> str | None:
 
     for stream_content in (result.stdout, result.stderr):
         if match := re.search(
-            r"\bgot:\s+(sha256-[A-Za-z0-9+/=]+)", stream_content
+            r"\bspecified:\s+(sha256-[A-Za-z0-9+/=]+).*?"
+            r"\bgot:\s+(sha256-[A-Za-z0-9+/=]+)",
+            stream_content,
+            re.DOTALL,
         ):
-            return match.group(1)
+            return match.group(1), match.group(2)
 
     print(
         f"Could not extract hash for {pkg_attribute}; "
@@ -258,16 +291,35 @@ def get_new_hash(pkg_attribute: str) -> str | None:
 
 def resolve_hashes(file_path: Path, content: str, pkg: Package) -> str:
     """Resolve dummy hashes by building and extracting correct values."""
-    for i in range(pkg.hash_count):
-        print(f"Resolving {pkg.name} hash {i + 1}/{pkg.hash_count}...")
+    pending_hashes = {
+        dummy_hash(pkg.name, slot)
+        for slot in range(pkg.hash_count)
+        if dummy_hash(pkg.name, slot) in content
+    }
+    total = len(pending_hashes)
+    for i in range(total):
+        print(f"Resolving {pkg.name} hash {i + 1}/{total}...")
 
-        new_hash = get_new_hash(pkg.name)
-        if not new_hash:
-            print(f"Failed to resolve {pkg.name} hash {i + 1}/{pkg.hash_count}.")
+        mismatch = get_hash_mismatch(pkg.name)
+        if not mismatch:
+            print(f"Failed to resolve {pkg.name} hash {i + 1}/{total}.")
             sys.exit(1)
 
+        specified_hash, new_hash = mismatch
         print(f"Found hash: {new_hash}")
-        content = content.replace(DUMMY_HASH, new_hash, 1)
+        if specified_hash not in pending_hashes:
+            print(
+                f"Nix reported unexpected placeholder {specified_hash} for {pkg.name}."
+            )
+            sys.exit(1)
+        if content.count(specified_hash) != 1:
+            print(
+                f"Expected exactly one occurrence of {specified_hash} for "
+                f"{pkg.name}, found {content.count(specified_hash)}."
+            )
+            sys.exit(1)
+        content = content.replace(specified_hash, new_hash)
+        pending_hashes.remove(specified_hash)
         file_path.write_text(content)
 
     print(f"Successfully updated {pkg.name}.")
@@ -284,7 +336,12 @@ def main():
 
     for pkg in PACKAGES:
         content, updated = update_version(content, pkg)
-        if updated:
+        has_pending_hashes = any(
+            dummy_hash(pkg.name, slot) in content for slot in range(pkg.hash_count)
+        )
+        if updated or has_pending_hashes:
+            if has_pending_hashes and not updated:
+                print(f"Resuming interrupted {pkg.name} hash resolution...")
             file_path.write_text(content)
             content = resolve_hashes(file_path, content, pkg)
 

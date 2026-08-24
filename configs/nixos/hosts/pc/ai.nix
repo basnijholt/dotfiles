@@ -37,6 +37,38 @@
 
     models:  # Ordered from newest to oldest
 
+      # Abliterated Qwen3.8 27B with embedded MTP weights; size 20.7 GB.
+      # Source: https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF
+      "qwen3.8:27b-q5-abliterated-mtp":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF
+          --hf-file Huihui-Qwen3.8-27B-abliterated-UD-Q5_K_XL.gguf
+          --no-mmproj
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q8_0
+          --cache-type-v q8_0
+          --split-mode layer
+          --temp 1.0
+          --top-p 0.95
+          --top-k 20
+          --min-p 0.0
+          --presence-penalty 0.0
+          --repeat-penalty 1.0
+          --spec-type draft-mtp
+          --spec-draft-n-max 3
+          --threads 1
+          --chat-template-kwargs '{"enable_thinking":true}'
+          --jinja
+
       # Uploaded 2026-08-14, size 20.2 GB, max ctx: 262144, layers: 64
       # Source: https://huggingface.co/unsloth/Qwen3.8-27B-GGUF
       # Thinking-mode sampling follows Unsloth's recommended settings.

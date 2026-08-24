@@ -14,8 +14,8 @@
         ollamaLlamaCppSrc = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b10380";
-          hash = "sha256-HT0QuIFJz5cgH2qinxhtyLEL/RrUpziZuntj/EDQtzI=";
+          tag = "b10488";
+          hash = "sha256-5noPIcSD9Ki1D3J7b6JofeXiPO1RdL/Q8z+E0ZCwceY=";
         };
       in
       {
@@ -25,12 +25,12 @@
             cudaArches = [ "sm_86" ];
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "0.32.13";
+              version = "0.32.15";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-KSvw7LsvpUVeSm9BKJ4wIp/fWGHjMp8bOTMUpFJCDmw=";
+                hash = "sha256-BpN3y1unf6Yd1RBura2S4O5jLSkImzi1Guo6GWbNZI8=";
               };
               vendorHash = "sha256-HMwoaFBMbpoy8f0I+O+i7kIa9BslLu3FcVWeaIOkpvs=";
               # This package only contains integration-tagged tests, so the
@@ -68,12 +68,12 @@
             blasSupport = true;
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "10435";
+              version = "10612";
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
                 tag = "b${version}";
-                hash = "sha256-5cSIwbzOxW5gv/TTcHrr/StGaM/i4OskwEG7MDCC+Gs=";
+                hash = "sha256-40pgYPdku7E0TK0dPOaeDwZYqTiXD4SAeAKk5u5RB50=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -97,8 +97,8 @@
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
-              url = "https://github.com/mostlygeek/llama-swap/releases/download/v250/llama-swap_250_linux_amd64.tar.gz";
-              hash = "sha256-FnWwvNsHkfYXLSKZOrIqgJfCWgrdpLuEZ9LDGHH7d6A=";
+              url = "https://github.com/mostlygeek/llama-swap/releases/download/v251/llama-swap_251_linux_amd64.tar.gz";
+              hash = "sha256-hb1/Ix9Xd/9ri3h6eU+CVni40ELNRIQERRaljs3HYis=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap
