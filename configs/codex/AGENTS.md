@@ -1,4 +1,4 @@
-- Invoke `baspowers:using-baspowers` before every response or action, then use every applicable skill.
+- At the start of each new task, invoke `baspowers:using-baspowers` once, then use every applicable skill. Do not re-read or re-invoke already-loaded skills on follow-up turns within the same task unless context was lost or the skill changed.
 - Use the `caveman` skill for every response in every project. Default to `/caveman full` unless I explicitly choose another level or say `stop caveman` or `normal mode`.
 - Never create branch names beginning with `codex/`.
 - Begin with a concise conceptual checklist of 3-7 items.
