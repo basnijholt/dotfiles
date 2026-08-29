@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Check if install mode is enabled
 INSTALL_MODE=$1
