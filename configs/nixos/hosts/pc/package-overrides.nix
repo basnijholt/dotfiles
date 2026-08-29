@@ -14,8 +14,8 @@
         ollamaLlamaCppSrc = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b10488";
-          hash = "sha256-5noPIcSD9Ki1D3J7b6JofeXiPO1RdL/Q8z+E0ZCwceY=";
+          tag = "b10630";
+          hash = "sha256-h7D/vn/tu2DyzvqhJauWJ+a2TMcjnW527Gv28YrB80I=";
         };
       in
       {
@@ -25,12 +25,12 @@
             cudaArches = [ "sm_86" ];
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "0.32.15";
+              version = "0.33.2";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-BpN3y1unf6Yd1RBura2S4O5jLSkImzi1Guo6GWbNZI8=";
+                hash = "sha256-jzhzMkEC/X4AyLOcBB8lAPcef9B+pmM+WhvDgsd6D2E=";
               };
               vendorHash = "sha256-HMwoaFBMbpoy8f0I+O+i7kIa9BslLu3FcVWeaIOkpvs=";
               # This package only contains integration-tagged tests, so the
@@ -49,7 +49,7 @@
                 (
                   cd $TMPDIR/llama-cpp-src
                   cmake -DPATCH_DIR=$NIX_BUILD_TOP/source/llama/compat \
-                    -P $NIX_BUILD_TOP/source/llama/compat/apply-patch.cmake
+                    -P $NIX_BUILD_TOP/source/cmake/apply-git-patches.cmake
                 )
               '';
             });
@@ -68,12 +68,12 @@
             blasSupport = true;
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "10618";
+              version = "10687";
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
                 tag = "b${version}";
-                hash = "sha256-ODJn/t+hAVMn5j0J2/1GOo3i2DE+YZvxT7MGLvkQKzM=";
+                hash = "sha256-AukWLqspouaUQo9mo3k3RdRgr5JFXpdJj3HPd1Gj4O8=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -81,7 +81,7 @@
                 '';
               };
               npmRoot = "tools/ui";
-              npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
+              npmDepsHash = "sha256-bFElmeV8cb7O4PUci9SpJCeWIkp/aTalNV9VXMGfcgU=";
               # Target this host explicitly: Zen 2 CPU and RTX 3090 GPU. Using
               # znver2 instead of GGML_NATIVE avoids llama.cpp overriding the
               # explicit CUDA target with a sandbox-time GPU probe.
