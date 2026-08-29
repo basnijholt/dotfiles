@@ -81,7 +81,7 @@
                 '';
               };
               npmRoot = "tools/ui";
-              npmDepsHash = "sha256-bFElmeV8cb7O4PUci9SpJCeWIkp/aTalNV9VXMGfcgU=";
+              npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
               # Target this host explicitly: Zen 2 CPU and RTX 3090 GPU. Using
               # znver2 instead of GGML_NATIVE avoids llama.cpp overriding the
               # explicit CUDA target with a sandbox-time GPU probe.
