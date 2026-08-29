@@ -8,6 +8,7 @@ cd dotfiles || { echo "❌ Error: dotfiles directory not found"; exit 1; }
 echo "📡 Pulling latest changes..."
 git pull --autostash
 echo "📦 Updating submodules..."
+git submodule sync --recursive
 git submodule update --recursive --init --force
 echo "🔄 Pruning lfs files..."
 cd submodules/mydotbins
