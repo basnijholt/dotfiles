@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export BUN_INSTALL="${BUN_INSTALL:-$HOME/.bun}"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 plugin_root="$repo_root/submodules/baspowers"
 codex_bin=${BASPOWERS_CODEX_BIN:-codex}

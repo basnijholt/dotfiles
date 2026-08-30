@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # -- Dotbins: ensures uv is in the PATH
-source "$HOME/.dotbins/shell/bash.sh"
+source "${DOTBINS_SHELL:-$HOME/.dotbins/shell/bash.sh}"
 
 xargs -P4 -I{} sh -c 'uv tool install {}' << 'EOF'
 asciinema
