@@ -164,8 +164,8 @@ Run `git status --short`, stage only `scripts/sync-secrets.sh` and `tests/test-s
 - No repository files. Mutate only explicitly identified remote Git metadata, conflict paths, ownership entries, and recovery directories.
 
 **Interfaces:**
-- Consumes: merged repository changes from Tasks 1-3.
-- Produces: reachable hosts able to run the shared installer while retaining their local work.
+- Consumes: the diagnostic evidence and current pinned Git revisions recorded in the spec.
+- Produces: reachable hosts with repaired local state, ready to consume Tasks 1-3 after Task 5 merges them.
 
 - [ ] **Step 1: Resolve `gce-vm` without committing**
 
