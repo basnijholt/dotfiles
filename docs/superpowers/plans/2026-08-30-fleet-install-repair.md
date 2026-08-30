@@ -185,11 +185,11 @@ Move both `submodules/mydotbins` and `.git/modules/submodules/mydotbins` into a 
 
 - [ ] **Step 5: Repair user-owned package state**
 
-On `pc`, list and validate every root-owned entry under `~/.local/share/uv/tools` and `~/.codex/tmp/arg0`, then use sudo to change only those entries to `basnijholt:users`. On `nas`, remove only the obsolete broken `truenas-unlock` UV tool and verify desired `zfs-unlock` installs successfully.
+On `pc`, list and validate every root-owned entry under `~/.local/share/uv/tools` and `~/.codex/tmp/arg0`. If sudo is unavailable, move only affected top-level UV environments into persistent recovery and recreate desired tools as the user. Preserve inaccessible Codex temp artifacts and prove fresh Codex and Claude plugin operations succeed despite cleanup warnings. On `nas`, remove only the obsolete broken `truenas-unlock` UV tool and verify desired `zfs-unlock` installs successfully.
 
 - [ ] **Step 6: Verify host-local invariants**
 
-Confirm no commits were created on `gce-vm` or `mindroom`, their indexes have no unmerged entries, remote recovery backups exist, and public remotes resolve through HTTPS.
+Confirm no commits were created on `gce-vm` or `mindroom`, their indexes have no unmerged entries, remote recovery backups exist, public remotes resolve through HTTPS, and `pc`'s UV and plugin operations succeed. Report any preserved inaccessible Codex temp artifacts explicitly.
 
 ---
 

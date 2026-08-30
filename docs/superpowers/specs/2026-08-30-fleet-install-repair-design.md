@@ -48,14 +48,14 @@ Required Pi 4 files are:
 - Resolve `mindroom`'s `configs/claude/settings.json` by preserving the combined worktree plus `"alwaysThinkingEnabled": false`, then stage only that path. Do not commit or drop the retained autostash.
 - Change the public top-level origins on `docker-lxc` and `hetzner` to HTTPS, preserving local modifications through autostash.
 - Move the corrupt `nix-cache` `mydotbins` worktree and gitdir into a persistent recovery directory, then reinitialize from HTTPS and verify it with `git fsck`.
-- Correct only root-owned UV/Codex entries under the affected `pc` user directories; do not delete entire tool trees.
+- Recover root-owned UV environments on `pc` into persistent storage and recreate desired tools as the user. Root-owned Codex temp artifacts may remain preserved when privilege is unavailable if fresh Codex and Claude plugin operations succeed; they are cleanup noise, not plugin state.
 - Remove the obsolete broken `truenas-unlock` UV tool on `nas`; the desired replacement is `zfs-unlock`.
 - Let the repository-wide HTTPS migration repair `hetzner-saas` and future public submodule fetches.
 
 ## Safety constraints
 
 - Never commit on `gce-vm` or `mindroom`.
-- Never discard host-local changes, retained autostashes, or corrupt Git state; preserve recoverable backups.
+- Never discard host-local changes, retained autostashes, corrupt Git state, or inaccessible root-owned temp artifacts; preserve recoverable backups.
 - Never use `git reset --hard`, force pushes, broad recursive deletion, or `git add -A`.
 - Never expose secret contents in logs, tests, commits, or review descriptions.
 - Do not modify `pi3` routing; report it as externally blocked until Layer-2 reachability returns.
