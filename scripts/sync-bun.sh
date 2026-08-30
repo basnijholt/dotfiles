@@ -7,6 +7,9 @@ source "${DOTBINS_SHELL:-$HOME/.dotbins/shell/bash.sh}"
 export BUN_INSTALL="${BUN_INSTALL:-$HOME/.bun}"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+# T3's node-pty postinstall requires node-gyp during package installation.
+bun install -g node-gyp@latest
+
 packages=(
     @google/gemini-cli@latest
     @just-every/code@latest
@@ -19,7 +22,6 @@ packages=(
 bun install -g "${packages[@]}"
 
 # T3's node-pty dependency has no Linux prebuild, so build its native addon.
-bun install -g node-gyp@latest
 node_pty_package=''
 t3_global_dir="$BUN_INSTALL/install/global/node_modules/t3"
 if ! node_pty_package=$(cd "$t3_global_dir" && node -p 'require.resolve("node-pty/package.json")'); then
