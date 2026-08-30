@@ -8,14 +8,16 @@ test_root=$(mktemp -d)
 trap 'rm -rf "$test_root"' EXIT
 
 bun_install="$test_root/bun"
+command_bin="$test_root/commands"
 dotbins_shell="$test_root/dotbins-shell.sh"
 node_pty_dir="$test_root/hoisted/node-pty"
 t3_dir="$bun_install/install/global/node_modules/t3"
 log="$test_root/commands.log"
-mkdir -p "$bun_install/bin" "$node_pty_dir" "$t3_dir"
+mkdir -p "$bun_install/bin" "$command_bin" "$node_pty_dir" "$t3_dir"
 touch "$node_pty_dir/package.json"
 
 cat >"$dotbins_shell" <<'SHELL'
+export PATH="${SYNC_BUN_TEST_COMMAND_BIN:?}:$PATH"
 export SYNC_BUN_DOTBINS_SOURCED=1
 SHELL
 
@@ -30,7 +32,7 @@ if [[ "${SYNC_BUN_FAIL_INSTALL:-}" == 1 ]]; then
 fi
 BUN
 
-cat >"$bun_install/bin/node" <<'NODE'
+cat >"$command_bin/node" <<'NODE'
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -47,13 +49,14 @@ if [[ "${SYNC_BUN_FAIL_REBUILD:-}" == 1 ]]; then
   exit 24
 fi
 NODE_GYP
-chmod +x "$bun_install/bin/bun" "$bun_install/bin/node" "$bun_install/bin/node-gyp"
+chmod +x "$bun_install/bin/bun" "$command_bin/node" "$bun_install/bin/node-gyp"
 
 run_sync() {
   env \
     BUN_INSTALL="$bun_install" \
     DOTBINS_SHELL="$dotbins_shell" \
     PATH="$shell_bin:/usr/bin:/bin" \
+    SYNC_BUN_TEST_COMMAND_BIN="$command_bin" \
     SYNC_BUN_NODE_PTY_PACKAGE="$node_pty_dir/package.json" \
     SYNC_BUN_TEST_LOG="$log" \
     "$@" \

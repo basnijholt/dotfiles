@@ -22,7 +22,7 @@ bun install -g "${packages[@]}"
 bun install -g node-gyp@latest
 node_pty_package=''
 t3_global_dir="$BUN_INSTALL/install/global/node_modules/t3"
-if ! node_pty_package=$(cd "$t3_global_dir" && "$BUN_INSTALL/bin/node" -p 'require.resolve("node-pty/package.json")'); then
+if ! node_pty_package=$(cd "$t3_global_dir" && node -p 'require.resolve("node-pty/package.json")'); then
     printf 'Could not resolve node-pty from T3 global modules.\n' >&2
     exit 1
 fi
