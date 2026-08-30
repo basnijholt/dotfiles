@@ -3,9 +3,10 @@
 set -euo pipefail
 
 DOTFILES_ROOT="${DOTFILES_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
-SECRETS_DIR="$DOTFILES_ROOT/secrets"
+SECRETS_DIR="${SECRETS_DIR:-$DOTFILES_ROOT/secrets}"
 SECRETS_REPO_URL="${SECRETS_REPO_URL:-git@github.com:basnijholt/dotfiles-secrets.git}"
-HOSTNAME="$(hostname -s)"
+HOSTNAME="${SYNC_SECRETS_HOSTNAME:-$(hostname -s)}"
+ZFS_UNLOCK_CONFIG_TARGET="${ZFS_UNLOCK_CONFIG_TARGET:-$HOME/.config/zfs-unlock/config.yaml}"
 
 case "$HOSTNAME" in
   basnijholt-macbook-pro-2|basnijholt-macbook-pro|pc|pi4)
@@ -34,6 +35,32 @@ else
     git -C "$SECRETS_DIR" switch --create main --track origin/main
   fi
   git -C "$SECRETS_DIR" pull --ff-only origin main
+fi
+
+if [[ "$HOSTNAME" == pi4 ]]; then
+  required_zfs_unlock_files=(
+    configs/zfs-unlock/config.yaml
+    configs/zfs-unlock/frigate_key
+    configs/zfs-unlock/photos_export_key
+    configs/zfs-unlock/photos_key
+    configs/zfs-unlock/stash_key
+    configs/zfs-unlock/zfs-unlock-receiver
+  )
+
+  for required_file in "${required_zfs_unlock_files[@]}"; do
+    if [[ ! -f "$SECRETS_DIR/$required_file" ]]; then
+      printf 'Missing required ZFS-unlock secret file: %s\n' "$required_file" >&2
+      exit 1
+    fi
+  done
+
+  if [[ ! -e "$ZFS_UNLOCK_CONFIG_TARGET" ]]; then
+    mkdir -p "$(dirname "$ZFS_UNLOCK_CONFIG_TARGET")"
+    rm -f "$ZFS_UNLOCK_CONFIG_TARGET"
+    ln -s "$SECRETS_DIR/configs/zfs-unlock/config.yaml" "$ZFS_UNLOCK_CONFIG_TARGET"
+  fi
+
+  exit 0
 fi
 
 if [[ -f "$SECRETS_DIR/install" ]]; then

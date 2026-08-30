@@ -73,13 +73,24 @@
     ~/dotfiles/submodules/oh-my-zsh/themes/mytheme.zsh-theme: configs/zsh/mytheme.zsh-theme
 
 - shell:
-  - bash scripts/sync-uv.sh
-  - bash scripts/sync-bun.sh
-  - bash scripts/install-nano-syntax.sh
+  - command: bash scripts/sync-uv.sh
+    stdout: true
+    stderr: true
+  - command: bash scripts/sync-bun.sh
+    stdout: true
+    stderr: true
+  - command: bash scripts/install-nano-syntax.sh
+    stdout: true
+    stderr: true
   - command: bash scripts/sync-secrets.sh
     stdout: true
-  - git submodule update --init --recursive
-  - bash scripts/sync-baspowers.sh
+    stderr: true
+  - command: git submodule sync --recursive && git submodule update --init --recursive
+    stdout: true
+    stderr: true
+  - command: bash scripts/sync-baspowers.sh
+    stdout: true
+    stderr: true
 
 # -- Only on Linux --
 - defaults:
