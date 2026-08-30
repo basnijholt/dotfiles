@@ -27,6 +27,13 @@ set -euo pipefail
 
 [[ "${SYNC_BUN_DOTBINS_SOURCED:-}" == 1 ]]
 printf 'bun %s\n' "$*" >>"${SYNC_BUN_TEST_LOG:?}"
+if [[ " $* " == *" t3@latest "* && ! -e "${SYNC_BUN_NODE_GYP_INSTALLED:?}" ]]; then
+  printf 'node-gyp must be installed before T3\n' >&2
+  exit 25
+fi
+if [[ " $* " == *" node-gyp@latest "* ]]; then
+  : >"$SYNC_BUN_NODE_GYP_INSTALLED"
+fi
 if [[ "${SYNC_BUN_FAIL_INSTALL:-}" == 1 ]]; then
   exit 23
 fi
@@ -58,12 +65,14 @@ run_sync() {
     PATH="$shell_bin:/usr/bin:/bin" \
     SYNC_BUN_TEST_COMMAND_BIN="$command_bin" \
     SYNC_BUN_NODE_PTY_PACKAGE="$node_pty_dir/package.json" \
+    SYNC_BUN_NODE_GYP_INSTALLED="$test_root/node-gyp-installed" \
     SYNC_BUN_TEST_LOG="$log" \
     "$@" \
     "$shell_bin/bash" "$script" >"$test_root/output" 2>&1
 }
 
 if ! run_sync; then
+  cat "$test_root/output" >&2
   printf 'sync-bun did not rebuild node-pty from the Node-resolved directory\n' >&2
   exit 1
 fi
