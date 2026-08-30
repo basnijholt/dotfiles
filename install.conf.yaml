@@ -85,7 +85,7 @@
   - command: bash scripts/sync-secrets.sh
     stdout: true
     stderr: true
-  - command: git submodule update --init --recursive
+  - command: git submodule sync --recursive && git submodule update --init --recursive
     stdout: true
     stderr: true
   - command: bash scripts/sync-baspowers.sh

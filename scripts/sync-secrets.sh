@@ -54,8 +54,9 @@ if [[ "$HOSTNAME" == pi4 ]]; then
     fi
   done
 
-  if [[ ! -e "$ZFS_UNLOCK_CONFIG_TARGET" && ! -L "$ZFS_UNLOCK_CONFIG_TARGET" ]]; then
+  if [[ ! -e "$ZFS_UNLOCK_CONFIG_TARGET" ]]; then
     mkdir -p "$(dirname "$ZFS_UNLOCK_CONFIG_TARGET")"
+    rm -f "$ZFS_UNLOCK_CONFIG_TARGET"
     ln -s "$SECRETS_DIR/configs/zfs-unlock/config.yaml" "$ZFS_UNLOCK_CONFIG_TARGET"
   fi
 

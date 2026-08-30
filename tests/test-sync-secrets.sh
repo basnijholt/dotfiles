@@ -83,6 +83,14 @@ if [[ ! -L "$config_target" || "$(readlink "$config_target")" != "$secrets_dir/c
   exit 1
 fi
 
+rm "$config_target"
+ln -s "$test_root/missing-config.yaml" "$config_target"
+run_sync
+if [[ ! -L "$config_target" || "$(readlink "$config_target")" != "$secrets_dir/configs/zfs-unlock/config.yaml" ]]; then
+  printf 'pi4 did not repair a dangling ZFS-unlock config link\n' >&2
+  exit 1
+fi
+
 rm "$secrets_dir/configs/zfs-unlock/photos_key"
 if run_sync; then
   printf 'pi4 accepted a missing required ZFS-unlock key\n' >&2
