@@ -35,7 +35,7 @@
   "disableRemoteControl": true,
   "disableClaudeAiConnectors": true,
   "disableArtifact": true,
-  "model": "opus[1m]",
+  "model": "claude-fable-5-1",
   "hooks": {
     "PreToolUse": [
       {

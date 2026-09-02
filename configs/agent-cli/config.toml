@@ -45,9 +45,9 @@ codex = ["--dangerously-bypass-approvals-and-sandbox"]
 
 [dev.agent_env.claude]
 CLAUDE_CODE_USE_VERTEX = "1"
-# Opus 5's 1M context window is the default, so no [1m] suffix is needed.
+# Fable 5.1 is the default Claude model.
 # Vertex takes the bare first-party model ID (no @date suffix for current-gen models).
-ANTHROPIC_MODEL = "claude-opus-5"
+ANTHROPIC_MODEL = "claude-fable-5-1"
 # Route via the Vertex *global* endpoint instead of us-east5.
 # Global has its own (much larger) quota pool, gets new models first, and skips the
 # regional price premium. us-east5 was returning 429 RESOURCE_EXHAUSTED on the
