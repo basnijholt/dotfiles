@@ -1,7 +1,7 @@
 {
   "providers": {
     "llama-swap": {
-      "baseUrl": "http://llama.local/v1",
+      "baseUrl": "https://llama.lab.nijho.lt/v1",
       "api": "openai-completions",
       "apiKey": "none",
       "models": [
@@ -10,6 +10,22 @@
           "name": "Qwen3.8 27B Q5 (local llama.cpp)",
           "reasoning": true,
           "input": ["text", "image"],
+          "contextWindow": 262144,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          }
+        },
+        {
+          "id": "qwen3.8:27b-q5-abliterated-mtp",
+          "name": "Qwen3.8 27B Q5 Uncensored MTP (local llama.cpp)",
+          "reasoning": true,
+          "input": ["text"],
           "contextWindow": 262144,
           "maxTokens": 16384,
           "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
