@@ -93,6 +93,38 @@ def remote_url() -> tuple[str | None, bool]:
     return fallback.stdout.strip() or None, False
 
 
+def explicitly_private_remotes() -> bool:
+    """Trust only exact fetch/push URLs listed in machine-local configuration.
+
+    Use one URL per line in ~/.config/git/forbidden-words.private-remotes.
+    Blank lines and comments are ignored. Trust is not cached, so removing an
+    entry immediately restores normal visibility checks.
+    """
+    path = config_directory() / "forbidden-words.private-remotes"
+    try:
+        trusted = {
+            line.strip()
+            for line in path.read_text().splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+    except (OSError, UnicodeError):
+        return False
+    remotes = git("remote")
+    if not trusted or remotes.returncode != 0 or not remotes.stdout.strip():
+        return False
+    for remote in remotes.stdout.splitlines():
+        for direction in ((), ("--push",)):
+            result = git("remote", "get-url", "--all", *direction, remote)
+            urls = result.stdout.splitlines()
+            if (
+                result.returncode != 0
+                or not urls
+                or any(url not in trusted for url in urls)
+            ):
+                return False
+    return True
+
+
 def visibility_ttl() -> int:
     raw_ttl = os.environ.get(
         "GIT_FORBIDDEN_WORDS_VISIBILITY_TTL", str(DEFAULT_VISIBILITY_TTL)
@@ -140,6 +172,8 @@ def repository_visibility() -> str:
         return "LOCAL"
     if remote is None:
         return "UNKNOWN"
+    if explicitly_private_remotes():
+        return "PRIVATE"
     path = cache_path(remote)
     now = int(time.time())
     cached = read_cached_visibility(path, now)
