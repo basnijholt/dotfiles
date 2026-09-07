@@ -1,6 +1,6 @@
 {
-  "defaultProvider": "litellm",
-  "defaultModel": "claude-fable-5-1",
+  "defaultProvider": "llama-swap",
+  "defaultModel": "qwen3.8:27b-q5",
   "lastChangelogVersion": "0.70.2",
   "defaultThinkingLevel": "high",
   "packages": [

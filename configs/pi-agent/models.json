@@ -6,6 +6,22 @@
       "apiKey": "none",
       "models": [
         {
+          "id": "qwen3.8:27b-q5",
+          "name": "Qwen3.8 27B Q5 (local llama.cpp)",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 262144,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          }
+        },
+        {
           "id": "glm-4.7-flash:q4",
           "name": "GLM-4.7 Flash Q4 (local)",
           "contextWindow": 131072,
