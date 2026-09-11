@@ -133,18 +133,6 @@ in
         useTemplate = [ "nas-backup-prune" ];
         recursive = true;
       };
-      # Preserve the retired pc Restic repository as file-level history.
-      # NAS-side snapshots keep the frozen archive rollbackable while ZFS
-      # replication is the active backup path.
-      "tank/backups/pc" = {
-        autosnap = true;
-        autoprune = true;
-        frequently = 0;
-        hourly = 48;
-        daily = 14;
-        weekly = 4;
-        monthly = 0;
-      };
       ssd = {
         useTemplate = [ "nas-default" ];
         recursive = "zfs";

@@ -7,7 +7,6 @@
   users.groups = {
     docker.gid = lib.mkForce 999;
     marcella.gid = 3001;
-    restic.gid = 3003;
     timemachine.gid = 3004;
     containers-share.gid = 3006;
   };
@@ -28,14 +27,6 @@
       extraGroups = [ "timemachine" ];
       home = "/var/empty";
       shell = "${pkgs.shadow}/bin/nologin";
-    };
-
-    restic = {
-      isSystemUser = true;
-      uid = 3002;
-      group = "restic";
-      home = "/mnt/tank/backups";
-      shell = pkgs.bashInteractive;
     };
   };
 }
