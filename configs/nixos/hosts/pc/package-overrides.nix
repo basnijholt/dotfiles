@@ -14,8 +14,8 @@
         ollamaLlamaCppSrc = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b10630";
-          hash = "sha256-h7D/vn/tu2DyzvqhJauWJ+a2TMcjnW527Gv28YrB80I=";
+          tag = "b10760";
+          hash = "sha256-+WI/1TAJWG1m9ttS2RO43C+1oL/5xpZTaHn7vQh4+kc=";
         };
       in
       {
@@ -25,14 +25,14 @@
             cudaArches = [ "sm_86" ];
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "0.33.2";
+              version = "0.34.0";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-jzhzMkEC/X4AyLOcBB8lAPcef9B+pmM+WhvDgsd6D2E=";
+                hash = "sha256-s8jFSGo8BJDxe4gSaruJ66JeDnyTBJ0x3dQ5KxWbuTU=";
               };
-              vendorHash = "sha256-HMwoaFBMbpoy8f0I+O+i7kIa9BslLu3FcVWeaIOkpvs=";
+              vendorHash = "sha256-RxmV/VgCydZRGfhWoxDUo3lw8ujCnfQiB1o7PcIikLw=";
               # This package only contains integration-tagged tests, so the
               # generic Go test sweep otherwise reports "build constraints
               # exclude all Go files".
@@ -68,12 +68,12 @@
             blasSupport = true;
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "10687";
+              version = "10930";
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
                 tag = "b${version}";
-                hash = "sha256-AukWLqspouaUQo9mo3k3RdRgr5JFXpdJj3HPd1Gj4O8=";
+                hash = "sha256-qqi7WGXb0dZx2MMZ/wIAse31Dc33V3spQ3RILDcMatQ=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -97,8 +97,8 @@
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
-              url = "https://github.com/mostlygeek/llama-swap/releases/download/v251/llama-swap_251_linux_amd64.tar.gz";
-              hash = "sha256-hb1/Ix9Xd/9ri3h6eU+CVni40ELNRIQERRaljs3HYis=";
+              url = "https://github.com/mostlygeek/llama-swap/releases/download/v255/llama-swap_255_linux_amd64.tar.gz";
+              hash = "sha256-hKoN8M8+MCqFkeOd40f2TAx9zhw6lI32hyOoLh+08dQ=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap

@@ -3,9 +3,7 @@
 
 {
   # --- Persistent Journal ---
-  services.journald.extraConfig = ''
-    Storage=persistent
-  '';
+  services.journald.settings.Journal.Storage = "persistent";
 
   # --- Kernel Watchdog ---
   # Panic after 60s total CPU stall + keep NMI watchdog on
