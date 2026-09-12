@@ -3,6 +3,9 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Netdata 2.11.0 is missing an offline Go proxy substitution and fails in
+    # the Nix sandbox. Keep only Netdata on the last cached working revision.
+    nixpkgs-netdata.url = "github:NixOS/nixpkgs/0e251e24a4f24e036a084b6b4b2d2491af4167f4";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -36,6 +39,7 @@
     {
       self,
       nixpkgs,
+      nixpkgs-netdata,
       home-manager,
       home-manager-pi,
       disko,
@@ -64,6 +68,7 @@
         extraModules:
         lib.nixosSystem {
           inherit system;
+          specialArgs = { inherit nixpkgs-netdata; };
           modules = commonModules home-manager ++ extraModules;
         };
 
