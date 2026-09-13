@@ -46,6 +46,9 @@ let
     [global]
     server_name = "${demoDomain}"
     database_path = "/var/lib/tuwunel-demo"
+    # Recommended by Tuwunel for the host's ZFS database dataset.
+    rocksdb_allow_fallocate = false
+    rocksdb_direct_io = false
     address = ["127.0.0.1", "::1"]
     port = ${toString demoTuwunelPort}
     # Caddy blocks public registration endpoints; the token keeps local
@@ -90,7 +93,11 @@ in
     '';
 
     serviceConfig = {
-      Type = "simple";
+      # READY follows startup migrations; ordered HTTP checks must wait for it.
+      Type = "notify";
+      # Never force-kill a migration at a systemd startup or shutdown deadline.
+      TimeoutStartSec = "infinity";
+      TimeoutStopSec = "infinity";
       User = "tuwunel-demo";
       Group = "tuwunel-demo";
       ExecStart = "${tuwunelPackage}/bin/tuwunel";
@@ -113,6 +120,7 @@ in
     environment = {
       CONDUWUIT_CONFIG = "/run/tuwunel-demo/tuwunel.toml";
       LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.liburing ];
+      SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
     };
   };
 

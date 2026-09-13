@@ -46,6 +46,9 @@ let
     [global]
     server_name = "${siteDomain}"
     database_path = "/var/lib/tuwunel"
+    # Recommended by Tuwunel for the host's ZFS database dataset.
+    rocksdb_allow_fallocate = false
+    rocksdb_direct_io = false
     address = ["127.0.0.1", "::1"]
     port = 8008
     # Token-gated registration; token is loaded from an agenix-managed secret file.
@@ -168,7 +171,11 @@ in
     '';
 
     serviceConfig = {
-      Type = "simple";
+      # READY follows startup migrations; ordered HTTP checks must wait for it.
+      Type = "notify";
+      # Never force-kill a migration at a systemd startup or shutdown deadline.
+      TimeoutStartSec = "infinity";
+      TimeoutStopSec = "infinity";
       User = "tuwunel";
       Group = "tuwunel";
       EnvironmentFile = [
@@ -196,6 +203,7 @@ in
     environment = {
       CONDUWUIT_CONFIG = "/run/tuwunel/tuwunel.toml";
       LD_LIBRARY_PATH = lib.makeLibraryPath [ pkgs.liburing ];
+      SSL_CERT_FILE = "${pkgs.cacert}/etc/ssl/certs/ca-bundle.crt";
     };
   };
 

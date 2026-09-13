@@ -72,10 +72,11 @@ Important: changing `server_name` on an existing Tuwunel database is not support
 
 ### Tuwunel binary (GitHub release)
 
-Tuwunel is pinned from a GitHub release asset in Nix (`default.nix`):
+Tuwunel is pinned from a GitHub release asset in `constants.nix` and packaged
+by `tuwunel.nix` and `tuwunel-demo.nix`:
 
 - `tuwunelVersion`
-- `tuwunelArchive` URL/hash
+- `tuwunelArchiveHash` (aarch64 tarball)
 
 To update:
 
@@ -91,6 +92,30 @@ nix store prefetch-file --json "https://github.com/mindroom-ai/mindroom-tuwunel/
 ```bash
 nixos-rebuild switch --flake ~/dotfiles/configs/nixos#hetzner-matrix
 ```
+
+Before a database-migrating upgrade, read the upstream release notes and
+[backup guide](https://github.com/matrix-construct/tuwunel/blob/v1.9.1/docs/backups.md).
+Upgrading from 1.8.3 or earlier to 1.9.1 runs a one-time migration before HTTP
+opens. Never force-kill it or bypass its migration guards. The main and demo
+units use `Type=notify` and unlimited startup/shutdown timeouts so ordered
+healthchecks wait for migration readiness. Check HTTP separately after READY.
+
+Comin deploys this host from `main`; the operator's checkout can be older than
+the live generation. Build from the deployed revision, review the system diff,
+and use `comin suspend` during a controlled upgrade. A runtime systemd mask
+does not override this host's Nix-managed unit symlinks in `/etc`.
+Stop healthcheck timers, then bridges, then both Tuwunel services before taking
+an atomic snapshot of `zroot/tuwunel` and `zroot/var`. Hold those snapshots and
+replicate them to the NAS; compare source/destination snapshot GUIDs. The first
+dataset includes media; the second includes demo and bridge databases.
+
+After activation, explicitly start both servers, wait for readiness and HTTP,
+then start/check bridges and healthchecks. Keep Comin suspended until the
+deployed pin and service configuration are on `main`, then resume it.
+Preserve the old system and snapshots: rollback requires the pre-upgrade data
+as well as the old binary. Both versions can report schema 17, so the schema
+guard alone does not establish downgrade compatibility. Restore only the
+relevant demo/bridge paths from `zroot/var`, not the entire shared dataset.
 
 ### Registration + SSO secrets (agenix)
 
