@@ -76,6 +76,10 @@ def cf(args):
     container = stack_container(stack)
     if command == "up":
         child = subprocess.Popen([sys.executable, __file__, "child-up", container])
+        if controls().get("up_signal_parent_then_exit"):
+            time.sleep(0.05)
+            os.kill(os.getppid(), signal.SIGTERM)
+            return 0
         return child.wait()
     if command == "down":
         settings = controls()
@@ -348,6 +352,19 @@ class VllmSwapLifecycleTests(unittest.TestCase):
         )
 
         process.send_signal(signal.SIGTERM)
+        self.assertNotEqual(process.wait(timeout=3), 0)
+        time.sleep(0.9)
+
+        self.assertFalse(self.marker("normal").exists())
+
+    def test_cancellation_as_start_leader_exits_reaps_descendant(self):
+        self.set_controls(
+            up_delay=0.8,
+            up_ignore_term=True,
+            up_signal_parent_then_exit=True,
+        )
+
+        process = self.start_launcher()
         self.assertNotEqual(process.wait(timeout=3), 0)
         time.sleep(0.9)
 

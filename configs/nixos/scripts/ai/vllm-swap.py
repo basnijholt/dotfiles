@@ -166,9 +166,13 @@ def run_cancelable(command, cancel, env, timeout):
             terminate_process_group(process, timeout)
             raise Cancelled(cancel["signum"])
         try:
-            return process.wait(timeout=0.1)
+            returncode = process.wait(timeout=0.1)
         except subprocess.TimeoutExpired:
             continue
+        terminate_process_group(process, timeout)
+        if cancel["signum"] is not None:
+            raise Cancelled(cancel["signum"])
+        return returncode
 
 
 def reject_conflicts(config):
