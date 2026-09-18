@@ -86,8 +86,10 @@ def inspect_container(config, container):
     diagnostic = "\n".join(
         part.strip() for part in (result.stdout, result.stderr) if part
     )
+    normalized_diagnostic = diagnostic.casefold()
     if result.returncode == 1 and (
-        "No such object:" in diagnostic or "No such container:" in diagnostic
+        "no such object:" in normalized_diagnostic
+        or "no such container:" in normalized_diagnostic
     ):
         return False
     raise LauncherError(

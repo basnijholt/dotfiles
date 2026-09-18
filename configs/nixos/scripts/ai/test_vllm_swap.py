@@ -103,7 +103,10 @@ def docker(args):
         if marker(container).exists():
             print("true")
             return 0
-        print(f"Error: No such object: {container}", file=sys.stderr)
+        if settings.get("lowercase_missing"):
+            print(f"error: no such object: {container}", file=sys.stderr)
+        else:
+            print(f"Error: No such object: {container}", file=sys.stderr)
         return 1
     if args[:1] == ["wait"] and len(args) == 2:
         container = args[1]
@@ -326,6 +329,16 @@ class VllmSwapLifecycleTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("cannot determine container state", result.stderr)
         self.assertFalse(self.marker("normal").exists())
+
+    def test_lowercase_no_such_object_is_treated_as_absent(self):
+        self.set_controls(lowercase_missing=True)
+
+        process = self.start_launcher()
+        self.wait_for(self.marker("normal").exists, process)
+        stopped = self.run_launcher("stop", "normal")
+
+        self.assertEqual(stopped.returncode, 0, stopped.stderr)
+        self.assertEqual(process.wait(timeout=3), 0)
 
     def test_failed_start_removes_partially_created_container(self):
         self.set_controls(up_fail_after_create=["llama-swap-qwen38-normal"])
