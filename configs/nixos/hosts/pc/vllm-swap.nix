@@ -82,13 +82,7 @@ let
           shm_size = "16gb";
           depends_on.fa2-init.condition = "service_completed_successfully";
           ports = [ "127.0.0.1:\${LLAMA_SWAP_PORT:-${toString fallbackPort}}:8000" ];
-          deploy.resources.reservations.devices = [
-            {
-              driver = "nvidia";
-              count = "all";
-              capabilities = [ "gpu" ];
-            }
-          ];
+          devices = [ "nvidia.com/gpu=all" ];
           inherit volumes;
           environment = {
             TARGET_MODEL = "/models/target";
