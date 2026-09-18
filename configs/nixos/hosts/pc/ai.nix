@@ -1,6 +1,9 @@
 # AI and machine learning services (Ollama, llama-swap, Wyoming)
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
+let
+  vllmSwap = "${config.system.build.llama-swap-vllm-launcher}/bin/vllm-swap";
+in
 {
   imports = [ ./vllm-swap.nix ];
 
@@ -42,11 +45,11 @@
       # Pinned Huihui AutoRound conversion served by the isolated vLLM project.
       "qwen3.8-27b-uncensored":
         cmd: |
-          /run/current-system/sw/bin/vllm-swap
+          ${vllmSwap}
           --config /etc/llama-swap/vllm.json
           start uncensored ''${PORT}
         cmdStop: |
-          /run/current-system/sw/bin/vllm-swap
+          ${vllmSwap}
           --config /etc/llama-swap/vllm.json
           stop uncensored
         proxy: "http://127.0.0.1:''${PORT}"
@@ -61,11 +64,11 @@
       # Frozenlock AutoRound conversion served by the isolated vLLM project.
       "qwen3.8-27b":
         cmd: |
-          /run/current-system/sw/bin/vllm-swap
+          ${vllmSwap}
           --config /etc/llama-swap/vllm.json
           start normal ''${PORT}
         cmdStop: |
-          /run/current-system/sw/bin/vllm-swap
+          ${vllmSwap}
           --config /etc/llama-swap/vllm.json
           stop normal
         proxy: "http://127.0.0.1:''${PORT}"

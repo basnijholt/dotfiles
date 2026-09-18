@@ -24,6 +24,20 @@ The PC follows the `main` branch through comin, so complete this migration
 before merging a change that enables these units. A later manual rebuild is not
 guaranteed to be the first activation.
 
+The generated recipes use `pull_policy: never` so an API request cannot trigger
+an image download. Pre-pull both exact pinned images on the PC before merging or
+activating this configuration:
+
+```bash
+docker image pull \
+  vllm/vllm-openai:v0.29.0@sha256:c2914767605584b6d8f45686b82de173ecc99e781897aa3d0a66dacd72c51ae1
+docker image pull \
+  ghcr.io/antonprokopyev/fa2-fp8kv-sm86@sha256:da040941fa048fd5fdfce520503341c0beda4ce41436a1c1fecaf3f8a99777c7
+```
+
+These explicit pulls are the only image-fetch step. Confirm both commands
+complete before continuing with the routing migration below.
+
 The global Compose Farm registry currently owns `club-3090-vllm`. Removing that
 entry also removes its generated Traefik routers. First create a separate static
 file on the NAS at

@@ -67,6 +67,7 @@ let
         fa2-init = {
           image = "ghcr.io/antonprokopyev/fa2-fp8kv-sm86@sha256:da040941fa048fd5fdfce520503341c0beda4ce41436a1c1fecaf3f8a99777c7";
           container_name = "${container}-fa2-init";
+          pull_policy = "never";
           restart = "no";
           volumes = [ "fa2-kernels:/export" ];
         };
@@ -74,6 +75,7 @@ let
         vllm = {
           image = "vllm/vllm-openai:v0.29.0@sha256:c2914767605584b6d8f45686b82de173ecc99e781897aa3d0a66dacd72c51ae1";
           container_name = container;
+          pull_policy = "never";
           restart = "no";
           user = "0:1000";
           ipc = "host";
@@ -268,7 +270,10 @@ in
     "llama-swap/stacks/qwen38-uncensored/compose.yaml".source = uncensoredCompose;
   };
 
-  system.build.llama-swap-vllm = bundle;
+  system.build = {
+    llama-swap-vllm = bundle;
+    llama-swap-vllm-launcher = launcher;
+  };
 
   systemd.services.llama-swap-vllm-retire-legacy = {
     description = "Retire legacy Club3090 vLLM container";
