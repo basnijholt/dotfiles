@@ -42,7 +42,9 @@ in
 
     models:  # Ordered from newest to oldest
 
-      "qwen3.8-27b-uncensored":
+      "qwen38-vllm:27b-uncensored":
+        name: "Qwen3.8 27B · vLLM · Uncensored"
+        description: "AutoRound INT4, DFlash2, 60K context."
         cmd: "${vllmSwap} start uncensored ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b-uncensored"
@@ -51,7 +53,9 @@ in
         ttl: 0
         unloadTimeout: 120
 
-      "qwen3.8-27b":
+      "qwen38-vllm:27b":
+        name: "Qwen3.8 27B · vLLM"
+        description: "AutoRound INT4, DFlash2, 60K context."
         cmd: "${vllmSwap} start normal ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b"
@@ -62,7 +66,9 @@ in
 
       # Abliterated Qwen3.8 27B with embedded MTP weights; size 20.7 GB.
       # Source: https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF
-      "qwen3.8:27b-q5-abliterated-mtp":
+      "qwen38:27b-uncensored":
+        name: "Qwen3.8 27B · llama.cpp · Uncensored"
+        description: "Abliterated UD-Q5_K_XL GGUF with MTP drafting; text only."
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF
@@ -95,7 +101,9 @@ in
       # Uploaded 2026-08-14, size 20.2 GB, max ctx: 262144, layers: 64
       # Source: https://huggingface.co/unsloth/Qwen3.8-27B-GGUF
       # Thinking-mode sampling follows Unsloth's recommended settings.
-      "qwen3.8:27b-q5":
+      "qwen38:27b":
+        name: "Qwen3.8 27B · llama.cpp"
+        description: "UD-Q5_K_XL GGUF with vision support."
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo unsloth/Qwen3.8-27B-GGUF
@@ -338,7 +346,9 @@ in
           --jinja
 
       # Local Qwen3.6-27B style adapter for prose generation.
-      "qwen3.6:27b-q5-style":
+      "qwen36:27b-style":
+        name: "Qwen3.6 27B · llama.cpp · Style"
+        description: "Q5_K_M GGUF with the local style LoRA and custom chat template; text only."
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
           --hf-repo DavidAU/Qwen3.6-27B-Heretic-Uncensored-FINETUNE-NEO-CODE-Di-IMatrix-MAX-GGUF

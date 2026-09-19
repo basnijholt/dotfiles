@@ -1,6 +1,6 @@
 {
   "defaultProvider": "llama-swap",
-  "defaultModel": "qwen3.8:27b-q5",
+  "defaultModel": "qwen38:27b",
   "lastChangelogVersion": "0.70.2",
   "defaultThinkingLevel": "high",
   "packages": [

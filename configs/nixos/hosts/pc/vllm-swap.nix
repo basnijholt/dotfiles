@@ -23,27 +23,4 @@ in
       TimeoutStopSec = "240s";
     };
   };
-
-  systemd.sockets.llama-swap-port-8010 = {
-    description = "Compatibility listener for the former Club3090 vLLM endpoint";
-    wantedBy = [ "multi-user.target" ];
-    before = [
-      "multi-user.target"
-      "shutdown.target"
-    ];
-    conflicts = [ "shutdown.target" ];
-    unitConfig.DefaultDependencies = false;
-    listenStreams = [ "0.0.0.0:8010" ];
-  };
-
-  systemd.services.llama-swap-port-8010 = {
-    description = "Proxy port 8010 to llama-swap";
-    after = [ "llama-swap.service" ];
-    requires = [ "llama-swap.service" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.systemd}/lib/systemd/systemd-socket-proxyd 127.0.0.1:9292";
-      PrivateTmp = true;
-      NoNewPrivileges = true;
-    };
-  };
 }
