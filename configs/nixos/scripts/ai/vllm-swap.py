@@ -155,26 +155,38 @@ def terminate_process_group(process, timeout):
         process.wait()
 
 
-def run_cancelable(command, cancel, env, timeout):
+def run_cancelable(command, cancel, env, timeout, capture_stdout=False):
     if cancel["signum"] is not None:
         raise Cancelled(cancel["signum"])
     try:
-        process = subprocess.Popen(command, env=env, start_new_session=True)
+        process = subprocess.Popen(
+            command,
+            env=env,
+            start_new_session=True,
+            stdout=subprocess.PIPE if capture_stdout else None,
+            text=capture_stdout,
+        )
     except OSError as error:
         raise LauncherError(f"cannot start {' '.join(command)}: {error}") from error
 
     while True:
         if cancel["signum"] is not None:
             terminate_process_group(process, timeout)
+            if process.stdout is not None:
+                process.stdout.close()
             raise Cancelled(cancel["signum"])
         try:
             returncode = process.wait(timeout=0.1)
         except subprocess.TimeoutExpired:
             continue
         terminate_process_group(process, timeout)
+        stdout = None
+        if process.stdout is not None:
+            stdout = process.stdout.read()
+            process.stdout.close()
         if cancel["signum"] is not None:
             raise Cancelled(cancel["signum"])
-        return returncode
+        return subprocess.CompletedProcess(command, returncode, stdout=stdout)
 
 
 def reject_conflicts(config):
@@ -215,18 +227,33 @@ def start(config, name, port):
             env["LLAMA_SWAP_PORT"] = str(port)
             attempted_start = True
             up = compose_command(config, model, "up", "-d", model["service"])
-            if run_cancelable(up, cancel, env, config["stopTimeout"]) != 0:
+            up_result = run_cancelable(up, cancel, env, config["stopTimeout"])
+            if up_result.returncode != 0:
                 raise LauncherError(f"failed to start model {name}")
             if not inspect_container(config, model["container"]):
                 raise LauncherError(
                     f"container is not running after start: {model['container']}"
                 )
             wait = [config["docker"], "wait", model["container"]]
-            if (
-                run_cancelable(wait, cancel, os.environ.copy(), config["stopTimeout"])
-                != 0
-            ):
+            wait_result = run_cancelable(
+                wait,
+                cancel,
+                os.environ.copy(),
+                config["stopTimeout"],
+                capture_stdout=True,
+            )
+            if wait_result.returncode != 0:
                 raise LauncherError(f"failed while waiting for model {name}")
+            wait_output = wait_result.stdout.strip()
+            if not wait_output.isdecimal():
+                raise LauncherError(
+                    f"malformed Docker wait output for model {name}: {wait_output!r}"
+                )
+            container_status = int(wait_output)
+            if container_status != 0:
+                raise LauncherError(
+                    f"model {name} container exited with status {container_status}"
+                )
         except Cancelled as error:
             failure = f"received signal {error.signum}"
             exit_code = 128 + error.signum

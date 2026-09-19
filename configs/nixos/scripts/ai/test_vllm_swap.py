@@ -112,7 +112,7 @@ def docker(args):
         container = args[1]
         while marker(container).exists():
             time.sleep(0.02)
-        print("0")
+        print(controls().get("wait_output", "0"))
         return 0
     print("unexpected docker arguments", file=sys.stderr)
     return 64
@@ -290,6 +290,42 @@ class VllmSwapLifecycleTests(unittest.TestCase):
         self.assertEqual(stopped.returncode, 0, stopped.stderr)
         self.assertEqual(process.wait(timeout=3), 0)
         self.assertFalse(self.marker("normal").exists())
+
+    def test_nonzero_container_exit_status_fails_launcher(self):
+        process = self.start_launcher()
+        self.wait_for(self.marker("normal").exists, process)
+        self.set_controls(wait_output="42")
+        self.wait_for(
+            lambda: any(
+                call["kind"] == "docker" and call["args"][:1] == ["wait"]
+                for call in self.calls()
+            ),
+            process,
+        )
+
+        self.marker("normal").unlink()
+        _stdout, stderr = process.communicate(timeout=3)
+
+        self.assertNotEqual(process.returncode, 0)
+        self.assertIn("container exited with status 42", stderr)
+
+    def test_malformed_container_exit_status_fails_closed(self):
+        process = self.start_launcher()
+        self.wait_for(self.marker("normal").exists, process)
+        self.set_controls(wait_output="unknown")
+        self.wait_for(
+            lambda: any(
+                call["kind"] == "docker" and call["args"][:1] == ["wait"]
+                for call in self.calls()
+            ),
+            process,
+        )
+
+        self.marker("normal").unlink()
+        _stdout, stderr = process.communicate(timeout=3)
+
+        self.assertNotEqual(process.returncode, 0)
+        self.assertIn("malformed Docker wait output", stderr)
 
     def test_second_model_is_rejected_while_first_owns_lock(self):
         process = self.start_launcher()
