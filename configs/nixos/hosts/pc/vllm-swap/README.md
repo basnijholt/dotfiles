@@ -1,13 +1,20 @@
-# Qwen3.8 vLLM switching
+# Qwen3.8 llama.cpp and vLLM backends
 
-The PC serves two local vLLM backends through llama-swap:
+The existing GGUF model IDs continue to use llama.cpp:
 
-| Model ID | Legacy alias | Checkpoint directory |
+| Model ID | Engine | Source |
 |---|---|---|
-| `qwen3.8-27b` | `qwen3.8:27b-q5` | `/var/lib/club-3090-vllm/models/qwen3.8-27b-autoround-int4` |
-| `qwen3.8-27b-uncensored` | `qwen3.8:27b-q5-abliterated-mtp` | `/var/lib/club-3090-vllm/models/qwen3.8-27b-huihui-autoround` |
+| `qwen3.8:27b-q5` | llama.cpp | `unsloth/Qwen3.8-27B-GGUF` |
+| `qwen3.8:27b-q5-abliterated-mtp` | llama.cpp | `huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF` |
 
-Both projects use the draft model at
+The vLLM integration is additive and uses separate canonical IDs:
+
+| Model ID | Engine | Checkpoint directory |
+|---|---|---|
+| `qwen3.8-27b` | vLLM | `/var/lib/club-3090-vllm/models/qwen3.8-27b-autoround-int4` |
+| `qwen3.8-27b-uncensored` | vLLM | `/var/lib/club-3090-vllm/models/qwen3.8-27b-huihui-autoround` |
+
+Both vLLM projects use the draft model at
 `/var/lib/club-3090-vllm/models/qwen3.8-27b-dflash2-w4a16`. The files must
 already exist; startup is offline and refuses missing configuration or weight
 files. `/home/basnijholt/.local/bin/cf` must also exist and remain executable.
