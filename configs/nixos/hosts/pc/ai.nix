@@ -1,8 +1,8 @@
 # AI and machine learning services (Ollama, llama-swap, Wyoming)
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 let
-  vllmSwap = "${config.system.build.llama-swap-vllm-launcher}/bin/vllm-swap";
+  vllmSwap = "/var/lib/vllm-swap/current/bin/vllm-swap";
 in
 {
   imports = [ ./vllm-swap.nix ];
