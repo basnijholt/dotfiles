@@ -1,7 +1,12 @@
 # AI and machine learning services (Ollama, llama-swap, Wyoming)
 { pkgs, ... }:
 
+let
+  vllmSwap = "/var/lib/vllm-swap/current/bin/vllm-swap";
+in
 {
+  imports = [ ./vllm-swap.nix ];
+
   # --- Ollama ---
   services.ollama = {
     enable = true;
@@ -33,9 +38,27 @@
 
   environment.etc."llama-swap/config.yaml".text = ''
     # llama-swap configuration
-    # This config uses llama.cpp's server to serve models on demand
+    # This config serves models on demand
 
     models:  # Ordered from newest to oldest
+
+      "qwen3.8-27b-uncensored":
+        cmd: "${vllmSwap} start uncensored ''${PORT}"
+        proxy: "http://127.0.0.1:''${PORT}"
+        useModelName: "qwen3.8-27b-uncensored"
+        capabilities:
+          context: 60000
+        ttl: 0
+        unloadTimeout: 120
+
+      "qwen3.8-27b":
+        cmd: "${vllmSwap} start normal ''${PORT}"
+        proxy: "http://127.0.0.1:''${PORT}"
+        useModelName: "qwen3.8-27b"
+        capabilities:
+          context: 60000
+        ttl: 0
+        unloadTimeout: 120
 
       # Abliterated Qwen3.8 27B with embedded MTP weights; size 20.7 GB.
       # Source: https://huggingface.co/huihui-ai/Huihui-Qwen3.8-27B-abliterated-GGUF
