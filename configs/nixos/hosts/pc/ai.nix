@@ -38,20 +38,13 @@ in
 
   environment.etc."llama-swap/config.yaml".text = ''
     # llama-swap configuration
-    # This config uses llama.cpp and pinned vLLM backends to serve models on demand
+    # This config serves models on demand
 
     models:  # Ordered from newest to oldest
 
-      # Pinned Huihui AutoRound conversion served by the isolated vLLM project.
       "qwen3.8-27b-uncensored":
-        cmd: |
-          ${vllmSwap}
-          --config /etc/llama-swap/vllm.json
-          start uncensored ''${PORT}
-        cmdStop: |
-          ${vllmSwap}
-          --config /etc/llama-swap/vllm.json
-          stop uncensored
+        cmd: "${vllmSwap} start uncensored ''${PORT}"
+        cmdStop: "${vllmSwap} stop uncensored"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b-uncensored"
         capabilities:
@@ -59,16 +52,9 @@ in
         ttl: 0
         unloadTimeout: 120
 
-      # Frozenlock AutoRound conversion served by the isolated vLLM project.
       "qwen3.8-27b":
-        cmd: |
-          ${vllmSwap}
-          --config /etc/llama-swap/vllm.json
-          start normal ''${PORT}
-        cmdStop: |
-          ${vllmSwap}
-          --config /etc/llama-swap/vllm.json
-          stop normal
+        cmd: "${vllmSwap} start normal ''${PORT}"
+        cmdStop: "${vllmSwap} stop normal"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b"
         capabilities:
@@ -694,6 +680,7 @@ in
       RestartSec = 10;
       # Environment for CUDA support
       Environment = [
+        "PATH=/run/current-system/sw/bin"
         "LD_LIBRARY_PATH=/run/opengl-driver/lib:/run/opengl-driver-32/lib"
         # llama-swap can use both GPUs (0,1), but Ollama is restricted to GPU 0
       ];

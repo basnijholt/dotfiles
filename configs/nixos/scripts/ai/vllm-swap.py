@@ -2,59 +2,29 @@
 
 import argparse
 import fcntl
-import json
 import os
 import signal
 import subprocess
 import sys
+from contextlib import suppress
 from pathlib import Path
 
-
-class LauncherError(Exception):
-    pass
+CF = os.environ.get("VLLM_SWAP_CF", "cf")
+DOCKER = os.environ.get("VLLM_SWAP_DOCKER", "docker")
+CF_CONFIG = os.environ.get("VLLM_SWAP_CF_CONFIG", "/etc/llama-swap/compose-farm.yaml")
+STATE_DIR = Path(os.environ.get("VLLM_SWAP_STATE_DIR", "/run/llama-swap-vllm"))
+STOP_TIMEOUT = os.environ.get("VLLM_SWAP_STOP_TIMEOUT", "90")
+STACKS = {"normal": "qwen38-normal", "uncensored": "qwen38-uncensored"}
+CONTAINERS = {
+    "llama-swap-qwen38-normal",
+    "llama-swap-qwen38-uncensored",
+    "club-3090-vllm",
+}
+CANCEL_SIGNAL = None
 
 
 class Cancelled(Exception):
-    def __init__(self, signum):
-        self.signum = signum
-
-
-def load_config(path):
-    try:
-        config = json.loads(Path(path).read_text())
-        if not isinstance(config, dict):
-            raise TypeError("top level must be an object")
-        required_strings = ("cf", "cfConfig", "docker", "stateDir")
-        if not all(isinstance(config.get(key), str) for key in required_strings):
-            raise TypeError("paths must be strings")
-        if type(config.get("stopTimeout")) is not int:
-            raise TypeError("stopTimeout must be an integer")
-        if config["stopTimeout"] < 0:
-            raise ValueError("stopTimeout must not be negative")
-        legacy_containers = config.get("legacyContainers")
-        if not isinstance(legacy_containers, list) or not all(
-            isinstance(name, str) for name in legacy_containers
-        ):
-            raise TypeError("legacyContainers must be a list of strings")
-        models = config.get("models")
-        if not isinstance(models, dict) or not models:
-            raise ValueError("models must be a non-empty object")
-        for model in models.values():
-            if not isinstance(model, dict) or not all(
-                isinstance(model.get(key), str)
-                for key in ("stack", "service", "container")
-            ):
-                raise TypeError("each model requires stack, service, and container")
-    except (OSError, json.JSONDecodeError, TypeError, ValueError) as error:
-        raise LauncherError(f"invalid config {path}: {error}") from error
-    return config
-
-
-def model_config(config, name):
-    try:
-        return config["models"][name]
-    except KeyError as error:
-        raise LauncherError(f"unknown model: {name}") from error
+    pass
 
 
 def port_number(value):
@@ -67,253 +37,138 @@ def port_number(value):
     return port
 
 
-def inspect_container(config, container):
-    command = [
-        config["docker"],
-        "inspect",
-        "--format",
-        "{{.State.Running}}",
-        container,
-    ]
-    try:
-        result = subprocess.run(command, capture_output=True, text=True, check=False)
-    except OSError as error:
-        raise LauncherError(f"cannot inspect container {container}: {error}") from error
-
-    output = result.stdout.strip().lower()
-    if result.returncode == 0 and output in ("true", "false"):
-        return output == "true"
-    diagnostic = "\n".join(
-        part.strip() for part in (result.stdout, result.stderr) if part
-    )
-    normalized_diagnostic = diagnostic.casefold()
-    if result.returncode == 1 and (
-        "no such object:" in normalized_diagnostic
-        or "no such container:" in normalized_diagnostic
-    ):
-        return False
-    raise LauncherError(
-        f"cannot determine container state for {container}"
-        + (f": {diagnostic}" if diagnostic else "")
-    )
+def compose(stack, *args):
+    return [CF, "compose", "--config", CF_CONFIG, stack, *args]
 
 
-def compose_command(config, model, command, *args):
-    return [
-        config["cf"],
-        "compose",
-        "--config",
-        config["cfConfig"],
-        model["stack"],
-        command,
-        *args,
-    ]
-
-
-def command_failure(command, result):
-    diagnostic = "\n".join(
-        part.strip() for part in (result.stdout, result.stderr) if part
-    )
-    message = f"command failed with status {result.returncode}: {' '.join(command)}"
-    return message + (f": {diagnostic}" if diagnostic else "")
-
-
-def cleanup_model(config, model):
-    command = compose_command(
-        config, model, "down", "--timeout", str(config["stopTimeout"])
-    )
-    errors = []
-    try:
-        result = subprocess.run(command, capture_output=True, text=True, check=False)
-        if result.returncode != 0:
-            errors.append(command_failure(command, result))
-    except OSError as error:
-        errors.append(f"cannot run cleanup command: {error}")
-
-    try:
-        if inspect_container(config, model["container"]):
-            errors.append(f"container survived cleanup: {model['container']}")
-    except LauncherError as error:
-        errors.append(str(error))
-    return errors
-
-
-def terminate_process_group(process, timeout):
-    try:
-        os.killpg(process.pid, signal.SIGTERM)
-    except ProcessLookupError:
-        pass
-    try:
-        process.wait(timeout=max(0.1, min(5, timeout)))
-    except subprocess.TimeoutExpired:
-        pass
-    try:
-        os.killpg(process.pid, signal.SIGKILL)
-    except ProcessLookupError:
-        pass
-    if process.poll() is None:
-        process.wait()
-
-
-def run_cancelable(command, cancel, env, timeout, capture_stdout=False):
-    if cancel["signum"] is not None:
-        raise Cancelled(cancel["signum"])
-    try:
-        process = subprocess.Popen(
-            command,
-            env=env,
-            start_new_session=True,
-            stdout=subprocess.PIPE if capture_stdout else None,
-            text=capture_stdout,
+def describe(error):
+    if isinstance(error, subprocess.CalledProcessError):
+        detail = "\n".join(
+            text.strip() for text in (error.stdout, error.stderr) if text
         )
-    except OSError as error:
-        raise LauncherError(f"cannot start {' '.join(command)}: {error}") from error
+        message = (
+            f"command failed with status {error.returncode}: {' '.join(error.cmd)}"
+        )
+        return message + (f": {detail}" if detail else "")
+    return str(error)
 
-    while True:
-        if cancel["signum"] is not None:
-            terminate_process_group(process, timeout)
-            if process.stdout is not None:
-                process.stdout.close()
-            raise Cancelled(cancel["signum"])
+
+def running_containers():
+    command = [DOCKER, "ps", "--format", "{{.Names}}"]
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+    except (OSError, subprocess.CalledProcessError) as error:
+        raise RuntimeError(
+            f"cannot list running containers: {describe(error)}"
+        ) from error
+    return set(result.stdout.splitlines())
+
+
+def cleanup_stack(stack):
+    subprocess.run(
+        compose(stack, "down", "--timeout", STOP_TIMEOUT),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    container = f"llama-swap-{stack}"
+    if container in running_containers():
+        raise RuntimeError(f"container survived cleanup: {container}")
+
+
+def terminate_group(process):
+    for signum in (signal.SIGTERM, signal.SIGKILL):
+        with suppress(ProcessLookupError):
+            os.killpg(process.pid, signum)
+        with suppress(subprocess.TimeoutExpired):
+            process.wait(timeout=5)
+
+
+def run_attached(command, env):
+    if CANCEL_SIGNAL:
+        raise Cancelled(CANCEL_SIGNAL)
+    process = subprocess.Popen(command, env=env, start_new_session=True)
+    while not CANCEL_SIGNAL:
         try:
-            returncode = process.wait(timeout=0.1)
+            status = process.wait(timeout=0.1)
+            break
         except subprocess.TimeoutExpired:
-            continue
-        terminate_process_group(process, timeout)
-        stdout = None
-        if process.stdout is not None:
-            stdout = process.stdout.read()
-            process.stdout.close()
-        if cancel["signum"] is not None:
-            raise Cancelled(cancel["signum"])
-        return subprocess.CompletedProcess(command, returncode, stdout=stdout)
+            pass
+    terminate_group(process)
+    if CANCEL_SIGNAL:
+        raise Cancelled(CANCEL_SIGNAL)
+    if status:
+        raise subprocess.CalledProcessError(status, command)
 
 
-def reject_conflicts(config):
-    containers = [model["container"] for model in config["models"].values()]
-    containers.extend(config.get("legacyContainers", []))
-    for container in containers:
-        if inspect_container(config, container):
-            raise LauncherError(f"conflicting container is running: {container}")
-
-
-def start(config, name, port):
-    model = model_config(config, name)
-    state_dir = Path(config["stateDir"])
-    state_dir.mkdir(parents=True, exist_ok=True)
-    lock_path = state_dir / "ownership.lock"
-
-    with lock_path.open("a+") as lock:
+def start(model, port):
+    stack = STACKS[model]
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    with (STATE_DIR / "ownership.lock").open("a+") as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError as error:
-            raise LauncherError("another vLLM launcher owns the host lock") from error
-
-        reject_conflicts(config)
-        cancel = {"signum": None}
-
-        def handle_signal(signum, _frame):
-            cancel["signum"] = signum
-
-        previous = {
-            signum: signal.signal(signum, handle_signal)
-            for signum in (signal.SIGTERM, signal.SIGINT)
-        }
-        attempted_start = False
-        failure = None
-        exit_code = 0
+            raise RuntimeError("another vLLM launcher owns the host lock") from error
+        conflicts = CONTAINERS & running_containers()
+        if conflicts:
+            raise RuntimeError(f"container already running: {min(conflicts)}")
+        env = os.environ | {"LLAMA_SWAP_PORT": str(port)}
+        signal.signal(signal.SIGTERM, handle_signal)
+        signal.signal(signal.SIGINT, handle_signal)
         try:
-            env = os.environ.copy()
-            env["LLAMA_SWAP_PORT"] = str(port)
-            attempted_start = True
-            up = compose_command(config, model, "up", "-d", model["service"])
-            up_result = run_cancelable(up, cancel, env, config["stopTimeout"])
-            if up_result.returncode != 0:
-                raise LauncherError(f"failed to start model {name}")
-            if not inspect_container(config, model["container"]):
-                raise LauncherError(
-                    f"container is not running after start: {model['container']}"
-                )
-            wait = [config["docker"], "wait", model["container"]]
-            wait_result = run_cancelable(
-                wait,
-                cancel,
-                os.environ.copy(),
-                config["stopTimeout"],
-                capture_stdout=True,
+            run_attached(
+                compose(stack, "up", "--exit-code-from", "fa2-init", "fa2-init"), env
             )
-            if wait_result.returncode != 0:
-                raise LauncherError(f"failed while waiting for model {name}")
-            wait_output = wait_result.stdout.strip()
-            if not wait_output.isdecimal():
-                raise LauncherError(
-                    f"malformed Docker wait output for model {name}: {wait_output!r}"
-                )
-            container_status = int(wait_output)
-            if container_status != 0:
-                raise LauncherError(
-                    f"model {name} container exited with status {container_status}"
-                )
-        except Cancelled as error:
-            failure = f"received signal {error.signum}"
-            exit_code = 128 + error.signum
-        except LauncherError as error:
-            failure = str(error)
-            exit_code = 1
+            run_attached(
+                compose(stack, "up", "--exit-code-from", "vllm", "--no-deps", "vllm"),
+                env,
+            )
         finally:
-            cleanup_errors = cleanup_model(config, model) if attempted_start else []
-            for signum, handler in previous.items():
-                signal.signal(signum, handler)
-
-        if failure:
-            print(failure, file=sys.stderr)
-        if cleanup_errors:
-            print("; ".join(cleanup_errors), file=sys.stderr)
-            return 1
-        return exit_code
+            cleanup_stack(stack)
 
 
-def stop(config, name):
-    errors = cleanup_model(config, model_config(config, name))
-    if errors:
-        raise LauncherError("; ".join(errors))
-    return 0
+def handle_signal(signum, _frame):
+    global CANCEL_SIGNAL
+    CANCEL_SIGNAL = signum
 
 
-def cleanup(config):
+def cleanup():
     errors = []
-    for name, model in config["models"].items():
-        errors.extend(f"{name}: {error}" for error in cleanup_model(config, model))
+    for model, stack in STACKS.items():
+        try:
+            cleanup_stack(stack)
+        except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+            errors.append(f"{model}: {describe(error)}")
     if errors:
-        raise LauncherError("; ".join(errors))
-    return 0
+        raise RuntimeError("; ".join(errors))
 
 
-def parse_args(argv=None):
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", required=True)
     commands = parser.add_subparsers(dest="command", required=True)
     start_parser = commands.add_parser("start")
-    start_parser.add_argument("model")
+    start_parser.add_argument("model", choices=STACKS)
     start_parser.add_argument("port", type=port_number)
     stop_parser = commands.add_parser("stop")
-    stop_parser.add_argument("model")
+    stop_parser.add_argument("model", choices=STACKS)
     commands.add_parser("cleanup")
-    return parser.parse_args(argv)
-
-
-def main(argv=None):
-    args = parse_args(argv)
+    args = parser.parse_args()
     try:
-        config = load_config(args.config)
         if args.command == "start":
-            return start(config, args.model, args.port)
-        if args.command == "stop":
-            return stop(config, args.model)
-        return cleanup(config)
-    except LauncherError as error:
-        print(error, file=sys.stderr)
-        return 1
+            start(args.model, args.port)
+        elif args.command == "stop":
+            cleanup_stack(STACKS[args.model])
+        else:
+            cleanup()
+        return 0
+    except Cancelled as error:
+        print(f"received signal {error.args[0]}", file=sys.stderr)
+        return 128 + error.args[0]
+    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+        print(describe(error), file=sys.stderr)
+        return (
+            error.returncode if isinstance(error, subprocess.CalledProcessError) else 1
+        )
 
 
 if __name__ == "__main__":

@@ -35,6 +35,7 @@ apply_embedding_patch() {
 : "${TARGET_MODEL:?TARGET_MODEL must be set}"
 : "${DRAFT_MODEL:?DRAFT_MODEL must be set}"
 : "${SERVED_MODEL_NAME:?SERVED_MODEL_NAME must be set}"
+: "${QUANTIZATION:?QUANTIZATION must be set}"
 
 require_model "$TARGET_MODEL" "target model"
 require_model "$DRAFT_MODEL" "DFlash2 draft model"
@@ -64,7 +65,21 @@ speculative_config=$(printf \
 
 exec vllm serve \
   "${all_reduce_args[@]}" \
-  "$@" \
+  --model "$TARGET_MODEL" --served-model-name "$SERVED_MODEL_NAME" \
+  --quantization "$QUANTIZATION" --dtype bfloat16 \
+  --tensor-parallel-size "${TP:-2}" --max-model-len 60000 \
+  --gpu-memory-utilization 0.65 --max-num-seqs 1 \
+  --max-num-batched-tokens 8192 --long-prefill-token-threshold 4096 \
+  --kv-cache-dtype fp8_e4m3 --attention-backend FLASH_ATTN \
+  --trust-remote-code \
+  --enable-prefix-caching \
+  --enable-chunked-prefill \
+  --reasoning-parser qwen3 --enable-auto-tool-choice \
+  --tool-call-parser qwen3_coder \
+  --default-chat-template-kwargs \
+  '{"enable_thinking": false, "reasoning_effort": "low"}' \
+  --enable-prompt-tokens-details \
+  --host 0.0.0.0 --port 8000 \
   --speculative-config "$speculative_config" \
   --override-generation-config \
   '{"temperature":0.7,"top_p":0.8,"top_k":20,"min_p":0.0,"presence_penalty":1.5,"repetition_penalty":1.0}'

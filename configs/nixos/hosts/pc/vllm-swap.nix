@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   pkgs,
   ...
@@ -24,13 +23,13 @@ let
     hash = "sha256-he9AicCc1HjkT8lhdd6OaczR4W+o7olZQqTYpBN9Uf0=";
   };
 
-  launcher = pkgs.writeScriptBin "vllm-swap" ''
-    #!${pkgs.python3}/bin/python3
-    ${builtins.readFile ../../scripts/ai/vllm-swap.py}
+  launcher = pkgs.writeShellScriptBin "vllm-swap" ''
+    export VLLM_SWAP_CF=${lib.escapeShellArg cf}
+    export VLLM_SWAP_DOCKER=${pkgs.docker}/bin/docker
+    exec ${pkgs.python3}/bin/python3 ${../../scripts/ai/vllm-swap.py} "$@"
   '';
 
   composeFormat = pkgs.formats.yaml { };
-  jsonFormat = pkgs.formats.json { };
 
   mkCompose =
     {
@@ -43,7 +42,6 @@ let
     }:
     let
       project = "llama-swap-qwen38-${suffix}";
-      container = project;
       volumes = [
         "${targetModel}:/models/target:ro"
         "${draftModel}:/models/draft:ro"
@@ -66,7 +64,7 @@ let
       services = {
         fa2-init = {
           image = "ghcr.io/antonprokopyev/fa2-fp8kv-sm86@sha256:da040941fa048fd5fdfce520503341c0beda4ce41436a1c1fecaf3f8a99777c7";
-          container_name = "${container}-fa2-init";
+          container_name = "${project}-fa2-init";
           pull_policy = "never";
           restart = "no";
           volumes = [ "fa2-kernels:/export" ];
@@ -74,7 +72,7 @@ let
 
         vllm = {
           image = "vllm/vllm-openai:v0.29.0@sha256:c2914767605584b6d8f45686b82de173ecc99e781897aa3d0a66dacd72c51ae1";
-          container_name = container;
+          container_name = project;
           pull_policy = "never";
           restart = "no";
           user = "0:1000";
@@ -88,6 +86,7 @@ let
             TARGET_MODEL = "/models/target";
             DRAFT_MODEL = "/models/draft";
             SERVED_MODEL_NAME = servedModelName;
+            QUANTIZATION = quantization;
             PATCH_EMBEDDING = if patchEmbedding then "1" else "0";
             TP = "2";
             HF_HUB_OFFLINE = "1";
@@ -107,47 +106,6 @@ let
           entrypoint = [
             "bash"
             "/etc/club3090/entrypoint.sh"
-          ];
-          command = [
-            "--model"
-            "/models/target"
-            "--served-model-name"
-            servedModelName
-            "--quantization"
-            quantization
-            "--dtype"
-            "bfloat16"
-            "--tensor-parallel-size"
-            "2"
-            "--max-model-len"
-            "60000"
-            "--gpu-memory-utilization"
-            "0.65"
-            "--max-num-seqs"
-            "1"
-            "--max-num-batched-tokens"
-            "8192"
-            "--long-prefill-token-threshold"
-            "4096"
-            "--kv-cache-dtype"
-            "fp8_e4m3"
-            "--attention-backend"
-            "FLASH_ATTN"
-            "--trust-remote-code"
-            "--enable-prefix-caching"
-            "--enable-chunked-prefill"
-            "--reasoning-parser"
-            "qwen3"
-            "--enable-auto-tool-choice"
-            "--tool-call-parser"
-            "qwen3_coder"
-            "--default-chat-template-kwargs"
-            ''{"enable_thinking": false, "reasoning_effort": "low"}''
-            "--enable-prompt-tokens-details"
-            "--host"
-            "0.0.0.0"
-            "--port"
-            "8000"
           ];
         };
       };
@@ -188,84 +146,28 @@ let
     };
   };
 
-  launcherConfig = jsonFormat.generate "llama-swap-vllm.json" {
-    inherit cf;
-    cfConfig = "/etc/llama-swap/compose-farm.yaml";
-    docker = "${pkgs.docker}/bin/docker";
-    stateDir = "/run/llama-swap-vllm";
-    stopTimeout = 90;
-    legacyContainers = [ "club-3090-vllm" ];
-    models = {
-      normal = {
-        stack = "qwen38-normal";
-        service = "vllm";
-        container = "llama-swap-qwen38-normal";
-      };
-      uncensored = {
-        stack = "qwen38-uncensored";
-        service = "vllm";
-        container = "llama-swap-qwen38-uncensored";
-      };
-    };
-  };
-
   retireLegacyContainer = pkgs.writeShellScript "retire-club-3090-vllm" ''
     set -euo pipefail
-
-    set +e
-    state="$(${pkgs.docker}/bin/docker inspect --format '{{.State.Running}}' club-3090-vllm 2>&1)"
-    inspect_status=$?
-    set -e
-
-    if ((inspect_status != 0)); then
-      diagnostic="''${state,,}"
-      case "$diagnostic" in
-        *"no such object:"* | *"no such container:"*) exit 0 ;;
-        *)
-          echo "cannot inspect legacy container club-3090-vllm: $state" >&2
-          exit "$inspect_status"
-          ;;
-      esac
+    all="$(${pkgs.docker}/bin/docker ps -a --format '{{.Names}}')"
+    if [[ $'\n'$all$'\n' == *$'\nclub-3090-vllm\n'* ]]; then
+      ${pkgs.docker}/bin/docker update --restart=no club-3090-vllm >/dev/null
+      running="$(${pkgs.docker}/bin/docker ps --format '{{.Names}}')"
+      if [[ $'\n'$running$'\n' == *$'\nclub-3090-vllm\n'* ]]; then
+        ${pkgs.docker}/bin/docker stop --time 90 club-3090-vllm >/dev/null
+      fi
     fi
-
-    ${pkgs.docker}/bin/docker update --restart=no club-3090-vllm >/dev/null
-    case "$state" in
-      true) ${pkgs.docker}/bin/docker stop --time 90 club-3090-vllm >/dev/null ;;
-      false) ;;
-      *)
-        echo "unexpected legacy container running state: $state" >&2
-        exit 1
-        ;;
-    esac
-  '';
-
-  bundle = pkgs.runCommand "llama-swap-vllm-bundle" { } ''
-    mkdir -p \
-      "$out/bin" \
-      "$out/etc/llama-swap/stacks/qwen38-normal" \
-      "$out/etc/llama-swap/stacks/qwen38-uncensored"
-    ln -s ${launcher}/bin/vllm-swap "$out/bin/vllm-swap"
-    ln -s ${config.environment.etc."llama-swap/config.yaml".source} "$out/etc/llama-swap/config.yaml"
-    ln -s ${launcherConfig} "$out/etc/llama-swap/vllm.json"
-    ln -s ${composeFarmConfig} "$out/etc/llama-swap/compose-farm.yaml"
-    ln -s ${normalCompose} "$out/etc/llama-swap/stacks/qwen38-normal/compose.yaml"
-    ln -s ${uncensoredCompose} "$out/etc/llama-swap/stacks/qwen38-uncensored/compose.yaml"
   '';
 in
 {
   environment.systemPackages = [ launcher ];
 
   environment.etc = {
-    "llama-swap/vllm.json".source = launcherConfig;
     "llama-swap/compose-farm.yaml".source = composeFarmConfig;
     "llama-swap/stacks/qwen38-normal/compose.yaml".source = normalCompose;
     "llama-swap/stacks/qwen38-uncensored/compose.yaml".source = uncensoredCompose;
   };
 
-  system.build = {
-    llama-swap-vllm = bundle;
-    llama-swap-vllm-launcher = launcher;
-  };
+  system.build.llama-swap-vllm-launcher = launcher;
 
   systemd.services.llama-swap-vllm-retire-legacy = {
     description = "Retire legacy Club3090 vLLM container";
@@ -304,7 +206,7 @@ in
       RuntimeDirectory = "llama-swap-vllm";
       RuntimeDirectoryMode = "0750";
       RuntimeDirectoryPreserve = "restart";
-      ExecStopPost = "${launcher}/bin/vllm-swap --config /etc/llama-swap/vllm.json cleanup";
+      ExecStopPost = "${launcher}/bin/vllm-swap cleanup";
       TimeoutStopSec = "240s";
     };
   };
