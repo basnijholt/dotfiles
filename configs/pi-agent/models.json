@@ -6,7 +6,7 @@
       "apiKey": "none",
       "models": [
         {
-          "id": "qwen3.8:27b-q5",
+          "id": "qwen38:27b",
           "name": "Qwen3.8 27B Q5 (local llama.cpp)",
           "reasoning": true,
           "input": ["text", "image"],
@@ -22,7 +22,7 @@
           }
         },
         {
-          "id": "qwen3.8:27b-q5-abliterated-mtp",
+          "id": "qwen38:27b-uncensored",
           "name": "Qwen3.8 27B Q5 Uncensored MTP (local llama.cpp)",
           "reasoning": true,
           "input": ["text"],
