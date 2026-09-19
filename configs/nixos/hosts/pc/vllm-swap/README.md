@@ -16,7 +16,10 @@ llama-swap owns at most one of these GPU projects. The persistent embedding
 group remains separate. A first request starts the selected container and can
 take several minutes while vLLM loads weights and prepares its caches. `ttl: 0`
 keeps that backend resident until another incompatible model is requested or it
-is explicitly unloaded.
+is explicitly unloaded. Measured cold first responses were 315.6 seconds for
+normal and 341.2 seconds for uncensored. Set client HTTP and SDK timeouts to at
+least 600 seconds for requests that can trigger a load or swap. Switching back
+can still take minutes even when compilation artifacts are cached.
 
 ## Required migration before merge or activation
 
@@ -124,6 +127,21 @@ systemctl status llama-swap.service llama-swap-port-8010.socket
 curl --fail http://127.0.0.1:9292/v1/models
 curl --fail http://club-3090-vllm.local/v1/models
 ```
+
+A successful model-list response confirms the proxy configuration, but does not
+prove that model weights are loaded. Before relying on normal clients, complete
+a synthetic chat request over loopback with a timeout that covers startup:
+
+```bash
+curl --fail-with-body --silent --show-error --max-time 600 \
+  http://127.0.0.1:9292/v1/chat/completions \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"qwen3.8-27b","messages":[{"role":"user","content":"Reply with READY."}],"max_tokens":8,"temperature":0}'
+```
+
+Only a completed chat response proves that the selected backend is ready. Use
+the uncensored model ID in the same request when that backend must be prewarmed;
+doing so swaps out normal because the two GPU projects are exclusive.
 
 ## Roll back
 
