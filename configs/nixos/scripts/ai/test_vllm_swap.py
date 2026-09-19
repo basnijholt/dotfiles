@@ -10,6 +10,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 LAUNCHER = HERE / "vllm-swap.py"
+AI_CONFIG = HERE.parents[1] / "hosts/pc/ai.nix"
 
 FAKE = r"""
 import json
@@ -36,8 +37,12 @@ def cf(args):
         return 0
     service = args[-1]
     if service == "fa2-init":
+        if settings.get("signal_after_init"):
+            os.kill(os.getppid(), signal.SIGTERM)
         return 0
     (root / "port").write_text(os.environ["LLAMA_SWAP_PORT"])
+    (root / "cf-pid").write_text(str(os.getpid()))
+    (root / "backend-started").touch()
     marker(name).touch()
     if settings.get("leader_race"):
         subprocess.Popen([sys.executable, __file__, "late", name])
@@ -158,8 +163,8 @@ class LauncherTests(unittest.TestCase):
         self.assertEqual((self.root / "port").read_text(), "18123")
         self.assertIsNone(process.poll())
 
-        self.assertEqual(self.invoke("stop", "normal").returncode, 0)
-        self.assertEqual(process.wait(timeout=2), 0)
+        process.send_signal(signal.SIGTERM)
+        self.assertEqual(process.wait(timeout=2), 128 + signal.SIGTERM)
 
     def test_running_container_and_docker_failure_block_start(self):
         self.marker("normal").touch()
@@ -190,13 +195,11 @@ class LauncherTests(unittest.TestCase):
         time.sleep(0.6)
         self.assertFalse(self.marker("normal").exists())
 
-    def test_stop_for_other_model_does_not_stop_owner(self):
+    def test_signal_as_init_succeeds_prevents_backend_spawn(self):
+        self.set_controls(signal_after_init=True)
         process = self.start()
-        self.wait_for(self.marker("normal").exists)
-
-        self.assertEqual(self.invoke("stop", "uncensored").returncode, 0)
-        self.assertTrue(self.marker("normal").exists())
-        self.assertIsNone(process.poll())
+        self.assertEqual(process.wait(timeout=2), 128 + signal.SIGTERM)
+        self.assertFalse((self.root / "backend-started").exists())
 
     def test_failed_cleanup_leaves_survivor_that_blocks_next_start(self):
         process = self.start()
@@ -205,10 +208,16 @@ class LauncherTests(unittest.TestCase):
 
         process.send_signal(signal.SIGTERM)
         self.assertNotEqual(process.wait(timeout=3), 0)
+        cf_pid = int((self.root / "cf-pid").read_text())
+        with self.assertRaises(ProcessLookupError):
+            os.kill(cf_pid, 0)
         self.assertTrue(self.marker("normal").exists())
         blocked = self.invoke("start", "uncensored", "18001")
         self.assertNotEqual(blocked.returncode, 0)
         self.assertIn("already running", blocked.stderr)
+
+    def test_vllm_models_use_llama_swap_default_stop_signal(self):
+        self.assertNotIn('cmdStop: "${vllmSwap}', AI_CONFIG.read_text())
 
 
 if __name__ == "__main__":

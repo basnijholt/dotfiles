@@ -149,15 +149,11 @@ def main():
     start_parser = commands.add_parser("start")
     start_parser.add_argument("model", choices=STACKS)
     start_parser.add_argument("port", type=port_number)
-    stop_parser = commands.add_parser("stop")
-    stop_parser.add_argument("model", choices=STACKS)
     commands.add_parser("cleanup")
     args = parser.parse_args()
     try:
         if args.command == "start":
             start(args.model, args.port)
-        elif args.command == "stop":
-            cleanup_stack(STACKS[args.model])
         else:
             cleanup()
         return 0

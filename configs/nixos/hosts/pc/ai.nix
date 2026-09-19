@@ -44,7 +44,6 @@ in
 
       "qwen3.8-27b-uncensored":
         cmd: "${vllmSwap} start uncensored ''${PORT}"
-        cmdStop: "${vllmSwap} stop uncensored"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b-uncensored"
         capabilities:
@@ -54,7 +53,6 @@ in
 
       "qwen3.8-27b":
         cmd: "${vllmSwap} start normal ''${PORT}"
-        cmdStop: "${vllmSwap} stop normal"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b"
         capabilities:
