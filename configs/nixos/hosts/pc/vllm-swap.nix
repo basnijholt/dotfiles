@@ -243,15 +243,13 @@ let
     mkdir -p \
       "$out/bin" \
       "$out/etc/llama-swap/stacks/qwen38-normal" \
-      "$out/etc/llama-swap/stacks/qwen38-uncensored" \
-      "$out/share/doc/llama-swap-vllm"
+      "$out/etc/llama-swap/stacks/qwen38-uncensored"
     ln -s ${launcher}/bin/vllm-swap "$out/bin/vllm-swap"
     ln -s ${config.environment.etc."llama-swap/config.yaml".source} "$out/etc/llama-swap/config.yaml"
     ln -s ${launcherConfig} "$out/etc/llama-swap/vllm.json"
     ln -s ${composeFarmConfig} "$out/etc/llama-swap/compose-farm.yaml"
     ln -s ${normalCompose} "$out/etc/llama-swap/stacks/qwen38-normal/compose.yaml"
     ln -s ${uncensoredCompose} "$out/etc/llama-swap/stacks/qwen38-uncensored/compose.yaml"
-    ln -s ${./vllm-swap/README.md} "$out/share/doc/llama-swap-vllm/README.md"
   '';
 in
 {
