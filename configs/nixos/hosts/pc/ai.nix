@@ -44,23 +44,23 @@ in
 
       "qwen38-vllm:27b-uncensored":
         name: "Qwen3.8 27B · vLLM · Uncensored"
-        description: "AutoRound INT4, DFlash2, 60K context."
+        description: "AutoRound INT4, DFlash2, 128K context."
         cmd: "${vllmSwap} start uncensored ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b-uncensored"
         capabilities:
-          context: 60000
+          context: 131072
         ttl: 0
         unloadTimeout: 120
 
       "qwen38-vllm:27b":
         name: "Qwen3.8 27B · vLLM"
-        description: "AutoRound INT4, DFlash2, 60K context."
+        description: "AutoRound INT4, DFlash2, 128K context."
         cmd: "${vllmSwap} start normal ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b"
         capabilities:
-          context: 60000
+          context: 131072
         ttl: 0
         unloadTimeout: 120
 
