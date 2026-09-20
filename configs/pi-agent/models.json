@@ -6,6 +6,38 @@
       "apiKey": "none",
       "models": [
         {
+          "id": "qwen38-vllm:27b",
+          "name": "Qwen3.8 27B · vLLM",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 131072,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          }
+        },
+        {
+          "id": "qwen38-vllm:27b-uncensored",
+          "name": "Qwen3.8 Uncensored 27B · vLLM",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 131072,
+          "maxTokens": 16384,
+          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 },
+          "compat": {
+            "supportsStore": false,
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false,
+            "maxTokensField": "max_tokens",
+            "thinkingFormat": "qwen-chat-template"
+          }
+        },
+        {
           "id": "qwen38:27b",
           "name": "Qwen3.8 27B Q5 (local llama.cpp)",
           "reasoning": true,

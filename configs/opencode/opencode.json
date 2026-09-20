@@ -29,6 +29,30 @@
         }
       }
     },
+    "llama-swap": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "llama-swap (vLLM)",
+      "options": {
+        "baseURL": "http://llama.local/v1",
+        "apiKey": "none"
+      },
+      "models": {
+        "qwen38-vllm:27b": {
+          "name": "Qwen3.8 27B · vLLM",
+          "reasoning": true,
+          "attachment": true,
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "limit": { "context": 131072, "output": 16384 }
+        },
+        "qwen38-vllm:27b-uncensored": {
+          "name": "Qwen3.8 Uncensored 27B · vLLM",
+          "reasoning": true,
+          "attachment": true,
+          "modalities": { "input": ["text", "image"], "output": ["text"] },
+          "limit": { "context": 131072, "output": 16384 }
+        }
+      }
+    },
     "llama-cpp": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "llama-swap (local)",
