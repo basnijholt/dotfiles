@@ -128,10 +128,6 @@
           "name": "Devstral-2 24B Q4 (local)",
           "limit": { "context": 65536, "output": 32768 }
         },
-        "devstral-2:24b-q8": {
-          "name": "Devstral-2 24B Q8 (local)",
-          "limit": { "context": 65536, "output": 32768 }
-        },
         "devstral-2:123b": {
           "name": "Devstral-2 123B Q3 (local)",
           "limit": { "context": 65536, "output": 32768 }
@@ -166,14 +162,6 @@
         },
         "gpt-oss:120b": {
           "name": "GPT-OSS 120B (local)",
-          "limit": { "context": 65536, "output": 32768 }
-        },
-        "gpt-oss:120b-q8": {
-          "name": "GPT-OSS 120B Q8 (local)",
-          "limit": { "context": 65536, "output": 32768 }
-        },
-        "gpt-oss:120b-derestricted": {
-          "name": "GPT-OSS 120B Derestricted (local)",
           "limit": { "context": 65536, "output": 32768 }
         }
       }

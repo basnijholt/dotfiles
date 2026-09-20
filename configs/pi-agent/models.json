@@ -84,13 +84,6 @@
           "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
         },
         {
-          "id": "devstral-2:24b-q8",
-          "name": "Devstral-2 24B Q8 (local)",
-          "contextWindow": 65536,
-          "maxTokens": 16384,
-          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
-        },
-        {
           "id": "devstral-2:123b",
           "name": "Devstral-2 123B Q3 (local)",
           "contextWindow": 65536,
@@ -121,20 +114,6 @@
         {
           "id": "gpt-oss:120b",
           "name": "GPT-OSS 120B (local)",
-          "contextWindow": 65536,
-          "maxTokens": 16384,
-          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
-        },
-        {
-          "id": "gpt-oss:120b-q8",
-          "name": "GPT-OSS 120B Q8 (local)",
-          "contextWindow": 65536,
-          "maxTokens": 16384,
-          "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
-        },
-        {
-          "id": "gpt-oss:120b-derestricted",
-          "name": "GPT-OSS 120B Derestricted (local)",
           "contextWindow": 65536,
           "maxTokens": 16384,
           "cost": { "input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0 }
