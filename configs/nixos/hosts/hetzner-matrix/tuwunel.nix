@@ -66,6 +66,7 @@ let
     [global.well_known]
     client = "https://${siteDomain}"
     server = "${siteDomain}:443"
+    livekit_url = "https://${siteDomain}/livekit/jwt"
 
     [[global.identity_provider]]
     # Keep Google identities independent from GitHub-backed Matrix accounts.
