@@ -33,6 +33,8 @@ in
       environment = {
         PATH = lib.mkForce "${bunBin}:${systemBin}";
         T3CODE_HOME = "${homeDir}/.t3";
+        # Shell startup and fixssh refresh this link when the SSH agent changes.
+        SSH_AUTH_SOCK = "${homeDir}/.ssh/t3-agent.sock";
       };
       serviceConfig = {
         ExecStart = "${bunBin}/t3 serve --mode web --host ${cfg.host} --port ${toString cfg.port} --no-browser";

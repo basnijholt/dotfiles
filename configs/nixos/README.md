@@ -54,6 +54,20 @@ nix build .#nixosConfigurations.installer.config.system.build.isoImage
 cp result/iso/*.iso /tmp/nixos.iso
 ```
 
+## T3 Code and SSH agents
+
+Hosts with `local.t3code.enable = true` give T3 Code the stable agent socket `~/.ssh/t3-agent.sock`.
+Shell startup updates this symlink to the current SSH agent when it has loaded identities, including agents forwarded through an SSH connection.
+Empty or unavailable agents leave the existing link alone.
+The link stores a socket path, and authentication requires that agent connection to remain active.
+
+After reconnecting from an existing terminal multiplexer session, run `fixssh` to select the newest working forwarded agent.
+Use `fixssh /path/to/agent.sock` to select a particular agent explicitly.
+T3 uses the updated link for subsequent Git commands without a restart.
+Applying the service configuration for the first time requires one T3 service restart, so wait for active agent jobs to finish.
+
+Run `bash tests/test-ssh-agent.sh` from the repository root to check Bash and Zsh behavior with real disposable SSH agents.
+
 ## Install Cheatsheet
 
 Boot from installer ISO, then:

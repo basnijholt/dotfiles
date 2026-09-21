@@ -11,10 +11,6 @@ if [[ $- == *i* ]]; then
     alias ccat='command cat'
     alias last_conda_repodata_update='curl -sI https://conda.anaconda.org/conda-forge/linux-64/repodata.json | grep "last-modified"'  # Also see https://anaconda.statuspage.io/ and https://github.com/conda/infrastructure/issues/892
     alias gs='git status'  # I use `gst` from `oh-my-zsh` git plugin but this is a frequent typo
-    fixssh() {
-        export SSH_AUTH_SOCK="$(ls -t ~/.ssh/agent/s.*.sshd.* 2>/dev/null | head -n1)"
-        ssh-add -l
-    }
     alias gdom='git diff origin/main'
     alias grhom='git reset --hard origin/main'
     alias grsom='git reset --soft origin/main'
