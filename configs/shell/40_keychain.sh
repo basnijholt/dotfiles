@@ -9,7 +9,8 @@ publish_ssh_agent() {
     [[ -S "$agent_socket" ]] || return 1
     [[ "$agent_socket" == /* ]] || agent_socket="$PWD/$agent_socket"
     SSH_AUTH_SOCK="$agent_socket" ssh-add -l >/dev/null 2>&1 || return 1
-    [[ "$agent_socket" -ef "$stable_socket" ]] && return 0
+    # Comparing the same pathname by inode can race another shell replacing it.
+    [[ "$agent_socket" == "$stable_socket" || "$agent_socket" -ef "$stable_socket" ]] && return 0
     [[ -d "$stable_socket" ]] && return 1
     [[ ! -e "$stable_socket" || -L "$stable_socket" ]] || return 1
     (umask 077; mkdir -p "$HOME/.ssh") || return 1

@@ -101,7 +101,23 @@ for test_shell in bash zsh; do
       fixssh >/dev/null
       [[ $(service_identity) == *"$TEST_FIRST_FP"* ]] || fail "fixssh did not discover the forwarded socket"
 
-      # Publishing a reconnect must not leave a missing socket between the two agents.
+      # Select the newest usable agent, skipping newer empty and disconnected candidates.
+      ln -s "$TEST_AGENT_ROOT/second.sock" "$HOME/.ssh/agent/s.test.sshd.second"
+      ln -s "$TEST_AGENT_ROOT/empty.sock" "$HOME/.ssh/agent/s.test.sshd.empty"
+      ln -s "$TEST_AGENT_ROOT/disconnected.sock" "$HOME/.ssh/agent/s.test.sshd.disconnected"
+      touch -h -t 202601010001 "$HOME/.ssh/agent/s.test.sshd.first"
+      touch -h -t 202601010002 "$HOME/.ssh/agent/s.test.sshd.second"
+      touch -h -t 202601010003 "$HOME/.ssh/agent/s.test.sshd.empty"
+      touch -h -t 202601010004 "$HOME/.ssh/agent/s.test.sshd.disconnected"
+      fixssh >/dev/null
+      [[ "$SSH_AUTH_SOCK" == "$HOME/.ssh/agent/s.test.sshd.second" ]] || fail "fixssh did not select the newest usable socket"
+      [[ $(service_identity) == *"$TEST_SECOND_FP"* ]] || fail "service did not follow discovery past unusable sockets"
+      touch -h -t 202601010005 "$HOME/.ssh/agent/s.test.sshd.first"
+      fixssh >/dev/null
+      [[ "$SSH_AUTH_SOCK" == "$HOME/.ssh/agent/s.test.sshd.first" ]] || fail "fixssh ignored candidate modification times"
+      [[ $(service_identity) == *"$TEST_FIRST_FP"* ]] || fail "service did not follow the newest usable socket"
+
+      # A service shell publishing the stable path must not race a reconnect into a self-link.
       (
         for attempt in $(seq 1 100); do
           publish_ssh_agent "$TEST_AGENT_ROOT/first.sock"
@@ -111,7 +127,7 @@ for test_shell in bash zsh; do
       writer_pid=$!
       missing_socket=false
       while kill -0 "$writer_pid" 2>/dev/null; do
-        if [[ ! -S "$stable_socket" ]]; then
+        if ! publish_ssh_agent "$stable_socket" || [[ ! -S "$stable_socket" ]]; then
           missing_socket=true
           break
         fi
