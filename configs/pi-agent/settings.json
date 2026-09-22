@@ -1,7 +1,7 @@
 {
   "defaultProvider": "llama-swap",
-  "defaultModel": "qwen38:27b",
-  "lastChangelogVersion": "0.70.2",
+  "defaultModel": "qwen38-vllm:27b",
+  "lastChangelogVersion": "0.73.1",
   "defaultThinkingLevel": "high",
   "packages": [
     "https://github.com/basnijholt/pi-multi-agent-review-loop",
