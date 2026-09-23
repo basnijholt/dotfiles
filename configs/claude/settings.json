@@ -35,7 +35,7 @@
   "disableRemoteControl": true,
   "disableClaudeAiConnectors": true,
   "disableArtifact": true,
-  "model": "claude-fable-5-1",
+  "model": "claude-opus-5-5",
   "hooks": {
     "PreToolUse": [
       {
@@ -63,6 +63,12 @@
       }
     ]
   },
+  "worktree": {
+    "bgIsolation": "none"
+  },
+  "disableRemoteControl": true,
+  "disableArtifact": true,
+  "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
     "command": "python3 ~/.claude/statusline.py",
@@ -74,10 +80,18 @@
     "baspowers@baspowers-dev": true
   },
   "outputStyle": "caveman",
+  "feedbackDrafts": "off",
   "effortLevel": "xhigh",
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.41",
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "switchModelsOnFlag": false,
-  "fastMode": true
+  "inputNeededNotifEnabled": false,
+  "agentPushNotifEnabled": false,
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  }
 }
