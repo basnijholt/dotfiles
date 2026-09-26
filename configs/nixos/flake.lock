@@ -380,6 +380,7 @@
         "nixpkgs": "nixpkgs_3",
         "nixpkgs-netdata": "nixpkgs-netdata",
         "ragenix": "ragenix",
+        "zfs-tenant": "zfs-tenant",
         "zfs-unlock": "zfs-unlock"
       }
     },
@@ -449,6 +450,26 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "zfs-tenant": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790443555,
+        "narHash": "sha256-1QDVJzsBpAssWAGLpDhWCtjLCClcIqQZO5fi4L61cTE=",
+        "owner": "basnijholt",
+        "repo": "zfs-tenant",
+        "rev": "25ae9cd6a58edac2118de07d7521fe14524162a5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "basnijholt",
+        "repo": "zfs-tenant",
         "type": "github"
       }
     },
