@@ -30,6 +30,10 @@
       url = "github:basnijholt/zfs-unlock";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zfs-tenant = {
+      url = "github:basnijholt/zfs-tenant";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
     # its own forked nixpkgs with boot.loader.raspberryPi support
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
@@ -46,6 +50,7 @@
       comin,
       ragenix,
       zfs-unlock,
+      zfs-tenant,
       nixos-raspberrypi,
       ...
     }:
@@ -139,6 +144,7 @@
         nas = mkHost [
           disko.nixosModules.disko
           zfs-unlock.nixosModules.receiver
+          zfs-tenant.nixosModules.host
           ./hosts/nas/disko.nix
           ./hosts/nas/default.nix
           ./hosts/nas/hardware-configuration.nix
