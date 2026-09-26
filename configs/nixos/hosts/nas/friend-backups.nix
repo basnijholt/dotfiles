@@ -14,7 +14,7 @@ let
   # Each direction stays off until Joe has sent the details it needs.
   joe = {
     # Hosting Joe: the public key of his syncoid user, and the address his
-    # pushes arrive from. His NAS reaches the tailnet through joe-router's
+    # pushes arrive from. His NAS reaches the tailnet through his router's
     # subnet route, which source-NATs to the router's tailnet IP.
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINVKYYZ2SZF9PhBKy5n3Nxse6GGI3dQGtQZBeHP4iHtJ"
