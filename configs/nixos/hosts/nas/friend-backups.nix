@@ -1,5 +1,5 @@
-# Friend-to-friend off-site backups with Joe (jbweston on the tailnet) via
-# zfs-tenant (https://github.com/basnijholt/zfs-tenant). Each of us hosts a
+# Friend-to-friend off-site backups with Joe via zfs-tenant
+# (https://github.com/basnijholt/zfs-tenant). Each of us hosts a
 # quota-capped tenant root for the other and pushes raw encrypted sanoid
 # snapshots into our own root on the other's pool with plain syncoid, so
 # neither side ever holds the other's encryption keys.
