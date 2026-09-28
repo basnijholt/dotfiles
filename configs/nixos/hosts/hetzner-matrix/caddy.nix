@@ -91,6 +91,12 @@ in
     # Cinny web client (SPA)
     virtualHosts."${cinnyDomain}" = {
       extraConfig = ''
+        # The pairing approval page must never render inside another site's frame.
+        @connect path /connect /connect/
+        header @connect {
+          Content-Security-Policy "frame-ancestors 'none'"
+          X-Frame-Options "DENY"
+        }
         root * ${cinnyCurrentPath}
         try_files {path} /index.html
         file_server
