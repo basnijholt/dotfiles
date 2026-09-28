@@ -98,8 +98,16 @@ in
           X-Frame-Options "DENY"
         }
         root * ${cinnyCurrentPath}
-        try_files {path} /index.html
-        file_server
+
+        handle /.well-known/apple-app-site-association {
+          header Content-Type application/json
+          file_server
+        }
+
+        handle {
+          try_files {path} /index.html
+          file_server
+        }
       '';
     };
 
