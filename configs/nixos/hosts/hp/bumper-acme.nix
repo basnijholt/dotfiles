@@ -38,4 +38,8 @@
       '';
     };
   };
+
+  # Reconcile domain-list changes shortly after activation instead of waiting for
+  # the randomized daily renewal. OnCalendar still handles normal renewals.
+  systemd.timers.acme-renew-bumper-t80.timerConfig.OnActiveSec = "1m";
 }
