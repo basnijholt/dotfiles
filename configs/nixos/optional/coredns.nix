@@ -32,7 +32,7 @@ let
   # server (stacks repo, runs on hp) instead of Ecovacs. Scoped to the robot's
   # IP so the rest of the LAN still resolves these domains normally.
   bumperIP = "192.168.1.3";
-  ecovacsRobotIPs = [ "192.168.1.201" ];
+  ecovacsRobotIPs = [ "192.168.1.125" ]; # DHCP reservation on the ASUS router
   ecovacsZones = "ecouser.net ecouser.com ecovacs.com ecovacs.net aliyuncs.com aliyun.com";
 
   localZone = pkgs.writeText "local.zone" ''
@@ -51,6 +51,7 @@ let
     pi4             3600  IN  A     192.168.1.7
     pi3             3600  IN  A     192.168.1.8
     vacuum          3600  IN  A     192.168.1.10
+    deebot          3600  IN  A     192.168.1.125
     tv              3600  IN  A     192.168.1.11
     leo             3600  IN  A     192.168.1.12
     tom             3600  IN  A     192.168.1.13
