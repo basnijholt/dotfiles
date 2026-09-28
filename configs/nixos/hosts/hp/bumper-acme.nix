@@ -10,6 +10,7 @@
       extraDomainNames = [
         "*.local.nijho.lt"
         "*.area.robotww.local.nijho.lt"
+        "*.area.ww.local.nijho.lt"
         "*.dc.robotww.local.nijho.lt"
         "*.robotww.local.nijho.lt"
         "*.dc-na.robotww.local.nijho.lt"
