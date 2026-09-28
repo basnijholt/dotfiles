@@ -20,6 +20,7 @@
         "*.ww.local.nijho.lt"
       ];
       dnsProvider = "cloudflare";
+      dnsResolver = "1.1.1.1:53";
       environmentFile = "/opt/stacks/traefik/.env";
       group = "docker";
 
