@@ -33,7 +33,7 @@ let
   # IP so the rest of the LAN still resolves these domains normally.
   bumperIP = "192.168.1.3";
   ecovacsRobotIPs = [ "192.168.1.125" ]; # DHCP reservation on the ASUS router
-  ecovacsZones = "ecouser.net ecouser.com ecovacs.com ecovacs.net aliyuncs.com aliyun.com";
+  ecovacsZones = "ecouser.net ecouser.com ecovacs.com ecovacs.net aliyuncs.com aliyun.com local.nijho.lt";
 
   localZone = pkgs.writeText "local.zone" ''
     $ORIGIN local.
