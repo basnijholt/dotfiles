@@ -23,6 +23,9 @@
       dnsResolver = "1.1.1.1:53";
       environmentFile = "/opt/stacks/traefik/.env";
       group = "docker";
+      # Match both Ecovacs' MQTT endpoint and the certificate already proven with
+      # this robot. The NixOS default is EC256.
+      keyType = "rsa2048";
 
       # Bumper reads its certificate only at startup. Restart it after a successful
       # issuance or renewal, but leave initial host provisioning independent of the
