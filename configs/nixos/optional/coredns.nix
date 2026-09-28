@@ -105,6 +105,7 @@ in
         view ecovacs-robot {
           expr client_ip() in [${lib.concatMapStringsSep ", " (ip: "'${ip}'") ecovacsRobotIPs}]
         }
+        log
         template IN A {
           answer "{{ .Name }} 60 IN A ${bumperIP}"
         }
@@ -118,6 +119,20 @@ in
         bind ${listenIP}
         forward . 1.1.1.1 8.8.8.8
         cache 300
+        errors
+      }
+
+      # Log every other DNS question from the robot while investigating local
+      # control paths. The WAN block still prevents the resolved endpoints from
+      # being reached directly.
+      . {
+        bind ${listenIP}
+        view ecovacs-robot-catchall {
+          expr client_ip() in [${lib.concatMapStringsSep ", " (ip: "'${ip}'") ecovacsRobotIPs}]
+        }
+        log
+        forward . 1.1.1.1 8.8.8.8
+        cache 60
         errors
       }
 
