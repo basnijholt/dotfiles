@@ -5,8 +5,8 @@
 #
 # - nofail: Don't block boot if NAS is down
 # - bg: Retry in background if mount fails at boot
-# - wait-online@br0: Don't try TrueNAS before the wired bridge has IPv4,
-#   otherwise the request can leave over Wi-Fi and be denied by TrueNAS ACLs.
+# - wait-online@br0: Don't try nas before the wired bridge has IPv4,
+#   otherwise the request can leave over Wi-Fi and be denied by the NFS export ACLs.
 # - soft: Return errors instead of hanging when NAS unreachable
 # - NFSv4 handles reconnection automatically when NAS comes back
 { ... }:
