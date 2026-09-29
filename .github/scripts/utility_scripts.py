@@ -15,11 +15,11 @@ descriptions = {
     "upload-file.sh": "Upload files to various paste/file hosts",
 
     # Backups / sync
-    "rclone.sh": "Scheduled backups to Backblaze B2 (and rsync to TrueNAS)",
+    "rclone.sh": "Scheduled backups to Backblaze B2 (and rsync to the NAS)",
     "rsync-time-machine.sh": "Create incremental Time Machine-like backups using rsync",
     "sync-dotfiles.sh": "Push updater to hosts and trigger sync/install",
     "sync-local-dotfiles.sh": "On a host: pull latest and optionally run ./install",
-    "sync-photos-to-truenas.sh": "Sync photos to TrueNAS server",
+    "sync-photos-to-nas.sh": "Sync photos to the NAS",
     "sync-uv.sh": "Globally install uv tools I frequently use",
 
     # AI / LLM utilities

@@ -15,21 +15,11 @@
   # --- TCP Performance Tuning ---
   # BBR + large buffers: enables 300+ Mbps on high-latency links (vs ~8 Mbps with defaults)
   # Tested on Seattle <-> Germany (263ms RTT) - went from 2 Mbps to 300 Mbps
-  #
-  # For TrueNAS SCALE (which hosts docker-lxc), apply the same settings via CLI:
-  #   ssh root@truenas.local
-  #   midclt call tunable.create '{"var": "net.ipv4.tcp_congestion_control", "value": "bbr", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.core.default_qdisc", "value": "fq", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.core.rmem_max", "value": "134217728", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.core.wmem_max", "value": "134217728", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.ipv4.tcp_rmem", "value": "4096 131072 134217728", "type": "SYSCTL", "enabled": true}'
-  #   midclt call tunable.create '{"var": "net.ipv4.tcp_wmem", "value": "4096 16384 134217728", "type": "SYSCTL", "enabled": true}'
-  # These persist in TrueNAS UI under System Settings -> Advanced -> Sysctl
 
   boot.kernelModules = [ "tcp_bbr" ];
 
   # Don't prompt for ZFS encryption keys at boot
-  # Our root datasets are unencrypted; only replicated backup datasets from TrueNAS are encrypted
+  # Our root datasets are unencrypted; only replicated backup datasets from nas are encrypted
   # Without this, replicated encrypted datasets block boot waiting for a passphrase
   boot.zfs.requestEncryptionCredentials = false;
   boot.zfs.forceImportRoot = lib.mkDefault false;

@@ -29,7 +29,7 @@ scripts/rpi
 scripts/rsync-time-machine.sh
 scripts/signature.html
 scripts/sync-dotfiles.sh
-scripts/sync-photos-to-truenas.sh
+scripts/sync-photos-to-nas.sh
 scripts/zfs-encrypt-migrate.py
 submodules/dotbins
 submodules/rsync-time-backup

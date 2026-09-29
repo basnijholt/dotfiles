@@ -335,14 +335,14 @@ scripts
 ├── nbviewer.sh                   # Share a Jupyter notebook via nbviewer (after upload)
 ├── post-clone.sh                 # Initialize submodules with LFS skip for mydotbins, then init rest
 ├── pypi-sha256.sh                # Print commands to update a conda-forge feedstock checksum
-├── rclone.sh                     # Scheduled backups to Backblaze B2 (and rsync to TrueNAS)
+├── rclone.sh                     # Scheduled backups to Backblaze B2 (and rsync to the NAS)
 ├── remove-box.py                 # Strip box-drawing characters from copied code snippets
 ├── rsync-time-machine.sh         # Create incremental Time Machine-like backups using rsync
 ├── run.sh                        # Run a command from .dotbins platform bin directory
 ├── signature.html
 ├── sync-dotfiles.sh              # Push updater to hosts and trigger sync/install
 ├── sync-local-dotfiles.sh        # On a host: pull latest and optionally run ./install
-├── sync-photos-to-truenas.sh     # Sync photos to TrueNAS server
+├── sync-photos-to-nas.sh         # Sync photos to the NAS
 ├── sync-submodules.sh
 ├── sync-uv.sh              # Globally install uv tools I frequently use
 ├── transcribe.py                 # Stream mic audio to a Wyoming ASR server (clipboard optional)

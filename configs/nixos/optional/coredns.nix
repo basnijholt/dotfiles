@@ -44,10 +44,8 @@ let
     nuc             3600  IN  A     192.168.1.2
     hp              3600  IN  A     192.168.1.3
     nas             3600  IN  A     192.168.1.4
-    truenas         3600  IN  A     192.168.1.4
     pc              3600  IN  A     192.168.1.5
     docker          3600  IN  A     192.168.1.6
-    docker-truenas  3600  IN  A     192.168.1.6
     pi4             3600  IN  A     192.168.1.7
     pi3             3600  IN  A     192.168.1.8
     vacuum          3600  IN  A     192.168.1.10
@@ -58,7 +56,6 @@ let
     switch          3600  IN  A     192.168.1.14
     meshcentral     3600  IN  A     192.168.1.15
     printer         3600  IN  A     192.168.1.234
-    debian-truenas  3600  IN  A     192.168.1.62
     nix-cache       3600  IN  A     192.168.1.145
     traefik         3600  IN  CNAME docker
     dns             3600  IN  CNAME nuc

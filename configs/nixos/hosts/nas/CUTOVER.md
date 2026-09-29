@@ -368,7 +368,7 @@ findmnt -t nfs,nfs4 -o TARGET,SOURCE,FSTYPE,OPTIONS
 Confirm the mounts resolve to the NAS address and that read/write behavior matches the old TrueNAS exports.
 The cutover validated the PC mounts for `/opt/stacks`, `/mnt/data`, and the expected `/mnt/tank/...` paths.
 
-`truenas.local` remains a compatibility DNS name for existing clients.
+`truenas.local` was kept as a compatibility DNS name at cutover; it was retired on 2026-09-29 in favor of `nas` and `nas.local`.
 `nas` and `nas.local` should also resolve to the NAS address.
 
 Remove or disable client jobs that depended on the TrueNAS API, such as the old PC TrueNAS config-backup timer.

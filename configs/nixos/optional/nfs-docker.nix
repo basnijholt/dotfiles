@@ -1,5 +1,5 @@
 # NFS mounts for Docker hosts running compose-farm services
-# NAS: truenas.local
+# NAS: nas.local
 #
 # See: https://github.com/basnijholt/compose-farm/blob/main/docs/truenas-nested-nfs.md
 #
@@ -25,43 +25,43 @@ let
 in
 {
   fileSystems."/opt/stacks" = {
-    device = "truenas.local:/mnt/ssd/docker/stacks";
+    device = "nas.local:/mnt/ssd/docker/stacks";
     fsType = "nfs";
     options = nfsOptions;
   };
 
   fileSystems."/mnt/data" = {
-    device = "truenas.local:/mnt/ssd/docker/data";
+    device = "nas.local:/mnt/ssd/docker/data";
     fsType = "nfs";
     options = nfsOptions;
   };
 
   fileSystems."/mnt/tank/media" = {
-    device = "truenas.local:/mnt/tank/media";
+    device = "nas.local:/mnt/tank/media";
     fsType = "nfs";
     options = nfsOptions;
   };
 
   fileSystems."/mnt/tank/youtube" = {
-    device = "truenas.local:/mnt/tank/youtube";
+    device = "nas.local:/mnt/tank/youtube";
     fsType = "nfs";
     options = nfsOptions;
   };
 
   fileSystems."/mnt/tank/photos-export" = {
-    device = "truenas.local:/mnt/tank/photos-export";
+    device = "nas.local:/mnt/tank/photos-export";
     fsType = "nfs";
     options = nfsOptions;
   };
 
   fileSystems."/mnt/tank/syncthing" = {
-    device = "truenas.local:/mnt/tank/syncthing";
+    device = "nas.local:/mnt/tank/syncthing";
     fsType = "nfs";
     options = nfsOptions;
   };
 
   fileSystems."/mnt/tank/frigate" = {
-    device = "truenas.local:/mnt/tank/frigate";
+    device = "nas.local:/mnt/tank/frigate";
     fsType = "nfs";
     options = nfsOptions;
   };

@@ -52,7 +52,7 @@
     matchConfig.Name = "br0";
     networkConfig.DHCP = "yes";
     # NFS mounts use systemd-networkd-wait-online@br0.service before
-    # contacting TrueNAS.
+    # contacting nas.
     linkConfig.RequiredForOnline = "routable";
     linkConfig.RequiredFamilyForOnline = "ipv4";
   };

@@ -1,6 +1,6 @@
 # Incus LXC Container with NixOS and Docker
 
-This runs on my TrueNAS Scale server.
+This runs as an Incus container on `nas`. It was created when `nas` still ran TrueNAS SCALE, so the steps below are from then.
 
 1. I just created a basic NixOS LXC container via the UI on http://truenas.local/ui/containers/new.
 2. Then NIC -> Add -> `br0`.
