@@ -44,6 +44,10 @@ let
     nuc             3600  IN  A     192.168.1.2
     hp              3600  IN  A     192.168.1.3
     nas             3600  IN  A     192.168.1.4
+    ; Retired names: an explicit record keeps the * wildcard from answering them
+    truenas         3600  IN  TXT   "retired, use nas"
+    docker-truenas  3600  IN  TXT   "retired, use docker"
+    debian-truenas  3600  IN  TXT   "retired, the Debian VM is gone"
     pc              3600  IN  A     192.168.1.5
     docker          3600  IN  A     192.168.1.6
     pi4             3600  IN  A     192.168.1.7
