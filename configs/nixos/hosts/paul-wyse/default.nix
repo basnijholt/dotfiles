@@ -28,9 +28,11 @@
   # --- Come back by itself ---
   # It kept going offline with nobody around to turn it back on. The TCO
   # watchdog isn't usable ("Invalid pltconfig, ensure IPC1 device is enabled
-  # in BIOS"), so rely on the kernel's lockup detectors and reboot on panic.
+  # in BIOS"), so rely on the kernel's lockup detectors and reboot on panic
+  # (the sysctl applies on switch; panic=10 also covers early boot).
   boot.kernelParams = [ "panic=10" ];
   boot.kernel.sysctl = {
+    "kernel.panic" = 10;
     "kernel.softlockup_panic" = 1;
     "kernel.hardlockup_panic" = 1;
   };
