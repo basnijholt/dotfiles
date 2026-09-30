@@ -41,6 +41,25 @@ The script handles partitioning (disko), installation, and provides post-install
 3. Connect to Tailscale: `sudo tailscale up --login-server https://headscale.nijho.lt`
 4. Point router DNS at this machine's IP
 
+## Deploying
+
+Not comin-managed, so deploy by hand from pc. Activate with `test` first: if the box
+drops off the tailnet, a reboot brings back the previous generation. Then `switch`.
+
+```bash
+nixos-rebuild test --flake ~/dotfiles/configs/nixos#paul-wyse \
+  --target-host basnijholt@100.64.0.35 --sudo --ask-sudo-password --use-substitutes
+ssh basnijholt@100.64.0.35 true  # still reachable?
+nixos-rebuild switch --flake ~/dotfiles/configs/nixos#paul-wyse \
+  --target-host basnijholt@100.64.0.35 --sudo --ask-sudo-password --use-substitutes
+```
+
+`--use-substitutes` makes the Wyse download from cache.nixos.org over its own uplink
+instead of pulling everything through the tailnet. The eMMC pool is small (about 9 GB
+free before a nixpkgs bump, which needs about 4 GB): check `zpool list` first and
+collect old generations if it's tight. After a Jellyfin upgrade, its first start can
+spend 20 minutes migrating over the rclone mount; `/health` says `Degraded` until then.
+
 ## Services
 
 | Service | Purpose |
