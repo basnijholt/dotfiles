@@ -2,7 +2,7 @@
 
 Gateway to home services via Tailscale. Provides DNS resolution for `*.local` domains and reverse proxies to home network.
 
-**Location:** Netherlands (managed remotely from Seattle - changes require caution!)
+**Location:** France, at Paul's (managed remotely from Seattle - changes require caution!)
 
 ## Hardware
 
@@ -54,6 +54,17 @@ The script handles partitioning (disko), installation, and provides post-install
 For testing without hardware, use the `paul-wyse-incus` config. See `incus-overrides.nix` for instructions.
 
 ## Troubleshooting
+
+### It turns itself off
+
+The journal showed `Power key pressed short.` before most of the shutdowns, some
+within minutes of booting, so a short press of the power button is ignored now
+(`optional/power.nix`); holding it still forces the box off. Kernel lockups and
+panics reboot it (`panic=10`). The TCO watchdog would catch hard freezes too, but
+the BIOS doesn't expose it. For power cuts, set Power Management > AC Recovery to
+"Power On" in the BIOS (F2 at boot), so it starts again when the power returns.
+Uptime Kuma pings it over Tailscale (100.64.0.35).
+
 
 ### NIC instability
 

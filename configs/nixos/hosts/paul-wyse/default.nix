@@ -10,6 +10,7 @@
 
 {
   imports = [
+    ../../optional/power.nix # A short press of the power button did nothing but power it off, for days
     ./networking.nix
     ./coredns.nix
     ./caddy.nix
@@ -23,6 +24,16 @@
   # Deliberately NOT comin-managed: 4 GB box where nix eval risks OOM, at
   # someone else's house where a wedged deploy is hard to fix.
   services.comin.enable = lib.mkForce false;
+
+  # --- Come back by itself ---
+  # It kept going offline with nobody around to turn it back on. The TCO
+  # watchdog isn't usable ("Invalid pltconfig, ensure IPC1 device is enabled
+  # in BIOS"), so rely on the kernel's lockup detectors and reboot on panic.
+  boot.kernelParams = [ "panic=10" ];
+  boot.kernel.sysctl = {
+    "kernel.softlockup_panic" = 1;
+    "kernel.hardlockup_panic" = 1;
+  };
 
   # --- Tailscale for secure tunnel to home network ---
   services.tailscale.enable = lib.mkForce true;
