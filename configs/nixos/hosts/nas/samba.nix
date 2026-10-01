@@ -59,8 +59,24 @@
         "read only" = "no";
         "durable handles" = "yes";
       };
+
+      # Drop zone for files from the iPhone (Files app > Connect to Server).
+      # It lives under the NFS-exported /mnt/ssd/docker/data, so it shows up as
+      # /mnt/data/inbox on every host, where coding agents can read it.
+      inbox = {
+        path = "/mnt/ssd/docker/data/inbox";
+        browseable = "yes";
+        "read only" = "no";
+        "valid users" = "basnijholt";
+        "force user" = "basnijholt";
+        "force group" = "users";
+        "create mask" = "0644";
+        "directory mask" = "0755";
+      };
     };
   };
+
+  systemd.tmpfiles.rules = [ "d /mnt/ssd/docker/data/inbox 0755 basnijholt users - -" ];
 
   services.samba-wsdd = {
     enable = true;
