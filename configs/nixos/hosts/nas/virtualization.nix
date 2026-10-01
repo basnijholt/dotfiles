@@ -68,6 +68,12 @@ let
           # Cap the main workload LXC (runs ~104 Docker containers; ~22 GiB at
           # normal load) so it cannot exhaust host RAM as it did on TrueNAS.
           set_config docker limits.memory 40GiB
+          # Let it swap idle memory into the host's zram (compressed RAM; no swap
+          # on ZFS, which can deadlock). It has to be a size: with limits.memory
+          # set, "true" means memory+swap <= limit, i.e. no swap at all. Without
+          # swap, ~31 GiB of container memory couldn't be paged out and the host
+          # OOMed on 2026-09-30.
+          set_config docker limits.memory.swap 12GiB
           set_config docker security.nesting true
           set_config docker security.privileged true
           set_config docker security.syscalls.intercept.mount true
