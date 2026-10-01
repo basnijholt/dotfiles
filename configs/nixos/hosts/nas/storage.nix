@@ -6,7 +6,6 @@
 }:
 
 let
-  arcMax = 8 * 1024 * 1024 * 1024; # 8 GiB
   unlockEncryptedDatasets = pkgs.writeShellScriptBin "zfs-unlock-encrypted-datasets" ''
     set -euo pipefail
 
@@ -62,24 +61,12 @@ in
     memoryPercent = 25;
   };
 
-  # Cap the ZFS ARC at 8 GiB (default is ~50% of RAM, ~31 GiB here). This host
+  # Cap the ZFS ARC at 16 GiB (default is ~50% of RAM, ~31 GiB here). This host
   # has 64 GiB, no ECC, and a history of OOM under heavy container load, so we
-  # trade cache for predictable headroom for the Incus workloads. At 16 GiB it
-  # still OOMed on 2026-09-30: the containers had grown to ~31 GiB, and a write
-  # burst pushed the ARC to 23.6 GB, past its cap (dirty data counts on top).
+  # trade cache for predictable headroom for the Incus workloads.
   boot.extraModprobeConfig = ''
-    options zfs zfs_arc_max=${toString arcMax}
+    options zfs zfs_arc_max=17179869184
   '';
-  # The module option only applies at boot; this applies a change on switch.
-  systemd.services.zfs-arc-max = {
-    description = "Apply the ZFS ARC size cap";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = "echo ${toString arcMax} > /sys/module/zfs/parameters/zfs_arc_max";
-  };
 
   services.zfs.autoScrub = {
     enable = true;
