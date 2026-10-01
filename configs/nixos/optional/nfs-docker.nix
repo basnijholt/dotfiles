@@ -65,4 +65,21 @@ in
     fsType = "nfs";
     options = nfsOptions;
   };
+
+  # A mount unit tries once, and bg only retries after a timeout, not an error
+  # like "Network is unreachable". On 2026-09-30 pc booted into a race with
+  # tailscaled's route setup, every NFS mount failed, and its containers ran on
+  # empty local directories for hours. Keep starting the mounts until they're up.
+  systemd.services.nfs-mounts-retry = {
+    description = "Retry NFS mounts that failed";
+    after = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "/run/current-system/systemd/bin/systemctl start remote-fs.target";
+      Restart = "on-failure";
+      RestartSec = 30;
+    };
+    startLimitIntervalSec = 0; # Retry for as long as it takes
+  };
 }
