@@ -12,10 +12,11 @@
       upgrade = true;
     };
 
-    # Homebrew 6 requires explicit trust for third-party formulae. nix-darwin
+    # Homebrew 6 requires explicit trust for third-party formulae and casks. nix-darwin
     # does not expose Homebrew Bundle's `trusted` option yet.
     extraConfig = ''
       brew "hashicorp/tap/terraform", trusted: true
+      cask "basnijholt/tap/agent-cli", trusted: true # AI agent CLI
     '';
 
     # CLI Tools (Part 1)
@@ -116,12 +117,10 @@
     casks = [
       "1password-cli" # 1Password CLI
       "adobe-creative-cloud" # Adobe suite
-      "basnijholt/tap/agent-cli" # AI agent CLI
       "airflow" # Video transcoder
       "balenaetcher" # USB image writer
       "block-goose" # open source AI agent
       "brave-browser" # Web browser
-      "chromedriver" # Chrome automation
       "cryptomator" # File encryption
       "cursor" # Cursor editor
       "cyberduck" # FTP client
@@ -168,7 +167,6 @@
       "rectangle" # Window manager
       "rotki" # Portfolio tracker
       "sabnzbd" # Usenet client
-      "jackielii/tap/skhd-zig" # Hotkey daemon
       "scroll-reverser" # Scroll direction control
       "selfcontrol" # Website blocker
       "signal" # Secure messenger
@@ -213,7 +211,6 @@
     taps = [
       "hashicorp/tap" # For Terraform
       "basnijholt/tap" # For agent-cli
-      "jackielii/tap" # For skhd-zig
     ];
   };
 }
