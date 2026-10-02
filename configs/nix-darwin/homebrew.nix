@@ -161,7 +161,6 @@
       "obsidian" # Note taking app
       "onyx" # System maintenance
       "proton-mail-bridge" # ProtonMail bridge
-      "qbittorrent" # Torrent client
       "quicklook-video" # Video QuickLook
       "raycast" # Productivity tool
       "rectangle" # Window manager
@@ -169,7 +168,6 @@
       "sabnzbd" # Usenet client
       "scroll-reverser" # Scroll direction control
       "selfcontrol" # Website blocker
-      "signal" # Secure messenger
       "slack" # Slack chat
       "sloth" # Process monitor
       "spotify" # Music streaming
@@ -180,7 +178,6 @@
       "syncthing-app" # File synchronization
       "teamviewer" # Remote control
       "telegram" # Messenger
-      "tor-browser" # Private browser
       "tunnelblick" # OpenVPN client
       "unclack" # Mute keyboard sounds
       "universal-media-server" # Media server
@@ -195,7 +192,10 @@
           "google-chrome" # Web browser
           "mullvad-vpn" # VPN client
           "nordvpn" # VPN client
+          "qbittorrent" # Torrent client
+          "signal" # Secure messenger
           "tailscale-app" # VPN service
+          "tor-browser" # Private browser
           "zoom" # Video conferencing
         ]
       else
