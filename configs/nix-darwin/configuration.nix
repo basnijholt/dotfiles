@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   # Required for current nix-darwin
   nixpkgs.hostPlatform = "aarch64-darwin"; # for Apple Silicon
@@ -22,6 +22,9 @@
     nixpkgs-fmt
     sops # Secrets editor
     cocoapods # required for Capacitor iOS builds (pod install)
+  ]
+  ++ lib.optionals config.isPersonal [
+    qbittorrent # Torrent client; the Homebrew cask is disabled for failing Gatekeeper
   ];
 
   # Start the Docker-compatible Colima VM at login, without Docker Desktop.

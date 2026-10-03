@@ -192,7 +192,6 @@
           "google-chrome" # Web browser
           "mullvad-vpn" # VPN client
           "nordvpn" # VPN client
-          "qbittorrent" # Torrent client
           "signal" # Secure messenger
           "tailscale-app" # VPN service
           "tor-browser" # Private browser
