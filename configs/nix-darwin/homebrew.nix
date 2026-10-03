@@ -21,6 +21,7 @@
 
     # CLI Tools (Part 1)
     brews = [
+      "age" # File encryption
       "asciinema" # Terminal recorder
       "atuin" # Shell history sync tool
       "autossh" # Automatically restart SSH sessions
