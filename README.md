@@ -200,7 +200,6 @@ This will give you an interactive Zsh session within an Ubuntu container, config
 │   ├── nvim
 │   ├── opencode
 │   ├── shell                        # Shell-agnostic configurations
-│   ├── skhd
 │   ├── starship                     # Cross-shell prompt
 │   ├── syncthing                    # File synchronization
 │   ├── wezterm                      # WezTerm terminal configuration

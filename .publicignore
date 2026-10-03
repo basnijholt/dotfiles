@@ -20,7 +20,6 @@ configs/keyboard-maestro
 configs/mako
 configs/nix-darwin
 configs/nixos
-configs/skhd
 configs/syncthing
 scripts/git-credential-gitea.sh
 scripts/git-credential-portable.sh
