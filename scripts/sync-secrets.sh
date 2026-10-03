@@ -9,7 +9,7 @@ HOSTNAME="${SYNC_SECRETS_HOSTNAME:-$(hostname -s)}"
 ZFS_UNLOCK_CONFIG_TARGET="${ZFS_UNLOCK_CONFIG_TARGET:-$HOME/.config/zfs-unlock/config.yaml}"
 
 case "$HOSTNAME" in
-  basnijholt-macbook-pro-2|basnijholt-macbook-pro|pc|pi4)
+  basnijholt-macbook-pro-2|basnijholt-macbook-pro|basnijholt-macbook-pro-m2|pc|pi4)
     ;;
   *)
     echo "Skipping secrets on $HOSTNAME"
