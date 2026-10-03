@@ -53,9 +53,16 @@
             }
           ];
         };
-        "basnijholt-macbook-pro-2" = mkDarwin {
+        # M4
+        "basnijholt-macbook-pro-m4" = mkDarwin {
           isPersonal = false;
           primaryUser = "bas.nijholt";
+          extraModules = [
+            {
+              networking.hostName = "basnijholt-macbook-pro-m4";
+              networking.computerName = "basnijholt-macbook-pro-m4";
+            }
+          ];
         };
         # M2 Pro that stays on with its lid closed, used remotely
         "basnijholt-macbook-pro-m2" = mkDarwin {
