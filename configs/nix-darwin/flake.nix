@@ -25,6 +25,7 @@
           modules = [
             ./configuration.nix
             ./homebrew.nix
+            ./t3code.nix
             {
               options = {
                 isPersonal = nixpkgs.lib.mkOption {
@@ -60,6 +61,10 @@
               # which breaks darwin-rebuild's LocalHostName flake lookup
               networking.hostName = "basnijholt-macbook-pro-m2";
               networking.computerName = "basnijholt-macbook-pro-m2";
+              local.t3code = {
+                enable = true;
+                host = "100.64.0.27";
+              };
             }
           ];
         };

@@ -2,6 +2,9 @@
 {
   # Never sleep while on AC power and reboot itself if the kernel hangs
   power.sleep.computer = "never";
+  # Keep the virtual screen awake too, so screenshots over SSH aren't black.
+  # With the lid closed no physical panel is lit.
+  power.sleep.display = "never";
   power.restartAfterFreeze = true;
 
   # Remote Login. On macOS 26 this also lets FileVault be unlocked over SSH
