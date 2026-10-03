@@ -200,7 +200,6 @@ This will give you an interactive Zsh session within an Ubuntu container, config
 │   ├── nvim
 │   ├── opencode
 │   ├── shell                        # Shell-agnostic configurations
-│   ├── skhd
 │   ├── starship                     # Cross-shell prompt
 │   ├── syncthing                    # File synchronization
 │   ├── wezterm                      # WezTerm terminal configuration
@@ -471,7 +470,7 @@ Tip: Run dotbins sync to install missing tools
 Before running Nix-darwin, set the hostname to one of the `darwinConfigurations` in [`configs/nix-darwin/flake.nix`](configs/nix-darwin/flake.nix), since `darwin-rebuild` picks the configuration by `LocalHostName` (e.g. `basnijholt-macbook-pro-m2` for the always-on M2):
 
 ```bash
-NAME="basnijholt-macbook-pro"
+NAME="basnijholt-macbook-pro-m5"
 sudo scutil --set HostName $NAME
 sudo scutil --set LocalHostName $NAME
 sudo scutil --set ComputerName $NAME
