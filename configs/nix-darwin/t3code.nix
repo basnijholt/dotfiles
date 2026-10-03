@@ -46,5 +46,11 @@ in
         };
       };
     };
+
+    # While the tailnet IP is down, every KeepAlive retry appends a bind error,
+    # so cap the log: rotate at 1 MiB, keep 3 old copies.
+    environment.etc."newsyslog.d/t3code.conf".text = ''
+      ${logFile} ${config.system.primaryUser}:staff 644 3 1024 * N
+    '';
   };
 }

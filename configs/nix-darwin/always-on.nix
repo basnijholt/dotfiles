@@ -6,6 +6,8 @@
   # With the lid closed no physical panel is lit.
   power.sleep.display = "never";
   power.restartAfterFreeze = true;
+  # Always on the charger, so keep the battery from sitting at 100%
+  local.chargeLimit = 80;
 
   # Remote Login. On macOS 26 this also lets FileVault be unlocked over SSH
   # (from the LAN, Tailscale isn't up yet) after a reboot.
