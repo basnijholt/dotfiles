@@ -26,6 +26,7 @@
             ./configuration.nix
             ./homebrew.nix
             ./t3code.nix
+            ./charge-limit.nix
             {
               options = {
                 isPersonal = nixpkgs.lib.mkOption {
@@ -50,6 +51,10 @@
             {
               networking.hostName = "basnijholt-macbook-pro-m5";
               networking.computerName = "basnijholt-macbook-pro-m5";
+              local.t3code = {
+                enable = true;
+                host = "100.64.0.39";
+              };
             }
           ];
         };
