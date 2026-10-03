@@ -468,7 +468,7 @@ Tip: Run dotbins sync to install missing tools
 
 ### macOS
 
-Before running Nix-darwin, set the hostname:
+Before running Nix-darwin, set the hostname to one of the `darwinConfigurations` in [`configs/nix-darwin/flake.nix`](configs/nix-darwin/flake.nix), since `darwin-rebuild` picks the configuration by `LocalHostName` (e.g. `basnijholt-macbook-pro-m2` for the always-on M2):
 
 ```bash
 NAME="basnijholt-macbook-pro"
