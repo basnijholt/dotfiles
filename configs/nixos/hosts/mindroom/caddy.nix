@@ -4,7 +4,6 @@ let
   inherit (constants)
     publicSiteDomain
     publicCinnyDomain
-    publicElementDomain
     ;
 in
 {
@@ -62,12 +61,6 @@ in
             lb_try_duration 5s
             lb_try_interval 100ms
           }
-        '';
-      };
-
-      "${publicElementDomain}:80" = {
-        extraConfig = ''
-          reverse_proxy 127.0.0.1:8091
         '';
       };
     };
