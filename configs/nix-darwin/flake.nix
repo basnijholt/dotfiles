@@ -42,9 +42,16 @@
     in
     {
       darwinConfigurations = {
-        "basnijholt-macbook-pro" = mkDarwin {
+        # M5 Pro, the main personal Mac
+        "basnijholt-macbook-pro-m5" = mkDarwin {
           isPersonal = true;
           primaryUser = "basnijholt";
+          extraModules = [
+            {
+              networking.hostName = "basnijholt-macbook-pro-m5";
+              networking.computerName = "basnijholt-macbook-pro-m5";
+            }
+          ];
         };
         "basnijholt-macbook-pro-2" = mkDarwin {
           isPersonal = false;
