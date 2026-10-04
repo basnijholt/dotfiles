@@ -26,12 +26,10 @@
     # power.sleep.computer only covers idle sleep; closing the lid still sleeps without this.
     # This is global, so on battery it also stays up and rides out short power cuts.
     pmset -a disablesleep 1
-
-    # Screen Sharing (VNC on port 5900). Enable even when already loaded, so a
-    # persisted disable override can't stop it from starting after a reboot.
-    launchctl enable system/com.apple.screensharing
-    if ! launchctl print system/com.apple.screensharing &> /dev/null; then
-      launchctl bootstrap system /System/Library/LaunchDaemons/com.apple.screensharing.plist
-    fi
   '';
+
+  # Not declarative: Screen Sharing has to be switched on once in System
+  # Settings > General > Sharing. Starting it with launchctl opens port 5900,
+  # but macOS then rejects clients with "Screen Sharing is not permitted".
+  # BetterDisplay's first launch also needs a click on the Gatekeeper prompt.
 }
