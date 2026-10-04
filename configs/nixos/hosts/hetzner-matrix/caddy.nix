@@ -32,7 +32,7 @@ in
           header Content-Type application/json
           header Access-Control-Allow-Origin "*"
           respond 200 {
-            body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"},\"org.matrix.msc4143.rtc_foci\":[{\"type\":\"livekit\",\"livekit_service_url\":\"https://${siteDomain}/livekit/jwt\"}]}"
+            body "{\"m.homeserver\":{\"base_url\":\"https://${siteDomain}\"},\"org.matrix.msc4143.rtc_foci\":[{\"type\":\"livekit\",\"livekit_service_url\":\"https://${siteDomain}/livekit/jwt\"}],\"io.mindroom.bug_reports\":{\"admins\":[\"@basnijholt:${siteDomain}\"]}}"
             close
           }
         }
