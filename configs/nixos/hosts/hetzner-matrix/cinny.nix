@@ -84,6 +84,15 @@ process.stdout.write(manifest.version);
         exit 1
       fi
 
+      # chat.mindroom.chat runs agent canvases; the repo default keeps them off.
+      ${pkgs.nodejs}/bin/node -e '
+const fs = require("node:fs");
+const path = process.argv[1];
+const config = JSON.parse(fs.readFileSync(path, "utf8"));
+config.mindroom = { ...config.mindroom, canvas: { ...config.mindroom?.canvas, enabled: true } };
+fs.writeFileSync(path, JSON.stringify(config, null, 2) + "\n");
+' dist/config.json
+
       mkdir -p "$release_dir"
       rsync -a --delete dist/ "$release_dir/"
 
