@@ -56,7 +56,11 @@ in
     '';
 
     serviceConfig = {
-      Type = "simple";
+      # READY follows startup migrations; ordered HTTP checks must wait for it.
+      Type = "notify";
+      # Never force-kill a migration at a systemd startup or shutdown deadline.
+      TimeoutStartSec = "infinity";
+      TimeoutStopSec = "infinity";
       User = "tuwunel";
       Group = "tuwunel";
       ExecStart = "${tuwunelPackage}/bin/tuwunel";
