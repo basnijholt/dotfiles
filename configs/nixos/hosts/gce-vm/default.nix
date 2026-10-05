@@ -102,10 +102,33 @@ in
     "incusbr*"
   ];
 
-  # Coding agents may legitimately consume most memory. Avoid killing them
-  # while plenty of RAM remains, but retain a last-resort OOM safety margin.
-  services.earlyoom.freeMemThreshold = lib.mkForce 3;
-  services.earlyoom.freeSwapThreshold = lib.mkForce 3;
+  # Without swap a full box thrashes page cache instead of OOM-killing.
+  zramSwap = {
+    enable = true;
+    memoryPercent = 25;
+  };
+
+  # Never restart zram on switch; see hosts/hetzner/default.nix.
+  systemd.units."systemd-zram-setup@zram0.service" = {
+    overrideStrategy = "asDropin";
+    text = ''
+      [Service]
+      X-RestartIfChanged=false
+      X-StopIfChanged=false
+    '';
+  };
+
+  services.earlyoom.freeMemThreshold = lib.mkForce 5;
+  services.earlyoom.freeSwapThreshold = lib.mkForce 10;
+
+  # Cap agents so a runaway leaves headroom for sshd, dockerd and tailscale.
+  systemd.slices.user = {
+    overrideStrategy = "asDropin";
+    sliceConfig = {
+      MemoryMax = "104G";
+      MemorySwapMax = "24G";
+    };
+  };
 
   # Keep the encrypted work disk fully manual. Neither boot nor systemd stores
   # its passphrase. The helper creates and owns this otherwise-empty directory.
