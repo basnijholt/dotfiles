@@ -5,16 +5,13 @@
 # ]
 # ///
 
-import contextlib
 import importlib.util
-import io
-import re
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 SCRIPT_PATH = Path(__file__).with_name("update-overrides.py")
 SPEC = importlib.util.spec_from_file_location("update_overrides", SCRIPT_PATH)
@@ -23,144 +20,91 @@ update_overrides = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = update_overrides
 SPEC.loader.exec_module(update_overrides)
 
+placeholder = update_overrides.placeholder
+HASHES = [placeholder("fixture", i) for i in range(4)]
+CONTENT = f"""
+    packageOverrides = pkgs: {{
+      ollama =
+        let
+          llamaCppSrc = pkgs.fetchFromGitHub {{
+            tag = "b100";
+            hash = "{HASHES[0]}";
+          }};
+        in
+        rec {{
+          version = "0.35.1";
+          src = pkgs.fetchFromGitHub {{ hash = "{HASHES[1]}"; }};
+          vendorHash = "{HASHES[2]}";
+        }};
 
-class GetNewHashTests(unittest.TestCase):
-    @patch.object(update_overrides.subprocess, "run")
-    def test_extracts_hash_mismatch_from_either_output_stream(self, run):
-        specified = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-        got = "sha256-HT0QuIFJz5cgH2qinxhtyLEL/RrUpziZuntj/EDQtzI="
-
-        for stream_name in ("stdout", "stderr"):
-            with self.subTest(stream_name=stream_name):
-                streams = {"stdout": "", "stderr": ""}
-                streams[stream_name] = (
-                    f"      specified: {specified}\n             got: {got}\n"
-                )
-                run.return_value = subprocess.CompletedProcess(
-                    args=["nix", "build"],
-                    returncode=1,
-                    **streams,
-                )
-
-                self.assertEqual(
-                    update_overrides.get_hash_mismatch("ollama"), (specified, got)
-                )
-
-    @patch.object(update_overrides.subprocess, "run")
-    def test_does_not_combine_partial_diagnostics_across_streams(self, run):
-        specified = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
-        got = "sha256-HT0QuIFJz5cgH2qinxhtyLEL/RrUpziZuntj/EDQtzI="
-        run.return_value = subprocess.CompletedProcess(
-            args=["nix", "build"],
-            returncode=1,
-            stdout=f"specified: {specified}\n",
-            stderr=f"got: {got}\n",
-        )
-        captured_stderr = io.StringIO()
-
-        with contextlib.redirect_stderr(captured_stderr):
-            actual = update_overrides.get_hash_mismatch("ollama")
-
-        self.assertIsNone(actual)
-
-    @patch.object(update_overrides.subprocess, "run")
-    def test_reports_build_failure_output_when_hash_is_missing(self, run):
-        run.return_value = subprocess.CompletedProcess(
-            args=["nix", "build"],
-            returncode=1,
-            stdout="copying source\n",
-            stderr="error: unable to download source\n",
-        )
-        captured_stderr = io.StringIO()
-
-        with contextlib.redirect_stderr(captured_stderr):
-            actual = update_overrides.get_hash_mismatch("ollama")
-
-        self.assertIsNone(actual)
-        self.assertIn("nix build exited with status 1", captured_stderr.getvalue())
-        self.assertIn("copying source", captured_stderr.getvalue())
-        self.assertIn("error: unable to download source", captured_stderr.getvalue())
+      llama-swap =
+        let
+          version = "262";
+        in
+        pkgs.fetchurl {{ hash = "{HASHES[3]}"; }};
+    }};
+"""
 
 
-class ReplaceHashesTests(unittest.TestCase):
-    def test_uses_distinct_dummy_hashes_for_each_slot(self):
-        content = """
-        block = {
-          src = pkgs.fetchFromGitHub {
-            hash = "sha256-source";
-          };
-          vendorHash = "sha256-vendor";
-        };
-        """
+class LatestReleaseTests(unittest.TestCase):
+    @patch.object(update_overrides.requests, "get")
+    def test_picks_highest_numeric_version_with_prefix(self, get):
+        tags = ["v0.40.0-rc3", "v0.9.0", "v0.35.1", "b11430"]
+        get.return_value = Mock(json=lambda: [{"tag_name": tag} for tag in tags])
 
-        updated = update_overrides.replace_hashes_in_block(
-            content, content.index("block ="), 2
-        )
-        hashes = re.findall(r'sha256-[^"]+', updated)
+        self.assertEqual(update_overrides.latest_release("o/r", "v"), "0.35.1")
 
-        self.assertEqual(len(hashes), 2)
-        self.assertNotEqual(hashes[0], hashes[1])
 
-    def test_does_not_replace_hashes_in_the_next_package(self):
-        content = """
-        first = {
-          hash = "sha256-first";
-        };
-        second = {
-          hash = "sha256-second";
-        };
-        """
+class BumpTests(unittest.TestCase):
+    @patch.object(update_overrides, "ollama_llama_cpp_tag", return_value="b200")
+    @patch.object(update_overrides, "latest_release", return_value="0.36.0")
+    def test_bumps_version_pin_and_only_this_packages_hashes(self, *_):
+        updated = update_overrides.bump(CONTENT, "ollama")
 
-        with self.assertRaises(ValueError):
-            update_overrides.replace_hashes_in_block(content, 1, 2, "first")
+        expected = CONTENT.replace("0.35.1", "0.36.0").replace("b100", "b200")
+        for i in range(3):
+            expected = expected.replace(HASHES[i], placeholder("ollama", i))
+        self.assertEqual(updated, expected)
 
-    def test_finds_package_block_from_a_nested_version_match(self):
-        content = """
-        llama-swap = pkgs.runCommand "llama-swap" { } ''
-          url = "https://example.com/llama-swap";
-          hash = "sha256-first";
-        '';
-        """
-
-        try:
-            updated = update_overrides.replace_hashes_in_block(
-                content, content.index("https://example.com"), 1, "llama-swap"
-            )
-        except ValueError:
-            updated = content
-
-        self.assertNotIn("sha256-first", updated)
+    @patch.object(update_overrides, "latest_release", return_value="262")
+    def test_leaves_up_to_date_package_alone(self, _):
+        self.assertEqual(update_overrides.bump(CONTENT, "llama-swap"), CONTENT)
 
 
 class ResolveHashesTests(unittest.TestCase):
-    @patch.object(update_overrides, "get_hash_mismatch")
-    def test_resumes_only_unresolved_package_hashes(self, get_hash_mismatch):
-        existing = "sha256-existing"
-        first_dummy = update_overrides.dummy_hash("ollama", 1)
-        second_dummy = update_overrides.dummy_hash("ollama", 2)
-        first_resolved = "sha256-first-resolved"
-        second_resolved = "sha256-second-resolved"
-        get_hash_mismatch.side_effect = [
-            (first_dummy, first_resolved),
-            (second_dummy, second_resolved),
-            (existing, "sha256-wrongly-replaced"),
-        ]
-        content = f"{existing}\n{first_dummy}\n{second_dummy}\n"
-        package = update_overrides.Package(
-            name="ollama",
-            owner="ollama",
-            repo="ollama",
-            tag_prefix="v",
-            version_pattern=re.compile("unused"),
-            hash_count=3,
+    @patch.object(update_overrides, "hash_mismatch")
+    def test_resolves_only_remaining_placeholders(self, hash_mismatch):
+        content = CONTENT.replace(HASHES[1], placeholder("ollama", 1)).replace(
+            HASHES[2], placeholder("ollama", 2)
         )
+        hash_mismatch.side_effect = [
+            (placeholder("ollama", 2), "sha256-vendor"),
+            (placeholder("ollama", 1), "sha256-src"),
+        ]
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            file_path = Path(tmpdir) / "overrides.nix"
-            file_path.write_text(content)
-            updated = update_overrides.resolve_hashes(file_path, content, package)
+            file = Path(tmpdir) / "overrides.nix"
+            with patch.object(update_overrides, "FILE", file):
+                updated = update_overrides.resolve_hashes(content, "ollama")
+            self.assertEqual(file.read_text(), updated)
 
-        self.assertEqual(updated, f"{existing}\n{first_resolved}\n{second_resolved}\n")
+        expected = CONTENT.replace(HASHES[1], "sha256-src")
+        self.assertEqual(updated, expected.replace(HASHES[2], "sha256-vendor"))
+
+
+class HashMismatchTests(unittest.TestCase):
+    @patch.object(update_overrides.subprocess, "run")
+    def test_parses_nix_hash_mismatch(self, run):
+        stderr = (
+            "error: hash mismatch in fixed-output derivation '/nix/store/x.drv':\n"
+            "         specified: sha256-old=\n"
+            "            got:    sha256-new=\n"
+        )
+        run.return_value = subprocess.CompletedProcess([], 1, "", stderr)
+
+        self.assertEqual(
+            update_overrides.hash_mismatch("ollama"), ("sha256-old=", "sha256-new=")
+        )
 
 
 if __name__ == "__main__":
