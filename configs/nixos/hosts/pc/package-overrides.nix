@@ -14,8 +14,8 @@
         ollamaLlamaCppSrc = pkgs.fetchFromGitHub {
           owner = "ggml-org";
           repo = "llama.cpp";
-          tag = "b10864";
-          hash = "sha256-koitz/rveMwXTPOd+D3S5FxaYrgLL56ENOxAviuU17M=";
+          tag = "b11232";
+          hash = "sha256-2+yobqi5pOI8FyMK2StFIWAOLR2JgQGh/7gX6o4k8JU=";
         };
       in
       {
@@ -25,14 +25,14 @@
             cudaArches = [ "sm_86" ];
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "0.34.1";
+              version = "0.35.1";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-ae4yreExpFaGGHy1uvfKrMINnogjJ2mCfAmK6QGYpCU=";
+                hash = "sha256-5qJyJhqL/Zhfq2s/Z3x5Sq0GFgBai812cQkgNq82nm4=";
               };
-              vendorHash = "sha256-LEauOa88W8qqGN5B7MEvLSHgjnJ8NlP87U2rXb9miYs=";
+              vendorHash = "sha256-45FfI47tNHBPYOBLRrwuhADCUtkjAhlFrExlEy9piMI=";
               # This package only contains integration-tagged tests, so the
               # generic Go test sweep otherwise reports "build constraints
               # exclude all Go files".
@@ -68,12 +68,12 @@
             blasSupport = true;
           }).overrideAttrs
             (oldAttrs: rec {
-              version = "11028";
+              version = "11430";
               src = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
                 tag = "b${version}";
-                hash = "sha256-ORc2elp1FpSwk2Givmg0eUtOpUJq/Ar/dVKxGqEUacU=";
+                hash = "sha256-p2pShof7VpGZSHhezWvIL44Ou9CTK8e1OT3iBNdwU+I=";
                 leaveDotGit = true;
                 postFetch = ''
                   git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -81,7 +81,7 @@
                 '';
               };
               npmRoot = "tools/ui";
-              npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
+              npmDepsHash = "sha256-a17M+L3nLdRnN6WMB6imPFmwqG2g8uv+gwN0XTAUrf8=";
               # Target this host explicitly: Zen 2 CPU and RTX 3090 GPU. Using
               # znver2 instead of GGML_NATIVE avoids llama.cpp overriding the
               # explicit CUDA target with a sandbox-time GPU probe.
@@ -97,8 +97,8 @@
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
-              url = "https://github.com/mostlygeek/llama-swap/releases/download/v256/llama-swap_256_linux_amd64.tar.gz";
-              hash = "sha256-VXdXM2zeGmZ/CyANSoTEjJ9f31Yf2K6WmivtnYyU7Eg=";
+              url = "https://github.com/mostlygeek/llama-swap/releases/download/v262/llama-swap_262_linux_amd64.tar.gz";
+              hash = "sha256-hxs+14kfjOBXQo9aNNOCmOBsNsaEjBE24FMI60MDr1A=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap
