@@ -82,6 +82,15 @@
               };
               npmRoot = "tools/ui";
               npmDepsHash = "sha256-a17M+L3nLdRnN6WMB6imPFmwqG2g8uv+gwN0XTAUrf8=";
+              # nixpkgs hardcodes the build number and commit of its own
+              # release. Report ours in `llama-server --version`, `/props`,
+              # and the web UI; flags appended later win in CMake.
+              preConfigure = ''
+                pushd ${npmRoot}
+                LLAMA_BUILD_NUMBER=${version} npm run build
+                popd
+                cmakeFlagsArray+=("-DLLAMA_BUILD_COMMIT=$(cat COMMIT)")
+              '';
               # Target this host explicitly: Zen 2 CPU and RTX 3090 GPU. Using
               # znver2 instead of GGML_NATIVE avoids llama.cpp overriding the
               # explicit CUDA target with a sandbox-time GPU probe.
@@ -89,6 +98,7 @@
                 "-DCMAKE_C_FLAGS=-march=znver2"
                 "-DCMAKE_CXX_FLAGS=-march=znver2"
                 "-DCMAKE_CUDA_ARCHITECTURES=86" # RTX 3090 - needed since sandbox has no GPU
+                "-DLLAMA_BUILD_NUMBER=${version}"
               ];
             });
 
