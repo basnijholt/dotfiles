@@ -125,8 +125,8 @@ in
   systemd.slices.user = {
     overrideStrategy = "asDropin";
     sliceConfig = {
-      MemoryMax = "104G";
-      MemorySwapMax = "24G";
+      MemoryMax = "85%";
+      MemorySwapMax = "48G";
     };
   };
 
