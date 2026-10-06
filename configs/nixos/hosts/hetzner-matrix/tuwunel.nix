@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain tuwunelVersion tuwunelArchiveHash;
+  inherit (constants) siteDomain cinnyDomain tuwunelVersion tuwunelArchiveHash;
 
   tuwunelArchive = pkgs.fetchurl {
     url = "https://github.com/mindroom-ai/mindroom-tuwunel/releases/download/${tuwunelVersion}/tuwunel-${tuwunelVersion}-linux-aarch64.tar.gz";
@@ -61,6 +61,9 @@ let
     mindroom_edit_purge_interval_secs = 3600
     mindroom_edit_purge_batch_size = 10000
     max_request_size = 25165824
+    # MindRoom Chat on the web and in the iOS/Android apps (mindroom://auth/...)
+    # gets SSO login tokens without the extra Continue Sign-In page.
+    sso_trusted_redirect_hosts = ["${cinnyDomain}", "mindroom"]
 
     # Keep one-off OAuth repair commands out of this public repository.
     [global.well_known]
