@@ -7,7 +7,7 @@
 }:
 
 let
-  ntfyUrl = "http://192.168.1.2:8089/nas-alerts";
+  ntfyUrl = "http://192.168.1.6:8089/nas-alerts";
   ntfyPriority = "high";
   heartbeatUrlFile = "/etc/nas-heartbeat-url";
   netdataPkgs = import nixpkgs-netdata {
@@ -274,8 +274,8 @@ in
 
   # Dead man's switch. Everything above alerts on failure, but nothing alerts
   # on absence: if the whole NAS hangs, no OnFailure ever fires, and both the
-  # Grafana stack (Incus container on this host) and the ntfy relay (NUC) are
-  # too close to the failure domain. An external healthchecks-style service
+  # Grafana stack and ntfy (on docker-lxc) run in Incus containers on this host,
+  # inside the same failure domain. An external healthchecks-style service
   # alerts when these pings stop arriving. There is deliberately no OnFailure
   # here: detecting missed pings is the external service's job, and a local
   # alert on transient egress failure would only add noise.
