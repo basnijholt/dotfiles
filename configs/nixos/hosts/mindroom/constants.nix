@@ -8,6 +8,6 @@ in
   publicBaseDomain = "lab.mindroom.chat";
   publicSiteDomain = siteDomain;
   publicCinnyDomain = "chat.lab.mindroom.chat";
-  tuwunelVersion = "v1.9.1-mindroom.16";
-  tuwunelArchiveHash = "sha256-IVPcJv8Uo5L5herc+sKGZCTFezxSoy5BCUZBGsf7LMI=";
+  tuwunelVersion = "v1.9.3-mindroom.1";
+  tuwunelArchiveHash = "sha256-chXru1ObjCPW9qqQg5nebOiPE1h5PaWwdjjgCQPVBdg=";
 }
