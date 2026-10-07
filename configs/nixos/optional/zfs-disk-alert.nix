@@ -1,20 +1,25 @@
-# ntfy alert when the zroot pool runs low on space.
+# ntfy alert when a ZFS pool runs low on space.
 #
-# On 2026-10-05 the pool filled up while Tuwunel was writing, which left a torn
-# WAL record that hung every later startup until the database was restored from
-# a snapshot. This timer warns well before that point.
+# On 2026-10-05 hetzner-matrix's pool filled up while Tuwunel was writing,
+# which left a torn WAL record that hung every later startup until the
+# database was restored from a snapshot. This timer warns well before that
+# point.
 #
-# ntfy runs on docker-lxc; the headscale ACL lets hetzner-matrix reach
-# docker:8089 over the tailnet. The `homelab` topic is the one Uptime Kuma uses.
-{ config, pkgs, ... }:
+# ntfy runs on docker-lxc; the headscale ACL (/opt/stacks/headscale/acl.json)
+# must let the host reach docker:8089 over the tailnet. The `homelab` topic is
+# the one Uptime Kuma uses. Run `disk-space-alert-test` to send a test alert.
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
+  cfg = config.local.zfsDiskAlert;
   zfs = config.boot.zfs.package;
-  pool = "zroot";
+  inherit (cfg) pool;
   ntfyUrl = "http://100.64.0.28:8089/homelab";
-  # GiB of free space below which to warn (high priority) and page (urgent).
-  warnGiB = 8;
-  critGiB = 3;
   # While still low, repeat the alert this often.
   repeatSeconds = 6 * 3600;
 
@@ -29,9 +34,9 @@ let
     free_gib="$(${pkgs.gawk}/bin/awk -v a="$avail" -v g="$gib" 'BEGIN { printf "%.1f", a / g }')"
     total_gib="$(${pkgs.gawk}/bin/awk -v a="$total" -v g="$gib" 'BEGIN { printf "%.0f", a / g }')"
 
-    if [ "$avail" -lt $((${toString critGiB} * gib)) ]; then
+    if [ "$avail" -lt $((${toString cfg.critGiB} * gib)) ]; then
       level=crit
-    elif [ "$avail" -lt $((${toString warnGiB} * gib)) ]; then
+    elif [ "$avail" -lt $((${toString cfg.warnGiB} * gib)) ]; then
       level=warn
     else
       level=ok
@@ -84,26 +89,46 @@ let
   '';
 in
 {
-  environment.systemPackages = [
-    (pkgs.writeShellScriptBin "disk-space-alert-test" ''
-      exec ${pkgs.systemd}/bin/systemd-run --wait --collect --property=StateDirectory=disk-space-alert ${diskAlert} --test
-    '')
-  ];
-
-  systemd.services.disk-space-alert = {
-    description = "ntfy alert when ${pool} runs low on space";
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = diskAlert;
-      StateDirectory = "disk-space-alert";
+  options.local.zfsDiskAlert = {
+    pool = lib.mkOption {
+      type = lib.types.str;
+      default = "zroot";
+      description = "ZFS pool whose free space is checked.";
+    };
+    warnGiB = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 8;
+      description = "Free GiB below which to send a high-priority warning.";
+    };
+    critGiB = lib.mkOption {
+      type = lib.types.ints.positive;
+      default = 3;
+      description = "Free GiB below which to send an urgent alert.";
     };
   };
 
-  systemd.timers.disk-space-alert = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "*:0/10";
-      Persistent = true;
+  config = {
+    environment.systemPackages = [
+      (pkgs.writeShellScriptBin "disk-space-alert-test" ''
+        exec ${pkgs.systemd}/bin/systemd-run --wait --collect --property=StateDirectory=disk-space-alert ${diskAlert} --test
+      '')
+    ];
+
+    systemd.services.disk-space-alert = {
+      description = "ntfy alert when ${pool} runs low on space";
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = diskAlert;
+        StateDirectory = "disk-space-alert";
+      };
+    };
+
+    systemd.timers.disk-space-alert = {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "*:0/10";
+        Persistent = true;
+      };
     };
   };
 }

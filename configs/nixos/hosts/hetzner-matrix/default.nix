@@ -9,7 +9,7 @@
     ../../optional/git-repo-checkouts.nix
     ../../optional/zfs-sanoid.nix
     ./networking.nix
-    ./disk-alert.nix
+    ../../optional/zfs-disk-alert.nix
     ./local_mindroom_provisioning_service.nix
 
     # Service-focused modules

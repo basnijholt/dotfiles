@@ -14,8 +14,15 @@ in
 {
   imports = [
     ../../optional/zfs-sanoid.nix
+    ../../optional/zfs-disk-alert.nix
     ./networking.nix
   ];
+
+  # A release pre-pulls several GB of images, so warn earlier than the default.
+  local.zfsDiskAlert = {
+    warnGiB = 15;
+    critGiB = 6;
+  };
 
   system.stateVersion = "25.05";
 
