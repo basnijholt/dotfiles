@@ -55,6 +55,21 @@ in
   users.users.basnijholt.extraGroups = [ "k3s-admin" ];
   security.sudo.wheelNeedsPassword = false;
 
+  # Container images churn with every release and can be pulled again, so they
+  # live outside zroot/var: there, sanoid snapshots pinned every deleted layer
+  # (104 GB of snapshots for 6 GB of data on 2026-10-07). The dataset was
+  # created by hand on the running host:
+  #   zfs create -o mountpoint=legacy -o com.sun:auto-snapshot=false zroot/containerd
+  fileSystems."/var/lib/rancher/k3s/agent/containerd" = {
+    device = "zroot/containerd";
+    fsType = "zfs";
+  };
+  services.sanoid.datasets."zroot/containerd" = {
+    autosnap = false;
+    autoprune = false;
+  };
+  systemd.services.k3s.unitConfig.RequiresMountsFor = [ "/var/lib/rancher/k3s/agent/containerd" ];
+
   services.k3s = {
     enable = true;
     role = "server";
