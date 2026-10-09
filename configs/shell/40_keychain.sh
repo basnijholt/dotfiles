@@ -25,10 +25,11 @@ if [[ "$use_forwarded_agent" != true ]] && command -v keychain &> /dev/null && [
     # Execute keychain:
     # --eval: Output shell commands (export SSH_AUTH_SOCK=...; export SSH_AGENT_PID=...)
     # --quiet: Suppress informational messages.
+    # --immediate: Skip the "Press Enter to initialize keys" banner and prompt right away.
     # id_ed25519: The specific key to load into the agent (will use SSH_ASKPASS).
     if [ -t 0 ]; then
         # Interactive terminal - allow prompting
-        eval $(keychain --eval --quiet id_ed25519) || true
+        eval $(keychain --eval --quiet --immediate id_ed25519) || true
     else
         # Non-interactive (like during login) - don't prompt
         eval $(keychain --eval --quiet --noask id_ed25519)
