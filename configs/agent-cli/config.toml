@@ -56,7 +56,7 @@ CLOUD_ML_REGION = "global"
 # Kept for Opus 4.8 fallback traffic (e.g. refusal fallbacks).
 VERTEX_REGION_CLAUDE_4_8_OPUS = "global"
 # ANTHROPIC_SMALL_FAST_MODEL is deprecated; use ANTHROPIC_DEFAULT_HAIKU_MODEL instead.
-ANTHROPIC_DEFAULT_HAIKU_MODEL = "claude-haiku-4-5"
+ANTHROPIC_DEFAULT_HAIKU_MODEL = "claude-haiku-5-5"
 # Note: ANTHROPIC_API_KEY in the parent shell overrides CLAUDE_CODE_USE_VERTEX and
 # routes requests to api.anthropic.com ("API Usage Billing" header). Setting the var
 # to "" via TOML does NOT fix it (Claude Code treats empty as set).
