@@ -74,6 +74,18 @@ class PrivatePage(BaseHTTPRequestHandler):
         pass
 
 
+def stop_process(child, timeout=30):
+    """Stop only our disposable child, including a stalled graceful shutdown."""
+    if child.poll() is not None:
+        return
+    child.terminate()
+    try:
+        child.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        child.kill()
+        child.wait()
+
+
 with tempfile.TemporaryDirectory(prefix="mindroom-preview-check-") as temporary:
     root = Path(temporary)
     config = root / "config.toml"
@@ -202,10 +214,8 @@ rocksdb_cache_capacity_mb = 32.0
                         finally:
                             private.shutdown()
                             worker.join()
-                process.terminate()
-                process.wait(timeout=30)
+                stop_process(process)
                 process = None
     finally:
-        if process is not None and process.poll() is None:
-            process.terminate()
-            process.wait(timeout=30)
+        if process is not None:
+            stop_process(process)
