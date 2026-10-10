@@ -15,6 +15,8 @@ in
     # Primary domain website + Matrix API + Matrix well-known
     virtualHosts."${siteDomain}" = {
       extraConfig = ''
+        # More specific than the homeserver route; Caddy forwards websocket upgrades.
+        reverse_proxy /_matrix/client/unstable/fi.mau.as_sync localhost:29331
         # Tuwunel serves MatrixRTC transport discovery, including CORS preflights.
         reverse_proxy /_matrix/* localhost:8008
         reverse_proxy /v1/local-mindroom/* localhost:8776
@@ -50,7 +52,12 @@ in
         }
 
         root * /var/www/mindroom
-        try_files {path} /index.html
+        # Keep the website's SPA fallback from rewriting API/discovery requests.
+        @siteFiles {
+          not path /_matrix/* /v1/local-mindroom/* /.well-known/matrix/* /livekit/* /
+          file {path} /index.html
+        }
+        rewrite @siteFiles {file_match.relative}
         file_server
       '';
     };

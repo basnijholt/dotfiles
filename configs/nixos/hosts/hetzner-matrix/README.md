@@ -191,6 +191,13 @@ MindRoom iOS client values:
 
 Signal, WhatsApp, and Telegram bridges are loopback-only appservices backed by Tuwunel appservice config in `tuwunel.nix`.
 
+The iMessage bridge runs in the logged-in GUI session on the always-on M2 Mac, managed by configs/nix-darwin/imessage.nix.
+This server runs a pinned mautrix-wsproxy container bound to 127.0.0.1:29331; Caddy exposes its /_matrix/client/unstable/fi.mau.as_sync websocket endpoint.
+Tuwunel's inline imessage appservice registration sends transactions to that proxy.
+The Mac's private config.yaml tokens must match secrets/imessage-appservice-env.age, encrypted to the existing administrator and host keys.
+Apply both configurations and grant the Mac bridge Full Disk Access and Messages automation permissions.
+Check the proxy with systemctl is-active podman-mautrix-wsproxy and journalctl -u podman-mautrix-wsproxy -n 100 --no-pager.
+
 Health checks:
 
 ```bash

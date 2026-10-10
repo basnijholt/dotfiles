@@ -75,6 +75,7 @@
           primaryUser = "basnijholt";
           extraModules = [
             ./always-on.nix
+            ./imessage.nix
             {
               # Pinned so a name collision on the LAN can't turn it into "-3",
               # which breaks darwin-rebuild's LocalHostName flake lookup

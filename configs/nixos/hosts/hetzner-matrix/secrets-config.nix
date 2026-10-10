@@ -3,6 +3,16 @@
 {
   age.identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   age.secrets = {
+    imessage-appservice-env-tuwunel = {
+      file = ./secrets/imessage-appservice-env.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
+    imessage-appservice-env-wsproxy = {
+      file = ./secrets/imessage-appservice-env.age;
+      mode = "0400";
+    };
     registration-token = {
       file = ./secrets/registration-token.age;
       owner = "tuwunel";

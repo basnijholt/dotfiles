@@ -15,4 +15,5 @@ in
   "signal-appservice-env.age".publicKeys = recipients;
   "whatsapp-appservice-env.age".publicKeys = recipients;
   "telegram-appservice-env.age".publicKeys = recipients;
+  "imessage-appservice-env.age".publicKeys = recipients;
 }
