@@ -61,6 +61,9 @@ let
     mindroom_edit_purge_interval_secs = 3600
     mindroom_edit_purge_batch_size = 10000
     max_request_size = 25165824
+    # OpenID tokens prove a user's identity to whoever holds them, so keep them short-lived;
+    # clients (MindRoom Chat, Element Call, MindRoom) use them right after requesting.
+    openid_token_ttl = 120
     # MindRoom Chat on the web and in the iOS/Android apps (mindroom://auth/...)
     # gets SSO login tokens without the extra Continue Sign-In page.
     sso_trusted_redirect_hosts = ["${cinnyDomain}", "mindroom"]

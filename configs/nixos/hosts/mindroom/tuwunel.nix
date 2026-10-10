@@ -28,6 +28,9 @@ let
     registration_token_file = "${config.age.secrets.registration-token.path}"
     allow_federation = false
     max_request_size = 25165824
+    # OpenID tokens prove a user's identity to whoever holds them, so keep them short-lived;
+    # clients (MindRoom Chat, Element Call, MindRoom) use them right after requesting.
+    openid_token_ttl = 120
   '';
 in
 {
