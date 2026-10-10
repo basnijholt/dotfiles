@@ -147,6 +147,23 @@ let
     [[global.appservice.telegram.users]]
     regex = "^@telegram_.*:mindroom\\.chat$"
     exclusive = true
+
+    [global.appservice.imessage]
+    id = "imessage"
+    url = "http://127.0.0.1:29331"
+    as_token = "$TUWUNEL_IMESSAGE_AS_TOKEN"
+    hs_token = "$TUWUNEL_IMESSAGE_HS_TOKEN"
+    sender_localpart = "$TUWUNEL_IMESSAGE_SENDER_LOCALPART"
+    rate_limited = false
+    receive_ephemeral = true
+
+    [[global.appservice.imessage.users]]
+    regex = "^@imessagebot:mindroom\\.chat$"
+    exclusive = true
+
+    [[global.appservice.imessage.users]]
+    regex = "^@imessage_.*:mindroom\\.chat$"
+    exclusive = true
   '';
 in
 {
@@ -186,6 +203,7 @@ in
         config.age.secrets.signal-appservice-env-tuwunel.path
         config.age.secrets.whatsapp-appservice-env-tuwunel.path
         config.age.secrets.telegram-appservice-env-tuwunel.path
+        config.age.secrets.imessage-appservice-env-tuwunel.path
       ];
       ExecStart = "${tuwunelPackage}/bin/tuwunel";
       Restart = "on-failure";

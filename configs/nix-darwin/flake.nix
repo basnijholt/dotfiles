@@ -27,6 +27,7 @@
             ./homebrew.nix
             ./t3code.nix
             ./charge-limit.nix
+            ./imessage.nix
             {
               options = {
                 isPersonal = nixpkgs.lib.mkOption {
@@ -80,6 +81,27 @@
               # which breaks darwin-rebuild's LocalHostName flake lookup
               networking.hostName = "basnijholt-macbook-pro-m2";
               networking.computerName = "basnijholt-macbook-pro-m2";
+              local.imessage = {
+                enable = true;
+                settings = {
+                  homeserver = {
+                    address = "https://mindroom.chat";
+                    domain = "mindroom.chat";
+                    websocket_proxy = "wss://mindroom.chat";
+                  };
+                  imessage.platform = "mac";
+                  bridge = {
+                    user = "@basnijholt:mindroom.chat";
+                    personal_filtering_spaces = true;
+                    encryption = {
+                      allow = true;
+                      default = true;
+                      require = true;
+                    };
+                  };
+                  logging.min_level = "info";
+                };
+              };
               local.t3code = {
                 enable = true;
                 host = "100.64.0.27";

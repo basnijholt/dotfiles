@@ -24,6 +24,7 @@
     ./signal.nix
     ./whatsapp.nix
     ./telegram.nix
+    ./imessage.nix
   ];
 
   # ── General server config ──────────────────────────────────────────
