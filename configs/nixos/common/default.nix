@@ -10,6 +10,7 @@
     ./user.nix
     ./services.nix
     ./t3code.nix
+    ./paseo.nix
     ./packages.nix
     ./disk-cleanup.nix
     ./home-manager.nix

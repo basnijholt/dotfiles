@@ -26,6 +26,7 @@
             ./configuration.nix
             ./homebrew.nix
             ./t3code.nix
+            ./paseo.nix
             ./charge-limit.nix
             {
               options = {
@@ -52,6 +53,10 @@
               networking.hostName = "basnijholt-macbook-pro-m5";
               networking.computerName = "basnijholt-macbook-pro-m5";
               local.t3code = {
+                enable = true;
+                host = "100.64.0.39";
+              };
+              local.paseo = {
                 enable = true;
                 host = "100.64.0.39";
               };
@@ -82,6 +87,10 @@
               networking.hostName = "basnijholt-macbook-pro-m2";
               networking.computerName = "basnijholt-macbook-pro-m2";
               local.t3code = {
+                enable = true;
+                host = "100.64.0.27";
+              };
+              local.paseo = {
                 enable = true;
                 host = "100.64.0.27";
               };

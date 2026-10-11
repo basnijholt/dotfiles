@@ -85,6 +85,10 @@ in
     enable = true;
     host = "100.64.0.6";
   };
+  local.paseo = {
+    enable = true;
+    host = "100.64.0.6";
+  };
 
   environment.systemPackages = with pkgs; [
     cryptsetup

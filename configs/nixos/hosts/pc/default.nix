@@ -37,6 +37,10 @@
     enable = true;
     host = "0.0.0.0";
   };
+  local.paseo = {
+    enable = true;
+    host = "0.0.0.0";
+  };
 
   # Required for DDC/CI tools such as ddcutil to read monitor state (e.g. the
   # active input source) for manual diagnostics. Display automation no longer

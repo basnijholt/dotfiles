@@ -83,6 +83,7 @@
   networking.firewall.trustedInterfaces = [ "br0" "incusbr0" "tailscale0" ];
   networking.firewall.allowedTCPPorts = [
     3773 # T3 Code (web GUI for AI coding agents, proxied via t3.lab.nijho.lt)
+    6767 # Paseo (daemon and web UI for AI coding agents, proxied via paseo.lab.nijho.lt)
     10200 # Wyoming Piper
     10300 # Wyoming Faster Whisper - English
     10301 # Wyoming Faster Whisper - Dutch

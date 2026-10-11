@@ -15,5 +15,6 @@ packages=(
     opencode-ai@latest
     @anthropic-ai/claude-code@latest
     t3@latest
+    @getpaseo/cli@latest
 )
 bun install -g "${packages[@]}"
