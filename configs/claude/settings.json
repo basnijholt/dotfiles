@@ -27,9 +27,9 @@
       "ReadMcpResourceDirTool"
     ]
   },
+  "model": "claude-opus-5-5",
   "disableClaudeAiConnectors": true,
   "disableBundledSkills": true,
-  "model": "claude-opus-5-5",
   "hooks": {
     "PreToolUse": [
       {
@@ -84,6 +84,11 @@
   "outputStyle": "caveman",
   "feedbackDrafts": "off",
   "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  },
   "fastMode": true,
   "autoUpdatesChannel": "stable",
   "minimumVersion": "2.1.41",
@@ -91,10 +96,5 @@
   "skipDangerousModePermissionPrompt": true,
   "switchModelsOnFlag": false,
   "inputNeededNotifEnabled": false,
-  "agentPushNotifEnabled": false,
-  "modelSettings": {
-    "claude-opus-5-5": {
-      "effortLevel": "xhigh"
-    }
-  }
+  "agentPushNotifEnabled": false
 }
