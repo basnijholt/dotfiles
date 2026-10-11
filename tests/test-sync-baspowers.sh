@@ -20,19 +20,23 @@ printf '%s %s\n' "$(basename "$0")" "$*" >>"${BASPOWERS_TEST_LOG:?}"
 if [[ "$*" == "plugin list --json" ]]; then
   if [[ -e "${BASPOWERS_TEST_MISSING:-}" ]]; then
     printf '[]\n'
-  elif [[ $(basename "$0") == codex ]]; then
-    printf '{"installed":[{"pluginId":"baspowers@baspowers-dev"}]}\n'
   else
-    printf '[{"id":"baspowers@baspowers-dev"}]\n'
+    printf '{"installed":[{"pluginId":"baspowers@baspowers-dev"}]}\n'
   fi
 fi
 STUB
 chmod +x "$stub"
+# The script puts $BUN_INSTALL/bin first on PATH, so stubs there shadow the
+# real CLIs. The claude stub catches any `claude plugin` call, which would
+# rewrite the tracked configs/claude/settings.json.
+bun_install="$test_root/bun"
+mkdir -p "$bun_install/bin"
+ln -s "$stub" "$bun_install/bin/codex"
+ln -s "$stub" "$bun_install/bin/claude"
 ln -s "$stub" "$test_root/codex"
-ln -s "$stub" "$test_root/claude"
 
+export BUN_INSTALL="$bun_install"
 export BASPOWERS_CODEX_BIN="$test_root/codex"
-export BASPOWERS_CLAUDE_BIN="$test_root/claude"
 export BASPOWERS_TEST_LOG="$log"
 
 bash "$script" >"$test_root/override-output" 2>&1
@@ -46,32 +50,24 @@ codex plugin list --json
 codex plugin remove ${legacy}@${legacy}-dev
 codex plugin marketplace remove ${legacy}-dev
 codex plugin remove ${legacy}@openai-curated
-claude plugin uninstall baspowers@baspowers-dev
-claude plugin marketplace remove baspowers-dev
-claude plugin marketplace add $repo_root/submodules/baspowers
-claude plugin install baspowers@baspowers-dev
-claude plugin list --json
-claude plugin uninstall ${legacy}@${legacy}-dev
-claude plugin marketplace remove ${legacy}-dev
-claude plugin uninstall ${legacy}@claude-plugins-official
 EOF
 )
 [[ $(cat "$log") == "$expected" ]]
 
 : >"$log"
-bun_install="$test_root/bun"
-mkdir -p "$bun_install/bin"
-ln -s "$stub" "$bun_install/bin/codex"
-ln -s "$stub" "$bun_install/bin/claude"
-if ! env -u BASPOWERS_CODEX_BIN -u BASPOWERS_CLAUDE_BIN \
+if ! env -u BASPOWERS_CODEX_BIN \
   BASPOWERS_TEST_LOG="$log" \
   BUN_INSTALL="$bun_install" \
   PATH="$shell_bin:/usr/bin:/bin" \
   "$shell_bin/bash" "$script" >"$test_root/bun-install-output" 2>&1; then
-  printf 'sync-baspowers did not resolve Codex and Claude from BUN_INSTALL/bin\n' >&2
+  printf 'sync-baspowers did not resolve Codex from BUN_INSTALL/bin\n' >&2
   exit 1
 fi
 [[ $(head -n 1 "$log") == 'codex plugin remove baspowers@baspowers-dev' ]]
+if grep -q '^claude ' "$log"; then
+  printf 'sync-baspowers ran claude plugin commands\n' >&2
+  exit 1
+fi
 
 : >"$log"
 touch "$test_root/missing"
