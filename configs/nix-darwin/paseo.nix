@@ -22,6 +22,17 @@ in
   };
 
   config = lib.mkIf cfg.enable {
+    # The application firewall holds incoming connections to Homebrew's ad-hoc
+    # signed node, which runs the daemon, for a prompt nobody answers on a
+    # headless Mac. It tracks the binary by hash, so allow it again after every
+    # Homebrew upgrade. This allows any server run by this node, not just Paseo.
+    system.activationScripts.postActivation.text = ''
+      if node=$(/usr/bin/readlink -f /opt/homebrew/bin/node); then
+        /usr/libexec/ApplicationFirewall/socketfilterfw --add "$node" >&2 || true
+        /usr/libexec/ApplicationFirewall/socketfilterfw --unblockapp "$node" >&2 || true
+      fi
+    '';
+
     # Runs in the GUI login session, so the agents can reach the login keychain
     launchd.user.agents.paseo = {
       script = ''
