@@ -19,12 +19,6 @@ in
       default = "127.0.0.1";
       description = "Address on which the Paseo daemon listens.";
     };
-
-    port = lib.mkOption {
-      type = lib.types.port;
-      default = 6767;
-      description = "TCP port on which the Paseo daemon listens.";
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -56,8 +50,7 @@ in
         EnvironmentVariables = {
           # node (for the paseo launcher and node-based providers) comes from Homebrew
           PATH = "${bunBin}:/opt/homebrew/bin:/run/current-system/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin";
-          PASEO_HOME = paseoHome;
-          PASEO_LISTEN = "${cfg.host}:${toString cfg.port}";
+          PASEO_LISTEN = "${cfg.host}:6767";
           PASEO_WEB_UI_ENABLED = "true";
           # Traefik serves the web UI from *.lab.nijho.lt; IPs and localhost are always allowed
           PASEO_HOSTNAMES = ".lab.nijho.lt";
