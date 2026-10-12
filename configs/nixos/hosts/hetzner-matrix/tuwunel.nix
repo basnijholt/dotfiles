@@ -167,6 +167,10 @@ let
     [[global.appservice.imessage.users]]
     regex = "^@imessage_.*:mindroom\\.chat$"
     exclusive = true
+
+    [[global.appservice.imessage.users]]
+    regex = "^@basnijholt:mindroom\\.chat$"
+    exclusive = false
   '';
 in
 {
