@@ -27,6 +27,7 @@ nixswitch
 The always-on M2 imports imessage.nix to install a pinned official bridge and run it as a user LaunchAgent.
 Its private config.yaml and database live in ~/Library/Application Support/mautrix-imessage/ and stay outside the Nix store.
 This Mac's existing configuration targets @basnijholt:mindroom.chat and requires encrypted Matrix rooms.
+Set bridge.login_shared_secret to appservice in the private config.yaml so messages sent from your Apple devices also appear as your Matrix user; the server registration allows only @basnijholt:mindroom.chat for this login.
 On a replacement Mac, securely copy config.yaml to the same directory with mode 0600; its tokens must match configs/nixos/hosts/hetzner-matrix/secrets/imessage-appservice-env.age.
 
 Apply the Mac configuration with sudo darwin-rebuild switch --flake "path:$HOME/dotfiles/configs/nix-darwin#basnijholt-macbook-pro-m2" and apply the server configuration under configs/nixos/hosts/hetzner-matrix too.
