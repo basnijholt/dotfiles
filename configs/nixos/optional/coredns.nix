@@ -101,6 +101,19 @@ in
         file ${labMindroomChatZone}
       }
 
+      # Public names that Traefik limits to local IPs. Publicly they resolve to
+      # the WAN IP, which split-tunnel WireGuard clients reach outside the
+      # tunnel (and get a 403), so answer with Traefik's LAN IP instead.
+      home.nijho.lt {
+        bind ${listenIP}
+        template IN A {
+          answer "{{ .Name }} 300 IN A ${wildcardIP}"
+        }
+        template ANY ANY {
+          rcode NOERROR
+        }
+      }
+
       ${ecovacsZones} {
         bind ${listenIP}
         view ecovacs-robot {
