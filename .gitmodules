@@ -1,16 +1,7 @@
-[submodule "submodules/rsync-time-backup"]
-	path = submodules/rsync-time-backup
-	url = https://github.com/basnijholt/backups.git
 [submodule "submodules/dotbot"]
 	path = submodules/dotbot
 	url = https://github.com/anishathalye/dotbot
 	ignore = dirty
-[submodule "submodules/truenas-zfs-unlock"]
-	path = submodules/truenas-zfs-unlock
-	url = https://github.com/ThorpeJosh/truenas-zfs-unlock.git
-[submodule "submodules/dotbins"]
-	path = submodules/dotbins
-	url = https://github.com/basnijholt/dotbins.git
 [submodule "submodules/mydotbins"]
 	path = submodules/mydotbins
 	url = https://github.com/basnijholt/mydotbins.git
@@ -24,9 +15,6 @@
 [submodule "submodules/zsh-autosuggestions"]
 	path = submodules/zsh-autosuggestions
 	url = https://github.com/zsh-users/zsh-autosuggestions.git
-[submodule "submodules/syncthing-resolve-conflicts"]
-	path = submodules/syncthing-resolve-conflicts
-	url = https://github.com/dschrempf/syncthing-resolve-conflicts.git
 [submodule "submodules/tmux"]
 	path = submodules/tmux
 	url = https://github.com/gpakosz/.tmux.git
