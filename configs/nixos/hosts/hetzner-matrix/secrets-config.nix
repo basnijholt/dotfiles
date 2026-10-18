@@ -13,6 +13,12 @@
       file = ./secrets/imessage-appservice-env.age;
       mode = "0400";
     };
+    doublepuppet-appservice-env-tuwunel = {
+      file = ./secrets/doublepuppet-appservice-env.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
     registration-token = {
       file = ./secrets/registration-token.age;
       owner = "tuwunel";

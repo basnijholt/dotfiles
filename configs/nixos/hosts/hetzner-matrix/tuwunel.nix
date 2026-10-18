@@ -168,7 +168,17 @@ let
     regex = "^@imessage_.*:mindroom\\.chat$"
     exclusive = true
 
-    [[global.appservice.imessage.users]]
+    # Double puppeting for the iMessage bridge (login_shared_secret: as_token:...). Without a url, Tuwunel pushes
+    # no events here, so the bridge no longer receives every event from the owner's rooms, which it did while the
+    # owner was in its own namespace.
+    [global.appservice.doublepuppet]
+    id = "doublepuppet"
+    as_token = "$TUWUNEL_DOUBLEPUPPET_AS_TOKEN"
+    hs_token = "$TUWUNEL_DOUBLEPUPPET_HS_TOKEN"
+    sender_localpart = "_doublepuppet"
+    rate_limited = false
+
+    [[global.appservice.doublepuppet.users]]
     regex = "^@basnijholt:mindroom\\.chat$"
     exclusive = false
   '';
@@ -211,6 +221,7 @@ in
         config.age.secrets.whatsapp-appservice-env-tuwunel.path
         config.age.secrets.telegram-appservice-env-tuwunel.path
         config.age.secrets.imessage-appservice-env-tuwunel.path
+        config.age.secrets.doublepuppet-appservice-env-tuwunel.path
       ];
       ExecStart = "${tuwunelPackage}/bin/tuwunel";
       Restart = "on-failure";

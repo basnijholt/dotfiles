@@ -16,4 +16,5 @@ in
   "whatsapp-appservice-env.age".publicKeys = recipients;
   "telegram-appservice-env.age".publicKeys = recipients;
   "imessage-appservice-env.age".publicKeys = recipients;
+  "doublepuppet-appservice-env.age".publicKeys = recipients;
 }

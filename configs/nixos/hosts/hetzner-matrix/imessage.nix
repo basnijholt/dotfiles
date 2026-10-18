@@ -13,6 +13,9 @@
     ports = [ "127.0.0.1:29331:29331" ];
   };
 
-  systemd.services.tuwunel.restartTriggers = [ config.age.secrets.imessage-appservice-env-tuwunel.file ];
+  systemd.services.tuwunel.restartTriggers = [
+    config.age.secrets.imessage-appservice-env-tuwunel.file
+    config.age.secrets.doublepuppet-appservice-env-tuwunel.file
+  ];
   systemd.services.podman-mautrix-wsproxy.restartTriggers = [ config.age.secrets.imessage-appservice-env-wsproxy.file ];
 }
