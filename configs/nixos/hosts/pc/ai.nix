@@ -44,23 +44,23 @@ in
 
       "qwen38-vllm:27b-uncensored":
         name: "Qwen3.8 27B · vLLM · Uncensored"
-        description: "AutoRound INT4, DFlash2, 128K context."
+        description: "AutoRound INT4, DFlash2, 256K context."
         cmd: "${vllmSwap} start uncensored ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b-uncensored"
         capabilities:
-          context: 131072
+          context: 262144
         ttl: 0
         unloadTimeout: 120
 
       "qwen38-vllm:27b":
         name: "Qwen3.8 27B · vLLM"
-        description: "AutoRound INT4, DFlash2, 128K context."
+        description: "AutoRound INT4, DFlash2, 256K context."
         cmd: "${vllmSwap} start normal ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "qwen3.8-27b"
         capabilities:
-          context: 131072
+          context: 262144
         ttl: 0
         unloadTimeout: 120
 
@@ -555,6 +555,9 @@ in
           --embeddings
           --batch-size 2048
           --ubatch-size 2048
+        # GPU 1 also holds Whisper and half of vLLM, which caps vLLM's KV cache.
+        env:
+          - "CUDA_VISIBLE_DEVICES=0"
 
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
