@@ -17,7 +17,6 @@
 
     # Host-specific modules (Tier 3)
     ./networking.nix
-    ./system-packages.nix
     ./kodi.nix
   ];
 
