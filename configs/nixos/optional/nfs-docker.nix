@@ -73,6 +73,7 @@ in
   systemd.services.nfs-mounts-retry = {
     description = "Retry NFS mounts that failed";
     after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
