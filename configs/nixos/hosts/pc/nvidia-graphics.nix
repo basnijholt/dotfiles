@@ -30,11 +30,7 @@ in
 {
   services.xserver.videoDrivers = [ "nvidia" ];
   services.xserver.deviceSection = ''
-    Section "Device"
-      Identifier "nvidia-undervolt"
-      Driver "nvidia"
-      Option "Coolbits" "28"
-    EndSection
+    Option "Coolbits" "28"
   '';
   hardware.nvidia = {
     modesetting.enable = true;
