@@ -1,10 +1,50 @@
 # PC-specific package overrides (CUDA, custom packages)
 # Note: allowUnfree is set in common/nixpkgs.nix
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
+  # TODO: remove this overlay and the NVIDIA override in nvidia-graphics.nix
+  # once nixos-unstable ships a fixed patchelf (NixOS/patchelf#672).
+  # patchelf 0.19.2 aborts in shiftFile when addDriverRunpath re-patches CUDA
+  # redists, so pin them to 0.15.2 like nixpkgs#575979. The pin turns itself
+  # off with a warning once that fix is in our nixpkgs, so a stale pin cannot
+  # cost cache.nixos-cuda.org hits.
+  nixpkgs.overlays = [
+    (final: prev: {
+      patchelf_0_15 = prev.patchelf.overrideAttrs (
+        finalAttrs: _: {
+          version = "0.15.2";
+          src = prev.fetchurl {
+            url = "https://github.com/NixOS/patchelf/releases/download/${finalAttrs.version}/patchelf-${finalAttrs.version}.tar.bz2";
+            hash = "sha256-F3RfVkFZyOIo/EEtplogSLhGxLa0Igt3y/IkFuAvLXw=";
+          };
+        }
+      );
+      _cuda =
+        if lib.functionArgs (import (prev.path + "/pkgs/development/cuda-modules/buildRedist")) ? patchelf then
+          lib.warn "nixpkgs#575979 is in nixpkgs: remove the CUDA patchelf pin in hosts/pc/package-overrides.nix" prev._cuda
+        else
+          prev._cuda.extend (
+            _: cudaPrev: {
+              extensions = cudaPrev.extensions ++ [
+                (_: cudaPackagesPrev: {
+                  buildRedist =
+                    args:
+                    (cudaPackagesPrev.buildRedist args).overrideAttrs (old: {
+                      nativeBuildInputs = [ final.patchelf_0_15 ] ++ old.nativeBuildInputs;
+                    });
+                })
+              ];
+            }
+          );
+    })
+  ];
+
   nixpkgs.config = {
     cudaSupport = true;
+    # Build CUDA kernels only for the RTX 3090 instead of every supported GPU;
+    # this trades cache.nixos-cuda.org hits for ~10x faster local CUDA builds.
+    cudaCapabilities = [ "8.6" ];
     packageOverrides = pkgs: {
       ollama =
         (pkgs.ollama.override {
@@ -81,6 +121,11 @@
                 find "$out" -name .git -print0 | xargs -0 rm -rf
               '';
             };
+            # nixpkgs backports llama.cpp#30034, which this release already has.
+            patches = [ ];
+            # Requires the test-download-model fixture, which needs network;
+            # CTest runs a required fixture even when nixpkgs disables it.
+            disabledTests = (oldAttrs.disabledTests or [ ]) ++ [ "test-llama-context-model" ];
             npmRoot = "tools/ui";
             npmDepsHash = "sha256-hqYzdp1FwPhYkBP278fQXgY9NCKB6Q3P6Gko7BfP0m0=";
             # nixpkgs hardcodes the build number and commit of its own
@@ -102,6 +147,32 @@
               "-DLLAMA_BUILD_NUMBER=${version}"
             ];
           });
+
+      # whisper-cpp builds on llama-cpp's ggml. The llama-cpp override above
+      # drops GGML_BACKEND_DL, so linking against it needs libcuda.so.1, which
+      # the sandbox lacks. Only ffmpeg-full uses whisper-cpp here, so use the
+      # cached CPU build on top of the stock llama-cpp.
+      whisper-cpp = pkgs.whisper-cpp.override {
+        cudaSupport = false;
+        llama-cpp = pkgs.llama-cpp;
+      };
+
+      # TODO: remove once nixpkgs#576407 is in nixos-unstable (the filter is a
+      # no-op after that). HandBrake's A15 pgssubdec patch no longer applies to
+      # ffmpeg 8.1.3 (nixpkgs#576333), so drop it from HandBrake's ffmpeg.
+      handbrake = pkgs.handbrake.overrideAttrs (old: {
+        buildInputs = map (
+          dep:
+          if lib.hasPrefix "ffmpeg-full" (dep.name or "") then
+            dep.overrideAttrs (ffmpegOld: {
+              patches = builtins.filter (
+                patch: !lib.hasInfix "A15-lavc-pgssubdec" (toString patch)
+              ) ffmpegOld.patches;
+            })
+          else
+            dep
+        ) old.buildInputs;
+      });
 
       # llama-swap from GitHub releases
       llama-swap =

@@ -1,5 +1,5 @@
 # NVIDIA graphics configuration
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   # --- NVIDIA Wayland VRAM Workaround (driver >= R565) ---
@@ -41,7 +41,21 @@ in
     powerManagement.enable = true;
     open = false;
     nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.latest;
+    # TODO: remove with the patchelf overlay in package-overrides.nix.
+    # patchelf 0.19.2 writes a segfaulting nvidia-smi from the builder's single
+    # --interpreter/--set-rpath call; nixpkgs#576397 splits it. Pin 0.15.2
+    # until then; this turns itself off with a warning once that lands.
+    package =
+      let
+        nvidia = config.boot.kernelPackages.nvidiaPackages.latest;
+        builder = builtins.readFile (pkgs.path + "/pkgs/os-specific/linux/nvidia-x11/builder.sh");
+      in
+      if lib.hasInfix "--set-rpath $out/lib:$libPath $bin/bin/$i" builder then
+        nvidia.overrideAttrs (old: {
+          nativeBuildInputs = [ pkgs.patchelf_0_15 ] ++ old.nativeBuildInputs;
+        })
+      else
+        lib.warn "nixpkgs#576397 is in nixpkgs: remove the NVIDIA patchelf pin in hosts/pc/nvidia-graphics.nix" nvidia;
   };
   hardware.nvidia-container-toolkit.enable = true;
   hardware.graphics.enable = true;
