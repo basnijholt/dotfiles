@@ -338,7 +338,6 @@
       };
 
       diskoConfigurations = {
-        pc = (import ./hosts/pc/disko.nix) { inherit lib; };
         nuc = (import ./hosts/nuc/disko.nix) { inherit lib; };
         hp = (import ./hosts/hp/disko.nix) { inherit lib; };
         nas = (import ./hosts/nas/disko.nix) { inherit lib; };
