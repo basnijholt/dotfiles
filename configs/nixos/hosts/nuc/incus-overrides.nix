@@ -71,7 +71,7 @@
 
   # --- Hardware Overrides for VM ---
   # Incus exposes root disk as SCSI (sda), not NVMe by-id
-  disko.devices.disk.nvme.device = lib.mkForce "/dev/sda";
+  disko.devices.disk.main.device = lib.mkForce "/dev/sda";
   # Force ZFS to look for pools in /dev directly (VMs don't always have stable by-id)
   boot.zfs.devNodes = "/dev";
   # Use virtio modules instead of physical hardware modules
