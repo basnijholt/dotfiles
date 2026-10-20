@@ -3,6 +3,9 @@
 
 {
   networking.hostName = "hetzner-saas";
+  # Here rather than in default.nix so the bootstrap config, which imports
+  # this file, installs with the same hostId the pool is later imported with.
+  networking.hostId = "5aa5c0de";
 
   systemd.network.enable = true;
   systemd.network.wait-online.enable = false;

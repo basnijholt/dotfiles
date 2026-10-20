@@ -74,9 +74,6 @@
     memoryPercent = 50;
   };
 
-  # ZFS
-  networking.hostId = "a1b2c3d4"; # Generate with: head -c4 /dev/urandom | od -A none -t x4 | tr -d ' '
-
   # Tailscale for management
   services.tailscale.enable = lib.mkForce true;
 }

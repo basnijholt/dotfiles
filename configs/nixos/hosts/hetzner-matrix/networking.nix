@@ -3,6 +3,9 @@
 
 {
   networking.hostName = "hetzner-matrix";
+  # Here rather than in default.nix so the bootstrap config, which imports
+  # this file, installs with the same hostId the pool is later imported with.
+  networking.hostId = "a1b2c3d4";
 
   # systemd-networkd (required for Hetzner)
   systemd.network.enable = true;

@@ -10,9 +10,6 @@ in
   system.stateVersion = "25.05";
   networking.hostName = lib.mkForce "hetzner-bootstrap";
 
-  # Required for ZFS pool import on boot.
-  networking.hostId = "a1b2c3d4";
-
   users.users.basnijholt = {
     isNormalUser = true;
     description = "Bas Nijholt";

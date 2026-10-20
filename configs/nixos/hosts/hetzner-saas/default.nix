@@ -26,9 +26,6 @@ in
 
   system.stateVersion = "25.05";
 
-  # Required for ZFS
-  networking.hostId = "5aa5c0de";
-
   # Cloud overrides of the common stack (no LAN cache, no reverse DNS).
   nix.settings = {
     substituters = lib.mkForce [
