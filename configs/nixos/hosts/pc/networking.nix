@@ -105,14 +105,4 @@
     30080 # mindroom ingress http (kind)
     30443 # mindroom ingress https (kind)
   ];
-
-  # --- NAT for Incus Containers ---
-  networking.nat = {
-    enable = true;
-    externalInterface = "br0";
-    internalInterfaces = [ "incusbr0" ];
-    forwardPorts = [
-      { sourcePort = 8123; destination = "10.5.28.161:8123"; proto = "tcp"; }
-    ];
-  };
 }
