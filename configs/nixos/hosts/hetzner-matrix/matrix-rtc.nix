@@ -32,6 +32,9 @@ in
     keyFile = config.age.secrets.livekit-keys.path;
     port = rtcJwtPort;
   };
+  # Required since lk-jwt-service 0.9.0: only users of these homeservers may
+  # create LiveKit rooms. Only siteDomain advertises this RTC focus.
+  systemd.services.lk-jwt-service.environment.LIVEKIT_FULL_ACCESS_HOMESERVERS = siteDomain;
 
   # WebRTC media goes directly to the SFU, not through Caddy.
   networking.firewall = {

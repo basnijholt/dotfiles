@@ -40,6 +40,14 @@ let
     current="$(printf '%s\n' "$metrics" | ${pkgs.gawk}/bin/awk '$1 ~ /^comin_fetch_count/ && $0 ~ /status="succeeded"/ { print int($NF); exit }')"
     previous="$(${pkgs.coreutils}/bin/cat "$state" 2>/dev/null || true)"
     if [ -z "$current" ]; then
+      # comin exports fetch_count only after its first successful fetch, which
+      # can take a while after boot (network, DNS).
+      started_us="$(${pkgs.systemd}/bin/systemctl show -P ActiveEnterTimestampMonotonic comin.service)"
+      uptime_us="$(${pkgs.gawk}/bin/awk '{ printf "%d", $1 * 1000000 }' /proc/uptime)"
+      if [ $(( uptime_us - started_us )) -lt 900000000 ]; then
+        echo "comin started less than 15 minutes ago and has not fetched yet"
+        exit 0
+      fi
       echo "could not read comin_fetch_count from metrics"
       exit 1
     fi

@@ -1,8 +1,19 @@
 # System services shared by all hosts
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   services.fwupd.enable = true;
+  # A switch that changes fwupd can start fwupd-refresh while the other
+  # version's daemon still answers ("Unsupported daemon version"), failing the
+  # deploy. Retry once after the switch settles; a second failure still shows.
+  systemd.services.fwupd-refresh = lib.mkIf config.services.fwupd.enable {
+    startLimitBurst = 2;
+    startLimitIntervalSec = 300;
+    serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = "30s";
+    };
+  };
   services.syncthing.enable = true;
   services.tailscale.enable = true;
 

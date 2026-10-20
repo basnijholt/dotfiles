@@ -29,7 +29,7 @@
   environment.systemPackages = [ pkgs.signal-cli pkgs.ffmpeg-headless pkgs.chromium ];
 
   nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
-    "openclaw-2026.6.33"
+    "openclaw-2026.10.3"
   ];
 
   # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)
