@@ -7,7 +7,6 @@
 {
   environment.systemPackages = with pkgs; [
     # --- Cloud CLIs (~1GB+ each) ---
-    azure-cli         # +1.0 GB marginal
     google-cloud-sdk  # +690 MB marginal
 
     # --- Heavy Dev Tools ---
