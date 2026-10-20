@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
@@ -16,7 +16,6 @@
     ./cinny.nix
     ./tuwunel.nix  # Local Matrix homeserver (MindRoom Tuwunel fork)
     ./caddy.nix
-    ../../optional/openclaw/services.nix
   ];
 
   # Allow basnijholt passwordless sudo (for mindroom agent)
@@ -25,12 +24,8 @@
     commands = [{ command = "ALL"; options = [ "NOPASSWD" ]; }];
   }];
 
-  # signal-cli for OpenClaw Signal channel
-  environment.systemPackages = [ pkgs.signal-cli pkgs.ffmpeg-headless pkgs.chromium ];
-
-  nixpkgs.config.permittedInsecurePackages = lib.mkAfter [
-    "openclaw-2026.10.3"
-  ];
+  # MindRoom runtime dependencies
+  environment.systemPackages = [ pkgs.ffmpeg-headless pkgs.chromium ];
 
   # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)
   # that link against it. Without this, uv run / pytest fail with import errors.
