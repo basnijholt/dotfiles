@@ -559,6 +559,25 @@ in
         env:
           - "CUDA_VISIBLE_DEVICES=0"
 
+      # Uploaded 2026-10-06, size 0.3 GB, max ctx: 8192
+      # Text only: --no-mmproj skips the 0.6 GB vision/audio projector. Needs
+      # gemma-embedding2 support (ggml-org/llama.cpp#30054). Each of the 4 slots
+      # gets the full 8K context, and a non-causal model needs its whole input
+      # in one ubatch. Clients add the query/document prompts themselves.
+      "embeddinggemma-2":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          -hf ggml-org/embeddinggemma-2-GGUF:Q8_0
+          --no-mmproj
+          --port ''${PORT}
+          --embeddings
+          --ctx-size 32768
+          --parallel 4
+          --batch-size 8192
+          --ubatch-size 8192
+        env:
+          - "CUDA_VISIBLE_DEVICES=0"
+
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
       # question: https://www.reddit.com/r/LocalLLaMA/comments/1ow1v5i/help_whats_the_absolute_cheapest_build_to_run_oss/
@@ -676,6 +695,7 @@ in
         exclusive: false  # Don't unload other groups when loading this
         members:
           - "embeddinggemma:300m"
+          - "embeddinggemma-2"
   '';
 
   systemd.services.llama-swap = {
