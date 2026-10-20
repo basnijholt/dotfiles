@@ -558,6 +558,7 @@ in
         # GPU 1 also holds Whisper and half of vLLM, which caps vLLM's KV cache.
         env:
           - "CUDA_VISIBLE_DEVICES=0"
+        ttl: 0
 
       # Uploaded 2026-10-06, size 0.3 GB, max ctx: 8192
       # Text only: --no-mmproj skips the 0.6 GB vision/audio projector. Needs
@@ -577,6 +578,7 @@ in
           --ubatch-size 8192
         env:
           - "CUDA_VISIBLE_DEVICES=0"
+        ttl: 0
 
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1n61mm7/comment/nc99fji/
@@ -684,7 +686,7 @@ in
     healthCheckTimeout: 28800  # 8 hours for large model download + loading
 
     # TTL keeps models in memory for specified seconds after last use
-    ttl: 3600  # Keep models loaded for 1 hour (like OLLAMA_KEEP_ALIVE)
+    globalTTL: 3600  # Keep models loaded for 1 hour (like OLLAMA_KEEP_ALIVE)
 
     # Groups allow running multiple models simultaneously
     groups:
