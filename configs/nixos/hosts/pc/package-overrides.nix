@@ -20,19 +20,19 @@
               llamaCppSrc = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                tag = "b11232";
-                hash = "sha256-2+yobqi5pOI8FyMK2StFIWAOLR2JgQGh/7gX6o4k8JU=";
+                tag = "b11669";
+                hash = "sha256-pEDYgI3AMTU+cekvRX7NNt5wddznydQSNuerswvEpsA=";
               };
             in
             rec {
-              version = "0.35.1";
+              version = "0.40.6";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-5qJyJhqL/Zhfq2s/Z3x5Sq0GFgBai812cQkgNq82nm4=";
+                hash = "sha256-t3Asu9lIz8RW7xonHTJsTvtm1IEM6Rwfa0K5JN48Nwo=";
               };
-              vendorHash = "sha256-45FfI47tNHBPYOBLRrwuhADCUtkjAhlFrExlEy9piMI=";
+              vendorHash = "sha256-QBwZKRnmLUHQNSx5oqE9AbMINE8PP5TVJncG9nzQryI=";
               # This package only contains integration-tagged tests, so the
               # generic Go test sweep otherwise reports "build constraints
               # exclude all Go files".
@@ -69,12 +69,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "11433";
+            version = "11756";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-zvvlsqHBSb0nktC7tdIoQqAvhhWB1uThnvW+Tkuk0A4=";
+              hash = "sha256-CAfNw9Y75Nch7abIgvOJioEhr157E/vVqlF2qB8Q8Qk=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -82,7 +82,7 @@
               '';
             };
             npmRoot = "tools/ui";
-            npmDepsHash = "sha256-a17M+L3nLdRnN6WMB6imPFmwqG2g8uv+gwN0XTAUrf8=";
+            npmDepsHash = "sha256-hqYzdp1FwPhYkBP278fQXgY9NCKB6Q3P6Gko7BfP0m0=";
             # nixpkgs hardcodes the build number and commit of its own
             # release. Report ours in `llama-server --version`, `/props`,
             # and the web UI; flags appended later win in CMake.
@@ -106,14 +106,14 @@
       # llama-swap from GitHub releases
       llama-swap =
         let
-          version = "262";
+          version = "265";
         in
         pkgs.runCommand "llama-swap" { } ''
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
               url = "https://github.com/mostlygeek/llama-swap/releases/download/v${version}/llama-swap_${version}_linux_amd64.tar.gz";
-              hash = "sha256-hxs+14kfjOBXQo9aNNOCmOBsNsaEjBE24FMI60MDr1A=";
+              hash = "sha256-yx+alL4Fr6Ep08F4aPHdLKcQuRkzPHuGgjncMVddz6E=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap
