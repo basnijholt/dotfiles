@@ -74,8 +74,8 @@ in
 
     restartTriggers = [
       sygnalConfigTemplate
-      config.age.secrets.sygnal-env.path
-      config.age.secrets.sygnal-apns-key.path
+      config.age.secrets.sygnal-env.file
+      config.age.secrets.sygnal-apns-key.file
     ];
 
     serviceConfig = {
