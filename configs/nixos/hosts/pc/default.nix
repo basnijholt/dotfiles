@@ -25,7 +25,6 @@
     ./gaming.nix
     ./debugging.nix
     ./ai.nix
-    ./agent-cli.nix
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix
     ./slurm.nix
