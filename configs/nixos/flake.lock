@@ -480,11 +480,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1783371752,
-        "narHash": "sha256-LQ0YiboZ3Tbcj/ivKwhS289+0M3Bv2h+8R+VhH4NuTU=",
+        "lastModified": 1792533166,
+        "narHash": "sha256-kna+NZ6wnUAnZnITaEgSSgIpDNoqhJJCWXWYlh9Evx8=",
         "owner": "basnijholt",
         "repo": "zfs-unlock",
-        "rev": "dd089ab7f033943e04c86266ddc8d7eff6de2338",
+        "rev": "d9372a7042a9a3c43bbaf21a9f7345e1aedab482",
         "type": "github"
       },
       "original": {

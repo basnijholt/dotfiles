@@ -23,6 +23,9 @@ in
         port_range_start = 50100;
         port_range_end = 50200;
       };
+      # lk-jwt-service creates rooms for full-access homeservers; without
+      # this, the SFU creates a room for anyone holding a valid JWT.
+      room.auto_create = false;
     };
   };
 
