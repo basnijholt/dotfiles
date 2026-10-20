@@ -8,6 +8,7 @@
   imports = [
     # Optional modules
     ../../optional/zfs-sanoid.nix
+    ../../optional/zfs-disk-alert.nix
 
     # Host-specific modules (Tier 3)
     ./networking.nix
