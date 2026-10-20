@@ -64,6 +64,9 @@ let
     # OpenID tokens prove a user's identity to whoever holds them, so keep them short-lived;
     # clients (MindRoom Chat, Element Call, MindRoom) use them right after requesting.
     openid_token_ttl = 120
+    # Bind each OpenID token to the MindRoom deployment the client names, so a token
+    # sent to one deployment cannot be replayed at another (mindroom-ai/mindroom-tuwunel#105).
+    mindroom_openid_audience = true
     # MindRoom Chat on the web and in the iOS/Android apps (mindroom://auth/...)
     # gets SSO login tokens without the extra Continue Sign-In page.
     sso_trusted_redirect_hosts = ["${cinnyDomain}", "mindroom"]

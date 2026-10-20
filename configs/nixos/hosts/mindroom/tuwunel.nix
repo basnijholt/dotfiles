@@ -31,6 +31,9 @@ let
     # OpenID tokens prove a user's identity to whoever holds them, so keep them short-lived;
     # clients (MindRoom Chat, Element Call, MindRoom) use them right after requesting.
     openid_token_ttl = 120
+    # Bind each OpenID token to the MindRoom deployment the client names, so a token
+    # sent to one deployment cannot be replayed at another (mindroom-ai/mindroom-tuwunel#105).
+    mindroom_openid_audience = true
   '';
 in
 {
