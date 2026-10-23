@@ -37,7 +37,7 @@ in
     powerManagement.enable = true;
     open = false;
     nvidiaSettings = true;
-    # TODO: remove with the patchelf overlay in package-overrides.nix.
+    # TODO: remove with the patchelf_0_15 overlay in package-overrides.nix.
     # patchelf 0.19.2 writes a segfaulting nvidia-smi from the builder's single
     # --interpreter/--set-rpath call; nixpkgs#576397 splits it. Pin 0.15.2
     # until then; this turns itself off with a warning once that lands.

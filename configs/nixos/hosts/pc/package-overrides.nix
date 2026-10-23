@@ -3,14 +3,10 @@
 { lib, pkgs, ... }:
 
 {
-  # TODO: remove this overlay and the NVIDIA override in nvidia-graphics.nix
-  # once nixos-unstable ships a fixed patchelf (NixOS/patchelf#672).
-  # patchelf 0.19.2 aborts in shiftFile when addDriverRunpath re-patches CUDA
-  # redists, so pin them to 0.15.2 like nixpkgs#575979. The pin turns itself
-  # off with a warning once that fix is in our nixpkgs, so a stale pin cannot
-  # cost cache.nixos-cuda.org hits.
+  # TODO: remove this overlay together with the NVIDIA override in
+  # nvidia-graphics.nix, its only user, once nixpkgs#576397 lands.
   nixpkgs.overlays = [
-    (final: prev: {
+    (_: prev: {
       patchelf_0_15 = prev.patchelf.overrideAttrs (
         finalAttrs: _: {
           version = "0.15.2";
@@ -20,23 +16,6 @@
           };
         }
       );
-      _cuda =
-        if lib.functionArgs (import (prev.path + "/pkgs/development/cuda-modules/buildRedist")) ? patchelf then
-          lib.warn "nixpkgs#575979 is in nixpkgs: remove the CUDA patchelf pin in hosts/pc/package-overrides.nix" prev._cuda
-        else
-          prev._cuda.extend (
-            _: cudaPrev: {
-              extensions = cudaPrev.extensions ++ [
-                (_: cudaPackagesPrev: {
-                  buildRedist =
-                    args:
-                    (cudaPackagesPrev.buildRedist args).overrideAttrs (old: {
-                      nativeBuildInputs = [ final.patchelf_0_15 ] ++ old.nativeBuildInputs;
-                    });
-                })
-              ];
-            }
-          );
     })
   ];
 
@@ -60,17 +39,17 @@
               llamaCppSrc = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                tag = "b11669";
-                hash = "sha256-pEDYgI3AMTU+cekvRX7NNt5wddznydQSNuerswvEpsA=";
+                tag = "b11738";
+                hash = "sha256-JyLJvxBcbHrwrJb6HKxr1H0IL+V/pXXCHCgaN1jmQLU=";
               };
             in
             rec {
-              version = "0.40.6";
+              version = "0.40.8";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-t3Asu9lIz8RW7xonHTJsTvtm1IEM6Rwfa0K5JN48Nwo=";
+                hash = "sha256-nX5joRy4HmBIzCi12TViwc3mepUhkHGgAyy9wU571XA=";
               };
               vendorHash = "sha256-QBwZKRnmLUHQNSx5oqE9AbMINE8PP5TVJncG9nzQryI=";
               # This package only contains integration-tagged tests, so the
@@ -109,12 +88,12 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "11756";
+            version = "11838";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-CAfNw9Y75Nch7abIgvOJioEhr157E/vVqlF2qB8Q8Qk=";
+              hash = "sha256-exicunIqKICxBbuAG7tH9e1vWLkxoAsMkCLK3mqrhaA=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -177,14 +156,14 @@
       # llama-swap from GitHub releases
       llama-swap =
         let
-          version = "265";
+          version = "266";
         in
         pkgs.runCommand "llama-swap" { } ''
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
               url = "https://github.com/mostlygeek/llama-swap/releases/download/v${version}/llama-swap_${version}_linux_amd64.tar.gz";
-              hash = "sha256-yx+alL4Fr6Ep08F4aPHdLKcQuRkzPHuGgjncMVddz6E=";
+              hash = "sha256-faoBcPmXweYOvHSejLE/SumWb9c+nV/KM0dw3M5cSrU=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap

@@ -2,22 +2,10 @@
 # Access at http://<hostname>:631
 { pkgs, ... }:
 
-let
-  # TODO: remove once nixos-unstable has nixpkgs#575319. hplip now builds with
-  # __structuredAttrs, so the bare `$makeWrapperArgs` expands to only its first
-  # element and makeCWrapper rejects the shifted wrapper arguments.
-  hplip = pkgs.hplip.overrideAttrs (old: {
-    preFixup =
-      builtins.replaceStrings
-        [ ''$makeWrapperArgs "''${gappsWrapperArgs[@]}"'' ]
-        [ ''"''${makeWrapperArgs[@]}" "''${gappsWrapperArgs[@]}"'' ]
-        old.preFixup;
-  });
-in
 {
   services.printing = {
     enable = true;
-    drivers = [ hplip ];
+    drivers = [ pkgs.hplip ];
     listenAddresses = [ "*:631" ]; # Listen on all interfaces
     allowFrom = [ "all" ]; # Allow connections from network
     browsing = true; # Advertise printers
@@ -53,9 +41,10 @@ in
     enable = true;
     nssmdns4 = true;
     openFirewall = true;
-    publish = {
-      enable = true;
-      userServices = true;
+    settings.publish = {
+      disable-publishing = false;
+      disable-user-service-publishing = false;
+      publish-addresses = true;
     };
   };
 
