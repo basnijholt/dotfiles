@@ -28,7 +28,12 @@ if [[ "$use_forwarded_agent" != true ]] && command -v keychain &> /dev/null && [
     # --immediate: Skip the "Press Enter to initialize keys" banner and prompt right away.
     # id_ed25519: The specific key to load into the agent (will use SSH_ASKPASS).
     if [ -t 0 ]; then
-        # Interactive terminal - allow prompting
+        # Interactive terminal - allow prompting.
+        # Run a foreground job first: after a `( cmd & )` earlier in startup
+        # (atuin's zsh init has one), zsh leaves the terminal with that job's
+        # process group until its next foreground job, so ssh-add inside
+        # $(...) gets EIO instead of reading the passphrase.
+        command true
         eval $(keychain --eval --quiet --immediate id_ed25519) || true
     else
         # Non-interactive (like during login) - don't prompt
