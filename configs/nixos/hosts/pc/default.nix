@@ -44,19 +44,20 @@
   # Required for DDC/CI tools such as ddcutil to read monitor state (e.g. the
   # active input source) for manual diagnostics. Display automation no longer
   # depends on it; Sunshine drives dummy-output switching via sunshine-mode.sh.
-  # Also used by gpu-leds-off below.
+  # Also used by rgb-leds-off below.
   hardware.i2c.enable = true;
 
-  # Turn off the RGB LEDs on both ASUS ROG Strix 3090s. Select by name rather
-  # than index so the motherboard is never hit if the GPUs are not detected;
-  # openrgb exits non-zero when no device matches.
-  systemd.services.gpu-leds-off = {
-    description = "Turn off GPU RGB LEDs";
+  # Turn off the RGB LEDs on both ASUS ROG Strix 3090s and the Crosshair VIII
+  # Hero (onboard LEDs and its RGB headers). Select by name because indices
+  # shift when a device is not detected; openrgb exits non-zero when a name
+  # matches nothing.
+  systemd.services.rgb-leds-off = {
+    description = "Turn off RGB LEDs";
     wantedBy = [ "multi-user.target" ];
     after = [ "systemd-modules-load.service" ];
     serviceConfig = {
       Type = "oneshot";
-      ExecStart = "${pkgs.openrgb}/bin/openrgb --noautoconnect --device \"RTX 3090\" --mode off";
+      ExecStart = "${pkgs.openrgb}/bin/openrgb --noautoconnect --device \"RTX 3090\" --mode off --device CROSSHAIR --mode off";
     };
   };
 
