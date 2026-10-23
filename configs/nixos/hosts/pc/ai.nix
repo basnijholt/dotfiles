@@ -10,7 +10,9 @@ in
   # --- Ollama ---
   services.ollama = {
     enable = true;
-    package = pkgs.ollama-cuda;
+    # The pinned sm_86 build from package-overrides.nix; it has CUDA because
+    # cudaSupport is set globally, unlike the separate ollama-cuda attribute.
+    package = pkgs.ollama;
     host = "0.0.0.0";
     openFirewall = true;
     environmentVariables = {
