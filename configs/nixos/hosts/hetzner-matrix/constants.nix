@@ -10,6 +10,6 @@
   cinnyCheckoutPath = "/var/www/cinny";
   cinnyPublishedPath = "/var/www/cinny-published";
   cinnyCurrentPath = "/var/www/cinny-published/current";
-  tuwunelVersion = "v1.9.4-mindroom.16";
-  tuwunelArchiveHash = "sha256-zDoCs3iRBdBqr04PAqYcw/QG9ru4//X7zXNFvSNyZ1M=";
+  tuwunelVersion = "v1.9.4-mindroom.17";
+  tuwunelArchiveHash = "sha256-JJZPxADnN7EEV5QX8TF85wwvPlNkcHtxSak/iUrymIw=";
 }
