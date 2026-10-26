@@ -564,9 +564,12 @@ in
 
       # Uploaded 2026-10-06, size 0.3 GB, max ctx: 8192
       # Text only: --no-mmproj skips the 0.6 GB vision/audio projector. Needs
-      # gemma-embedding2 support (ggml-org/llama.cpp#30054). Each of the 4 slots
-      # gets the full 8K context, and a non-causal model needs its whole input
-      # in one ubatch. Clients add the query/document prompts themselves.
+      # gemma-embedding2 support (ggml-org/llama.cpp#30054). A non-causal model
+      # needs its whole input in one ubatch, so inputs are capped at 4K tokens:
+      # the 8K ubatch's 1 GB compute buffer does not fit beside vLLM, while
+      # 4K uses about 0.7 GB in total. GPU 1 has the most room left after vLLM
+      # and Qwen3-ASR; GPU 0 also holds the TTS services and embeddinggemma:300m.
+      # Clients add the query/document prompts themselves.
       "embeddinggemma-2":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
@@ -574,12 +577,12 @@ in
           --no-mmproj
           --port ''${PORT}
           --embeddings
-          --ctx-size 32768
+          --ctx-size 16384
           --parallel 4
-          --batch-size 8192
-          --ubatch-size 8192
+          --batch-size 4096
+          --ubatch-size 4096
         env:
-          - "CUDA_VISIBLE_DEVICES=0"
+          - "CUDA_VISIBLE_DEVICES=1"
         ttl: 0
 
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
