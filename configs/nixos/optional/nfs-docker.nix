@@ -76,7 +76,7 @@ in
   # empty local directories for hours. Keep starting the mounts until they're up.
   #
   # Start the mounts themselves: remote-fs.target only wants them, so starting it
-  # succeeds while they fail. On 2026-10-26 this unit exited 0 after a 505 s DHCP
+  # succeeds while they fail. On 2026-10-26 this unit exited 0 during a 505 s DHCP
   # stall and pc's mounts stayed down until started by hand. Not a oneshot, so
   # multi-user.target doesn't wait on a mount that hangs while nas is away.
   systemd.services.nfs-mounts-retry = {
