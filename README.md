@@ -493,7 +493,7 @@ nixswitch  # Alias for darwin-rebuild switch --flake ~/dotfiles/configs/nix-darw
 #### Homebrew packages
 
 The nix-darwin configuration manages Homebrew packages declaratively.
-See the [`configs/nix-darwin/homebrew.nix`](`configs/nix-darwin/homebrew.nix`) file for the list of packages.
+See the [`configs/nix-darwin/homebrew.nix`](configs/nix-darwin/homebrew.nix) file for the list of packages.
 
 ### Linux
 
