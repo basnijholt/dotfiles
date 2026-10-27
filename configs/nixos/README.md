@@ -24,7 +24,6 @@ configs/nixos/
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
-| `mindroom-spouse` | Incus LXC | Companion bot / MindRoom runtime container |
 | `mindroom` | Incus LXC | MindRoom lab/runtime container with local Matrix and web services |
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |
