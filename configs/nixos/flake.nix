@@ -197,13 +197,6 @@
           ./optional/lxc-container.nix
         ];
 
-        # Companion bot LXC container for Incus
-        mindroom-spouse = mkHost [
-          ragenix.nixosModules.default
-          ./hosts/mindroom-spouse/default.nix
-          ./optional/lxc-container.nix
-        ];
-
         # Lightweight development LXC container for Incus (on HP)
         mindroom = mkHost [
           ragenix.nixosModules.default
