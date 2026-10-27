@@ -25,7 +25,6 @@ configs/nixos/
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-lxc` | Incus LXC | Lightweight dev container (x86_64) |
 | `mindroom-spouse` | Incus LXC | Companion bot / MindRoom runtime container |
-| `mindroom-mom` | Incus LXC | Companion container for mom (MindRoom only, hands-off, comin-deployed) |
 | `mindroom` | Incus LXC | MindRoom lab/runtime container with local Matrix and web services |
 | `docker-lxc` | Incus LXC | Docker-focused container (x86_64) |
 | `nix-cache` | Incus LXC | Nix cache server with Harmonia (for CUDA/large builds) |

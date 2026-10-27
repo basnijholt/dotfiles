@@ -1,5 +1,5 @@
 # Shared configuration for personal MindRoom companion-bot LXC containers
-# (mindroom-spouse, mindroom-mom, ...). MindRoom only — hosts that also run
+# (mindroom-spouse, ...). MindRoom only — hosts that also run
 # OpenClaw (e.g. mindroom-spouse) layer that on themselves.
 #
 # Each host additionally provides:
