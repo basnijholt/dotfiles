@@ -1,0 +1,11 @@
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
+
+# Homebrew tools must be available to non-interactive shells (including Codex).
+if [[ -d /opt/homebrew/bin ]]; then
+    export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+fi
+
+_os=$(uname -s | tr '[:upper:]' '[:lower:]'); [[ $_os == darwin ]] && _os=macos
+_arch=$(uname -m); [[ $_arch == x86_64 ]] && _arch=amd64; [[ $_arch == aarch64 ]] && _arch=arm64
+export PATH="$HOME/.dotbins/$_os/$_arch/bin:$HOME/.local/bin:$PATH"
+unset _os _arch

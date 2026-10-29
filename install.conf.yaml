@@ -70,6 +70,7 @@
     ~/.tmux.conf: submodules/tmux/.tmux.conf
     ~/.tmux.conf.local: submodules/tmux/.tmux.conf.local
     ~/.zshrc: configs/zsh/zshrc
+    ~/.zshenv: configs/zsh/zshenv
     ~/dotfiles/submodules/oh-my-zsh/themes/mytheme.zsh-theme: configs/zsh/mytheme.zsh-theme
 
 - shell:
