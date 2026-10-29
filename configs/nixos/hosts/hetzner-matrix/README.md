@@ -154,6 +154,28 @@ https://mindroom.chat/_matrix/client/unstable/login/sso/callback/<client_id>
 Provider IDs and callback URLs are in Nix config, while client secrets are read from decrypted agenix files at runtime.
 The MindRoom provisioning service reads the Google desktop OAuth client secret from `google-oauth-client-secret.age`; the corresponding non-secret client ID is configured in `provisioning.nix`.
 
+#### Renew Apple web SSO
+
+The Apple web client secret is an ES256 JWT, not a permanent password.
+The original token expired on August 26, 2026 and caused HTTP 400 at Apple's token endpoint during the browser callback.
+The replacement uses key `C4RH73H7U8`, scoped to the existing `chat.mindroom.matrix` primary App ID, and expires on April 27, 2027 at 05:43:55 UTC.
+The previous key remains active; APNs and native iOS credentials are unchanged.
+
+With Node.js and `age` installed, generate a new 180-day JWT from the downloaded key:
+
+```bash
+node configs/nixos/hosts/hetzner-matrix/refresh-apple-sso-secret.mjs /path/to/AuthKey_C4RH73H7U8.p8
+node --test configs/nixos/hosts/hetzner-matrix/refresh-apple-sso-secret.test.mjs
+```
+
+The helper keeps plaintext in memory and writes only age ciphertext.
+`sso-apple-secret.age` is encrypted to the normal owner and server recipients.
+`sso-apple-key-C4RH73H7U8.p8.age` is a recovery copy encrypted only to the owner; it is not deployed or readable with the server's host key.
+Restore that key into a temporary directory outside the repository using the owner's SSH identity, then delete the temporary copy when finished.
+Commit only the encrypted files and deploy through the normal Nix/comin flow.
+For an urgent runtime update, preserve `/run/agenix/sso-apple-secret` ownership and mode `0400`; Tuwunel reads this file on each exchange, so replacing it atomically needs no restart.
+The encrypted source must also reach `main`, otherwise the next activation restores the old credential.
+
 ### Push gateway (Sygnal)
 
 Sygnal runs locally in a Podman container and is exposed via:
