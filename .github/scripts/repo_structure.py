@@ -41,10 +41,8 @@ descriptions = {
 
     # submodules/*
     "submodules": "Git submodules for external tools",
-    "autoenv": "Directory-based environments",
     "dotbot": "Dotfiles installation",
     "dotbins": "Binaries manager in dotfiles",
-    "mechabar": "Waybar + Rofi theme (Hyprland)",
     "mydotbins": "CLI tool binaries managed by dotbins",
     "oh-my-zsh": "Zsh framework",
     "rsync-time-backup": "Time-Machine style backup with rsync",
@@ -52,9 +50,7 @@ descriptions = {
     "tmux": "oh-my-tmux configuration",
     "truenas-zfs-unlock": "Unlock ZFS pools on TrueNAS",
     "zsh-autosuggestions": "Zsh autosuggestions plugin",
-    "zsh-fzf-history-search": "Fuzzy history search",
     "zsh-syntax-highlighting": "Zsh syntax highlighting",
-    "zsh-z": "Frecent directory jumper",
 }
 
 
