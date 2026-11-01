@@ -11,6 +11,7 @@
       "tank/stash"
       "tank/photos-export"
       "tank/syncthing"
+      "tank/share"
     ];
   };
 }
