@@ -133,6 +133,14 @@ in
         useTemplate = [ "nas-backup-prune" ];
         recursive = true;
       };
+      # zfs-encrypt-migrate's stage: a snapshot taken on a staged copy makes
+      # its next incremental receive fail, and pruning there would drop
+      # snapshots the old copies keep for verification.
+      "tank/stage" = {
+        autosnap = false;
+        autoprune = false;
+        recursive = true;
+      };
       ssd = {
         useTemplate = [ "nas-default" ];
         recursive = "zfs";

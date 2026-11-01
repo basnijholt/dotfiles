@@ -10,6 +10,7 @@
       "tank/photos"
       "tank/stash"
       "tank/photos-export"
+      "tank/syncthing"
     ];
   };
 }
