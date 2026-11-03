@@ -27,6 +27,14 @@
   # MindRoom runtime dependencies
   environment.systemPackages = [ pkgs.ffmpeg-headless pkgs.chromium ];
 
+  # mindroom-chat workers run the locally built mindroom:dev-docs image (on
+  # top of mindroom:dev), which exists in no registry. The common weekly
+  # `docker system prune --all` deletes every image without a container, so
+  # it wiped both whenever no worker was running (2026-10-26, 2026-11-02) and
+  # every worker tool call then failed with "pull access denied". Prune only
+  # dangling images here; rebuild leftovers still go.
+  virtualisation.docker.autoPrune.flags = [ ];
+
   # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)
   # that link against it. Without this, uv run / pytest fail with import errors.
   environment.variables.LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
