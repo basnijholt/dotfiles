@@ -59,6 +59,7 @@
     ~/.pi/agent/models.json: configs/pi-agent/models.json
     ~/.pi/agent/settings.json: configs/pi-agent/settings.json
     ~/.local/bin/run: scripts/run.sh
+    ~/.local/bin/ssh-agent-sock: configs/nixos/common/ssh-agent-sock.sh
     ~/.local/bin/sync-dotfiles: scripts/sync-dotfiles.sh
     ~/.local/bin/sync-local-dotfiles: scripts/sync-local-dotfiles.sh
     ~/.local/bin/sync-bun: scripts/sync-bun.sh

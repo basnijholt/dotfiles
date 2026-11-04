@@ -2,9 +2,10 @@
 
 # Preserve SSH agent forwarding in remote sessions.
 # If SSH provided a valid forwarded agent socket, keep it instead of overriding
-# SSH_AUTH_SOCK with a local keychain-managed agent.
+# SSH_AUTH_SOCK with a local keychain-managed agent. OpenSSH 10.1+ puts
+# forwarded sockets in ~/.ssh/agent, older releases in /tmp.
 use_forwarded_agent=false
-if [[ -n "${SSH_CONNECTION:-}" && -n "${SSH_AUTH_SOCK:-}" && "${SSH_AUTH_SOCK}" == /tmp/ssh-*/agent.* ]]; then
+if [[ -n "${SSH_CONNECTION:-}" && ( "${SSH_AUTH_SOCK:-}" == /tmp/ssh-*/agent.* || "${SSH_AUTH_SOCK:-}" == "$HOME"/.ssh/agent/s.*.sshd.* ) ]]; then
     ssh-add -l >/dev/null 2>&1
     agent_status=$?
     if [[ $agent_status -eq 0 || $agent_status -eq 1 ]]; then

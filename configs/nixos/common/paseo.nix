@@ -30,8 +30,8 @@ in
         PASEO_WEB_UI_ENABLED = "true";
         # Traefik serves the web UI from *.lab.nijho.lt; IPs and localhost are always allowed
         PASEO_HOSTNAMES = ".lab.nijho.lt";
-        # Resolve the forwarded agent for each Git connection so SSH reconnects work.
-        GIT_SSH_COMMAND = ''SSH_AUTH_SOCK="$(ls -t "$HOME"/.ssh/agent/s.*.sshd.* 2>/dev/null | head -n1)" ssh'';
+        # Pick a live agent for each Git connection: forwarded ones die with their session.
+        GIT_SSH_COMMAND = ''SSH_AUTH_SOCK="$(${./ssh-agent-sock.sh})" ssh'';
       };
       # Without a password every client that reaches the port gets full control,
       # so wait until `paseo daemon set-password` has stored one.
