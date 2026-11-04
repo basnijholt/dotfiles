@@ -33,8 +33,8 @@ in
       environment = {
         PATH = lib.mkForce "${bunBin}:${systemBin}";
         T3CODE_HOME = "${homeDir}/.t3";
-        # Resolve the forwarded agent for each Git connection so SSH reconnects work.
-        GIT_SSH_COMMAND = ''SSH_AUTH_SOCK="$(ls -t "$HOME"/.ssh/agent/s.*.sshd.* 2>/dev/null | head -n1)" ssh'';
+        # Pick a live agent for each Git connection: forwarded ones die with their session.
+        GIT_SSH_COMMAND = ''SSH_AUTH_SOCK="$(${./ssh-agent-sock.sh})" ssh'';
       };
       serviceConfig = {
         ExecStart = "${bunBin}/t3 serve --mode web --host ${cfg.host} --port ${toString cfg.port} --no-browser";
