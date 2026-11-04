@@ -6,6 +6,7 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHwr8WDLxJiDap7nSB3WgFw/pI7x6AdInjajpu+r+Z4l pi4-zfs-unlock"
     ];
     datasets = [
+      "ssd"
       "tank/frigate"
       "tank/photos"
       "tank/stash"
