@@ -238,13 +238,15 @@ in
     after = [ "zfs.target" ];
   };
 
-  # The ssd pool is encrypted and its key arrives from the pi4 after boot
-  # (zfs-unlock). Incus storage and the docker instance's bind mounts live on
-  # ssd, so hold Incus back until the pool is unlocked and mounted instead of
-  # autostarting instances against locked datasets. Wants rather than
-  # Requires, so a restart of this unit never restarts Incus.
-  systemd.services.nas-wait-ssd-unlock = {
-    description = "Wait for the encrypted ssd pool to be unlocked and mounted";
+  # The keys of the encrypted datasets arrive from the pi4 after boot
+  # (zfs-unlock). Incus storage lives on ssd, and the docker instance binds
+  # the ssd tree and /mnt/tank, so hold Incus back until every dataset the
+  # receiver unlocks is mounted. Otherwise instances autostart against locked
+  # datasets, and apps such as Sonarr and Jellyfin act on an empty
+  # /mnt/tank/media. Wants rather than Requires, so a restart of this unit
+  # never restarts Incus.
+  systemd.services.nas-wait-zfs-unlock = {
+    description = "Wait for the datasets zfs-unlock unlocks to be unlocked and mounted";
     wants = [ "zfs.target" ];
     after = [ "zfs.target" ];
     before = [ "incus.service" ];
@@ -255,18 +257,23 @@ in
       RemainAfterExit = true;
       TimeoutStartSec = "infinity";
     };
-    # The receiver mounts the subtree one dataset at a time after loading the
+    # The receiver mounts each subtree one dataset at a time after loading the
     # key, parents first, so wait for all of it: the docker instance binds
     # docker/data with its children and docker/stacks.
     script = ''
       unmounted() {
-        zfs list -H -o canmount,mountpoint,mounted -r ssd |
+        zfs list -H -o canmount,mountpoint,mounted -r "$1" |
           awk -F'\t' '$1 == "on" && $2 != "legacy" && $2 != "none" && $3 != "yes"'
       }
-      until zfs list ssd >/dev/null 2>&1 &&
-        [ "$(zfs get -H -o value keystatus ssd)" != unavailable ] &&
-        [ -z "$(unmounted)" ]; do
-        sleep 5
+      ready() {
+        zfs list "$1" >/dev/null 2>&1 &&
+          [ "$(zfs get -H -o value keystatus "$1")" != unavailable ] &&
+          [ -z "$(unmounted "$1")" ]
+      }
+      for root in ${lib.escapeShellArgs config.services.zfs-unlock.receiver.datasets}; do
+        until ready "$root"; do
+          sleep 5
+        done
       done
     '';
   };
