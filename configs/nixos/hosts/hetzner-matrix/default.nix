@@ -64,11 +64,10 @@
   # Keep live switches compatible with the currently running generation.
   services.dbus.implementation = "dbus";
 
-  # The 75 GB disk also holds about 19 GB of Matrix media, and twelve local
-  # monthly snapshots kept up to a year of deleted data (92% full on
-  # 2026-11-04). Keep one weekly and one monthly here: sanoid still takes
-  # them, and the NAS mirror of tuwunel and var (nas-replicate-hetzner-matrix,
-  # pruned by nas-backup-prune) keeps the long history.
+  # Small disk: keep one weekly and one monthly snapshot here. Sanoid still
+  # takes them, and the NAS mirror of tuwunel and var
+  # (nas-replicate-hetzner-matrix, pruned by nas-backup-prune) keeps the
+  # long history.
   services.sanoid.templates.zfs-default = {
     weekly = lib.mkForce 1;
     monthly = lib.mkForce 1;
