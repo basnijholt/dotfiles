@@ -30,7 +30,10 @@ let
 
   mkSyncoidArgs = extraArgs: pkgs.lib.escapeShellArgs (syncoidCommon ++ extraArgs);
   mkSyncoidCommonArgs = mkSyncoidArgs [ ];
-  mkSyncoidSsdArgs = mkSyncoidArgs syncoidSsdExcludes;
+  # The ssd pool root is its own encryption root, created fresh rather than
+  # received, so it shares no snapshot with the root of either mirror. It
+  # holds no data; only its children are replicated.
+  mkSyncoidSsdArgs = mkSyncoidArgs (syncoidSsdExcludes ++ [ "--skip-parent" ]);
   mkSyncoidVolumeArgs = pkgs.lib.escapeShellArgs syncoidVolume;
   unmountedReceiveOptions = pkgs.lib.escapeShellArg "u o mountpoint=none o readonly=on";
   unmountedVolumeReceiveOptions = pkgs.lib.escapeShellArg "u o readonly=on";

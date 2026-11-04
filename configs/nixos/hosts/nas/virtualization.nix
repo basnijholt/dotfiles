@@ -237,4 +237,29 @@ in
     wants = [ "zfs.target" ];
     after = [ "zfs.target" ];
   };
+
+  # The ssd pool is encrypted and its key arrives from the pi4 after boot
+  # (zfs-unlock). Incus storage and the docker instance's bind mounts live on
+  # ssd, so hold Incus back until the pool is unlocked and mounted instead of
+  # autostarting instances against locked datasets. Wants rather than
+  # Requires, so a restart of this unit never restarts Incus.
+  systemd.services.nas-wait-ssd-unlock = {
+    description = "Wait for the encrypted ssd pool to be unlocked and mounted";
+    wants = [ "zfs.target" ];
+    after = [ "zfs.target" ];
+    before = [ "incus.service" ];
+    wantedBy = [ "incus.service" ];
+    path = [ config.boot.zfs.package ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      TimeoutStartSec = "infinity";
+    };
+    script = ''
+      until [ "$(zfs get -H -o value keystatus ssd)" != unavailable ] &&
+        [ "$(zfs get -H -o value mounted ssd/docker/data)" = yes ]; do
+        sleep 5
+      done
+    '';
+  };
 }
