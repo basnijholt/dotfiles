@@ -28,6 +28,7 @@
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix
     ./slurm.nix
+    ./streamdeck.nix
   ];
 
   local.wakeOnLan.interface = "enp5s0";
@@ -44,7 +45,7 @@
   # Required for DDC/CI tools such as ddcutil to read monitor state (e.g. the
   # active input source) for manual diagnostics. Display automation no longer
   # depends on it; Sunshine drives dummy-output switching via sunshine-mode.sh.
-  # Also used by rgb-leds-off below.
+  # Also used by rgb-leds-off below and the Stream Deck's dials (streamdeck.nix).
   hardware.i2c.enable = true;
 
   # Turn off the RGB LEDs on both ASUS ROG Strix 3090s and the Crosshair VIII

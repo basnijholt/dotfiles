@@ -1,0 +1,98 @@
+# The deck layout of the PC's Stream Deck + XL, run by the `deck` user service
+# (configs/nixos/hosts/pc/streamdeck.nix). Tokens come from ~/.config/deck/secrets.env.
+# Check with: deck check ~/.config/deck/config.yaml
+mac: {}
+home_assistant:
+  url: https://home.nijho.lt
+  token_env: HA_TOKEN
+t3:
+  servers:
+    - name: pc
+      url: http://127.0.0.1:3773
+      web_url: https://t3.lab.nijho.lt
+      environment_id: 6cd1637d-2c2f-4fa6-8cd2-fa04748043e2
+      token_env: T3_TOKEN
+  models:
+    claudeAgent: [claude-opus-5-5, claude-sonnet-5-5, claude-haiku-5-5]
+    codex: [gpt-5.5, gpt-5.5-mini]
+ddc:
+  model: DELL U4025QW
+audio:
+  outputs:
+    - {name: iLoud, match: iloud, bt: "00-11-22-33-44-55"}
+    - {name: AirPods, match: airpods, bt: "66-77-88-99-aa-bb"}
+    - {name: MacBook, match: macbook}
+  inputs: [q9, brio, macbook]
+pages:
+  home:
+    keys:
+      # Row 1: apps
+      - {icon: "👻", label: Ghostty, press: {mac.app: Ghostty}}
+      - {icon: "🦁", label: Brave, press: {mac.app: Brave Browser}}
+      - {icon: "🤖", label: T3 Code, press: {mac.tab: {match: t3.lab.nijho.lt, url: "https://t3.lab.nijho.lt"}}}
+      - {icon: "🪨", label: Obsidian, press: {mac.app: Obsidian}}
+      - {icon: "💬", label: Slack, press: {mac.app: Slack}}
+      - {icon: "🔑", label: 1Password, press: {mac.app: 1Password}}
+      - {icon: "🎵", label: Spotify, press: {mac.app: Spotify}}
+      - {icon: "📁", label: Files, press: {mac.app: Finder}}
+      - {icon: "📸", label: Screenshot, press: {mac.screenshot: null}}
+      # Row 2: agents
+      - {t3.slot: 0}
+      - {t3.slot: 1}
+      - {t3.slot: 2}
+      - {t3.slot: 3}
+      - {t3.slot: 4}
+      - {t3.slot: 5}
+      - {icon: "➕", label: New thread, press: {t3.new: null}}
+      - {icon: "🎙️", label: Dictate, press: {mac.km: Dictate}}
+      - null
+      # Row 3: tabs
+      - {icon: "📬", label: Gmail, press: {mac.tab: {match: mail.google.com, url: "https://mail.google.com"}}}
+      - {icon: "🔀", label: My PRs, press: {mac.tab: {match: github.com/pulls, url: "https://github.com/pulls"}}}
+      - {icon: "🔔", label: GitHub, press: {mac.tab: {match: github.com/notifications, url: "https://github.com/notifications"}}}
+      - {icon: "🏠", label: HA, press: {mac.tab: {match: "192.168.1.178:8123", url: "http://192.168.1.178:8123"}}}
+      - {icon: "🧩", label: MindRoom, press: {mac.tab: {match: mindroom, url: "https://chat.mindroom.chat"}}}
+      - {icon: "📅", label: Calendar, press: {mac.tab: {match: calendar.google.com, url: "https://calendar.google.com"}}}
+      - {icon: "📺", label: YouTube, press: {mac.tab: {match: youtube.com, url: "https://www.youtube.com"}}}
+      - null
+      - {icon: "📄", label: Page 2, press: {page: more}}
+      # Row 4: home and system
+      - icon: "💡"
+        label: Guest
+        state: {ha: light.guest_room}
+        press: {ha: {service: light.toggle, entity_id: light.guest_room}}
+      - icon: "💡"
+        label: Office
+        state: {ha: light.office}
+        press: {ha: {service: light.toggle, entity_id: light.office}}
+      - {icon: "🌙", label: Good night, press: {ha: {service: scene.turn_on, entity_id: scene.good_night}}}
+      - icon: "🔈"
+        label: iLoud
+        press: {mac.audio.output: {name: iLoud}}
+        long_press: {mac.audio.output: {name: iLoud, disconnect: true}}
+      - icon: "🎧"
+        label: AirPods
+        press: {mac.audio.output: {name: AirPods}}
+        long_press: {mac.audio.output: {name: AirPods, disconnect: true}}
+      - {icon: "💻", label: MacBook, press: {mac.audio.output: {name: MacBook}}}
+      - {icon: "🎤", label: Mic, press: {mac.mic.mute: null}}
+      - {icon: "🖥️", label: Input, press: {mac.audio.input: Q9}}
+      - {icon: "🔒", label: Lock, press: {mac.lock: null}}
+    dials:
+      - {kind: volume}
+      - {kind: input}
+      - {kind: brightness}
+      - {kind: t3.effort}
+      - {kind: t3.model}
+      - {kind: ha.brightness, entity_id: light.guest_room}
+  more:
+    keys:
+      - {icon: "🛋️", label: Living, press: {ha: {service: scene.turn_on, entity_id: scene.living}}}
+      - {icon: "🎮", label: Sunshine, press: {shell: [systemctl, --user, start, sunshine]}}
+      - {icon: "🐧", label: Show PC, press: {ddc: {code: 0x60, value: 0x0f}}}   # DisplayPort-1
+      - {icon: "🍎", label: Show Mac, press: {ddc: {code: 0x60, value: 0x19}}}  # Thunderbolt
+      - null
+      - null
+      - null
+      - null
+      - {icon: "⬅️", label: Home, press: {page: home}}
