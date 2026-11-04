@@ -255,9 +255,17 @@ in
       RemainAfterExit = true;
       TimeoutStartSec = "infinity";
     };
+    # The receiver mounts the subtree one dataset at a time after loading the
+    # key, parents first, so wait for all of it: the docker instance binds
+    # docker/data with its children and docker/stacks.
     script = ''
-      until [ "$(zfs get -H -o value keystatus ssd)" != unavailable ] &&
-        [ "$(zfs get -H -o value mounted ssd/docker/data)" = yes ]; do
+      unmounted() {
+        zfs list -H -o canmount,mountpoint,mounted -r ssd |
+          awk -F'\t' '$1 == "on" && $2 != "legacy" && $2 != "none" && $3 != "yes"'
+      }
+      until zfs list ssd >/dev/null 2>&1 &&
+        [ "$(zfs get -H -o value keystatus ssd)" != unavailable ] &&
+        [ -z "$(unmounted)" ]; do
         sleep 5
       done
     '';
