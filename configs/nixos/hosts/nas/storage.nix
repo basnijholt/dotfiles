@@ -95,7 +95,8 @@ in
     # the autosnap_ snapshots that replication delivers — otherwise the
     # mirrors accumulate every source snapshot forever. Every source
     # delivers sanoid-named autosnap_* snapshots, so this policy covers all
-    # mirrors; the push/pull jobs additionally trim targets to the source's
+    # mirrors; the push/pull jobs (except hetzner-matrix's, whose source
+    # keeps little history locally) additionally trim targets to the source's
     # snapshot set with --delete-target-snapshots. Retention here is a
     # superset of every source policy (nas-default above, zfs-default
     # elsewhere), so a target never keeps less history than its source
