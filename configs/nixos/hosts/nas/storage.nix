@@ -141,6 +141,12 @@ in
         autoprune = false;
         recursive = true;
       };
+      # file-move frees a moved file's space only if no snapshot holds it,
+      # and refuses to run while the dataset has any snapshot.
+      "tank/media" = {
+        autosnap = false;
+        autoprune = false;
+      };
       ssd = {
         useTemplate = [ "nas-default" ];
         recursive = "zfs";
