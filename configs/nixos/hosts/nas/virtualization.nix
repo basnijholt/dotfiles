@@ -251,7 +251,10 @@ in
     after = [ "zfs.target" ];
     before = [ "incus.service" ];
     wantedBy = [ "incus.service" ];
-    path = [ config.boot.zfs.package ];
+    path = [
+      config.boot.zfs.package
+      pkgs.gawk
+    ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
