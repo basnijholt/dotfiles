@@ -16,7 +16,8 @@
   systemd.user.services.deck = {
     description = "Stream Deck + XL daemon";
     wantedBy = [ "default.target" ];
-    path = [ pkgs.ddcutil ];
+    # fc-match finds the emoji and text fonts; without it every icon is a box.
+    path = [ pkgs.ddcutil pkgs.fontconfig ];
     environment = {
       LD_LIBRARY_PATH = "${pkgs.hidapi}/lib";
       # uv's Python looks for /etc/ssl/cert.pem, which NixOS does not have.
