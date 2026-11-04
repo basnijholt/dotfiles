@@ -45,8 +45,12 @@
         "fruit:encoding" = "native";
       };
 
-      # No media share while zfs-encrypt-migrate file-move moves /mnt/tank/media
-      # into an encrypted dataset: nothing may write to it until the swap.
+      media = {
+        path = "/mnt/tank/media";
+        browseable = "yes";
+        "read only" = "no";
+        "valid users" = "basnijholt marcella";
+      };
 
       share = {
         path = "/mnt/tank/share";

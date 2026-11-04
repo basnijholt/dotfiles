@@ -14,6 +14,7 @@
       "tank/syncthing"
       "tank/share"
       "tank/backups"
+      "tank/media"
     ];
   };
 }
