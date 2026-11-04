@@ -22,6 +22,14 @@
     password = "/etc/munge/munge.key";
   };
 
+  # nixpkgs orders slurmd after "munge.service", but the unit is
+  # munged.service, so a switch that restarts both can start slurmd before
+  # munged creates its socket. Depend on it like nixpkgs' slurmctld does.
+  systemd.services.slurmd = {
+    after = [ "munged.service" ];
+    requires = [ "munged.service" ];
+  };
+
   # --- SLURM Cluster ---
   services.slurm = {
     server.enable = true;

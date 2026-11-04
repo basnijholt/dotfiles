@@ -513,7 +513,6 @@ in
           --jinja
 
       # Uploaded 2025-12-15, size 21.3 GB, max ctx: 1048576, layers: 52
-      # TODO: Not in cache yet - run script after downloading
       "nemotron-3-nano:30b-q4":
         cmd: |
           ${pkgs.llama-cpp}/bin/llama-server
