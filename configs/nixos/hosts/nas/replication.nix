@@ -646,11 +646,12 @@ in
       # zroot/tuwunel is the Matrix RocksDB; zroot/var holds the mautrix
       # bridge state and secrets under /var/lib. The rest of zroot (root,
       # nix, home) is rebuildable from this repo.
-      # --delete-target-snapshots keeps the mirror matched to the source's
-      # retention.
+      # Unlike the other mirrors, no --delete-target-snapshots: hetzner-matrix
+      # keeps only one weekly and one monthly snapshot on its small disk, so
+      # this mirror holds the long history, pruned by nas-backup-prune.
+      # Manually named snapshots (pre-tuwunel-*) stay until deleted by hand.
       for dataset in tuwunel var; do
         syncoid ${mkSyncoidCommonArgs} \
-          --delete-target-snapshots \
           --sshkey=${hetznerMatrixReplicationKey} \
           --sshport=22 \
           --sshoption=BatchMode=yes \

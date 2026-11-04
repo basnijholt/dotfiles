@@ -64,6 +64,15 @@
   # Keep live switches compatible with the currently running generation.
   services.dbus.implementation = "dbus";
 
+  # Small disk: keep one weekly and one monthly snapshot here. Sanoid still
+  # takes them, and the NAS mirror of tuwunel and var
+  # (nas-replicate-hetzner-matrix, pruned by nas-backup-prune) keeps the
+  # long history.
+  services.sanoid.templates.zfs-default = {
+    weekly = lib.mkForce 1;
+    monthly = lib.mkForce 1;
+  };
+
   # Limit build parallelism on small VPS
   nix.settings.max-jobs = 2;
   nix.settings.cores = 2;
