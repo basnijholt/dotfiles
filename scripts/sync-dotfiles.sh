@@ -16,7 +16,6 @@ HOSTS=(
   # VM/LXC hosts
   "nix-cache"
   "docker-lxc"
-  "gce-vm"
   "mindroom"
   # Cloud hosts
   "hetzner-matrix"
