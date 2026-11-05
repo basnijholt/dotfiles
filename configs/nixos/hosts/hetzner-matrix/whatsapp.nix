@@ -30,6 +30,12 @@ in
         username_template = "whatsapp_{{.}}";
       };
 
+      # Prefer the name saved in the logged-in user's phone contacts. The
+      # upstream default leaves it out, so every contact without a WhatsApp
+      # profile name shows up as a phone number. Ghosts are shared between
+      # logins, so another bridge user can see that saved name too.
+      network.displayname_template = "{{or .FullName .BusinessName .PushName .Phone}} (WA)";
+
       bridge = {
         command_prefix = "!wa";
         permissions = {
