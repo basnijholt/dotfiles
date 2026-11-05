@@ -111,6 +111,26 @@ let
         else
           echo "Skipping nix-cache: Incus instance not imported"
         fi
+
+        if instance_exists dev-lxc; then
+          set_config dev-lxc boot.autostart true
+          set_config dev-lxc user.autostart true
+          # Coding agents (T3 Code) on spare cores. Keep 4 of the 20 threads
+          # for the NAS itself, and lose to docker and nix-cache when the
+          # CPUs are contended (default priority is 10).
+          set_config dev-lxc limits.cpu 16
+          set_config dev-lxc limits.cpu.priority 5
+          # Host memory is the NAS's limit (see the docker cap above). Swap
+          # must be a size: "true" with limits.memory set means no swap.
+          set_config dev-lxc limits.memory 12GiB
+          set_config dev-lxc limits.memory.swap 4GiB
+          # Docker inside the container, like the mindroom LXC on pc
+          set_config dev-lxc security.nesting true
+          ensure_device dev-lxc eth0 nic nictype=bridged parent=br0
+          ensure_device dev-lxc root disk path=/ pool=ssd size=200GiB
+        else
+          echo "Skipping dev-lxc: Incus instance not created"
+        fi
   '';
 in
 {

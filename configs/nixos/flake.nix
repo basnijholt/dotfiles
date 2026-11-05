@@ -183,9 +183,10 @@
           ./hosts/dev-vm/hardware-configuration.nix
         ];
 
-        # Lightweight development LXC container for Incus
+        # Development LXC container for Incus (on the NAS), running T3 Code
         dev-lxc = mkHost [
           ./hosts/dev-lxc/default.nix
+          ./hosts/dev-lxc/t3code.nix
           ./optional/lxc-container.nix
         ];
 
