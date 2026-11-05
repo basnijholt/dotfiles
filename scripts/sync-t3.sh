@@ -73,12 +73,8 @@ if [ -z "$self_url" ]; then
   exit 1
 fi
 
-if ! command -v t3 >/dev/null; then
-  echo "🛠️ Installing the T3 CLI"
-  bash "$HOME/dotfiles/scripts/sync-bun.sh"
-fi
 if ! t3 environment list >/dev/null 2>&1; then
-  echo "❌ No T3 Code server answers on $self. Enable local.t3code for this host in Nix."
+  echo "❌ No T3 Code server answers on $self. Install the CLI with sync-bun and enable local.t3code for this host in Nix."
   exit 1
 fi
 if [ "$(node - <<<"$ENABLE_LINKS")" = changed ]; then
@@ -94,7 +90,7 @@ for entry in "${HOSTS[@]}"; do
   echo "===== 🔗 $name ====="
 
   if ! state=$(remote "$target" "node -" <<<"$ENABLE_LINKS"); then
-    echo "⚠️ Skipped: $name does not answer over SSH ($target)"
+    echo "⚠️ Skipped: could not reach $name over SSH ($target) or turn on its Linked environments"
     FAILED+=("$name")
     continue
   fi
@@ -118,6 +114,11 @@ for entry in "${HOSTS[@]}"; do
 
   # The other machine's agents on this one
   token=$(t3 pair --label "$name" --ttl "$TTL" | token_of)
+  if [ -z "$token" ]; then
+    echo "❌ Could not mint a pairing code on $self"
+    FAILED+=("$name")
+    continue
+  fi
   if ! remote "$target" "t3 environment link $self_url --pairing-code $token --access $ACCESS"; then
     echo "❌ Could not link $name to $self"
     FAILED+=("$name")
