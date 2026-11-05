@@ -65,6 +65,7 @@
     ~/.local/bin/sync-local-dotfiles: scripts/sync-local-dotfiles.sh
     ~/.local/bin/sync-bun: scripts/sync-bun.sh
     ~/.local/bin/sync-submodules: scripts/sync-submodules.sh
+    ~/.local/bin/sync-t3: scripts/sync-t3.sh
     ~/.local/bin/sync-uv: scripts/sync-uv.sh
     ~/.local/bin/zellij-rename-tabs: scripts/zellij-rename-tabs.py
     ~/.mambarc: configs/mamba/mambarc
