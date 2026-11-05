@@ -15,12 +15,14 @@ set -uo pipefail
 # What the agents of one machine may do on the others
 ACCESS=full-access
 
-# hostname|ssh target|URL the other machines use. T3 refuses plain http for
-# links, so these are the Traefik names (LAN and tailnet only).
+# hostname|ssh target|URL the other machines use. The Macs are reached by
+# their hostname (tailnet DNS), not an ~/.ssh/config alias that a Mac's
+# own copy may lack. T3 refuses plain http for links, so the URLs are the
+# Traefik names (LAN and tailnet only).
 HOSTS=(
   "pc|pc|https://t3.lab.nijho.lt"
-  "basnijholt-macbook-pro-m2|macbook-m2|https://t3m2.lab.nijho.lt"
-  "basnijholt-macbook-pro-m5|macbook-m5|https://t3m5.lab.nijho.lt"
+  "basnijholt-macbook-pro-m2|basnijholt-macbook-pro-m2|https://t3m2.lab.nijho.lt"
+  "basnijholt-macbook-pro-m5|basnijholt-macbook-pro-m5|https://t3m5.lab.nijho.lt"
   "dev-lxc|basnijholt@192.168.1.84|https://t3dev.lab.nijho.lt"
 )
 
