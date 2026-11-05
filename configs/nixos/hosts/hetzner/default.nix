@@ -50,6 +50,11 @@
     "https://nix-community.cachix.org"
   ];
 
+  # Small disk (37.5G pool): a month of comin generations held ~12 GiB of
+  # store paths, which left no room to build packages missing from the
+  # aarch64 binary cache and filled the pool on 2026-11-05.
+  nix.gc.options = "--delete-older-than 7d";
+
   # Limit build parallelism to prevent OOM on small VPS
   nix.settings.max-jobs = 1;
   nix.settings.cores = 1;
