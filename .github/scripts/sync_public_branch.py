@@ -6,7 +6,9 @@ Steps:
  2) Remove exact paths listed in .publicignore (no globs)
  3) Replace configs/git/gitconfig-personal with example
  4) Convert submodule SSH URLs to HTTPS for public access
- 5) Commit and force-push PUBLIC_BRANCH (auto in CI; locally with PUSH=1)
+ 5) Commit sanitized content (first commit - has HTTPS URLs)
+ 6) Pin bootstrap.sh to first commit's SHA (second commit)
+ 7) Force-push PUBLIC_BRANCH (auto in CI; locally with PUSH=1)
 """
 
 import os
@@ -32,7 +34,9 @@ def run(args, *, check=True, capture=False):
 
 
 def main() -> int:
-    repo_root = Path(run(["git", "rev-parse", "--show-toplevel"], capture=True).stdout.strip())
+    repo_root = Path(
+        run(["git", "rev-parse", "--show-toplevel"], capture=True).stdout.strip()
+    )
     os.chdir(repo_root)
 
     base = os.getenv("BASE_BRANCH", "main")
@@ -40,7 +44,9 @@ def main() -> int:
 
     # Make sure we have the latest origin state
     run(["git", "fetch", "--prune", "origin"], check=False)
-    short_sha = run(["git", "rev-parse", "--short", f"origin/{base}"], capture=True).stdout.strip()
+    short_sha = run(
+        ["git", "rev-parse", "--short", f"origin/{base}"], capture=True
+    ).stdout.strip()
 
     log(f"Base branch:    {base}")
     log(f"Public branch: {public}")
@@ -86,7 +92,9 @@ def main() -> int:
         if ":" not in line:
             return False
         src = line.split(":", 1)[1].strip()
-        if (src.startswith('"') and src.endswith('"')) or (src.startswith("'") and src.endswith("'")):
+        if (src.startswith('"') and src.endswith('"')) or (
+            src.startswith("'") and src.endswith("'")
+        ):
             src = src[1:-1]
         return any(src == p or src.startswith(p + "/") for p in ignore_paths)
 
@@ -120,22 +128,44 @@ def main() -> int:
         )
         gitmodules.write_text(content)
 
-    # 3) Commit and push if there are changes
-    run(["git", "add", "-A"]) 
+    # 3) First commit: all sanitization (this has HTTPS submodule URLs)
+    run(["git", "add", "-A"])
     status = run(["git", "status", "--porcelain"], capture=True).stdout.strip()
     if not status:
         log("No changes after sanitization. Skipping commit/push.")
         return 0
 
-    run([
+    git_commit = [
         "git", "-c", "user.name=github-actions[bot]",
         "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
-        "commit", "-m", f"chore(public): sync from {base} {short_sha} and sanitize",
-    ])
+        "commit",
+    ]
+    run(git_commit + ["-m", f"chore(public): sync from {base} {short_sha} and sanitize"])
+
+    # 4) Pin bootstrap.sh to the sanitized commit SHA (not main!)
+    sanitized_sha = run(["git", "rev-parse", "HEAD"], capture=True).stdout.strip()
+    bootstrap = repo_root / "scripts/bootstrap.sh"
+    if bootstrap.exists():
+        log(f"Pinning bootstrap.sh to sanitized commit {sanitized_sha}")
+        content = bootstrap.read_text()
+        # Replace entire clone block with init+fetch of specific commit
+        old_clone = '''log "Cloning dotfiles ($DOTFILES_BRANCH) into $DOTFILES_DIR..."
+git clone --depth=1 --branch "$DOTFILES_BRANCH" --single-branch "$DOTFILES_REPO" "$DOTFILES_DIR"'''
+        new_clone = f'''log "Cloning dotfiles (commit {sanitized_sha}) into $DOTFILES_DIR..."
+git init "$DOTFILES_DIR"
+git -C "$DOTFILES_DIR" remote add origin "$DOTFILES_REPO"
+git -C "$DOTFILES_DIR" fetch --depth=1 origin {sanitized_sha}
+git -C "$DOTFILES_DIR" checkout FETCH_HEAD'''
+        if old_clone not in content:
+            raise RuntimeError("Could not find clone block in bootstrap.sh")
+        content = content.replace(old_clone, new_clone)
+        bootstrap.write_text(content)
+        run(["git", "add", bootstrap])
+        run(git_commit + ["-m", "chore(public): pin bootstrap.sh to sanitized commit"])
 
     if os.getenv("CI") == "true" or os.getenv("PUSH") == "1":
         log(f"Pushing {public} to origin (force)")
-        run(["git", "push", "origin", public, "--force"]) 
+        run(["git", "push", "origin", public, "--force"])
     else:
         log("Local run detected and PUSH!=1; not pushing. Use PUSH=1 to push.")
 
