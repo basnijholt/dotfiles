@@ -298,6 +298,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-atuin": {
+      "locked": {
+        "lastModified": 1792616051,
+        "narHash": "sha256-ZLCxQS4yeijXD0ttYD/g+HRfr3WYPoGbrecQcyZNFok=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6c3e813bfa03df06c0fbace92122cecd1651a51",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6c3e813bfa03df06c0fbace92122cecd1651a51",
+        "type": "github"
+      }
+    },
     "nixpkgs-netdata": {
       "locked": {
         "lastModified": 1786599213,
@@ -378,6 +394,7 @@
         "home-manager-pi": "home-manager-pi",
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_3",
+        "nixpkgs-atuin": "nixpkgs-atuin",
         "nixpkgs-netdata": "nixpkgs-netdata",
         "ragenix": "ragenix",
         "zfs-tenant": "zfs-tenant",
