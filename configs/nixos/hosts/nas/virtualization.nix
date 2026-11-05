@@ -115,11 +115,13 @@ let
         if instance_exists dev-lxc; then
           set_config dev-lxc boot.autostart true
           set_config dev-lxc user.autostart true
-          # Coding agents (T3 Code) on spare cores. Keep 4 of the 20 threads
-          # for the NAS itself, and lose to docker and nix-cache when the
-          # CPUs are contended (default priority is 10).
+          # Coding agents (T3 Code) on spare cores: at most 16 of the 20
+          # threads. A 20% allowance sets cpu.weight to 20 against the
+          # default 100, so dev-lxc yields to docker and nix-cache under
+          # contention but may still use all 16 threads when they idle.
+          # (limits.cpu.priority only subtracts 10 - priority from 100.)
           set_config dev-lxc limits.cpu 16
-          set_config dev-lxc limits.cpu.priority 5
+          set_config dev-lxc limits.cpu.allowance 20%
           # Host memory is the NAS's limit (see the docker cap above). Swap
           # must be a size: "true" with limits.memory set means no swap.
           set_config dev-lxc limits.memory 12GiB
