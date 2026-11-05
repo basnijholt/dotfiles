@@ -18,6 +18,7 @@ HOSTS=(
   "docker-lxc"
   "mindroom"
   # Cloud hosts
+  "gce-dev"
   "hetzner-matrix"
   "hetzner"
   "hetzner-saas"
