@@ -41,6 +41,15 @@ in
   };
   services.syncthing.enable = lib.mkForce false;
 
+  # T3 Code for the coding agents, reached as t3w.lab.nijho.lt through Traefik
+  # in docker-lxc over the tailnet. The VM has a public IP, so the port is
+  # open on tailscale0 only.
+  local.t3code = {
+    enable = true;
+    host = "0.0.0.0";
+  };
+  networking.firewall.interfaces.tailscale0.allowedTCPPorts = [ 3773 ];
+
   # Root key access for nixos-anywhere reinstalls.
   users.users.root.openssh.authorizedKeys.keys = sshKeys;
   security.sudo.wheelNeedsPassword = false;
