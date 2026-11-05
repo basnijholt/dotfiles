@@ -68,10 +68,13 @@ in
 
   environment.etc."agent-work-disk.json".text = builtins.toJSON settings;
 
-  # noauto mounts do not create their mount point. tmpfiles never replaces a
-  # real file or directory with a link; `agent-work-disk unlock` moves those.
+  # noauto mounts do not create their mount point. It stays root-owned, so
+  # nothing can write to the plain disk while the disk is locked; the ":"
+  # prefixes keep tmpfiles from resetting the owner of the mounted disk's
+  # root, which `agent-work-disk unlock` gives to the user. tmpfiles never
+  # replaces a real file or directory with a link; `unlock` moves those.
   systemd.tmpfiles.rules = [
-    "d ${mountPoint} 0755 root root -"
+    "d ${mountPoint} :0755 :root :root -"
   ]
   ++ lib.mapAttrsToList (src: dst: "L ${home}/${src} - - - - ${mountPoint}/config/${dst}") (
     settings.dirLinks // settings.fileLinks

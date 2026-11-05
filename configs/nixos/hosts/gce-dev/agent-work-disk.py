@@ -116,7 +116,12 @@ def unlock(cfg: dict) -> int:
             sys.exit(f"the guard locked the disk again; see `journalctl -t {TAG} -u {unit}`")
         sudo(["mount", mount])
     sudo(["systemctl", "start", unit])
+    if not os.path.ismount(mount):
+        sys.exit(f"{mount} is not mounted; nothing changed on the plain disk")
+    # The disk's root belongs to the user (the empty mount point below it
+    # stays root's).
     user = pwd.getpwnam(cfg["user"])
+    sudo(["install", "-d", "-o", user.pw_uid, "-g", user.pw_gid, "-m", "0755", mount])
     sudo(["install", "-d", "-o", user.pw_uid, "-g", user.pw_gid, "-m", "0700", f"{mount}/config"])
     link(cfg)
     print(f"{mount} unlocked, guard armed")
