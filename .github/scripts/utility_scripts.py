@@ -12,6 +12,7 @@ descriptions = {
     "sync-dotfiles.sh": "Push updater to hosts and trigger sync/install",
     "sync-local-dotfiles.sh": "On a host: pull latest and optionally run ./install",
     "sync-photos-to-nas.sh": "Sync photos to the NAS",
+    "sync-t3.sh": "Link this host's T3 Code server with the other T3 hosts",
     "sync-uv.sh": "Globally install uv tools I frequently use",
 
     # Repo helpers

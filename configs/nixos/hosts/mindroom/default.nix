@@ -3,7 +3,7 @@
 {
   imports = [
     # Optional modules (Tier 2)
-    # Note: mindroom is a lightweight development container
+    # Note: mindroom runs the MindRoom lab and chat runtimes
     ../../optional/git-repo-checkouts.nix
     ../../optional/virtualization.nix
     ../../optional/mindroom-runtime-services.nix

@@ -190,7 +190,7 @@
           ./optional/lxc-container.nix
         ];
 
-        # Lightweight development LXC container for Incus (on HP)
+        # MindRoom lab and runtime LXC container for Incus (on pc)
         mindroom = mkHost [
           ragenix.nixosModules.default
           ./hosts/mindroom/default.nix

@@ -187,6 +187,7 @@ This will give you an interactive Zsh session within an Ubuntu container, config
 │   ├── codex                        # Codex CLI configuration
 │   ├── conda                        # Conda/Mamba configuration
 │   ├── dask                         # Dask distributed computing
+│   ├── deck
 │   ├── direnv                       # Directory-specific environment setup
 │   ├── gemini                       # Gemini settings
 │   ├── ghostty
@@ -357,6 +358,7 @@ scripts
 ├── sync-photos-to-nas.sh       # Sync photos to the NAS
 ├── sync-secrets.sh
 ├── sync-submodules.sh
+├── sync-t3.sh                  # Link this host's T3 Code server with the other T3 hosts
 ├── sync-uv.sh                  # Globally install uv tools I frequently use
 └── zellij-rename-tabs.py
 ```
