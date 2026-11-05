@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # Deployed hosts with comin enabled.
-DEFAULT_HOSTS=(pc nuc hp nas pi3 pi4 nix-cache docker-lxc hetzner-matrix hetzner hetzner-saas mindroom)
+DEFAULT_HOSTS=(pc nuc hp nas pi3 pi4 nix-cache docker-lxc gce-dev hetzner-matrix hetzner hetzner-saas mindroom)
 
 HOSTS=("${@:-${DEFAULT_HOSTS[@]}}")
 

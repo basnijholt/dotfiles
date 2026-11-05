@@ -183,6 +183,14 @@
           ./hosts/dev-vm/hardware-configuration.nix
         ];
 
+        # Google Compute Engine VM (x86_64): big dev box for coding agents.
+        gce-dev = mkHost [
+          disko.nixosModules.disko
+          ./hosts/gce-dev/disko.nix
+          ./hosts/gce-dev/default.nix
+          ./hosts/gce-dev/hardware-configuration.nix
+        ];
+
         # Development LXC container for Incus (on the NAS), running T3 Code
         dev-lxc = mkHost [
           ./hosts/dev-lxc/default.nix
