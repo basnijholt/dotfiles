@@ -45,8 +45,11 @@ try {
 }
 if (settings.linkedEnvironmentsEnabled !== true) {
   settings.linkedEnvironmentsEnabled = true;
-  fs.writeFileSync(`${file}.tmp`, `${JSON.stringify(settings, null, 2)}\n`);
-  fs.renameSync(`${file}.tmp`, file);
+  // A temp name per writer, so two runs linking the same host at once
+  // cannot rename the temp file of the other
+  const tmp = `${file}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, `${JSON.stringify(settings, null, 2)}\n`);
+  fs.renameSync(tmp, file);
   console.log("changed");
 }
 '
