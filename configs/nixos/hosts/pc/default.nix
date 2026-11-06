@@ -25,6 +25,7 @@
     ./gaming.nix
     ./debugging.nix
     ./ai.nix
+    ./t3-links.nix
     ./nvidia-graphics.nix
     ./nvidia-undervolt.nix
     ./slurm.nix
