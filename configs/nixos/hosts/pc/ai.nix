@@ -566,8 +566,9 @@ in
       # gemma-embedding2 support (ggml-org/llama.cpp#30054). A non-causal model
       # needs its whole input in one ubatch, so inputs are capped at 4K tokens:
       # the 8K ubatch's 1 GB compute buffer does not fit beside vLLM, while
-      # 4K uses about 0.7 GB in total. GPU 1 has the most room left after vLLM
-      # and Qwen3-ASR; GPU 0 also holds the TTS services and embeddinggemma:300m.
+      # 4K uses about 1 GB in total. It runs on GPU 0, which has more room
+      # than GPU 1: Qwen3-ASR on GPU 1 needs headroom for activations, and
+      # transcribing clips over ~10 s ran out of CUDA memory there.
       # Clients add the query/document prompts themselves.
       "embeddinggemma-2":
         cmd: |
@@ -581,7 +582,7 @@ in
           --batch-size 4096
           --ubatch-size 4096
         env:
-          - "CUDA_VISIBLE_DEVICES=1"
+          - "CUDA_VISIBLE_DEVICES=0"
         ttl: 0
 
       # settings: https://www.reddit.com/r/LocalLLaMA/comments/1oo7kqy/comment/nn2dn8l/
