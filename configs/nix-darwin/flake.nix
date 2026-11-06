@@ -63,14 +63,14 @@
             }
           ];
         };
-        # M4
-        "basnijholt-macbook-pro-m4" = mkDarwin {
+        # M5 Max
+        "basnijholt-macbook-pro-m5-2" = mkDarwin {
           isPersonal = false;
-          primaryUser = "bas.nijholt";
+          primaryUser = "basnijholt";
           extraModules = [
             {
-              networking.hostName = "basnijholt-macbook-pro-m4";
-              networking.computerName = "basnijholt-macbook-pro-m4";
+              networking.hostName = "basnijholt-macbook-pro-m5-2";
+              networking.computerName = "basnijholt-macbook-pro-m5-2";
             }
           ];
         };
