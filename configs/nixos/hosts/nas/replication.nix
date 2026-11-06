@@ -99,8 +99,10 @@ let
 
       # --no-privilege-elevation: the remote user is non-root on purpose
       # and must never attempt sudo; its zfs rights are delegated.
-      # --delete-target-snapshots keeps the mirror matched to the source's
-      # retention, like every other mirror here.
+      # No --delete-target-snapshots: like hetzner-matrix's mirror, this one
+      # holds the long history (pruned by nas-backup-prune), so a source can
+      # trim its own snapshots to free disk without losing NAS restore points.
+      # Manually named snapshots stay here until deleted by hand.
       datasets="home var root"
       if ssh -i ${src.key} -o BatchMode=yes -o ConnectTimeout=10 \
           nas-replication@${src.addr} zfs list zroot/incus >/dev/null 2>&1; then
@@ -132,7 +134,6 @@ let
         if ! syncoid ${mkSyncoidCommonArgs} \
           "''${dataset_args[@]}" \
           --no-privilege-elevation \
-          --delete-target-snapshots \
           --recvoptions=${unmountedReceiveOptions} \
           --sshkey=${src.key} \
           --sshport=22 \
@@ -151,7 +152,6 @@ let
             target_volume="tank/backups/${host}/''${volume#zroot/}"
             if ! syncoid ${mkSyncoidVolumeArgs} \
               --no-privilege-elevation \
-              --delete-target-snapshots \
               --recvoptions=${unmountedVolumeReceiveOptions} \
               --sshkey=${src.key} \
               --sshport=22 \
