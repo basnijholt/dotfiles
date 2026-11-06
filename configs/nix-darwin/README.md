@@ -1,24 +1,26 @@
 # Nix
 
-On a fresh macOS machine, install [Homebrew](https://brew.sh/) first:
+On a fresh macOS machine, install [Homebrew](https://brew.sh/) first and put it on PATH for the current shell:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
 ```
 
-Then install [Determinate Nix](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer):
+Then install [Determinate Nix](https://github.com/DeterminateSystems/nix-installer?tab=readme-ov-file#determinate-nix-installer) and open a new terminal:
 
 ```bash
 curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 ```
 
-Then run:
+For the first switch, name this Mac's entry in `darwinConfigurations` in [`flake.nix`](flake.nix) explicitly, because the current hostname won't match yet.
+Activation sets HostName, LocalHostName, and ComputerName to that name.
 
 ```bash
-nix run nix-darwin -- switch --flake ~/dotfiles/configs/nix-darwin
+sudo nix run nix-darwin -- switch --flake ~/dotfiles/configs/nix-darwin#basnijholt-macbook-pro-m5
 ```
 
-or use the alias:
+After that, `darwin-rebuild` finds the configuration by LocalHostName, so in a new terminal use the alias:
 
 ```bash
 nixswitch

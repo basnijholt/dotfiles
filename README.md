@@ -113,28 +113,27 @@ The “Mono” variant forces single‑width glyphs so powerline/nerd icons alig
 
 ### Installation for me (@basnijholt)
 
-First, you need to set up SSH authentication to access private submodules.
-
-<details>
-<summary><b>Using 1Password</b></summary>
-
-Install 1Password and set up the SSH agent:
+On a fresh Mac, run these in order (on Linux, install `git-lfs` with the package manager and skip the Homebrew and 1Password lines):
 
 ```bash
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
-```
+# 1. Homebrew; the installer does not put brew on PATH for the current shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-</details>
-
-```bash
-# Clone the repository with public submodules
+# 2. Git LFS, needed before cloning because submodules/mydotbins stores binaries in LFS
+brew install git-lfs
 git lfs install
-git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git
-cd dotfiles
 
-# Run the installer. Approved hosts also clone/update dotfiles-secrets.
+# 3. SSH through the 1Password agent (install 1Password and enable its SSH agent first)
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
+# 4. Clone and install. Approved hosts also clone/update dotfiles-secrets.
+git clone --recurse-submodules -j8 git@github.com:basnijholt/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 ./install
 ```
+
+On macOS, open a new terminal and continue with [nix-darwin](#macos).
 
 ### Trying with Docker
 
@@ -479,27 +478,20 @@ Tip: Run dotbins sync to install missing tools
 
 ### macOS
 
-Before running Nix-darwin, set the hostname to one of the `darwinConfigurations` in [`configs/nix-darwin/flake.nix`](configs/nix-darwin/flake.nix), since `darwin-rebuild` picks the configuration by `LocalHostName` (e.g. `basnijholt-macbook-pro-m2` for the always-on M2):
+The repository includes nix-darwin configuration for a reproducible macOS setup.
+Every Mac has an entry in `darwinConfigurations` in [`configs/nix-darwin/flake.nix`](configs/nix-darwin/flake.nix), named after its hostname (e.g. `basnijholt-macbook-pro-m2` for the always-on M2).
+Homebrew must be installed first (see [Installation for me](#installation-for-me-basnijholt)).
 
 ```bash
-NAME="basnijholt-macbook-pro-m5"
-sudo scutil --set HostName $NAME
-sudo scutil --set LocalHostName $NAME
-sudo scutil --set ComputerName $NAME
-dscacheutil -flushcache
-```
-
-The repository includes nix-darwin configuration for a reproducible macOS setup:
-
-```bash
-# Install Homebrew first if this is a fresh macOS machine
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
 # Install Determinate Nix
 curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 
-# Apply nix-darwin configuration
-nixswitch  # Alias for darwin-rebuild switch --flake ~/dotfiles/configs/nix-darwin
+# First switch: name the configuration explicitly.
+# Activation sets HostName, LocalHostName, and ComputerName to that name.
+sudo nix run nix-darwin -- switch --flake ~/dotfiles/configs/nix-darwin#basnijholt-macbook-pro-m5
+
+# Later switches (in a new terminal): darwin-rebuild finds the configuration by LocalHostName
+nixswitch  # Alias for sudo darwin-rebuild switch --flake ~/dotfiles/configs/nix-darwin
 ```
 
 #### Homebrew packages

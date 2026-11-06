@@ -24,7 +24,7 @@
     sops # Secrets editor
     cocoapods # required for Capacitor iOS builds (pod install)
   ]
-  ++ lib.optionals config.isPersonal [
+  ++ lib.optionals config.privacyApps [
     qbittorrent # Torrent client; the Homebrew cask is disabled for failing Gatekeeper
   ];
 
