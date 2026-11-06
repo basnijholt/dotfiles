@@ -179,6 +179,7 @@
       "syncthing-app" # File synchronization
       "teamviewer" # Remote control
       "telegram" # Messenger
+      "textream" # Teleprompter
       "tunnelblick" # OpenVPN client
       "unclack" # Mute keyboard sounds
       "universal-media-server" # Media server
