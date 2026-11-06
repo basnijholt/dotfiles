@@ -30,7 +30,7 @@ HOSTS=(
 # More hosts in the same format, kept out of this public repository
 EXTRA_HOSTS=${XDG_CONFIG_HOME:-$HOME/.config}/sync-t3/hosts
 if [ -f "$EXTRA_HOSTS" ]; then
-  while IFS= read -r line; do
+  while IFS= read -r line || [ -n "$line" ]; do
     case $line in "" | "#"*) continue ;; esac
     HOSTS+=("$line")
   done <"$EXTRA_HOSTS"
@@ -66,8 +66,10 @@ if (settings.linkedEnvironmentsEnabled !== true) {
 }
 '
 
+# The code goes into a command line that a shell runs on the other host, so
+# only accept the letters, digits, _ and - that t3 pairing codes are made of
 token_of() {
-  sed -n 's/^Token: //p'
+  sed -n 's/^Token: \([A-Za-z0-9_-]*\)$/\1/p'
 }
 
 # t3 looks for its server under a git worktree's own .t3 when run inside one
@@ -131,7 +133,7 @@ for i in "${UP[@]}"; do
     to=${NAMES[$j]}
     token=$(on "$j" "t3 pair --label $from --ttl $TTL" 2>/dev/null | token_of)
     if [ -z "$token" ]; then
-      echo "❌ $from to $to: no pairing code from $to"
+      echo "❌ $from to $to: no valid pairing code from $to"
     elif ! on "$i" "t3 environment link ${URLS[$j]} --pairing-code $token --access $ACCESS" >/dev/null; then
       echo "❌ $from to $to: the link failed"
     else
