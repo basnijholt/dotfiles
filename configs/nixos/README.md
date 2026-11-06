@@ -22,6 +22,7 @@ configs/nixos/
 | `hp-incus` | Incus VM | HP config for Incus VM testing |
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |
 | `pc-incus` | Incus VM | PC config for Incus VM testing (GPU services build but won't run) |
+| `pc-vmtest` | VM test | PC config for local `nixos-anywhere --vm-test` runs |
 | `dev-vm` | Incus VM | Lightweight dev environment (x86_64) |
 | `dev-lxc` | Incus LXC | Dev container on the NAS running T3 Code (`t3dev.lab.nijho.lt`) |
 | `mindroom` | Incus LXC | MindRoom lab/runtime container with local Matrix and web services |
@@ -32,6 +33,7 @@ configs/nixos/
 | `hetzner` | Cloud VPS | Minimal Docker Compose host for websites (Hetzner Cloud) |
 | `hetzner-saas` | Cloud VPS | Hetzner x86_64 single-node K3s host for MindRoom SaaS |
 | `hetzner-saas-bootstrap` | Bootstrap | Minimal first-stage config for Hetzner SaaS installs |
+| `gce-dev` | Cloud VM | Google Compute Engine x86_64 dev box for coding agents |
 | `paul-wyse` | Physical | Gateway to home services via Tailscale (Dell Wyse 5070) |
 | `paul-wyse-incus` | Incus VM | Paul Wyse config for Incus VM testing |
 | `pi4` | Physical | Raspberry Pi 4 - lightweight headless server with ZFS on SSD (aarch64) |
