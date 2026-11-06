@@ -103,7 +103,7 @@
       "zellij" # Terminal workspace
       "zsh" # Shell
     ] ++ (
-      if config.isPersonal then
+      if config.privacyApps then
         [ ]
       else
         [
@@ -185,7 +185,7 @@
       "wezterm" # Terminal emulator
     ]
     ++ (
-      if config.isPersonal then
+      if config.privacyApps then
         [
           "1password" # Password manager
           "google-chrome" # Web browser

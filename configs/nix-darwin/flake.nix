@@ -17,7 +17,7 @@
     let
       mkDarwin =
         {
-          isPersonal,
+          privacyApps,
           primaryUser,
           extraModules ? [ ],
         }:
@@ -30,12 +30,12 @@
             ./charge-limit.nix
             {
               options = {
-                isPersonal = nixpkgs.lib.mkOption {
+                privacyApps = nixpkgs.lib.mkOption {
                   type = nixpkgs.lib.types.bool;
                   default = false;
                 };
               };
-              config.isPersonal = isPersonal;
+              config.privacyApps = privacyApps;
               config.system.primaryUser = primaryUser;
             }
           ]
@@ -44,9 +44,9 @@
     in
     {
       darwinConfigurations = {
-        # M5 Pro, the main personal Mac
+        # M5 Pro
         "basnijholt-macbook-pro-m5" = mkDarwin {
-          isPersonal = true;
+          privacyApps = true;
           primaryUser = "basnijholt";
           extraModules = [
             {
@@ -65,7 +65,7 @@
         };
         # M5 Max
         "basnijholt-macbook-pro-m5-2" = mkDarwin {
-          isPersonal = false;
+          privacyApps = false;
           primaryUser = "basnijholt";
           extraModules = [
             {
@@ -76,7 +76,7 @@
         };
         # M2 Pro that stays on with its lid closed, used remotely
         "basnijholt-macbook-pro-m2" = mkDarwin {
-          isPersonal = true;
+          privacyApps = true;
           primaryUser = "basnijholt";
           extraModules = [
             ./always-on.nix
