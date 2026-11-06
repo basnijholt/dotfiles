@@ -25,7 +25,6 @@
       "asciinema" # Terminal recorder
       "atuin" # Shell history sync tool
       "autossh" # Automatically restart SSH sessions
-      "azure-cli" # Microsoft Azure CLI
       "bandwhich" # Per-process network monitor
       "bat" # Better cat with syntax highlighting
       "blueutil" # Bluetooth utility
@@ -119,6 +118,7 @@
       "1password-cli" # 1Password CLI
       "adobe-creative-cloud" # Adobe suite
       "airflow" # Video transcoder
+      "azure-cli" # Microsoft Azure CLI
       "balenaetcher" # USB image writer
       "block-goose" # open source AI agent
       "brave-browser" # Web browser
@@ -126,10 +126,8 @@
       "cursor" # Cursor editor
       "cyberduck" # FTP client
       "db-browser-for-sqlite" # SQLite browser
-      "disk-inventory-x" # Disk space visualizer
       "dropbox" # Cloud storage
       "eqmac" # Audio equalizer
-      "filebot" # File renamer
       "firefox" # Web browser
       "flux-app" # Screen color adjuster
       "font-fira-code" # Programming font
@@ -202,7 +200,6 @@
         [
           "gcloud-cli" # Google Cloud CLI
           "google-drive" # Cloud storage
-          "klayout" # GDS Layout viewer
           "xquartz" # X11 server
         ]
     );
