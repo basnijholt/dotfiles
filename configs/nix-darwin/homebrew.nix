@@ -137,6 +137,7 @@
       "git-credential-manager" # Git credential helper
       "github" # GitHub desktop
       "google-earth-pro" # 3D earth viewer
+      "granola" # AI meeting notes
       "handbrake-app" # Video transcoder
       "inkscape" # Vector graphics editor
       "istat-menus" # System monitor
@@ -175,6 +176,7 @@
       "submariner" # Subsonic music client
       "switchresx" # Display manager
       "syncthing-app" # File synchronization
+      "tailscale-app" # VPN service
       "teamviewer" # Remote control
       "telegram" # Messenger
       "tunnelblick" # OpenVPN client
@@ -192,7 +194,6 @@
           "mullvad-vpn" # VPN client
           "nordvpn" # VPN client
           "signal" # Secure messenger
-          "tailscale-app" # VPN service
           "tor-browser" # Private browser
           "zoom" # Video conferencing
         ]
