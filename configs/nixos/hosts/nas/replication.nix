@@ -542,7 +542,11 @@ in
       # snapshots (nuc's sanoid deliberately excludes zroot/backups), so
       # trim it to the source's retention here — without this the mirror
       # accumulates every ssd snapshot forever.
+      # Raw sends (-w) keep the ssd pool's encryption: the nuc stores only
+      # ciphertext and never holds the key, so restoring from it needs the
+      # ssd passphrase.
       syncoid ${mkSyncoidSsdArgs} \
+        --sendoptions=w \
         --delete-target-snapshots \
         --recvoptions=${unmountedReceiveOptions} \
         --sshkey=${nucReplicationKey} \
