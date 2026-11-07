@@ -112,7 +112,7 @@ in
     enable = true;
     repositories.cinny = {
       path = cinnyCheckoutPath;
-      url = "https://github.com/mindroom-ai/mindroom-chat.git";
+      url = "https://github.com/mindroom-ai/mindroom-chat-legacy.git";
       branch = "dev";
       user = "basnijholt";
       group = "users";
