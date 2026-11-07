@@ -95,27 +95,12 @@ in
       '';
     };
 
-    # Cinny web client (SPA)
+    # MindRoom Chat static build, published by the dev repo's
+    # scripts/mindroom-chat-publish.sh into releases/; `current` is the live one.
     virtualHosts."${cinnyDomain}" = {
-      extraConfig = ''
-        # The pairing approval page must never render inside another site's frame.
-        @connect path /connect /connect/
-        header @connect {
-          Content-Security-Policy "frame-ancestors 'none'"
-          X-Frame-Options "DENY"
-        }
-        root * ${cinnyCurrentPath}
-
-        handle /.well-known/apple-app-site-association {
-          header Content-Type application/json
-          file_server
-        }
-
-        handle {
-          try_files {path} /index.html
-          file_server
-        }
-      '';
+      extraConfig = import ../../optional/mindroom-chat-caddy.nix {
+        root = cinnyCurrentPath;
+      };
     };
 
     # Matrix push gateway for native mobile clients.
