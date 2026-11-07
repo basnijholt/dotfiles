@@ -12,6 +12,13 @@
   services.zfs.autoScrub.enable = true;
   services.zfs.trim.enable = true;
 
+  # Cap the ZFS ARC at 16 GiB. The OpenZFS default on this kernel lets ARC grow
+  # to all 64 GiB of RAM; under many parallel agent builds it held ~16 GiB while
+  # ~36 GiB of application memory was pushed to swap.
+  boot.extraModprobeConfig = ''
+    options zfs zfs_arc_max=17179869184
+  '';
+
   systemd.tmpfiles.rules = [
     "d /var/lib/club-3090-vllm 0755 root root -"
     "d /var/lib/club-3090-vllm/models 0755 root root -"
