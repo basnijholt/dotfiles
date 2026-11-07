@@ -8,6 +8,8 @@ in
   publicBaseDomain = "lab.mindroom.chat";
   publicSiteDomain = siteDomain;
   publicCinnyDomain = "chat.lab.mindroom.chat";
+  # Releases of the MindRoom Chat static build and the `current` symlink Caddy serves.
+  chatPublishedPath = "/var/www/cinny-published";
   tuwunelVersion = "v1.9.4-mindroom.29";
   tuwunelArchiveHash = "sha256-0IZkeDOmoZ3YBVA6yzMuyFeYvCAz6KKeX21M6w9KB+U=";
 }

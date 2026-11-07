@@ -1,15 +1,12 @@
 { ... }:
+let
+  inherit (import ./constants.nix) chatPublishedPath;
+in
 {
-  services.git-repo-checkouts = {
-    enable = true;
-    repositories.cinny = {
-      path = "/var/www/cinny";
-      url = "https://github.com/mindroom-ai/mindroom-chat.git";
-      branch = "dev";
-      user = "basnijholt";
-      group = "users";
-      updateWhenClean = true;
-      hardResetWhenDiverged = true;
-    };
-  };
+  # MindRoom Chat is a static build published from another machine into
+  # releases/<ts>-<ref>-<sha>; `current` points at the live one (caddy.nix).
+  systemd.tmpfiles.rules = [
+    "d ${chatPublishedPath} 0755 basnijholt users -"
+    "d ${chatPublishedPath}/releases 0755 basnijholt users -"
+  ];
 }
