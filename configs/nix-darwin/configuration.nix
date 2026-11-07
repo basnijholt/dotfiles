@@ -64,6 +64,25 @@
       autohide = true; # automatically hide and show the dock
       show-recents = false; # don't show recent apps
       static-only = false; # show only running apps
+
+      # Pinned Dock apps; replaces whatever is currently pinned
+      persistent-apps = [
+        { app = "/System/Applications/System Settings.app"; }
+        { app = "/System/Applications/Messages.app"; }
+        { app = "/System/Applications/Mail.app"; }
+        { app = "/Applications/Brave Browser.app"; }
+      ]
+      # Chrome is only installed on hosts with privacyApps (see homebrew.nix)
+      ++ lib.optionals config.privacyApps [
+        { app = "/Applications/Google Chrome.app"; }
+      ]
+      ++ [
+        { app = "/Applications/iTerm.app"; }
+      ];
+    };
+    NSGlobalDomain = {
+      # Tap to click, also for the login screen and other users
+      "com.apple.mouse.tapBehavior" = 1;
     };
     trackpad = {
       # Enable tap to click
@@ -71,16 +90,38 @@
 
       # Enable three finger drag
       TrackpadThreeFingerDrag = true;
+
+      # Three-finger swipes take priority over three-finger drag, so move
+      # them to four fingers (same as enabling the drag in System Settings)
+      TrackpadThreeFingerHorizSwipeGesture = 0;
+      TrackpadThreeFingerVertSwipeGesture = 0;
+      TrackpadFourFingerHorizSwipeGesture = 2;
+      TrackpadFourFingerVertSwipeGesture = 2;
     };
   };
 
   # Add ability to used TouchID for sudo
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # Configure Terminal.app to use Option as Meta key (for Alt+Arrow word navigation)
-  system.activationScripts.postActivation.text = ''
-    defaults write com.apple.Terminal useOptionAsMetaKey -bool true
-  '';
+  # Activation runs as root, so user defaults must be written as the primary user
+  system.activationScripts.postActivation.text =
+    let
+      user = lib.escapeShellArg config.system.primaryUser;
+      asUser = ''launchctl asuser "$(id -u -- ${user})" sudo --user=${user} --'';
+    in
+    ''
+      # Configure Terminal.app to use Option as Meta key (for Alt+Arrow word navigation)
+      ${asUser} defaults write com.apple.Terminal useOptionAsMetaKey -bool true
+
+      # Per-host (ByHost) copy of the three-finger drag settings; System Settings
+      # writes these too, but nix-darwin's trackpad options don't
+      ${asUser} defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerDragGesture -int 1
+      ${asUser} defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerHorizSwipeGesture -int 0
+      ${asUser} defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerVertSwipeGesture -int 0
+
+      # Apply trackpad settings without logging out
+      ${asUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    '';
 
   # Create /etc/zshrc that loads the nix-darwin environment.
   programs.zsh = {
