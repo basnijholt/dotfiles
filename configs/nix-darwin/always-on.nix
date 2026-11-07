@@ -9,10 +9,6 @@
   # Always on the charger, so keep the battery from sitting at 100%
   local.chargeLimit = 80;
 
-  # Remote Login. On macOS 26 this also lets FileVault be unlocked over SSH
-  # (from the LAN, Tailscale isn't up yet) after a reboot.
-  services.openssh.enable = true;
-
   # BetterDisplay keeps a virtual screen connected, so Screen Sharing still has
   # a display to show when the lid is closed and the internal panel is off.
   # It is a GUI app, so after a reboot it only starts once someone logs in.

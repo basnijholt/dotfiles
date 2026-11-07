@@ -100,6 +100,10 @@
     };
   };
 
+  # Remote Login (SSH) on every Mac. On macOS 26 this also lets FileVault be
+  # unlocked over SSH (from the LAN, Tailscale isn't up yet) after a reboot.
+  services.openssh.enable = true;
+
   # Add ability to used TouchID for sudo
   security.pam.services.sudo_local.touchIdAuth = true;
 
