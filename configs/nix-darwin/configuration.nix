@@ -118,8 +118,11 @@
       ${asUser} defaults write com.apple.Terminal useOptionAsMetaKey -bool true
 
       # Per-host (ByHost) copy of the three-finger drag settings; System Settings
-      # writes these too, but nix-darwin's trackpad options don't
-      ${asUser} defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerDragGesture -int 1
+      # writes these too, but nix-darwin's trackpad options don't.
+      # threeFingerDragGesture must be a bool (activateSettings ignores an int). Delete
+      # first: writing true over an int 1 counts as unchanged and keeps the int.
+      ${asUser} defaults -currentHost delete NSGlobalDomain com.apple.trackpad.threeFingerDragGesture 2>/dev/null || true
+      ${asUser} defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerDragGesture -bool true
       ${asUser} defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerHorizSwipeGesture -int 0
       ${asUser} defaults -currentHost write NSGlobalDomain com.apple.trackpad.threeFingerVertSwipeGesture -int 0
 
