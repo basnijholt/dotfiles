@@ -128,6 +128,11 @@
 
       # Apply trackpad settings without logging out
       ${asUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+
+      # Don't start Adobe Creative Cloud at login: its broker and Desktop Service sat at
+      # 100% CPU for hours on the M5. Opening the app by hand still works.
+      launchctl disable "gui/$(id -u -- ${user})/com.adobe.AdobeCreativeCloud"
+      launchctl disable "gui/$(id -u -- ${user})/com.adobe.ccxprocess"
     '';
 
   # Create /etc/zshrc that loads the nix-darwin environment.
