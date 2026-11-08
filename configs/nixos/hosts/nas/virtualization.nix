@@ -281,9 +281,11 @@ in
       RemainAfterExit = true;
       TimeoutStartSec = "infinity";
     };
-    # The receiver mounts each subtree parents first, one dataset at a time.
-    # The instances use all of ssd's tree but only the top of each tank root:
+    # The receiver mounts each subtree parents first, one dataset at a time,
+    # so wait for all of ssd's tree. Check only the top of each tank root:
     # tank/backups' replication targets can hold a dataset that never mounts.
+    # The gate therefore does not cover the docker instance's B2 job, which
+    # reads tank/backups' ssd mirror.
     script = ''
       # ready ROOT SCOPE: ROOT exists, its key is loaded, and every dataset in
       # SCOPE (zfs list depth flags) that should be mounted is.

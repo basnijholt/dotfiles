@@ -1,8 +1,9 @@
 { pkgs, ... }:
 
 let
-  # An encrypted dataset stays unmounted until its key arrives after boot.
-  # Refuse its share until then, so nothing writes into the directory below.
+  # An encrypted tank dataset stays unmounted until its key arrives after
+  # boot. Refuse its share until then, so nothing writes into the directory
+  # below. %P is the share's path, so this fits shares at a dataset's root.
   whenMounted = {
     "root preexec" = "${pkgs.util-linux}/bin/mountpoint -q %P";
     "root preexec close" = "yes";
