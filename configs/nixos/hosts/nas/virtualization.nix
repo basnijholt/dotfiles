@@ -264,7 +264,7 @@ in
   # (zfs-unlock). Incus storage lives on ssd, and the docker instance binds
   # the ssd tree and /mnt/tank, so hold Incus back until every dataset the
   # receiver unlocks is mounted. Otherwise instances autostart against locked
-  # datasets, and apps such as Sonarr and Jellyfin act on an empty
+  # datasets, and the media apps act on an empty
   # /mnt/tank/media. Wants rather than Requires, so a restart of this unit
   # never restarts Incus.
   systemd.services.nas-wait-zfs-unlock = {
