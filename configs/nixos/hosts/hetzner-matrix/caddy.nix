@@ -19,6 +19,8 @@ in
         reverse_proxy /_matrix/client/unstable/fi.mau.as_sync localhost:29331
         # Tuwunel serves MatrixRTC transport discovery, including CORS preflights.
         reverse_proxy /_matrix/* localhost:8008
+        # Stylesheet and script of Tuwunel's SSO pages (UIA confirmation, sign-in).
+        reverse_proxy /_tuwunel/sso/* localhost:8008
         reverse_proxy /v1/local-mindroom/* localhost:8776
 
         handle /.well-known/matrix/server {
@@ -54,7 +56,7 @@ in
         root * /var/www/mindroom
         # Keep the website's SPA fallback from rewriting API/discovery requests.
         @siteFiles {
-          not path /_matrix/* /v1/local-mindroom/* /.well-known/matrix/* /livekit/* /
+          not path /_matrix/* /_tuwunel/sso/* /v1/local-mindroom/* /.well-known/matrix/* /livekit/* /
           file {path} /index.html
         }
         rewrite @siteFiles {file_match.relative}
