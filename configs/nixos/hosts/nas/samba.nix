@@ -1,5 +1,13 @@
 { pkgs, ... }:
 
+let
+  # An encrypted dataset stays unmounted until its key arrives after boot.
+  # Refuse its share until then, so nothing writes into the directory below.
+  whenMounted = {
+    "root preexec" = "${pkgs.util-linux}/bin/mountpoint -q %P";
+    "root preexec close" = "yes";
+  };
+in
 {
   services.samba = {
     enable = true;
@@ -36,7 +44,7 @@
         "fruit:time machine max size" = "0";
       };
 
-      photos = {
+      photos = whenMounted // {
         path = "/mnt/tank/photos";
         browseable = "yes";
         "read only" = "no";
@@ -45,14 +53,14 @@
         "fruit:encoding" = "native";
       };
 
-      media = {
+      media = whenMounted // {
         path = "/mnt/tank/media";
         browseable = "yes";
         "read only" = "no";
         "valid users" = "basnijholt marcella";
       };
 
-      share = {
+      share = whenMounted // {
         path = "/mnt/tank/share";
         browseable = "yes";
         "guest ok" = "yes";

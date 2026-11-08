@@ -267,7 +267,7 @@ in
   # datasets, and the media apps act on an empty /mnt/tank/media. Wants
   # rather than Requires, so a restart of this unit never restarts Incus.
   systemd.services.nas-wait-zfs-unlock = {
-    description = "Wait for the datasets zfs-unlock unlocks to be unlocked and mounted";
+    description = "Wait for the zfs-unlock datasets to be mounted";
     wants = [ "zfs.target" ];
     after = [ "zfs.target" ];
     before = [ "incus.service" ];
@@ -281,21 +281,22 @@ in
       RemainAfterExit = true;
       TimeoutStartSec = "infinity";
     };
-    # The receiver mounts each subtree one dataset at a time after loading the
-    # key, parents first, so wait for all of it: the docker instance binds
-    # docker/data with its children and docker/stacks.
+    # The receiver mounts each subtree parents first, one dataset at a time.
+    # The instances use all of ssd's tree but only the top of each tank root:
+    # tank/backups' replication targets can hold a dataset that never mounts.
     script = ''
-      unmounted() {
-        zfs list -H -o canmount,mountpoint,mounted -r "$1" |
-          awk -F'\t' '$1 == "on" && $2 != "legacy" && $2 != "none" && $3 != "yes"'
-      }
+      # ready ROOT SCOPE: ROOT exists, its key is loaded, and every dataset in
+      # SCOPE (zfs list depth flags) that should be mounted is.
       ready() {
-        zfs list "$1" >/dev/null 2>&1 &&
+        rows=$(zfs list -H -o canmount,mountpoint,mounted $2 "$1" 2>/dev/null) &&
           [ "$(zfs get -H -o value keystatus "$1")" != unavailable ] &&
-          [ -z "$(unmounted "$1")" ]
+          [ -z "$(printf '%s\n' "$rows" |
+            awk -F'\t' '$1 == "on" && $2 != "legacy" && $2 != "none" && $3 != "yes"')" ]
       }
       for root in ${lib.escapeShellArgs config.services.zfs-unlock.receiver.datasets}; do
-        until ready "$root"; do
+        if [ "$root" = ssd ]; then scope=-r; else scope="-d 0"; fi
+        echo "waiting for $root"
+        until ready "$root" "$scope"; do
           sleep 5
         done
       done
