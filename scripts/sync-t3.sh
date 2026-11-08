@@ -25,6 +25,7 @@ HOSTS=(
   "pc|pc|https://t3.lab.nijho.lt"
   "basnijholt-macbook-pro-m2|basnijholt-macbook-pro-m2|https://t3m2.lab.nijho.lt"
   "basnijholt-macbook-pro-m5|basnijholt-macbook-pro-m5|https://t3m5.lab.nijho.lt"
+  "basnijholt-macbook-pro-m5-2|basnijholt-macbook-pro-m5-2|https://t3m5w.lab.nijho.lt"
   "dev-lxc|basnijholt@192.168.1.84|https://t3dev.lab.nijho.lt"
 )
 # More hosts in the same format, kept out of this public repository

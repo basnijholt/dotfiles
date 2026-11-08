@@ -71,6 +71,10 @@
             {
               networking.hostName = "basnijholt-macbook-pro-m5-2";
               networking.computerName = "basnijholt-macbook-pro-m5-2";
+              local.t3code = {
+                enable = true;
+                host = "100.64.0.17";
+              };
             }
           ];
         };
