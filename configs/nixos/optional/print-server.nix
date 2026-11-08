@@ -13,6 +13,10 @@
     openFirewall = true;
   };
 
+  # cups-browsed only discovers remote printers, which this print server does
+  # not need. It sat at ~90% CPU for days on hp while the printer was offline.
+  services.printing.browsed.enable = false;
+
   # Enable web interface administration
   services.printing.extraConf = ''
     DefaultEncryption Never
