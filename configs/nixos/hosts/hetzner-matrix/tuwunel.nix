@@ -67,9 +67,12 @@ let
     # Bind each OpenID token to the MindRoom deployment the client names, so a token
     # sent to one deployment cannot be replayed at another (mindroom-ai/mindroom-tuwunel#105).
     mindroom_openid_audience = true
-    # MindRoom Chat on the web and in the iOS/Android apps (mindroom://auth/...)
-    # gets SSO login tokens without the extra Continue Sign-In page.
-    sso_trusted_redirect_hosts = ["${cinnyDomain}", "mindroom"]
+    # MindRoom Chat on the web gets SSO login tokens without the "Continue sign-in"
+    # page. Since v1.9.4 this list replaces the fork's sso_trusted_redirect_hosts.
+    # It also limits OIDC dynamic client registration to these redirect hosts.
+    # The apps' mindroom://auth/... callbacks have host "auth", so they still
+    # see the page.
+    oidc_registration_allowed_redirect_hosts = ["${cinnyDomain}"]
 
     # Keep one-off OAuth repair commands out of this public repository.
     [global.well_known]
