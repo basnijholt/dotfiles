@@ -284,14 +284,14 @@ Use these recovery answers:
 Would you like to recover another storage pool? yes
 Name of the storage pool: ssd
 Name of the storage backend (dir, lvm, btrfs, zfs): zfs
-Source of the storage pool (block device, volume group, dataset, path, ... as applicable): ssd/.ix-virt
+Source of the storage pool (block device, volume group, dataset, path, ... as applicable): ssd/incus
 Additional storage pool configuration property (KEY=VALUE, empty when done):
 Would you like to recover another storage pool? no
 Would you like to continue with scanning for lost volumes? yes
 Would you like those to be recovered? yes
 ```
 
-Use the ZFS dataset name `ssd/.ix-virt`, not a mounted filesystem path.
+Use the ZFS dataset name `ssd/incus`, not a mounted filesystem path.
 After recovery:
 
 ```bash
