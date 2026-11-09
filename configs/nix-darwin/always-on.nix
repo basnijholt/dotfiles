@@ -18,6 +18,19 @@
     serviceConfig.RunAtLoad = true;
   };
 
+  # Tailscale's GUI app only runs inside a login session, and its own
+  # "Launch at login" setting can be off. Open it at login so the Mac comes
+  # back on the tailnet after a reboot without anyone opening it by hand.
+  launchd.user.agents.tailscale = {
+    command = "/usr/bin/open -a Tailscale";
+    serviceConfig.RunAtLoad = true;
+  };
+
+  # A macOS update restarts the Mac, and then Tailscale and the user agents
+  # stay down until someone logs in (FileVault rules out auto-login). Install
+  # macOS updates by hand instead.
+  system.defaults.SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
+
   system.activationScripts.postActivation.text = ''
     # power.sleep.computer only covers idle sleep; closing the lid still sleeps without this.
     # This is global, so on battery it also stays up and rides out short power cuts.

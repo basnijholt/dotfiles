@@ -68,6 +68,7 @@
           privacyApps = false;
           primaryUser = "basnijholt";
           extraModules = [
+            ./always-on.nix
             {
               networking.hostName = "basnijholt-macbook-pro-m5-2";
               networking.computerName = "basnijholt-macbook-pro-m5-2";
