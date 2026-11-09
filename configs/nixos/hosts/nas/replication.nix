@@ -547,11 +547,9 @@ in
       # ciphertext and never holds the key, so restoring from it needs the
       # ssd passphrase.
       # --no-sync-snap: send up to the newest existing snapshot. Both ssd jobs
-      # run as host nas, so their sync snapshots would share the syncoid_nas_
-      # prefix, and each would prune the other's incremental base, forcing a
-      # rollback of the other's target. --identifier does not fix that: the
-      # local job's -I stream would carry the nuc job's sync snapshots into
-      # tank/backups, where nothing prunes them.
+      # run as host nas, so with sync snapshots of its own this job would
+      # prune the local job's syncoid_nas_ incremental base. A replicated
+      # dataset without any snapshot fails the run; sanoid snapshots all of ssd.
       syncoid ${mkSyncoidSsdArgs} \
         --sendoptions=w \
         --no-sync-snap \
