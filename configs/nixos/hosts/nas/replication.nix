@@ -22,10 +22,10 @@ let
   syncoidVolume = [ "--compress=lz4" ];
 
   syncoidSsdExcludes = [
-    # Keep .ix-virt backed up: it is part of Incus recovery fidelity.
+    # Keep Incus storage backed up: it is part of restore fidelity.
     # The nix-cache container is rebuildable and large, so skip only that
     # container dataset instead of excluding all Incus storage.
-    "--exclude-datasets=^ssd/\\.ix-virt/containers/nix-cache($|/)"
+    "--exclude-datasets=^ssd/incus/containers/nix-cache($|/)"
   ];
 
   mkSyncoidArgs = extraArgs: pkgs.lib.escapeShellArgs (syncoidCommon ++ extraArgs);
@@ -265,7 +265,7 @@ let
     {
       # Check the child separately; a fresh sibling can mask its stale state.
       label = "local ssd docker container mirror";
-      dataset = "tank/backups/ssd/.ix-virt/containers/docker";
+      dataset = "tank/backups/ssd/incus/containers/docker";
       maxAgeHours = 36;
       deferDuringTankScan = true;
     }
@@ -484,15 +484,15 @@ in
 
       syncoid ${mkSyncoidSsdArgs} ssd tank/backups/ssd
 
-      # syncoid gives newly received .ix-virt children canmount=on and a real
+      # syncoid gives newly received Incus children canmount=on and a real
       # mountpoint under the mirror root, but tank/backups/ssd is readonly=on,
       # so `zfs mount -a` cannot create their mountpoint directories. That
       # fails zfs-mount.service, which fails the whole nixos-rebuild switch and
       # blocks comin deploys. Cannot fix this with --recvoptions mountpoint=none
       # because docker/* must stay mounted for the B2 job, so normalize only the
       # Incus subtree. `zfs set` has no recursive flag.
-      if zfs list tank/backups/ssd/.ix-virt >/dev/null 2>&1; then
-        zfs list -H -o name -r tank/backups/ssd/.ix-virt | while read -r dataset; do
+      if zfs list tank/backups/ssd/incus >/dev/null 2>&1; then
+        zfs list -H -o name -r tank/backups/ssd/incus | while read -r dataset; do
           zfs set canmount=noauto "$dataset"
         done
       fi

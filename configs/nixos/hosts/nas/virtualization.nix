@@ -183,8 +183,8 @@ in
             name = "ssd";
             driver = "zfs";
             config = {
-              source = "ssd/.ix-virt";
-              "zfs.pool_name" = "ssd/.ix-virt";
+              source = "ssd/incus";
+              "zfs.pool_name" = "ssd/incus";
             };
           }
         ];
