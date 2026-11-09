@@ -25,6 +25,11 @@
     command = "/usr/bin/open -a Tailscale";
     serviceConfig.RunAtLoad = true;
   };
+  # Opening the app doesn't connect if it was stopped before. AlwaysOn makes it
+  # connect on launch and hides Disconnect. The Standalone app reads its
+  # system policies from these user defaults as well as from MDM profiles.
+  # The cask auto-updates, so brew bundle never upgrades it underneath AlwaysOn.
+  system.defaults.CustomUserPreferences."io.tailscale.ipn.macsys"."AlwaysOn.Enabled" = true;
 
   # A macOS update restarts the Mac, and then Tailscale and the user agents
   # stay down until someone logs in (FileVault rules out auto-login). Install
