@@ -478,7 +478,8 @@ in
         exit 0
       fi
 
-      # Both SSD mirrors create and prune snapshots on the same source tree.
+      # This job and sanoid create and prune snapshots on the source tree
+      # that the nuc mirror sends from.
       exec 9>/run/lock/nas-ssd-replication.lock
       flock 9
 
@@ -545,8 +546,13 @@ in
       # Raw sends (-w) keep the ssd pool's encryption: the nuc stores only
       # ciphertext and never holds the key, so restoring from it needs the
       # ssd passphrase.
+      # --no-sync-snap: send up to the newest existing snapshot. Both ssd jobs
+      # run as host nas, so with sync snapshots of its own this job would
+      # prune the local job's syncoid_nas_ incremental base. A replicated
+      # dataset without any snapshot fails the run; sanoid snapshots all of ssd.
       syncoid ${mkSyncoidSsdArgs} \
         --sendoptions=w \
+        --no-sync-snap \
         --delete-target-snapshots \
         --recvoptions=${unmountedReceiveOptions} \
         --sshkey=${nucReplicationKey} \
