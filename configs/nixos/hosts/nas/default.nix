@@ -8,6 +8,7 @@
     ../../optional/zfs-sanoid.nix
 
     # Host-specific modules (Tier 3)
+    ./b2-backup.nix
     ./friend-backups.nix
     ./health.nix
     ./identity.nix
