@@ -15,6 +15,8 @@
       "tank/share"
       "tank/backups"
       "tank/media"
+      "tank/youtube"
+      "tank/timemachine"
     ];
   };
 }

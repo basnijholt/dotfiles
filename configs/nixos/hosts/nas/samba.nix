@@ -36,7 +36,7 @@ in
         "server min protocol" = "SMB2_02";
       };
 
-      timemachine = {
+      timemachine = whenMounted // {
         path = "/mnt/tank/timemachine";
         browseable = "yes";
         "read only" = "no";
@@ -110,9 +110,14 @@ in
     after = [ "zfs.target" ];
     before = [ "samba-smbd.service" ];
     wantedBy = [ "multi-user.target" ];
-    path = [ pkgs.coreutils ];
+    path = [
+      pkgs.coreutils
+      pkgs.util-linux
+    ];
     script = ''
-      test -d /mnt/tank/timemachine
+      # Until its key arrives after boot, the path is the empty directory
+      # below the dataset; the dataset keeps its own root's owner and mode.
+      mountpoint -q /mnt/tank/timemachine || exit 0
       chown root:timemachine /mnt/tank/timemachine
 
       actual="$(stat -c '%U:%G %a' /mnt/tank/timemachine)"
