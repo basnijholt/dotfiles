@@ -60,6 +60,7 @@ let
     rclone
     ripgrep
     rsync
+    sops # Secrets editor
     sqlite
     starship
     tealdeer
