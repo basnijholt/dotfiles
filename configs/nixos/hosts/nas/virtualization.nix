@@ -262,10 +262,12 @@ in
 
   # The keys of the encrypted datasets arrive from the pi4 after boot
   # (zfs-unlock). Incus storage lives on ssd, and the docker instance binds
-  # the ssd tree and /mnt/tank, so hold Incus back until every dataset the
-  # receiver unlocks is mounted. Otherwise instances autostart against locked
-  # datasets, and the media apps act on an empty /mnt/tank/media. Wants
-  # rather than Requires, so a restart of this unit never restarts Incus.
+  # the ssd tree and /mnt/tank, so hold Incus back until the datasets the
+  # receiver unlocks are mounted. Otherwise instances autostart against locked
+  # datasets, and the media apps act on an empty /mnt/tank/media. No instance
+  # uses tank/timemachine, so a failed unlock there must not hold them all
+  # back. Wants rather than Requires, so a restart of this unit never
+  # restarts Incus.
   systemd.services.nas-wait-zfs-unlock = {
     description = "Wait for the zfs-unlock datasets to be mounted";
     wants = [ "zfs.target" ];
@@ -295,7 +297,7 @@ in
           [ -z "$(printf '%s\n' "$rows" |
             awk -F'\t' '$1 == "on" && $2 != "legacy" && $2 != "none" && $3 != "yes"')" ]
       }
-      for root in ${lib.escapeShellArgs config.services.zfs-unlock.receiver.datasets}; do
+      for root in ${lib.escapeShellArgs (lib.remove "tank/timemachine" config.services.zfs-unlock.receiver.datasets)}; do
         if [ "$root" = ssd ]; then scope=-r; else scope="-d 0"; fi
         echo "waiting for $root"
         until ready "$root" "$scope"; do
