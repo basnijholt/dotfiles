@@ -1,5 +1,7 @@
 # Rclone backup to Backblaze B2 with client-side encryption
-# Run manually: sudo systemctl start rclone-b2-backup
+# The NAS starts it nightly (nas-b2-backup.timer) if the mirror it reads
+# is fully mounted. A manual start skips that check:
+#   sudo systemctl start rclone-b2-backup
 # Check logs: journalctl -u rclone-b2-backup -f
 { pkgs, ... }:
 
@@ -35,14 +37,6 @@
       Type = "oneshot";
       TimeoutStartSec = "infinity";
       StateDirectory = "rclone-b2-backup";
-    };
-  };
-
-  systemd.timers.rclone-b2-backup = {
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "*-*-* 04:00:00";
-      Persistent = true;
     };
   };
 }
