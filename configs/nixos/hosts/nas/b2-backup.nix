@@ -1,8 +1,5 @@
 { config, pkgs, ... }:
 
-let
-  incus = "${config.virtualisation.incus.package}/bin/incus";
-in
 {
   # The docker instance's rclone sync copies this mirror to B2. A mirror
   # dataset that is not mounted shows up there as an empty or missing
@@ -18,30 +15,26 @@ in
     ];
     script = ''
       set -o pipefail
-      # A catch-up run at boot starts before the key arrives; give the
-      # mounts up to two hours.
-      for _ in $(seq 120); do
-        unmounted=$(zfs list -H -o name,canmount,mounted,mountpoint -r tank/backups/ssd/docker |
-          awk -F'\t' '$2 == "on" && $3 != "yes" && $4 != "legacy" && $4 != "none" { print $1 }') ||
-          unmounted="tank/backups/ssd/docker (zfs list failed)"
-        [ -z "$unmounted" ] && break
-        sleep 60
-      done
+      unmounted=$(zfs list -H -o name,canmount,mounted,mountpoint -r tank/backups/ssd/docker |
+        awk -F'\t' '$2 == "on" && $3 != "yes" && $4 != "legacy" && $4 != "none" { print $1 }') ||
+        unmounted="tank/backups/ssd/docker (zfs list failed)"
       if [ -n "$unmounted" ]; then
+        # A retired dataset that can no longer mount keeps this failing
+        # until it gets canmount=noauto or is destroyed.
         echo "not syncing to B2; not mounted:"
         echo "$unmounted"
         exit 1
       fi
-      ${incus} exec docker -- /run/current-system/sw/bin/systemctl start rclone-b2-backup.service
+      ${config.virtualisation.incus.package}/bin/incus exec docker -- \
+        /run/current-system/sw/bin/systemctl start rclone-b2-backup.service
     '';
     serviceConfig.Type = "oneshot";
   };
 
+  # No Persistent: a catch-up run at boot would race the key and the
+  # instance's startup. A missed night shows up in the B2 watchdog.
   systemd.timers.nas-b2-backup = {
     wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "*-*-* 04:00:00";
-      Persistent = true;
-    };
+    timerConfig.OnCalendar = "*-*-* 04:00:00";
   };
 }
