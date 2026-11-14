@@ -76,6 +76,10 @@
           "name": "Gemma 4 12B Q4 (local)",
           "limit": { "context": 65536, "output": 32768 }
         },
+        "gemma-4:12b-q4-uncensored": {
+          "name": "Gemma 4 12B Q4 Uncensored (local)",
+          "limit": { "context": 65536, "output": 32768 }
+        },
         "qwen3.6:27b-q4": {
           "name": "Qwen3.6 27B Q4 (local)",
           "limit": { "context": 262144, "output": 32768 }

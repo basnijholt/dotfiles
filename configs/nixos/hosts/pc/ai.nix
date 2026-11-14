@@ -227,6 +227,21 @@ in
           --threads 1
           --jinja
 
+      # Uploaded 2026-06-13, size 7.5 GB, max ctx: 131072
+      # Source: https://huggingface.co/mradermacher/gemma-4-12B-it-uncensored-heretic-GGUF
+      "gemma-4:12b-q4-uncensored":
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo mradermacher/gemma-4-12B-it-uncensored-heretic-GGUF
+          --hf-file gemma-4-12B-it-uncensored-heretic.Q4_K_M.gguf
+          --mmproj-url https://huggingface.co/mradermacher/gemma-4-12B-it-uncensored-heretic-GGUF/resolve/main/gemma-4-12B-it-uncensored-heretic.mmproj-f16.gguf
+          --port ''${PORT}
+          --ctx-size 65536
+          --batch-size 2048
+          --ubatch-size 512
+          --threads 1
+          --jinja
+
       # Uploaded 2026-05-11, size 16.7 GB, max ctx: 262144, layers: 65
       # Qwen3.6 aliases keep mmproj enabled and speculative MTP disabled
       "qwen3.6:27b-q4":
