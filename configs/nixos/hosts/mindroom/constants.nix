@@ -10,6 +10,6 @@ in
   publicCinnyDomain = "chat.lab.mindroom.chat";
   # Releases of the MindRoom Chat static build and the `current` symlink Caddy serves.
   chatPublishedPath = "/var/www/cinny-published";
-  tuwunelVersion = "v1.9.4-mindroom.45";
-  tuwunelArchiveHash = "sha256-2iZx9Oaw82xfURLb6FO0rBNFrOVqppPC9rfe2MyIGcE=";
+  tuwunelVersion = "v1.9.4-mindroom.46";
+  tuwunelArchiveHash = "sha256-mUTXI5usjFl4zeHeVCbQHVE7LQtNYYkNkq0UybRvbmE=";
 }
