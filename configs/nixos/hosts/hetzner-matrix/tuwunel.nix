@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain cinnyDomain tuwunelVersion tuwunelArchiveHash;
+  inherit (constants) siteDomain chatDomain tuwunelVersion tuwunelArchiveHash;
 
   tuwunelArchive = pkgs.fetchurl {
     url = "https://github.com/mindroom-ai/mindroom-tuwunel/releases/download/${tuwunelVersion}/tuwunel-${tuwunelVersion}-linux-aarch64.tar.gz";
@@ -72,7 +72,7 @@ let
     # It also limits OIDC dynamic client registration to these redirect hosts.
     # The apps' mindroom://auth/... callbacks have host "auth", so they still
     # see the page.
-    oidc_registration_allowed_redirect_hosts = ["${cinnyDomain}"]
+    oidc_registration_allowed_redirect_hosts = ["${chatDomain}"]
 
     # Keep one-off OAuth repair commands out of this public repository.
     [global.well_known]

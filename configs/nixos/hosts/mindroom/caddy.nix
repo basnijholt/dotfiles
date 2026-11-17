@@ -3,7 +3,7 @@ let
   constants = import ./constants.nix;
   inherit (constants)
     publicSiteDomain
-    publicCinnyDomain
+    publicChatDomain
     chatPublishedPath
     ;
 in
@@ -58,8 +58,8 @@ in
       };
 
       # MindRoom Chat, published from another machine with the dev repo's
-      # scripts/mindroom-chat-publish.sh (nothing is built on this host).
-      "${publicCinnyDomain}:80" = {
+      # scripts/mindroom-chat-publish.py (nothing is built on this host).
+      "${publicChatDomain}:80" = {
         extraConfig = import ../../optional/mindroom-chat-caddy.nix {
           root = "${chatPublishedPath}/current";
         };

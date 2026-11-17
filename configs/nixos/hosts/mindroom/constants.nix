@@ -7,9 +7,9 @@ in
   inherit siteDomain;
   publicBaseDomain = "lab.mindroom.chat";
   publicSiteDomain = siteDomain;
-  publicCinnyDomain = "chat.lab.mindroom.chat";
+  publicChatDomain = "chat.lab.mindroom.chat";
   # Releases of the MindRoom Chat static build and the `current` symlink Caddy serves.
-  chatPublishedPath = "/var/www/cinny-published";
+  chatPublishedPath = "/var/www/mindroom-chat";
   tuwunelVersion = "v1.9.4-mindroom.47";
   tuwunelArchiveHash = "sha256-1U1OYgtjoJMVXzZivjgwMKpN40K9imsBRAcLCnSCKiQ=";
 }

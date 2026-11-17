@@ -2,9 +2,10 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain cinnyDomain;
+  inherit (constants) siteDomain chatDomain;
 in
 {
+  services.git-repo-checkouts.enable = true;
   services.git-repo-checkouts.repositories.mindroom = {
     path = "/srv/mindroom";
     url = "https://github.com/mindroom-ai/mindroom.git";
@@ -24,7 +25,7 @@ in
     googleOAuthClientSecretFile = config.age.secrets.google-oauth-client-secret.path;
     listenHost = "127.0.0.1";
     listenPort = 8776;
-    corsOrigins = [ "https://${cinnyDomain}" ];
+    corsOrigins = [ "https://${chatDomain}" ];
   };
 
   # Ensure provisioning code checkout exists before provisioning service starts.

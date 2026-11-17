@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) siteDomain appDomain cinnyDomain pushDomain demoDomain demoTuwunelPort cinnyCurrentPath rtcJwtPort;
+  inherit (constants) siteDomain appDomain chatDomain pushDomain demoDomain demoTuwunelPort chatPublishedPath rtcJwtPort;
 in
 {
   systemd.tmpfiles.rules = [
@@ -98,10 +98,10 @@ in
     };
 
     # MindRoom Chat static build, published by the dev repo's
-    # scripts/mindroom-chat-publish.sh into releases/; `current` is the live one.
-    virtualHosts."${cinnyDomain}" = {
+    # scripts/mindroom-chat-publish.py into releases/; `current` is the live one.
+    virtualHosts."${chatDomain}" = {
       extraConfig = import ../../optional/mindroom-chat-caddy.nix {
-        root = cinnyCurrentPath;
+        root = "${chatPublishedPath}/current";
       };
     };
 

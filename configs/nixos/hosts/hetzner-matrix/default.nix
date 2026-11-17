@@ -18,7 +18,7 @@
     ./tuwunel-demo.nix
     ./caddy.nix
     ./matrix-rtc.nix
-    ./cinny.nix
+    ./mindroom-chat.nix
     ./provisioning.nix
     ./sygnal.nix
     ./signal.nix
