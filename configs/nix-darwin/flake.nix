@@ -72,6 +72,10 @@
             {
               networking.hostName = "basnijholt-macbook-pro-m5-2";
               networking.computerName = "basnijholt-macbook-pro-m5-2";
+              # Unlike the M2, turn the display off after 10 min idle so the screen
+              # locks. The Mac itself stays awake and reachable over SSH. Wake the
+              # display with `caffeinate -u -t 1` before taking a screenshot over SSH.
+              power.sleep.display = nixpkgs.lib.mkForce 10;
               local.t3code = {
                 enable = true;
                 host = "100.64.0.17";
