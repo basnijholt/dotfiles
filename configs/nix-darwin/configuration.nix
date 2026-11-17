@@ -117,6 +117,11 @@
       # Configure Terminal.app to use Option as Meta key (for Alt+Arrow word navigation)
       ${asUser} defaults write com.apple.Terminal useOptionAsMetaKey -bool true
 
+      # Start the screen saver (which locks the screen) after 10 minutes idle. Needed
+      # because always-on hosts never turn the display off, so nothing else locks it.
+      # nix-darwin has no option for this per-host (ByHost) key.
+      ${asUser} defaults -currentHost write com.apple.screensaver idleTime -int 600
+
       # Per-host (ByHost) copy of the three-finger drag settings; System Settings
       # writes these too, but nix-darwin's trackpad options don't.
       # threeFingerDragGesture must be a bool (activateSettings ignores an int). Delete
