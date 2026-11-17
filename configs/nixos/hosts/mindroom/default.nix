@@ -13,7 +13,7 @@
     ./networking.nix
     ./secrets-config.nix
     ./mindroom.nix
-    ./cinny.nix
+    ./mindroom-chat.nix
     ./tuwunel.nix  # Local Matrix homeserver (MindRoom Tuwunel fork)
     ./caddy.nix
   ];

@@ -14,15 +14,13 @@ Nix-managed:
 - Matrix bridge services (`mautrix-signal`, `mautrix-whatsapp`, `mautrix-telegram`) and Tuwunel appservice wiring.
 - Caddy routing (`mindroom.chat`, `chat.mindroom.chat`, Matrix API, well-known, provisioning API proxy).
 - Local provisioning service systemd unit, environment, user/group, and state directory.
-- Runtime Git checkout presence/branch sync for:
-  - `/srv/mindroom` (branch `main`)
-  - `/var/www/cinny` (branch `dev`)
+- Runtime Git checkout presence/branch sync for `/srv/mindroom` (branch `main`).
 - agenix secret decryption and secret file ownership/mode.
 - Host-level config (networking, SSH options, zram, tailscale, etc.).
 
 Manual/runtime-managed:
 
-- MindRoom Chat build/deploy from `/var/www/cinny` into the published root at `/var/www/cinny-published/current`.
+- MindRoom Chat releases in `/var/www/mindroom-chat/releases` and the live `/var/www/mindroom-chat/current` symlink.
 - Website files in `/var/www/mindroom`.
 - DNS records at your DNS provider.
 
@@ -237,22 +235,11 @@ Onboarding flow:
 
 ### MindRoom Chat web client
 
-MindRoom Chat build artifacts are not pinned in Nix.
-The checkout at `/var/www/cinny` is ensured by the `git-checkout-cinny` systemd service.
-Caddy serves the published symlink at `/var/www/cinny-published/current`, so failed builds do not blank the live site.
-
-```bash
-# Refresh checkout to configured branch tip (skips pull if local changes exist)
-sudo systemctl start git-checkout-cinny
-
-# Build in a detached worktree and atomically publish the result
-mindroom-publish-cinny v4.10.5-mindroom.X
-```
-
-No `nixos-rebuild` is needed for MindRoom Chat-only updates.
-The publish command also sets a larger Node heap limit for the build and validates
-that `index.html`, `runtime-config.js`, and `assets/` exist before it updates the
-live symlink.
+MindRoom Chat build artifacts are not pinned in Nix, and nothing is built on this host.
+The dev repo's `scripts/mindroom-chat-publish.py` builds elsewhere, uploads to
+`/var/www/mindroom-chat/releases/<ts>-<ref>-<sha>`, then atomically flips the
+`/var/www/mindroom-chat/current` symlink that Caddy serves, so failed builds do not
+blank the live site. No `nixos-rebuild` is needed for MindRoom Chat-only updates.
 
 ### Local provisioning service code
 
