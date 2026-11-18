@@ -9,6 +9,6 @@
   rtcJwtPort = 8090;
   # Releases of the MindRoom Chat static build and the `current` symlink Caddy serves.
   chatPublishedPath = "/var/www/mindroom-chat";
-  tuwunelVersion = "v1.9.4-mindroom.47";
-  tuwunelArchiveHash = "sha256-DDhhzmzd3KBHVBf0zsuiByuLEHuH0BIDYvW4HCax1Qo=";
+  tuwunelVersion = "v1.9.4-mindroom.49";
+  tuwunelArchiveHash = "sha256-5w05jo6iBWtPWPr2zyr70P74RbQ3a9Xj4tccxTSGVHo=";
 }
