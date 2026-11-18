@@ -19,6 +19,12 @@
       group = "tuwunel";
       mode = "0400";
     };
+    matrix-user-appservice-env-tuwunel = {
+      file = ./secrets/matrix-user-appservice-env.age;
+      owner = "tuwunel";
+      group = "tuwunel";
+      mode = "0400";
+    };
     registration-token = {
       file = ./secrets/registration-token.age;
       owner = "tuwunel";
