@@ -187,6 +187,28 @@ let
     [[global.appservice.doublepuppet.users]]
     regex = "^@basnijholt:mindroom\\.chat$"
     exclusive = false
+
+    # MindRoom's matrix_user toolkit: the MindRoom runtime that holds this as_token (MATRIX_USER_APPSERVICE_TOKEN,
+    # mindroom-chat on the lab host) lets a personal agent read Matrix as its owner and write as them. That
+    # runtime's tool_approval rule for matrix_user_write is what asks the owner before a write. The users pattern
+    # names exactly the owners who asked for it, never everyone on this server: the token can do whatever an account
+    # it covers can, and can sign in as them (appservice login) and sign their devices out. If it leaks, replace it
+    # and check those accounts' sessions.
+    # - (?-i:...): Tuwunel matches user patterns ignoring case, so without it the pattern covers more than one ID.
+    # - No url: Tuwunel pushes no events here.
+    # - device_management stays false, the default: true swaps appservice login for MSC4190's device API, which
+    #   deletes devices without the owner's own authentication.
+    [global.appservice.matrix_user]
+    id = "matrix_user"
+    as_token = "$TUWUNEL_MATRIX_USER_AS_TOKEN"
+    hs_token = "$TUWUNEL_MATRIX_USER_HS_TOKEN"
+    sender_localpart = "_matrix_user"
+    rate_limited = true
+    device_management = false
+
+    [[global.appservice.matrix_user.users]]
+    regex = "(?-i:^@basnijholt:mindroom\\.chat$)"
+    exclusive = false
   '';
 in
 {
@@ -207,6 +229,8 @@ in
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
     wantedBy = [ "multi-user.target" ];
+    # A new matrix_user token (a re-encrypted secret) reaches Tuwunel only through a restart.
+    restartTriggers = [ config.age.secrets.matrix-user-appservice-env-tuwunel.file ];
 
     preStart = ''
       ${pkgs.envsubst}/bin/envsubst \
@@ -228,6 +252,7 @@ in
         config.age.secrets.telegram-appservice-env-tuwunel.path
         config.age.secrets.imessage-appservice-env-tuwunel.path
         config.age.secrets.doublepuppet-appservice-env-tuwunel.path
+        config.age.secrets.matrix-user-appservice-env-tuwunel.path
       ];
       ExecStart = "${tuwunelPackage}/bin/tuwunel";
       Restart = "on-failure";
