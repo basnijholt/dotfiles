@@ -35,6 +35,12 @@
   # dangling images here; rebuild leftovers still go.
   virtualisation.docker.autoPrune.flags = [ ];
 
+  # Agents' nix-shell and nix develop calls make nix-daemon build and evaluate
+  # for them. At the default policy those workers took about a core from the
+  # mindroom-chat event loop under load (2026-11-17). SCHED_IDLE lets them run
+  # only on CPU nothing else wants, like the agents' own shell jobs (mindroom#4092).
+  nix.daemonCPUSchedPolicy = "idle";
+
   # libstdc++.so.6 for Python packages (numpy, qdrant-client, chromadb)
   # that link against it. Without this, uv run / pytest fail with import errors.
   environment.variables.LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
