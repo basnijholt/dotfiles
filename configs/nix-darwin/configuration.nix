@@ -98,6 +98,10 @@
       TrackpadFourFingerHorizSwipeGesture = 2;
       TrackpadFourFingerVertSwipeGesture = 2;
     };
+    # KeepingYouAwake only keeps the system awake (caffeinate -i, not -di), so
+    # displays still turn off when idle and the screen still locks.
+    CustomUserPreferences."info.marcel-dierkes.KeepingYouAwake"."info.marcel-dierkes.KeepingYouAwake.AllowDisplaySleep" =
+      true;
   };
 
   # Remote Login (SSH) on every Mac. On macOS 26 this also lets FileVault be
