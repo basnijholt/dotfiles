@@ -11,9 +11,14 @@ let
     "${mountPoint}" = {
       device = "zroot/scratch/${dataset}";
       fsType = "zfs";
-      # No nofail: it would let boot (and incus) go on before the mount, and
-      # incus would then bind the empty directory underneath. The datasets are
-      # on zroot, which / needs anyway.
+      # nofail keeps a missing dataset (e.g. after a NAS restore, which has no
+      # scratch) from stopping the boot, but drops the ordering before
+      # local-fs.target, so add it back: incus and T3 Code must start after
+      # the mounts, or incus binds the empty directory underneath.
+      options = [
+        "nofail"
+        "x-systemd.before=local-fs.target"
+      ];
     };
   };
 in
