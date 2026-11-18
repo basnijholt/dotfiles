@@ -11,9 +11,9 @@ let
     "${mountPoint}" = {
       device = "zroot/scratch/${dataset}";
       fsType = "zfs";
-      # A missing dataset must not stop the boot; the directory underneath
-      # then simply takes the writes again.
-      options = [ "nofail" ];
+      # No nofail: it would let boot (and incus) go on before the mount, and
+      # incus would then bind the empty directory underneath. The datasets are
+      # on zroot, which / needs anyway.
     };
   };
 in
@@ -51,6 +51,8 @@ in
   # pulls only home, var, root and incus). The datasets are created by hand
   # (zfs create -o mountpoint=legacy zroot/scratch/<name>), and their content
   # must be moved in before this config mounts them over the old directories.
+  # Snapshots sanoid took of zroot/scratch before this config deployed are
+  # not pruned (autoprune = false): destroy them by hand.
   services.sanoid.datasets."zroot/scratch" = {
     autosnap = false;
     autoprune = false;
@@ -60,8 +62,9 @@ in
     scratch "t3-worktrees" "/home/basnijholt/.t3/worktrees"
     // scratch "repos-worktrees" "/home/basnijholt/repos/worktrees"
     # Passed into the mindroom container as its ~/repos/worktrees with
-    # `incus config device add mindroom worktrees disk source=... path=...`
-    # (no shift: files keep the container's mapped uids).
+    # `incus config device add mindroom worktrees disk source=... path=...
+    # shift=true` (the container's rootfs is idmapped too, so files keep the
+    # container's own uids on disk).
     // scratch "mindroom-worktrees" "/var/lib/mindroom-worktrees";
 
   # --- Swap ---
