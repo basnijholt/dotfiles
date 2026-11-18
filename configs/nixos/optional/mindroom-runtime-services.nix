@@ -126,6 +126,11 @@ in
         TimeoutStopSec = "15s";
         KillMode = "mixed";
         SuccessExitStatus = "143 SIGTERM";
+        # Keep the process's heap out of swap: a full garbage collection walks the whole
+        # heap, and with part of it swapped out the collector stalled the event loop for up
+        # to 78 s (2026-11-17). Only works with memory.low on the container's cgroup on pc
+        # too (incus raw.lxc "lxc.cgroup2.memory.low = 6G"); swap stays on.
+        MemoryLow = "4G";
       };
     };
 
