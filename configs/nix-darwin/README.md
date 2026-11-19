@@ -32,7 +32,7 @@ This Mac's existing configuration targets @basnijholt:mindroom.chat and requires
 Set bridge.login_shared_secret to appservice in the private config.yaml so messages sent from your Apple devices also appear as your Matrix user; the server registration allows only @basnijholt:mindroom.chat for this login.
 On a replacement Mac, securely copy config.yaml to the same directory with mode 0600; its tokens must match configs/nixos/hosts/hetzner-matrix/secrets/imessage-appservice-env.age.
 
-Apply the Mac configuration with sudo darwin-rebuild switch --flake "$HOME/dotfiles/configs/nix-darwin#basnijholt-macbook-pro-m2" and apply the server configuration under configs/nixos/hosts/hetzner-matrix too.
+Apply the Mac configuration with sudo darwin-rebuild switch --flake "path:$HOME/dotfiles/configs/nix-darwin#basnijholt-macbook-pro-m2" and apply the server configuration under configs/nixos/hosts/hetzner-matrix too.
 Grant Full Disk Access to /Users/basnijholt/Library/Application Support/mautrix-imessage/mautrix-imessage in System Settings and allow Messages automation and Contacts access when prompted.
 Messages must be signed in, and the Mac user must be logged in after a reboot.
 Launchd retries failed starts; logs are launchagent.stdout.log and launchagent.stderr.log in the private directory.
