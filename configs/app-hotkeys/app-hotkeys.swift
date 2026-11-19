@@ -55,27 +55,17 @@ func parse(_ text: String) -> (bindings: [Binding], errors: [String]) {
         let line = String(raw.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false)[0])
             .trimmingCharacters(in: .whitespaces)
         if line.isEmpty { continue }
-        guard let eq = line.lastIndex(of: "=") else {
-            errors.append("line \(n): expected 'modifiers+key = bundle.id', got '\(line)'"); continue
-        }
-        let lhs = line[..<eq].trimmingCharacters(in: .whitespaces).lowercased()
-        let target = line[line.index(after: eq)...].trimmingCharacters(in: .whitespaces)
+        let eq = line.lastIndex(of: "=")  // last, so "cmd+= = x" binds the = key
+        let lhs = eq.map { line[..<$0].trimmingCharacters(in: .whitespaces).lowercased() } ?? ""
+        let target = eq.map { line[line.index(after: $0)...].trimmingCharacters(in: .whitespaces) } ?? ""
         if lhs.isEmpty || target.isEmpty {
             errors.append("line \(n): expected 'modifiers+key = bundle.id', got '\(line)'"); continue
         }
-        let parts = lhs.split(separator: "+", omittingEmptySubsequences: false).map {
-            $0.trimmingCharacters(in: .whitespaces)
+        let parts = lhs.split(separator: "+", omittingEmptySubsequences: false).map { $0.trimmingCharacters(in: .whitespaces) }
+        if let bad = parts.dropLast().first(where: { modifierBits[$0] == nil }) {
+            errors.append("line \(n): unknown modifier '\(bad)' (use ctrl, alt, shift, cmd, hyper)"); continue
         }
-        var mods: UInt32 = 0, ok = true
-        for m in parts.dropLast() {
-            guard let bit = modifierBits[m] else {
-                errors.append("line \(n): unknown modifier '\(m)' (use ctrl, alt, shift, cmd, hyper)")
-                ok = false; break
-            }
-            mods |= bit
-        }
-        guard ok else { continue }
-        let keyName = parts.last!
+        let mods = parts.dropLast().reduce(UInt32(0)) { $0 | modifierBits[$1]! }, keyName = parts.last!
         guard let key = keyCodes[keyName] else {
             errors.append("line \(n): " + (keyName.isEmpty ? "missing key after '+'" : "unknown key '\(keyName)'")); continue
         }
@@ -192,12 +182,14 @@ if let a = args.first, a.hasPrefix("-") || args.count > 1 {
 
 let configPath = args.first ?? defaultConfig
 var bindings = [Binding](), hotKeyRefs = [EventHotKeyRef](), lastText: String?
-var watchers = [DispatchSourceFileSystemObject](), reloadPending = false
+var watchers = [DispatchSourceFileSystemObject](), reloadPending = false, unreadable = false
 
 func reload(force: Bool = false) {
     guard let text = try? String(contentsOfFile: configPath, encoding: .utf8) else {
-        log("cannot read \(configPath); keeping \(bindings.count) bindings"); return
+        if !unreadable { log("cannot read \(configPath); keeping \(bindings.count) bindings") }
+        unreadable = true; return
     }
+    unreadable = false
     if text == lastText && !force { return }
     lastText = text
     let (parsed, errors) = parse(text)
@@ -240,6 +232,8 @@ func watch() {
         source.resume()
         return source
     }
+    // Nothing to watch yet (e.g. dotbot hasn't created the directory): poll until there is
+    if watchers.isEmpty { DispatchQueue.main.asyncAfter(deadline: .now() + 5) { reload(); watch() } }
 }
 
 NSApplication.shared.setActivationPolicy(.prohibited)
