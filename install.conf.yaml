@@ -132,7 +132,7 @@
       if: '[ "$(uname)" = "Darwin" ]'
 - link:
     ~/.gitconfig-sign: configs/git/gitconfig-sign
-    ~/.config/app-hotkeys/hotkeys.conf: configs/app-hotkeys/hotkeys.conf
+    ~/.config/macos-hotkey-app-switcher/hotkeys.conf: configs/macos-hotkey-app-switcher/hotkeys.conf
     ~/.config/karabiner/karabiner.json: configs/karabiner/karabiner.json
     ~/Work/.stignore: configs/syncthing/stignore
     ~/Lightroom/.stignore: configs/syncthing/stignore

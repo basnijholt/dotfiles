@@ -12,12 +12,12 @@ scripts/sync-secrets.sh
 .github
 .gitignore
 configs/agent-cli/config.toml
-configs/app-hotkeys/hotkeys.conf
 configs/atuin/zfs
 configs/git/gitconfig-personal
 configs/hypr
 configs/karabiner
 configs/keyboard-maestro
+configs/macos-hotkey-app-switcher/hotkeys.conf
 configs/mako
 configs/nix-darwin
 configs/nixos

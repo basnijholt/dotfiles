@@ -6,8 +6,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    app-hotkeys.url = "github:basnijholt/app-hotkeys";
-    app-hotkeys.inputs.nixpkgs.follows = "nixpkgs";
+    macos-hotkey-app-switcher.url = "github:basnijholt/macos-hotkey-app-switcher";
+    macos-hotkey-app-switcher.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -15,7 +15,7 @@
       self,
       nix-darwin,
       nixpkgs,
-      app-hotkeys,
+      macos-hotkey-app-switcher,
     }:
     let
       mkDarwin =
@@ -30,7 +30,7 @@
             ./homebrew.nix
             ./t3code.nix
             ./paseo.nix
-            app-hotkeys.darwinModules.default
+            macos-hotkey-app-switcher.darwinModules.default
             ./charge-limit.nix
             {
               options = {
@@ -56,7 +56,7 @@
             {
               networking.hostName = "basnijholt-macbook-pro-m5";
               networking.computerName = "basnijholt-macbook-pro-m5";
-              services.app-hotkeys.enable = true;
+              services.macos-hotkey-app-switcher.enable = true;
               local.t3code = {
                 enable = true;
                 host = "100.64.0.39";
@@ -81,7 +81,7 @@
               # locks. The Mac itself stays awake and reachable over SSH. Wake the
               # display with `caffeinate -u -t 1` before taking a screenshot over SSH.
               power.sleep.display = nixpkgs.lib.mkForce 10;
-              services.app-hotkeys.enable = true;
+              services.macos-hotkey-app-switcher.enable = true;
               local.t3code = {
                 enable = true;
                 host = "100.64.0.17";
@@ -101,7 +101,7 @@
               # which breaks darwin-rebuild's LocalHostName flake lookup
               networking.hostName = "basnijholt-macbook-pro-m2";
               networking.computerName = "basnijholt-macbook-pro-m2";
-              services.app-hotkeys.enable = true;
+              services.macos-hotkey-app-switcher.enable = true;
               local.t3code = {
                 enable = true;
                 host = "100.64.0.27";
