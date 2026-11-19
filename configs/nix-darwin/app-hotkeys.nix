@@ -14,6 +14,7 @@ let
   # (no event tap, no Accessibility), so a new /nix/store path after a rebuild is fine.
   package = pkgs.swiftPackages.stdenv.mkDerivation {
     name = "app-hotkeys";
+    # Outside this flake's directory: works with the git flake (`nixswitch`), not a `path:` one
     src = ../app-hotkeys/app-hotkeys.swift;
     dontUnpack = true;
     nativeBuildInputs = [ pkgs.swift ];
