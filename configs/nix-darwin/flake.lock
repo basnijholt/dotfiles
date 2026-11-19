@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795125395,
-        "narHash": "sha256-3bEBfj4LmBbh3mX+eYiYhZVuVfZk8P2GWfKrqT1HRTQ=",
+        "lastModified": 1795129765,
+        "narHash": "sha256-K4Puyv8oU3BMhU3TNl/5Jh+hDF/L3fV/GNAXHilXv78=",
         "owner": "basnijholt",
         "repo": "app-hotkeys",
-        "rev": "5f8aac82421c075cfa47dec77cd902a5cd8b49b4",
+        "rev": "2d521b1caa3b27ec80d535a3bc193921459d9b70",
         "type": "github"
       },
       "original": {
