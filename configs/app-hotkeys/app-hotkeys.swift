@@ -141,13 +141,13 @@ func activate(_ target: String, done: @escaping (Bool) -> Void) {
     let start = DispatchTime.now()
     let ms = { String(format: "%.1f ms", Double(DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) / 1e6) }
     if let app = runningApp(target) {
-        let pid = app.processIdentifier
+        let pid = app.processIdentifier, wasHidden = app.isHidden  // SetFront unhides its windows
         var action = "already front"
         if NSWorkspace.shared.frontmostApplication?.processIdentifier != pid {
             let err = setFront(pid)
             action = err == noErr ? "front" : "SetFrontProcessWithOptions failed (\(err))"
         }
-        if !hasWindows(pid) {
+        if !wasHidden && !hasWindows(pid) {
             let err = reopen(pid)
             action += err == noErr ? ", reopened" : ", reopen failed (\(err))"
         }
