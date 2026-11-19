@@ -1,22 +1,22 @@
 {
   "nodes": {
-    "app-hotkeys": {
+    "macos-hotkey-app-switcher": {
       "inputs": {
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1795129765,
-        "narHash": "sha256-K4Puyv8oU3BMhU3TNl/5Jh+hDF/L3fV/GNAXHilXv78=",
+        "lastModified": 1795131790,
+        "narHash": "sha256-RAOPBD62f0H2m2YSr9eCgzfD+dMEU0AIytbrxvhAH+I=",
         "owner": "basnijholt",
-        "repo": "app-hotkeys",
-        "rev": "2d521b1caa3b27ec80d535a3bc193921459d9b70",
+        "repo": "macos-hotkey-app-switcher",
+        "rev": "fe4fe3d185fe87c4349c7e5196b3406da9311a9e",
         "type": "github"
       },
       "original": {
         "owner": "basnijholt",
-        "repo": "app-hotkeys",
+        "repo": "macos-hotkey-app-switcher",
         "type": "github"
       }
     },
@@ -58,7 +58,7 @@
     },
     "root": {
       "inputs": {
-        "app-hotkeys": "app-hotkeys",
+        "macos-hotkey-app-switcher": "macos-hotkey-app-switcher",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs"
       }
