@@ -3,13 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    # Netdata 2.11.0 is missing an offline Go proxy substitution and fails in
-    # the Nix sandbox. Keep only Netdata on the last cached working revision.
-    nixpkgs-netdata.url = "github:NixOS/nixpkgs/0e251e24a4f24e036a084b6b4b2d2491af4167f4";
-    # Hydra fails atuin 18.24.x on aarch64-linux, so it is never cached and
-    # the ARM hosts compile it locally, where rustc gets OOM-killed. Keep
-    # atuin on those hosts at 18.23.0, the last revision Hydra cached.
-    nixpkgs-atuin.url = "github:NixOS/nixpkgs/b6c3e813bfa03df06c0fbace92122cecd1651a51";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -47,8 +40,6 @@
     {
       self,
       nixpkgs,
-      nixpkgs-netdata,
-      nixpkgs-atuin,
       home-manager,
       home-manager-pi,
       disko,
@@ -78,7 +69,6 @@
         extraModules:
         lib.nixosSystem {
           inherit system;
-          specialArgs = { inherit nixpkgs-netdata; };
           modules = commonModules home-manager ++ extraModules;
         };
 
@@ -86,16 +76,7 @@
         extraModules:
         lib.nixosSystem {
           system = "aarch64-linux";
-          modules =
-            commonModules home-manager
-            ++ [
-              {
-                nixpkgs.overlays = [
-                  (_final: _prev: { inherit (nixpkgs-atuin.legacyPackages.aarch64-linux) atuin; })
-                ];
-              }
-            ]
-            ++ extraModules;
+          modules = commonModules home-manager ++ extraModules;
         };
 
       mkPi =

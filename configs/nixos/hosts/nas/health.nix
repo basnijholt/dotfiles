@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  nixpkgs-netdata,
   pkgs,
   ...
 }:
@@ -10,10 +9,6 @@ let
   ntfyUrl = "http://192.168.1.6:8089/nas-alerts";
   ntfyPriority = "high";
   heartbeatUrlFile = "/etc/nas-heartbeat-url";
-  netdataPkgs = import nixpkgs-netdata {
-    system = pkgs.stdenv.hostPlatform.system;
-    config.allowUnfree = true;
-  };
 
   nasHealthAlert = pkgs.writeShellScriptBin "nas-health-alert" ''
         set -euo pipefail
@@ -192,7 +187,7 @@ in
 
   services.netdata = {
     enable = true;
-    package = netdataPkgs.netdataCloud;
+    package = pkgs.netdataCloud;
     enableAnalyticsReporting = false;
     extraNdsudoPackages = with pkgs; [
       nvme-cli
@@ -202,11 +197,6 @@ in
     # Docker/Traefik host can proxy the Netdata dashboard.
     config.web."bind to" = "127.0.0.1 192.168.1.4";
   };
-
-  # The pinned package predates the `go.d.plugin` -> `godplugin` rename in
-  # Nixpkgs, while the current NixOS module expects the new source name.
-  security.wrappers."go.d.plugin".source =
-    lib.mkForce "${netdataPkgs.netdataCloud}/libexec/netdata/plugins.d/go.d.plugin";
 
   # br0 must own the LAN address before Netdata binds its listener.
   systemd.services.netdata = {
