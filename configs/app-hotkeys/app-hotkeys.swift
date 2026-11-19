@@ -215,8 +215,7 @@ func reload(force: Bool = false) {
         let err = RegisterEventHotKey(b.key, b.mods, id, GetEventDispatcherTarget(), 0, &ref)
         if err == noErr, let ref { hotKeyRefs.append(ref); continue }
         failed += 1
-        let why = err == eventHotKeyExistsErr ? " (eventHotKeyExistsErr: another app, e.g. Keyboard Maestro, holds it)" : ""
-        log("line \(b.line): \(b.combo) = \(b.target): RegisterEventHotKey failed, OSStatus \(err)\(why)")
+        log("line \(b.line): \(b.combo) = \(b.target): RegisterEventHotKey failed, OSStatus \(err)")
     }
     log("loaded \(bindings.count - failed)/\(bindings.count) bindings from \(configPath)")
 }

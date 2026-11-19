@@ -2,6 +2,8 @@
 # Replaces Keyboard Maestro's "Open Apps" group with the same mechanism (Carbon
 # RegisterEventHotKey + SetFrontProcessWithOptions); see configs/app-hotkeys/.
 # Bindings: ~/.config/app-hotkeys/hotkeys.conf (linked by dotbot), reloaded on save.
+# Disable KM's "Open Apps" group: a combo held by two apps fires in both (macOS
+# accepts the second RegisterEventHotKey, even with kEventHotKeyExclusive).
 # Log: ~/Library/Logs/app-hotkeys/current. Force a reload (e.g. after quitting KM):
 #   launchctl kill HUP gui/$(id -u)/org.nixos.app-hotkeys
 { config, lib, pkgs, ... }:
