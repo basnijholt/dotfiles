@@ -3,7 +3,7 @@
 // handler calls SetFrontProcessWithOptions. No event tap, so no Accessibility permission.
 //   app-hotkeys [config]            run resident (default ~/.config/app-hotkeys/hotkeys.conf)
 //   app-hotkeys --check [config]    parse, print the bindings, exit 1 on errors
-//   app-hotkeys --activate <app>    run the activation path once (bundle id or .app path)
+//   app-hotkeys --activate <app>    run the activation path once (bundle id, or a path with a /)
 import AppKit
 import Carbon
 
@@ -49,7 +49,7 @@ func comboName(_ mods: UInt32, _ key: String) -> String {
 }
 
 func parse(_ text: String) -> (bindings: [Binding], errors: [String]) {
-    var bindings = [Binding](), errors = [String](), seen = [String: Int]()
+    var bindings = [Binding](), errors = [String](), seen = [UInt64: Binding]()
     for (i, raw) in text.components(separatedBy: "\n").enumerated() {
         let n = i + 1
         let line = String(raw.split(separator: "#", maxSplits: 1, omittingEmptySubsequences: false)[0])
@@ -69,12 +69,13 @@ func parse(_ text: String) -> (bindings: [Binding], errors: [String]) {
         guard let key = keyCodes[keyName] else {
             errors.append("line \(n): " + (keyName.isEmpty ? "missing key after '+'" : "unknown key '\(keyName)'")); continue
         }
-        let combo = comboName(mods, keyName)
-        if let first = seen[combo] {
-            errors.append("line \(n): \(combo) is already bound on line \(first)"); continue
+        let b = Binding(line: n, mods: mods, key: key, combo: comboName(mods, keyName), target: target)
+        let chord = UInt64(mods) << 32 | UInt64(key)  // esc and escape are the same chord
+        if let first = seen[chord] {
+            errors.append("line \(n): \(b.combo) is the same chord as line \(first.line) (\(first.combo))"); continue
         }
-        seen[combo] = n
-        bindings.append(Binding(line: n, mods: mods, key: key, combo: combo, target: target))
+        seen[chord] = b
+        bindings.append(b)
     }
     return (bindings, errors)
 }
@@ -86,7 +87,8 @@ func log(_ message: String) {
 
 // MARK: Activation
 
-func isPath(_ target: String) -> Bool { target.contains("/") || target.hasSuffix(".app") }
+// Only a value with a slash is a path (./Foo.app); chat.mindroom.app is a bundle id.
+func isPath(_ target: String) -> Bool { target.contains("/") }
 
 func appURL(_ target: String) -> URL? {
     if isPath(target) {
@@ -100,7 +102,7 @@ func runningApp(_ target: String) -> NSRunningApplication? {
     if !isPath(target) {
         return NSRunningApplication.runningApplications(withBundleIdentifier: target).first { !$0.isTerminated }
     }
-    let path = appURL(target)?.resolvingSymlinksInPath().path
+    guard let path = appURL(target)?.resolvingSymlinksInPath().path else { return nil }
     return NSWorkspace.shared.runningApplications.first { $0.bundleURL?.resolvingSymlinksInPath().path == path }
 }
 
@@ -127,8 +129,11 @@ func reopen(_ pid: pid_t) -> OSStatus {
     return OSStatus(AESendMessage(event.aeDesc, nil, AESendMode(kAENoReply), kAEDefaultTimeout))
 }
 
+var activationRequest = 0  // a slow launch must not take the front back from a later hotkey
+
 func activate(_ target: String, done: @escaping (Bool) -> Void) {
-    let start = DispatchTime.now()
+    activationRequest += 1
+    let start = DispatchTime.now(), request = activationRequest
     let ms = { String(format: "%.1f ms", Double(DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) / 1e6) }
     if let app = runningApp(target) {
         let pid = app.processIdentifier, wasHidden = app.isHidden  // SetFront unhides its windows
@@ -145,9 +150,14 @@ func activate(_ target: String, done: @escaping (Bool) -> Void) {
         return done(!action.contains("failed"))
     }
     guard let url = appURL(target) else { log("\(target): not installed"); return done(false) }
-    NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration()) { app, error in
+    let config = NSWorkspace.OpenConfiguration()
+    config.activates = false  // we raise it below, unless a newer hotkey fired meanwhile
+    NSWorkspace.shared.openApplication(at: url, configuration: config) { app, error in
         DispatchQueue.main.async {
             guard let app else { log("\(target): launch failed: \(error?.localizedDescription ?? "?")"); return done(false) }
+            if request != activationRequest {
+                log("\(target) (pid \(app.processIdentifier)): launched, not raised (a newer hotkey fired)"); return done(true)
+            }
             let err = setFront(app.processIdentifier)
             log("\(target) (pid \(app.processIdentifier)): launched\(err == noErr ? "" : ", SetFront failed (\(err))") in \(ms())")
             done(err == noErr)
@@ -181,12 +191,13 @@ if let a = args.first, a.hasPrefix("-") || args.count > 1 {
 }
 
 let configPath = args.first ?? defaultConfig
-var bindings = [Binding](), hotKeyRefs = [EventHotKeyRef](), lastText: String?
-var watchers = [DispatchSourceFileSystemObject](), reloadPending = false, unreadable = false
+let signature = OSType(0x4150_484B)  // 'APHK'
+var active = [UInt32: Binding](), hotKeyRefs = [EventHotKeyRef](), nextID: UInt32 = 0, lastText: String?
+var watchers = [String: DispatchSourceFileSystemObject](), reloadPending = false, pollPending = false, unreadable = false
 
 func reload(force: Bool = false) {
     guard let text = try? String(contentsOfFile: configPath, encoding: .utf8) else {
-        if !unreadable { log("cannot read \(configPath); keeping \(bindings.count) bindings") }
+        if !unreadable { log("cannot read \(configPath); keeping \(active.count) bindings") }
         unreadable = true; return
     }
     unreadable = false
@@ -195,65 +206,77 @@ func reload(force: Bool = false) {
     let (parsed, errors) = parse(text)
     if !errors.isEmpty {
         for e in errors { log("\(configPath): \(e)") }
-        log("config has errors; keeping the previous \(bindings.count) bindings"); return
+        log("config has errors; keeping the previous \(active.count) bindings"); return
+    }
+    // Register the new set before dropping the old one (macOS accepts a chord twice), so a failure
+    // leaves the working set alone. Fresh IDs keep a queued press of an old chord from misfiring.
+    var refs = [EventHotKeyRef](), staged = [UInt32: Binding]()
+    for b in parsed {
+        nextID += 1
+        var ref: EventHotKeyRef?
+        let err = RegisterEventHotKey(b.key, b.mods, EventHotKeyID(signature: signature, id: nextID),
+                                      GetEventDispatcherTarget(), 0, &ref)
+        guard err == noErr, let ref else {
+            log("line \(b.line): \(b.combo) = \(b.target): RegisterEventHotKey failed, OSStatus \(err); keeping the previous \(active.count) bindings")
+            refs.forEach { UnregisterEventHotKey($0) }
+            lastText = nil  // retry on the next change
+            return
+        }
+        refs.append(ref)
+        staged[nextID] = b
     }
     hotKeyRefs.forEach { UnregisterEventHotKey($0) }
-    hotKeyRefs = []
-    bindings = parsed
-    var failed = 0
-    for (i, b) in bindings.enumerated() {
-        var ref: EventHotKeyRef?
-        let id = EventHotKeyID(signature: OSType(0x4150_484B), id: UInt32(i))  // 'APHK'
-        let err = RegisterEventHotKey(b.key, b.mods, id, GetEventDispatcherTarget(), 0, &ref)
-        if err == noErr, let ref { hotKeyRefs.append(ref); continue }
-        failed += 1
-        log("line \(b.line): \(b.combo) = \(b.target): RegisterEventHotKey failed, OSStatus \(err)")
-    }
-    log("loaded \(bindings.count - failed)/\(bindings.count) bindings from \(configPath)")
+    (hotKeyRefs, active) = (refs, staged)
+    log("loaded \(active.count) bindings from \(configPath)")
 }
 
 // Watch the file and its directory (and the symlink target's), since editors and dotbot replace
-// files. Re-arm after every change so a replaced file or retargeted symlink is picked up.
+// files. Always arm before reading, so a change after the read fires an event. Directory watches
+// live on; the file watch is renewed each time (a replaced file is a new inode).
 func watch() {
-    watchers.forEach { $0.cancel() }
     let real = URL(fileURLWithPath: configPath).resolvingSymlinksInPath().path
     let dirs = Set([configPath, real].map { ($0 as NSString).deletingLastPathComponent })
-    watchers = ([real] + dirs).compactMap { path in
+    for (path, source) in watchers where !dirs.contains(path) { source.cancel(); watchers[path] = nil }
+    var dirMissing = false
+    for path in [real] + dirs where watchers[path] == nil {
         let fd = open(path, O_EVTONLY)
-        guard fd >= 0 else { return nil }
+        guard fd >= 0 else { dirMissing = dirMissing || dirs.contains(path); continue }
         let source = DispatchSource.makeFileSystemObjectSource(
             fileDescriptor: fd, eventMask: [.write, .delete, .rename, .extend, .attrib, .link], queue: .main)
         source.setEventHandler {
+            if !source.data.isDisjoint(with: [.delete, .rename]) { source.cancel(); watchers[path] = nil }
             guard !reloadPending else { return }
             reloadPending = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { reloadPending = false; reload(); watch() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { reloadPending = false; watch(); reload() }
         }
         source.setCancelHandler { close(fd) }
         source.resume()
-        return source
+        watchers[path] = source
     }
-    // Nothing to watch yet (e.g. dotbot hasn't created the directory): poll until there is
-    if watchers.isEmpty { DispatchQueue.main.asyncAfter(deadline: .now() + 5) { reload(); watch() } }
+    // A directory isn't there yet (e.g. dotbot hasn't created it): poll until it is
+    if dirMissing && !pollPending {
+        pollPending = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { pollPending = false; watch(); reload() }
+    }
 }
 
 NSApplication.shared.setActivationPolicy(.prohibited)
 var pressed = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
-InstallEventHandler(GetEventDispatcherTarget(), { _, event, _ in
+let installed = InstallEventHandler(GetEventDispatcherTarget(), { _, event, _ in
     var id = EventHotKeyID()
-    GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID),
-                      nil, MemoryLayout<EventHotKeyID>.size, nil, &id)
-    if Int(id.id) < bindings.count {
-        let b = bindings[Int(id.id)]
-        log("\(b.combo) pressed")
-        activate(b.target) { _ in }
-    }
+    let err = GetEventParameter(event, EventParamName(kEventParamDirectObject), EventParamType(typeEventHotKeyID),
+                                nil, MemoryLayout<EventHotKeyID>.size, nil, &id)
+    guard err == noErr, id.signature == signature, let b = active[id.id] else { return OSStatus(eventNotHandledErr) }
+    log("\(b.combo) pressed")
+    activate(b.target) { _ in }
     return noErr
 }, 1, &pressed, nil, nil)
+guard installed == noErr else { log("InstallEventHandler failed, OSStatus \(installed)"); exit(1) }
 
 signal(SIGHUP, SIG_IGN)
 let hup = DispatchSource.makeSignalSource(signal: SIGHUP, queue: .main)
-hup.setEventHandler { log("SIGHUP: reloading"); reload(force: true); watch() }
+hup.setEventHandler { log("SIGHUP: reloading"); watch(); reload(force: true) }
 hup.resume()
-reload()
 watch()
+reload()
 NSApplication.shared.run()
