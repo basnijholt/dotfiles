@@ -194,7 +194,7 @@ let configPath = args.first ?? defaultConfig
 let signature = OSType(0x4150_484B)  // 'APHK'
 var active = [UInt32: Binding](), nextID: UInt32 = 0, lastText: String?
 var registered = [UInt64: (id: UInt32, ref: EventHotKeyRef)]()  // by chord
-var watchers = [String: DispatchSourceFileSystemObject](), reloadPending = false, pollPending = false, unreadable = false
+var watchers = [String: DispatchSourceFileSystemObject](), reloadPending = false, unreadable = false
 
 func reload(force: Bool = false) {
     guard let text = try? String(contentsOfFile: configPath, encoding: .utf8) else {
@@ -237,15 +237,16 @@ func reload(force: Bool = false) {
 
 // Watch the file and its directory (and the symlink target's), since editors and dotbot replace
 // files. Always arm before reading, so a change after the read fires an event. Directory watches
-// live on; the file watch is renewed each time (a replaced file is a new inode).
+// live on; the file watch is renewed each time (a replaced file is a new inode). The watches only
+// make reloads instant: a 2 s poll below catches whatever they miss (a missing directory, a swap
+// mid-setup, a retargeted directory symlink).
 func watch() {
     let real = URL(fileURLWithPath: configPath).resolvingSymlinksInPath().path
     let dirs = Set([configPath, real].map { ($0 as NSString).deletingLastPathComponent })
     for (path, source) in watchers where !dirs.contains(path) { source.cancel(); watchers[path] = nil }
-    var dirMissing = false
     for path in [real] + dirs where watchers[path] == nil {
         let fd = open(path, O_EVTONLY)
-        guard fd >= 0 else { dirMissing = dirMissing || dirs.contains(path); continue }
+        guard fd >= 0 else { continue }
         let source = DispatchSource.makeFileSystemObjectSource(
             fileDescriptor: fd, eventMask: [.write, .delete, .rename, .extend, .attrib, .link], queue: .main)
         source.setEventHandler {
@@ -257,11 +258,6 @@ func watch() {
         source.setCancelHandler { close(fd) }
         source.resume()
         watchers[path] = source
-    }
-    // A directory isn't there yet (e.g. dotbot hasn't created it): poll until it is
-    if dirMissing && !pollPending {
-        pollPending = true
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) { pollPending = false; watch(); reload() }
     }
 }
 
@@ -280,8 +276,14 @@ guard installed == noErr else { log("InstallEventHandler failed, OSStatus \(inst
 
 signal(SIGHUP, SIG_IGN)
 let hup = DispatchSource.makeSignalSource(signal: SIGHUP, queue: .main)
-hup.setEventHandler { log("SIGHUP: reloading"); watch(); reload(force: true) }
+hup.setEventHandler {
+    log("SIGHUP: reloading")
+    watchers.values.forEach { $0.cancel() }; watchers = [:]  // reopen every path, in case one was retargeted
+    watch(); reload(force: true)
+}
 hup.resume()
+// reload() is a no-op while the text is unchanged, so this costs one small read every 2 s
+Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { _ in watch(); reload() }
 watch()
 reload()
 NSApplication.shared.run()
