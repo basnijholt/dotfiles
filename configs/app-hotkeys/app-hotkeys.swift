@@ -222,8 +222,7 @@ func reload(force: Bool = false) {
         guard err == noErr, let ref else {
             log("line \(b.line): \(b.combo) = \(b.target): RegisterEventHotKey failed, OSStatus \(err); keeping the previous \(active.count) bindings")
             added.values.forEach { UnregisterEventHotKey($0.ref) }
-            lastText = nil  // retry on the next change
-            return
+            return  // retried on the next edit or SIGHUP, not on every poll
         }
         added[b.chord] = (nextID, ref)
         staged[nextID] = b
