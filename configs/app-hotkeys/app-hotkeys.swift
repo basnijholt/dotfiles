@@ -16,6 +16,7 @@ func setFrontProcessWithOptions(_ psn: UnsafePointer<ProcessSerialNumber>, _ opt
 
 struct Binding: Equatable {
     let line: Int, mods: UInt32, key: UInt32, combo: String, target: String
+    var chord: UInt64 { UInt64(mods) << 32 | UInt64(key) }  // esc and escape are the same chord
 }
 
 // US ANSI virtual key codes (kVK_*). Codes 0...50 in order; "" marks the ISO-only § key (10).
@@ -70,11 +71,10 @@ func parse(_ text: String) -> (bindings: [Binding], errors: [String]) {
             errors.append("line \(n): " + (keyName.isEmpty ? "missing key after '+'" : "unknown key '\(keyName)'")); continue
         }
         let b = Binding(line: n, mods: mods, key: key, combo: comboName(mods, keyName), target: target)
-        let chord = UInt64(mods) << 32 | UInt64(key)  // esc and escape are the same chord
-        if let first = seen[chord] {
+        if let first = seen[b.chord] {
             errors.append("line \(n): \(b.combo) is the same chord as line \(first.line) (\(first.combo))"); continue
         }
-        seen[chord] = b
+        seen[b.chord] = b
         bindings.append(b)
     }
     return (bindings, errors)
@@ -192,7 +192,8 @@ if let a = args.first, a.hasPrefix("-") || args.count > 1 {
 
 let configPath = args.first ?? defaultConfig
 let signature = OSType(0x4150_484B)  // 'APHK'
-var active = [UInt32: Binding](), hotKeyRefs = [EventHotKeyRef](), nextID: UInt32 = 0, lastText: String?
+var active = [UInt32: Binding](), nextID: UInt32 = 0, lastText: String?
+var registered = [UInt64: (id: UInt32, ref: EventHotKeyRef)]()  // by chord
 var watchers = [String: DispatchSourceFileSystemObject](), reloadPending = false, pollPending = false, unreadable = false
 
 func reload(force: Bool = false) {
@@ -208,25 +209,29 @@ func reload(force: Bool = false) {
         for e in errors { log("\(configPath): \(e)") }
         log("config has errors; keeping the previous \(active.count) bindings"); return
     }
-    // Register the new set before dropping the old one (macOS accepts a chord twice), so a failure
-    // leaves the working set alone. Fresh IDs keep a queued press of an old chord from misfiring.
-    var refs = [EventHotKeyRef](), staged = [UInt32: Binding]()
+    // Unchanged chords keep their registration (this process can't hold a chord twice:
+    // eventHotKeyExistsErr). New chords get fresh IDs and are registered before anything is dropped,
+    // so a failure leaves the working set alone, and a queued press of a removed chord finds no ID.
+    var added = [UInt64: (id: UInt32, ref: EventHotKeyRef)](), staged = [UInt32: Binding]()
     for b in parsed {
+        if let kept = registered[b.chord] { staged[kept.id] = b; continue }
         nextID += 1
         var ref: EventHotKeyRef?
         let err = RegisterEventHotKey(b.key, b.mods, EventHotKeyID(signature: signature, id: nextID),
                                       GetEventDispatcherTarget(), 0, &ref)
         guard err == noErr, let ref else {
             log("line \(b.line): \(b.combo) = \(b.target): RegisterEventHotKey failed, OSStatus \(err); keeping the previous \(active.count) bindings")
-            refs.forEach { UnregisterEventHotKey($0) }
+            added.values.forEach { UnregisterEventHotKey($0.ref) }
             lastText = nil  // retry on the next change
             return
         }
-        refs.append(ref)
+        added[b.chord] = (nextID, ref)
         staged[nextID] = b
     }
-    hotKeyRefs.forEach { UnregisterEventHotKey($0) }
-    (hotKeyRefs, active) = (refs, staged)
+    let keep = Set(parsed.map(\.chord))
+    for (chord, r) in registered where !keep.contains(chord) { UnregisterEventHotKey(r.ref); registered[chord] = nil }
+    registered.merge(added) { $1 }
+    active = staged
     log("loaded \(active.count) bindings from \(configPath)")
 }
 
