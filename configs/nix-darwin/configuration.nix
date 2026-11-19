@@ -142,6 +142,10 @@
       # 100% CPU for hours on the M5. Opening the app by hand still works.
       launchctl disable "gui/$(id -u -- ${user})/com.adobe.AdobeCreativeCloud"
       launchctl disable "gui/$(id -u -- ${user})/com.adobe.ccxprocess"
+
+      # Don't start Keyboard Maestro at login: app-hotkeys took over its app hotkeys,
+      # and a combo held by both fires twice. Opening it by hand still works.
+      ${asUser} osascript -e 'tell application "System Events" to delete (every login item whose name starts with "Keyboard Maestro")' >/dev/null 2>&1 || true
     '';
 
   # Create /etc/zshrc that loads the nix-darwin environment.
