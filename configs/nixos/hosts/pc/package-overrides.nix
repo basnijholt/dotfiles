@@ -17,44 +17,28 @@
           (
             oldAttrs:
             let
-              # Ollama 0.30+ stages llama.cpp from the release's LLAMA_CPP_VERSION
-              # during postPatch. Keep this pin aligned with the overridden Ollama
-              # version; otherwise Ollama's compatibility patch can fail to apply.
+              # Keep this llama.cpp tag aligned with the release's
+              # LLAMA_CPP_VERSION; nixpkgs' postPatch checks that they match.
               llamaCppSrc = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                tag = "b11963";
-                hash = "sha256-DUggBODOVSOydWopvdXt/K9ZiRrbWrl+mywpr1vjJwM=";
+                tag = "b12177";
+                hash = "sha256-/bZRn+Zy4bqdJUWDX3a4+HClrsST60uXiNJT26mTgI0=";
               };
             in
             rec {
-              version = "0.40.14";
+              version = "0.40.16";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-IrTfIgwBqjdINyWqArWaa56k5ToeYW2RxTZiN/A12as=";
+                hash = "sha256-ita7MMcdRVBVNmOXnopJX31hnCaPHOx9079YGci5v18=";
               };
               vendorHash = "sha256-1mzJrZUHH2ouP6I+LVojHbft7No5AumqKZVq0I/Ubsg=";
-              # This package only contains integration-tagged tests, so the
-              # generic Go test sweep otherwise reports "build constraints
-              # exclude all Go files".
-              excludedPackages = (oldAttrs.excludedPackages or [ ]) ++ [ "./integration" ];
-              postPatch = ''
-                substituteInPlace version/version.go \
-                  --replace-fail 0.0.0 '${version}'
-
-                rm cmd/launch/*_test.go
-                rm -r app
-
-                cp -r ${llamaCppSrc} $TMPDIR/llama-cpp-src
-                chmod -R +w $TMPDIR/llama-cpp-src
-                (
-                  cd $TMPDIR/llama-cpp-src
-                  cmake -DPATCH_DIR=$NIX_BUILD_TOP/source/llama/compat \
-                    -P $NIX_BUILD_TOP/source/cmake/apply-git-patches.cmake
-                )
-              '';
+              passthru = oldAttrs.passthru // {
+                inherit llamaCppSrc;
+                llamaCppVersion = llamaCppSrc.tag;
+              };
             }
           );
 
@@ -72,28 +56,23 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "12098";
+            version = "12549";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
               tag = "b${version}";
-              hash = "sha256-NfQmRQZfxZwBMQUKyf/0drsCaZCrwCSuKGG9CBX0ZLY=";
+              hash = "sha256-yg+0PxV7myyndL7wz4zlF0VaeUO1eZKBJ/Iy81Uw/T8=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
                 find "$out" -name .git -print0 | xargs -0 rm -rf
               '';
             };
-            # test-llama-context-model requires the test-download-model
-            # fixture, which needs network; CTest runs a required fixture even
-            # when nixpkgs disables it. test-conversion-fp8 imports numpy,
-            # which the build's Python lacks.
-            disabledTests = (oldAttrs.disabledTests or [ ]) ++ [
-              "test-llama-context-model"
-              "test-conversion-fp8"
-            ];
-            npmRoot = "tools/ui";
-            npmDepsHash = "sha256-XLtEZsSFdk+2SyfXzBp8HQ2e27PQPpDCn1YjePU1/9w=";
+            # ggml-cuda includes nvml.h (loaded at runtime via dlopen), which
+            # nixpkgs' llama-cpp does not provide yet.
+            buildInputs = oldAttrs.buildInputs ++ [ pkgs.cudaPackages.cuda_nvml_dev ];
+            npmRoot = "ui/apps/chat";
+            npmDepsHash = "sha256-3kJJJGgPvtoRozjjvXJ97ljxzt0tshwi88UUd1D3VsI=";
             # nixpkgs hardcodes the build number and commit of its own
             # release. Report ours in `llama-server --version`, `/props`,
             # and the web UI; flags appended later win in CMake.
@@ -126,14 +105,14 @@
       # llama-swap from GitHub releases
       llama-swap =
         let
-          version = "269";
+          version = "274";
         in
         pkgs.runCommand "llama-swap" { } ''
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
               url = "https://github.com/mostlygeek/llama-swap/releases/download/v${version}/llama-swap_${version}_linux_amd64.tar.gz";
-              hash = "sha256-kzpFxXhijL+kuFNTN8NamSZdRbjrkebc8AmpA3jw98w=";
+              hash = "sha256-iiaCF4OxAETcfL7giJLK7qdRfUiE7DhDIQKMma6yAIo=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap
