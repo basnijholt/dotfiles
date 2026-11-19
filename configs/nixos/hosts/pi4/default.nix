@@ -13,6 +13,7 @@
 
     # Host-specific modules (Tier 3)
     ./networking.nix
+    ./tang.nix
     ./zfs-unlock-client.nix
   ];
 
