@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "app-hotkeys": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795125395,
+        "narHash": "sha256-3bEBfj4LmBbh3mX+eYiYhZVuVfZk8P2GWfKrqT1HRTQ=",
+        "owner": "basnijholt",
+        "repo": "app-hotkeys",
+        "rev": "5f8aac82421c075cfa47dec77cd902a5cd8b49b4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "basnijholt",
+        "repo": "app-hotkeys",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -38,6 +58,7 @@
     },
     "root": {
       "inputs": {
+        "app-hotkeys": "app-hotkeys",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs"
       }
