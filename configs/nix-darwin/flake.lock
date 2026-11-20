@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795131790,
-        "narHash": "sha256-RAOPBD62f0H2m2YSr9eCgzfD+dMEU0AIytbrxvhAH+I=",
+        "lastModified": 1795213485,
+        "narHash": "sha256-zMHGCcgR7bAo6Bjt9c8ZgsE2N1/4Ux8V3M4CZm5gwuY=",
         "owner": "basnijholt",
         "repo": "macos-hotkey-app-switcher",
-        "rev": "fe4fe3d185fe87c4349c7e5196b3406da9311a9e",
+        "rev": "a3e97aa9bf0ff5653b23846e7a7b47711e1ad089",
         "type": "github"
       },
       "original": {
