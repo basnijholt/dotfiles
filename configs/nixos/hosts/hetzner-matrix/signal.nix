@@ -1,8 +1,13 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 let
   constants = import ./constants.nix;
   inherit (constants) siteDomain;
+  version = "26.11";
+  binary = pkgs.fetchurl {
+    url = "https://github.com/mautrix/signal/releases/download/v0.2611.0/mautrix-signal-arm64";
+    hash = "sha256-jX253NTZ3bBWD+Kx/hSpBjlPnpVuYsirPAMMRX+/uvA=";
+  };
 in
 {
   # Runs locally and talks to Tuwunel over loopback.
@@ -10,6 +15,10 @@ in
   # using /var/lib/mautrix-signal/signal-registration.yaml.
   services.mautrix-signal = {
     enable = true;
+    # Pin the upstream static ARM64 release independently of nixpkgs.
+    package = pkgs.runCommand "mautrix-signal-${version}" { inherit version; } ''
+      install -Dm755 ${binary} "$out/bin/mautrix-signal"
+    '';
     serviceDependencies = [ "tuwunel.service" ];
     environmentFile = config.age.secrets.signal-appservice-env-mautrix.path;
 

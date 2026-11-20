@@ -1,13 +1,22 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 
 let
   constants = import ./constants.nix;
   inherit (constants) siteDomain;
+  version = "26.11";
+  binary = pkgs.fetchurl {
+    url = "https://github.com/mautrix/whatsapp/releases/download/v0.2611.0/mautrix-whatsapp-arm64";
+    hash = "sha256-zYqUPfpYIgdFP+TtrrVw3vMvidLnqWhkzhYKm6LZQTc=";
+  };
 in
 {
   # Runs locally and talks to Tuwunel over loopback.
   services.mautrix-whatsapp = {
     enable = true;
+    # Pin the upstream static ARM64 release independently of nixpkgs.
+    package = pkgs.runCommand "mautrix-whatsapp-${version}" { inherit version; } ''
+      install -Dm755 ${binary} "$out/bin/mautrix-whatsapp"
+    '';
     serviceDependencies = [ "tuwunel.service" ];
     environmentFile = config.age.secrets.whatsapp-appservice-env-mautrix.path;
 
