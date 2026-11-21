@@ -147,30 +147,12 @@ in
         useTemplate = [ "nas-default" ];
         recursive = "zfs";
       };
-      # dev-lxc is a build and test box: tens of GB of worktrees, caches and
-      # test output come and go each day. Under nas-default a deleted block
-      # stayed allocated until the last snapshot referencing it expired (31
-      # days for a daily, longer for weeklies and the monthly), and the
-      # snapshots filled the container's 200 GiB root quota (129 GiB
-      # snapshots vs 70 GiB live, 2026-11-20).
-      # Keep only a short local history. The parent's recursive = "zfs" still
-      # takes the snapshots; this section only changes how dev-lxc's are
-      # pruned. Sanoid reads sections in file order and the generated file is
-      # sorted, so this child section is applied after ssd and its counts win.
-      # What this gives up, on purpose, for a box whose state is rebuildable:
-      # - Both mirrors receive only what exists at the nightly send, and the
-      #   parent's weeklies and monthlies on dev-lxc are pruned within minutes,
-      #   so tank/backups keeps 31 dailies and normally no new weeklies or
-      #   monthlies. --delete-target-snapshots trims the nuc copy to this
-      #   section's set (8 dailies), not to tank's 31.
-      # - The nuc job (--no-sync-snap) needs a snapshot both sides still have.
-      #   8 dailies keep one across nightly sends up to 7 days apart; a longer
-      #   nuc outage fails its dev-lxc send until that dataset is reseeded.
+      # dev-lxc churns tens of GB a day, so nas-default's snapshots filled its
+      # 200 GiB quota. Prune it short (ssd's recursion still snapshots it);
+      # 8 dailies keep a common base for nuc sends up to 7 days apart.
       "ssd/incus/containers/dev-lxc" = {
         useTemplate = [ "nas-default" ];
-        # The ssd zfs recursion takes these snapshots; false only avoids
-        # sanoid's "ignored autosnap configuration" warning every run.
-        autosnap = false;
+        autosnap = false; # taken by ssd's recursion
         frequently = 0;
         hourly = 6;
         daily = 8;
