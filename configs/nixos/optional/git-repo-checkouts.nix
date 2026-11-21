@@ -117,7 +117,8 @@ in
               fi
 
               if [ "$update_when_clean" = "1" ]; then
-                if [ -n "$(git -C "$repo_path" status --porcelain)" ]; then
+                # Untracked files (agent scratch dirs) must not block updates.
+                if [ -n "$(git -C "$repo_path" status --porcelain --untracked-files=no)" ]; then
                   echo "Working tree has local changes; skipping pull for $repo_path."
                 else
                   local_head="$(git -C "$repo_path" rev-parse HEAD)"
