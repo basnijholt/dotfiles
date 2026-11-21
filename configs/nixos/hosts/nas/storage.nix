@@ -148,20 +148,22 @@ in
         recursive = "zfs";
       };
       # dev-lxc is a build and test box: tens of GB of worktrees, caches and
-      # test output come and go each day. Under nas-default every deleted byte
-      # stayed pinned for 31 days, and the snapshots filled the container's
+      # test output come and go each day. Under nas-default every deleted block
+      # that a snapshot still referenced stayed pinned for 31 days or more
+      # (weeklies, monthly), and the snapshots filled the container's
       # 200 GiB root quota (129 GiB snapshots vs 70 GiB live, 2026-11-20).
       # Keep only a short local history. The parent's recursive = "zfs" still
       # takes the snapshots; this section only changes how dev-lxc's are
       # pruned. Sanoid reads sections in file order and the generated file is
       # sorted, so this child section is applied after ssd and its counts win.
       # What this gives up, on purpose, for a box whose state is rebuildable:
-      # - Both mirrors receive only what exists at the nightly send. The
-      #   tank/backups copy keeps 31 dailies but no weeklies or monthlies;
-      #   --delete-target-snapshots trims the nuc copy to these 7 days.
-      # - The nuc job (--no-sync-snap) needs a snapshot both sides still have,
-      #   so a nuc outage longer than 7 days fails its dev-lxc send until that
-      #   dataset is reseeded on the nuc.
+      # - Both mirrors receive only what exists at the nightly send, and the
+      #   parent's weeklies and monthlies on dev-lxc are pruned within minutes,
+      #   so tank/backups gets 31 dailies but no new weeklies or monthlies.
+      #   --delete-target-snapshots mirrors the nuc copy to this set.
+      # - The nuc job (--no-sync-snap) needs a snapshot both sides still have.
+      #   8 dailies keep one across nightly sends up to 7 days apart; a longer
+      #   nuc outage fails its dev-lxc send until that dataset is reseeded.
       "ssd/incus/containers/dev-lxc" = {
         useTemplate = [ "nas-default" ];
         # The ssd zfs recursion takes these snapshots; false only avoids
@@ -169,7 +171,7 @@ in
         autosnap = false;
         frequently = 0;
         hourly = 6;
-        daily = 7;
+        daily = 8;
         weekly = 0;
         monthly = 0;
       };
