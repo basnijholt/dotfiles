@@ -147,6 +147,26 @@ in
         useTemplate = [ "nas-default" ];
         recursive = "zfs";
       };
+      # dev-lxc is a build and test box: tens of GB of worktrees, caches and
+      # test output come and go each day. Under nas-default every deleted byte
+      # stayed pinned for 31 days, and the snapshots filled the container's
+      # 200 GiB root quota (129 GiB snapshots vs 70 GiB live, 2026-11-20).
+      # Keep only a short local history; tank/backups keeps the long one
+      # (nas-backup-prune). The parent's recursive = "zfs" still takes the
+      # snapshots; this section only changes how dev-lxc's are pruned. Sanoid
+      # reads sections in file order and the generated file is sorted, so
+      # this child section is applied after ssd and its counts win.
+      "ssd/incus/containers/dev-lxc" = {
+        useTemplate = [ "nas-default" ];
+        # The ssd zfs recursion takes these snapshots; false only avoids
+        # sanoid's "ignored autosnap configuration" warning every run.
+        autosnap = false;
+        frequently = 0;
+        hourly = 6;
+        daily = 3;
+        weekly = 0;
+        monthly = 0;
+      };
     };
   };
 
