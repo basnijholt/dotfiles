@@ -18,10 +18,6 @@ let
   mindroomUnsetEnvironment = [
     "OPENCLAW_TELEGRAM_BOT_TOKEN"
     "TELEGRAM_BOT_TOKEN"
-    # MindRoom reads these from the .env beside config.yaml itself. Exported, they make the
-    # claude_code provider refuse, since Claude Code would use them instead of the subscription.
-    "ANTHROPIC_API_KEY"
-    "ANTHROPIC_VERTEX_PROJECT_ID"
   ];
 
   # Shared uv + python wrapper for mindroom CLI invocations.
