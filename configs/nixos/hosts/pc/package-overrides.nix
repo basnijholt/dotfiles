@@ -22,17 +22,17 @@
               llamaCppSrc = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                tag = "b12177";
-                hash = "sha256-/bZRn+Zy4bqdJUWDX3a4+HClrsST60uXiNJT26mTgI0=";
+                tag = "b12257";
+                hash = "sha256-lOtgL6pGoDaf5wK2y37AyycU0J4BoYvxfVl1h28HbUU=";
               };
             in
             rec {
-              version = "0.40.16";
+              version = "0.40.17";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-ita7MMcdRVBVNmOXnopJX31hnCaPHOx9079YGci5v18=";
+                hash = "sha256-PyZVSRttWuHG8zrEuKo3Q1r6O1SI8whj1IJV32cHmcU=";
               };
               vendorHash = "sha256-1mzJrZUHH2ouP6I+LVojHbft7No5AumqKZVq0I/Ubsg=";
               passthru = oldAttrs.passthru // {
@@ -108,14 +108,14 @@
       # llama-swap from GitHub releases
       llama-swap =
         let
-          version = "274";
+          version = "275";
         in
         pkgs.runCommand "llama-swap" { } ''
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
               url = "https://github.com/mostlygeek/llama-swap/releases/download/v${version}/llama-swap_${version}_linux_amd64.tar.gz";
-              hash = "sha256-iiaCF4OxAETcfL7giJLK7qdRfUiE7DhDIQKMma6yAIo=";
+              hash = "sha256-p/pZRuBUeD1MSl4quPPd1GfeCAVRn2tvKkFQiuRT++g=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap
