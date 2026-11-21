@@ -61,7 +61,7 @@ in
           --hf-file Mainline_Support/Inkling-2-Mini-UD-Q8_K_XL.gguf_file
           --mmproj-url https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/resolve/main/mmproj-F16.gguf
           --port ''${PORT}
-          --ctx-size 0
+          --ctx-size 131072
           --fit on
           --fit-target 2048,2048
           --fit-ctx 16384
@@ -76,7 +76,6 @@ in
           --top-p 1.0
           --top-k 0
           --min-p 0.0
-          --threads 1
           --jinja
 
       "qwen38-vllm:27b-uncensored":
