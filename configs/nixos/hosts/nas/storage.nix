@@ -151,8 +151,8 @@ in
       # test output come and go each day. Under nas-default a deleted block
       # stayed allocated until the last snapshot referencing it expired (31
       # days for a daily, longer for weeklies and the monthly), and the
-      # snapshots filled the container's
-      # 200 GiB root quota (129 GiB snapshots vs 70 GiB live, 2026-11-20).
+      # snapshots filled the container's 200 GiB root quota (129 GiB
+      # snapshots vs 70 GiB live, 2026-11-20).
       # Keep only a short local history. The parent's recursive = "zfs" still
       # takes the snapshots; this section only changes how dev-lxc's are
       # pruned. Sanoid reads sections in file order and the generated file is
