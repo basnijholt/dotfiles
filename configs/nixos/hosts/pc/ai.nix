@@ -44,6 +44,41 @@ in
 
     models:  # Ordered from newest to oldest
 
+      # Released 2026-11-20. Thinking Machines' looped MoE: 26.4B total, 5.4B
+      # active, 1M context, image input. UD-Q8_K_XL keeps the original
+      # NVFP4/MXFP8 expert weights (lossless); size 22.9 GB.
+      # Mainline llama.cpp reads only the Mainline_Support layout (the root
+      # GGUFs need Unsloth's fork) and needs ggml-org/llama.cpp#32704.
+      # Source: https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/tree/main/Mainline_Support
+      # Sampling follows Unsloth's recommendation (temp 1.0, no truncation).
+      # Reasoning depth is the request's reasoning_effort (default high).
+      "inkling-2:mini":
+        name: "Inkling 2 Mini · llama.cpp"
+        description: "UD-Q8_K_XL GGUF with vision support."
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --hf-repo unsloth/Inkling-2-Mini-GGUF
+          --hf-file Mainline_Support/Inkling-2-Mini-UD-Q8_K_XL.gguf_file
+          --mmproj-url https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/resolve/main/mmproj-F16.gguf
+          --port ''${PORT}
+          --ctx-size 0
+          --fit on
+          --fit-target 2048,2048
+          --fit-ctx 16384
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q8_0
+          --cache-type-v q8_0
+          --split-mode layer
+          --temp 1.0
+          --top-p 1.0
+          --top-k 0
+          --min-p 0.0
+          --threads 1
+          --jinja
+
       "qwen38-vllm:27b-uncensored":
         name: "Qwen3.8 27B · vLLM · Uncensored"
         description: "AutoRound INT4, DFlash2, 256K context."

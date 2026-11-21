@@ -56,12 +56,16 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            version = "12549";
+            # Pinned to master (build 12622) for Inkling 2 Mini: its loop fix
+            # (ggml-org/llama.cpp#32704) is in no release yet. Switch back to
+            # `tag = "b${version}"` once a release reaches 12622, before
+            # running update-overrides.py, which only bumps version and hashes.
+            version = "12622";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              tag = "b${version}";
-              hash = "sha256-yg+0PxV7myyndL7wz4zlF0VaeUO1eZKBJ/Iy81Uw/T8=";
+              rev = "19bc41dbb41e858eebc269b49ccdec1f0d28880c";
+              hash = "sha256-Q2oEX5NqQXvZOZod6QvpuKLon1VWEqECwlVjW7cZyZQ=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
