@@ -21,7 +21,9 @@ sys.modules[SPEC.name] = update_overrides
 SPEC.loader.exec_module(update_overrides)
 
 placeholder = update_overrides.placeholder
-HASHES = [placeholder("fixture", i) for i in range(4)]
+HASHES = [placeholder("fixture", i) for i in range(5)]
+OLD_REV = "a" * 40
+NEW_REV = "b" * 40
 CONTENT = f"""
     packageOverrides = pkgs: {{
       ollama =
@@ -36,6 +38,14 @@ CONTENT = f"""
           src = pkgs.fetchFromGitHub {{ hash = "{HASHES[1]}"; }};
           vendorHash = "{HASHES[2]}";
         }};
+
+      llama-cpp = pkgs.llama-cpp.overrideAttrs (oldAttrs: rec {{
+        version = "12549";
+        src = pkgs.fetchFromGitHub {{
+          rev = "{OLD_REV}";
+          hash = "{HASHES[4]}";
+        }};
+      }});
 
       llama-swap =
         let
@@ -55,6 +65,17 @@ class LatestReleaseTests(unittest.TestCase):
         self.assertEqual(update_overrides.latest_release("o/r", "v"), "0.35.1")
 
 
+class LatestCommitTests(unittest.TestCase):
+    @patch.object(update_overrides.requests, "get")
+    def test_reads_build_number_from_last_page(self, get):
+        last = "https://api.github.com/repositories/1/commits?per_page=1&page=12622"
+        get.return_value = Mock(
+            json=lambda: [{"sha": NEW_REV}], links={"last": {"url": last}}
+        )
+
+        self.assertEqual(update_overrides.latest_commit("o/r"), ("12622", NEW_REV))
+
+
 class BumpTests(unittest.TestCase):
     @patch.object(update_overrides, "ollama_llama_cpp_tag", return_value="b200")
     @patch.object(update_overrides, "latest_release", return_value="0.36.0")
@@ -65,6 +86,19 @@ class BumpTests(unittest.TestCase):
         for i in range(3):
             expected = expected.replace(HASHES[i], placeholder("ollama", i))
         self.assertEqual(updated, expected)
+
+    @patch.object(update_overrides, "latest_commit", return_value=("12622", NEW_REV))
+    def test_pins_master_package_to_newest_commit(self, _):
+        updated = update_overrides.bump(CONTENT, "llama-cpp")
+
+        expected = CONTENT.replace('"12549"', '"12622"').replace(OLD_REV, NEW_REV)
+        self.assertEqual(
+            updated, expected.replace(HASHES[4], placeholder("llama-cpp", 0))
+        )
+
+    @patch.object(update_overrides, "latest_commit", return_value=("12549", NEW_REV))
+    def test_leaves_current_master_pin_alone(self, _):
+        self.assertEqual(update_overrides.bump(CONTENT, "llama-cpp"), CONTENT)
 
     @patch.object(update_overrides, "latest_release", return_value="262")
     def test_leaves_up_to_date_package_alone(self, _):

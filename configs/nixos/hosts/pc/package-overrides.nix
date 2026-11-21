@@ -56,10 +56,9 @@
           blasSupport = true;
         }).overrideAttrs
           (oldAttrs: rec {
-            # Pinned to master (build 12622) for Inkling 2 Mini: its loop fix
-            # (ggml-org/llama.cpp#32704) is in no release yet. Switch back to
-            # `tag = "b${version}"` once a release reaches 12622, before
-            # running update-overrides.py, which only bumps version and hashes.
+            # Tracks master, not releases: release tags lag master by hours
+            # and skip build numbers. version is the build number (commit
+            # count) of rev; update-overrides.py updates both.
             version = "12622";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";

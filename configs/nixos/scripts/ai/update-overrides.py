@@ -5,11 +5,16 @@
 #     "requests",
 # ]
 # ///
-"""Update the AI packages in package-overrides.nix to their latest GitHub releases.
+"""Update the AI packages in package-overrides.nix to their latest versions.
 
-Run from configs/nixos. Each package's hashes are replaced with placeholders,
-then the package is built until Nix has reported every real hash. Rerunning
-after an interruption resumes where it stopped.
+Ollama and llama-swap follow GitHub releases. llama-cpp follows master: its
+release tags lag master by hours and skip build numbers, so it is pinned to
+the newest commit and its build number.
+
+Run from configs/nixos, optionally naming the packages to update. Each
+package's hashes are replaced with placeholders, then the package is built
+until Nix has reported every real hash. Rerunning after an interruption
+resumes where it stopped.
 """
 
 import itertools
@@ -23,13 +28,14 @@ from pathlib import Path
 import requests
 
 FILE = Path("hosts/pc/package-overrides.nix")
-# Package attribute: (GitHub repository, release tag prefix)
+# Package attribute: (GitHub repository, release tag prefix, or None for master)
 PACKAGES = {
     "ollama": ("ollama/ollama", "v"),
-    "llama-cpp": ("ggml-org/llama.cpp", "b"),
+    "llama-cpp": ("ggml-org/llama.cpp", None),
     "llama-swap": ("mostlygeek/llama-swap", "v"),
 }
 HASH = re.compile(r"sha256-[A-Za-z0-9+/]{43}=")
+REV = re.compile(r'rev = "[0-9a-f]{40}"')
 
 
 def parse_version(version: str) -> tuple[int, ...] | None:
@@ -47,6 +53,20 @@ def latest_release(repo: str, prefix: str) -> str:
     tags = (release["tag_name"] for release in response.json())
     versions = [tag[len(prefix) :] for tag in tags if tag.startswith(prefix)]
     return max(filter(parse_version, versions), key=parse_version)
+
+
+def latest_commit(repo: str) -> tuple[str, str]:
+    """Return the build number and SHA of the default branch's newest commit.
+
+    llama.cpp numbers builds by commit count. With one commit per page, the
+    last page of the commit list is that count.
+    """
+    response = requests.get(
+        f"https://api.github.com/repos/{repo}/commits", params={"per_page": 1}
+    )
+    response.raise_for_status()
+    build = re.search(r"[?&]page=(\d+)", response.links["last"]["url"])[1]
+    return build, response.json()[0]["sha"]
 
 
 def ollama_llama_cpp_tag(version: str) -> str:
@@ -73,16 +93,24 @@ def package_span(content: str, name: str) -> tuple[int, int]:
 
 
 def bump(content: str, name: str) -> str:
-    """Set a package to its latest release and replace its hashes with placeholders."""
+    """Set a package to its latest version and replace its hashes with placeholders."""
     start, end = package_span(content, name)
     block = content[start:end]
     current = re.search(r'version = "([^"]+)"', block)[1]
-    latest = latest_release(*PACKAGES[name])
+    repo, prefix = PACKAGES[name]
+    if prefix is None:
+        latest, commit = latest_commit(repo)
+    else:
+        latest, commit = latest_release(repo, prefix), None
     print(f"{name}: current {current}, latest {latest}")
     if parse_version(latest) <= parse_version(current):
         return content
 
     block = block.replace(f'version = "{current}"', f'version = "{latest}"')
+    if commit:
+        block, count = REV.subn(f'rev = "{commit}"', block)
+        if count != 1:
+            sys.exit(f"{name}: expected one 40-character rev to pin, found {count}.")
     if name == "ollama":
         tag = ollama_llama_cpp_tag(latest)
         block = re.sub(r'tag = "b\d+"', f'tag = "{tag}"', block)
@@ -123,13 +151,16 @@ def resolve_hashes(content: str, name: str) -> str:
         FILE.write_text(content)
 
 
-def main() -> None:
+def main(names: list[str]) -> None:
+    unknown = set(names) - PACKAGES.keys()
+    if unknown:
+        sys.exit(f"Unknown packages {sorted(unknown)}; choose from {list(PACKAGES)}.")
     content = FILE.read_text()
-    for name in PACKAGES:
+    for name in names or PACKAGES:
         content = bump(content, name)
         FILE.write_text(content)
         content = resolve_hashes(content, name)
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
