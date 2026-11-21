@@ -147,6 +147,18 @@ in
         useTemplate = [ "nas-default" ];
         recursive = "zfs";
       };
+      # dev-lxc churns tens of GB a day, so nas-default's snapshots filled its
+      # 200 GiB quota. Prune it short (ssd's recursion still snapshots it);
+      # 8 dailies keep a common base for nuc sends up to 7 days apart.
+      "ssd/incus/containers/dev-lxc" = {
+        useTemplate = [ "nas-default" ];
+        autosnap = false; # taken by ssd's recursion
+        frequently = 0;
+        hourly = 6;
+        daily = 8;
+        weekly = 0;
+        monthly = 0;
+      };
     };
   };
 
