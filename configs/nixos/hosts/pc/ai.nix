@@ -3,31 +3,6 @@
 
 let
   vllmSwap = "/var/lib/vllm-swap/current/bin/vllm-swap";
-
-  # HyperInkling: a vLLM sm86 port of Inkling 2 Mini with an INT4 GPTQ checkpoint and the
-  # DSpark drafter. It needs a GPU to itself, so it gets GPU 0; GPU 1 keeps Whisper.
-  # GPU 0 also holds TTS and the embedding model (~2 GiB), so GPU_UTIL is 0.88, and 128K
-  # then needs async scheduling off (~55k tokens more KV, 3-4% slower decode).
-  # The checkpoint is downloaded by hand, like the vllm-swap models:
-  #   hf download Pentium95/Inkling-2-Mini-W4A16-g128-gptq --revision <rev> --local-dir <dir>
-  # Source: https://github.com/Pento95/HyperInkling
-  hyperinklingCheckpoint = "/var/lib/vllm-swap/models/hyperinkling/2f1f9bce668e9bab7662ee0c71ca2c7aa84b00d1";
-  hyperinkling = pkgs.writeShellScript "hyperinkling" ''
-    set -euo pipefail
-    name=llama-swap-hyperinkling
-    [[ -f ${hyperinklingCheckpoint}/config.json ]] || { echo "missing checkpoint: ${hyperinklingCheckpoint}" >&2; exit 1; }
-    ${pkgs.docker}/bin/docker rm -f "$name" >/dev/null 2>&1 || true
-    exec ${pkgs.docker}/bin/docker run --rm --name "$name" \
-      --device nvidia.com/gpu=0 \
-      -p "127.0.0.1:$1:8000" \
-      --shm-size 16g \
-      -e MODEL=/models/inkling -e HOST=0.0.0.0 -e PORT=8000 \
-      -e MAX_LEN=131072 -e MAX_SEQS=4 -e GPU_UTIL=0.88 -e KV_OFFLOAD_GB=0 \
-      -e ASYNC=0 \
-      -v ${hyperinklingCheckpoint}:/models/inkling:ro \
-      -v llama-swap-hyperinkling-jit:/cache \
-      ghcr.io/pento95/hyperinkling:0.1.1@sha256:ec5c0501c193d01228fdb1b855c2097030b88127525f5b3f69cafcc787801d8c
-  '';
 in
 {
   imports = [ ./vllm-swap.nix ];
@@ -69,11 +44,12 @@ in
 
     models:  # Ordered from newest to oldest
 
+      # HyperInkling, a vLLM sm86 port; the recipe lives in the vllm-swap component
+      # (stacks: club-3090-vllm/swap). Source: https://github.com/Pento95/HyperInkling
       "inkling-2:mini-vllm":
         name: "Inkling 2 Mini · vLLM (HyperInkling)"
         description: "INT4 GPTQ, DSpark, 128K context, async off, GPU 0 only."
-        cmd: "${hyperinkling} ''${PORT}"
-        cmdStop: "${pkgs.docker}/bin/docker stop -t 60 llama-swap-hyperinkling"
+        cmd: "${vllmSwap} start inkling ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "inkling-2-mini"
         capabilities:
