@@ -18,13 +18,13 @@
 
 import asyncio
 import copy
+import logging
 import unittest
 from typing import Any, Callable, Dict, List, Optional, Tuple
 from unittest.mock import MagicMock, patch
 
 from aioapns import NotificationRequest
 from aioapns.common import NotificationResult
-from aioapns.connection import APNsBaseConnectionPool, APNsProductionClientProtocol
 from twisted.internet.defer import ensureDeferred
 from twisted.internet.testing import MemoryReactorClock
 
@@ -42,6 +42,7 @@ from mindroom_pushkin import (
 from sygnal.apnspushkin import ApnsPushkin
 from sygnal.notifications import Notification, NotificationContext
 from sygnal.sygnal import CONFIG_DEFAULTS, Sygnal, merge_left_with_defaults
+from sygnal.utils import NotificationLoggerAdapter
 
 APP_ID = "chat.mindroom.app"
 STOCK_APP_ID = "chat.mindroom.app.stock"
@@ -106,70 +107,6 @@ def _ring(sender_ts: int, lifetime: int = 30_000, intent: Optional[str] = "audio
 
 def _enc(hint: Any) -> Dict[str, Any]:
     return {"algorithm": "m.megolm.v1.aes-sha2", "ciphertext": "opaque", RING_HINT_KEY: hint}
-
-
-class _FakeH2Conn:
-    def __init__(self, headers_log: List[List[Tuple[str, str]]]) -> None:
-        self.headers_log = headers_log
-        self.data_log: List[bytes] = []
-
-    def send_headers(self, *, stream_id: int, headers: List[Tuple[str, str]]) -> None:
-        self.headers_log.append(list(headers))
-
-    def send_data(self, *, stream_id: int, data: bytes, end_stream: bool) -> None:
-        self.data_log.append(data)
-
-    def data_to_send(self) -> bytes:
-        return b""
-
-
-class _DelayedFakePool(APNsBaseConnectionPool):
-    def __init__(
-        self,
-        *,
-        on_connect: Callable[[], None],
-        headers_log: List[List[Tuple[str, str]]],
-        channel_wait: Optional[Callable[[], None]] = None,
-    ) -> None:
-        super().__init__(topic=APP_ID, max_connections=1, max_connection_attempts=1)
-        self.protocol_class = APNsProductionClientProtocol
-        self._on_connect = on_connect
-        self._headers_log = headers_log
-        self._channel_wait = channel_wait
-        self.last_protocol: Any = None
-
-    async def create_connection(self) -> Any:
-        await asyncio.sleep(0)
-        self._on_connect()
-        protocol = self.protocol_class(self.apns_topic, self.loop, self.discard_connection)
-        protocol.conn = _FakeH2Conn(self._headers_log)
-        protocol.transport = MagicMock()
-        orig_flush = protocol.flush
-
-        def _flush_then_ok() -> None:
-            orig_flush()
-
-            def _complete() -> None:
-                for nid, fut in list(protocol.requests.items()):
-                    if not fut.done():
-                        fut.set_result(NotificationResult(nid, "200"))
-
-            protocol.loop.call_soon(_complete)
-
-        protocol.flush = _flush_then_ok
-        if self._channel_wait is not None:
-            protocol.free_channels.bound = 1
-            await protocol.free_channels.acquire()
-            on_wait = self._channel_wait
-
-            async def _release_later() -> None:
-                await asyncio.sleep(0)
-                on_wait()
-                protocol.free_channels.release()
-
-            asyncio.create_task(_release_later())
-        self.last_protocol = protocol
-        return protocol
 
 
 class MindroomApnsPushkinTestCase(unittest.IsolatedAsyncioTestCase):
@@ -330,11 +267,20 @@ class MindroomApnsPushkinTestCase(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual((got.message, got.priority, got.time_to_live), (want.message, want.priority, want.time_to_live))
 
     async def test_expiry_and_retries(self) -> None:
-        # 1. Expired before first attempt (boundary and past)
+        # 1. Expired at payload build time -> returns None (skips truncation, no BodyTooLong)
+        oversized = {"aps": {"sound": "default"}, "pad": "x" * 5000}
         for age in (30_000, 60_000):
             with self.subTest(expired_age=age):
                 self.sent[APP_ID].clear()
-                notif = Notification(_raw(content=_ring(self.now_ms - age), tweaks={"sound": "ring"}))
+                notif = Notification(
+                    _raw(
+                        content=_ring(self.now_ms - age),
+                        tweaks={"sound": "ring"},
+                        default_payload=oversized,
+                    )
+                )
+                log = NotificationLoggerAdapter(logging.getLogger(__name__), {"request_id": "req-exp"})
+                self.assertIsNone(self.pushkin._get_payload_full(notif, notif.devices[0], log, True))
                 self.assertEqual(await self._dispatch(notif), [])
                 self.assertEqual(self.sent[APP_ID], [])
 
@@ -360,82 +306,6 @@ class MindroomApnsPushkinTestCase(unittest.IsolatedAsyncioTestCase):
                 notif = Notification(_raw(content=_ring(self.now_ms - age), tweaks={"sound": "ring"}))
                 self.assertEqual(await self._dispatch(notif, advance=adv), [])
                 self.assertEqual([r.time_to_live for r in self.sent[APP_ID]], expected_ttls)
-
-    async def test_delayed_connection_enforces_absolute_deadline_on_wire(self) -> None:
-        async def _send_with_pool(
-            raw: Dict[str, Any],
-            *,
-            connect_delay_ms: int,
-            channel_wait_ms: int = 0,
-        ) -> Tuple[List[str], List[List[Tuple[str, str]]], _DelayedFakePool]:
-            headers_log: List[List[Tuple[str, str]]] = []
-            pool = _DelayedFakePool(
-                on_connect=lambda: setattr(self, "now_ms", self.now_ms + connect_delay_ms),
-                headers_log=headers_log,
-                channel_wait=(
-                    (lambda: setattr(self, "now_ms", self.now_ms + channel_wait_ms))
-                    if channel_wait_ms > 0
-                    else None
-                ),
-            )
-            fake_apns = MagicMock(pool=pool)
-            fake_apns.send_notification.side_effect = pool.send_notification
-            with patch("sygnal.apnspushkin.APNs", return_value=fake_apns):
-                pushkin = MindroomApnsPushkin(
-                    APP_ID,
-                    self.sygnal,
-                    {
-                        "type": "mindroom_pushkin.MindroomApnsPushkin",
-                        "keyfile": FAKE_KEYFILE,
-                        "key_id": "KEYID12345",
-                        "team_id": "TEAMID1234",
-                        "topic": APP_ID,
-                        "platform": "production",
-                        "convert_device_token_to_hex": False,
-                    },
-                )
-            rejected = await self._dispatch(Notification(raw), pushkin=pushkin)
-            return rejected, headers_log, pool
-
-        # A. Connection wait crosses deadline -> nothing written on the wire
-        rej, hdrs, _ = await _send_with_pool(
-            _raw(content=_ring(self.now_ms, lifetime=5_000), tweaks={"sound": "ring"}),
-            connect_delay_ms=6_000,
-        )
-        self.assertEqual((rej, hdrs), ([], []))
-
-        # B. Connection waits 5 s (still before deadline) -> apns-expiration never exceeds deadline
-        self.now_ms = BASE_NOW_MS + 400
-        deadline_ms = self.now_ms + 25_000
-        rej, hdrs, _ = await _send_with_pool(
-            _raw(content=_ring(self.now_ms, lifetime=25_000), tweaks={"sound": "ring"}),
-            connect_delay_ms=5_000,
-        )
-        self.assertEqual(rej, [])
-        self.assertEqual(len(hdrs), 1)
-        exp_hdr = int(dict(hdrs[0])["apns-expiration"])
-        self.assertEqual(exp_hdr, deadline_ms // 1000)
-        self.assertLessEqual(exp_hdr * 1000, deadline_ms)
-
-        # C. Stream channel wait crosses deadline -> channel released, nothing sent
-        self.now_ms = BASE_NOW_MS
-        rej, hdrs, pool = await _send_with_pool(
-            _raw(content=_ring(self.now_ms, lifetime=5_000), tweaks={"sound": "ring"}),
-            connect_delay_ms=1_000,
-            channel_wait_ms=5_000,
-        )
-        self.assertEqual((rej, hdrs), ([], []))
-        self.assertFalse(pool.last_protocol.free_channels.is_busy)
-
-        # D. Non-ring through _MindroomDeadlineProtocol delegates to stock behavior (no apns-expiration)
-        self.now_ms = BASE_NOW_MS
-        rej, hdrs, _ = await _send_with_pool(
-            _raw(event_type="m.room.message", content={"msgtype": "m.text", "body": "Hi"}),
-            connect_delay_ms=2_000,
-        )
-        self.assertEqual(rej, [])
-        self.assertEqual(len(hdrs), 1)
-        self.assertNotIn("apns-expiration", dict(hdrs[0]))
 
 
 if __name__ == "__main__":

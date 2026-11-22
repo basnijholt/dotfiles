@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   constants = import ./constants.nix;
@@ -6,6 +6,33 @@ let
 
   sygnalImage = "docker.io/matrixdotorg/sygnal@sha256:141f5e72fdf99a28e29ca87f3a46c19ed1cf21d5074aa3ef9df7c067e0c1c46a";
   mindroomPushkin = ./mindroom_pushkin.py;
+
+  # Construct the pushkin via Sygnal's real creation path offline. Exits 3 ONLY
+  # on pushkin import/construction failure so sygnal-setup falls back to `apns`;
+  # any other error (podman/storage/config) fails sygnal-setup for systemd retry.
+  pushkinProbeCode = ''
+    import asyncio, sys, traceback
+    from twisted.internet.defer import ensureDeferred
+    from twisted.internet.testing import MemoryReactorClock
+    from sygnal.apnspushkin import ApnsPushkin
+    from sygnal.sygnal import Sygnal, parse_config
+
+    async def main():
+        cfg = parse_config()
+        s = Sygnal(cfg, MemoryReactorClock())
+        for app_id, app_cfg in cfg["apps"].items():
+            try:
+                p = await ensureDeferred(s._make_pushkin(app_id, app_cfg)).asFuture(
+                    asyncio.get_running_loop()
+                )
+                if not isinstance(p, ApnsPushkin):
+                    raise TypeError(f"Expected ApnsPushkin, got {type(p)!r}")
+            except Exception:
+                traceback.print_exc()
+                sys.exit(3)
+
+    asyncio.run(main())
+  '';
 
   sygnalConfigTemplate = pkgs.writeText "sygnal.yaml" ''
     log:
@@ -85,30 +112,49 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
+      Restart = "on-failure";
+      RestartSec = "15s";
     };
 
     script = ''
       install -d -m 0750 /run/sygnal
       install -m 0400 ${config.age.secrets.sygnal-apns-key.path} /run/sygnal/sygnal-apns-key.p8
-      install -m 0444 ${mindroomPushkin} /run/sygnal/mindroom_pushkin.py
+      if [ -f ${mindroomPushkin} ]; then
+        install -m 0444 ${mindroomPushkin} /run/sygnal/mindroom_pushkin.py
+      else
+        rm -f /run/sygnal/mindroom_pushkin.py
+      fi
       set -a
       . ${config.age.secrets.sygnal-env.path}
       set +a
-      if [ -f /run/sygnal/mindroom_pushkin.py ] && ${pkgs.podman}/bin/podman run --rm --entrypoint python \
+      export SYGNAL_APNS_TYPE="mindroom_pushkin.MindroomApnsPushkin"
+      ${pkgs.envsubst}/bin/envsubst \
+        -o /run/sygnal/sygnal.yaml.probe \
+        -i ${sygnalConfigTemplate}
+      chmod 0400 /run/sygnal/sygnal.yaml.probe
+      rc=0
+      ${pkgs.podman}/bin/podman run --rm --network=none --entrypoint python \
         -e PYTHONDONTWRITEBYTECODE=1 \
         -e PYTHONPATH=/sygnal \
-        -v /run/sygnal/mindroom_pushkin.py:/sygnal/mindroom_pushkin.py:ro \
+        -e SYGNAL_CONF=/sygnal/sygnal.yaml.probe \
+        -v /run/sygnal:/sygnal:ro \
         ${sygnalImage} \
-        -c 'from sygnal.apnspushkin import ApnsPushkin; from mindroom_pushkin import MindroomApnsPushkin; assert issubclass(MindroomApnsPushkin, ApnsPushkin)'; then
-        export SYGNAL_APNS_TYPE="mindroom_pushkin.MindroomApnsPushkin"
-      else
-        echo "WARNING: mindroom_pushkin failed import check; falling back to stock apns pushkin" >&2
+        -c ${lib.escapeShellArg pushkinProbeCode} || rc=$?
+      if [ "$rc" -eq 0 ]; then
+        mv -f /run/sygnal/sygnal.yaml.probe /run/sygnal/sygnal.yaml
+      elif [ "$rc" -eq 3 ]; then
+        echo "WARNING: mindroom_pushkin failed preflight (exit 3); falling back to stock apns pushkin" >&2
         export SYGNAL_APNS_TYPE="apns"
+        ${pkgs.envsubst}/bin/envsubst \
+          -o /run/sygnal/sygnal.yaml.probe \
+          -i ${sygnalConfigTemplate}
+        chmod 0400 /run/sygnal/sygnal.yaml.probe
+        mv -f /run/sygnal/sygnal.yaml.probe /run/sygnal/sygnal.yaml
+      else
+        rm -f /run/sygnal/sygnal.yaml.probe
+        echo "ERROR: sygnal preflight failed with exit code $rc" >&2
+        exit "$rc"
       fi
-      ${pkgs.envsubst}/bin/envsubst \
-        -o /run/sygnal/sygnal.yaml \
-        -i ${sygnalConfigTemplate}
-      chmod 0400 /run/sygnal/sygnal.yaml
     '';
   };
 
@@ -131,8 +177,7 @@ in
       sygnalConfigTemplate
       mindroomPushkin
     ];
-    requires = [ "sygnal-setup.service" ];
-    wants = [ "network-online.target" ];
+    wants = [ "network-online.target" "sygnal-setup.service" ];
     serviceConfig.ExecCondition = ''
       ${pkgs.bash}/bin/bash -lc '[ -s ${config.age.secrets.sygnal-apns-key.path} ] \
         && ! grep -q "CHANGE_ME" ${config.age.secrets.sygnal-apns-key.path} \
