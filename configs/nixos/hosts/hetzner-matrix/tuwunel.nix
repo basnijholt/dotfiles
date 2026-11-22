@@ -69,10 +69,14 @@ let
     mindroom_openid_audience = true
     # MindRoom Chat on the web gets SSO login tokens without the "Continue sign-in"
     # page. Since v1.9.4 this list replaces the fork's sso_trusted_redirect_hosts.
-    # It also limits OIDC dynamic client registration to these redirect hosts.
+    # It also limits OIDC dynamic client registration to these redirect hosts
+    # (element.io covers Element X iOS's https://element.io/oauth/ios/... redirect).
     # The apps' mindroom://auth/... callbacks have host "auth", so they still
     # see the page.
-    oidc_registration_allowed_redirect_hosts = ["${chatDomain}"]
+    oidc_registration_allowed_redirect_hosts = ["${chatDomain}", "element.io"]
+    # Show Tuwunel's sign-in page (password + all configured SSO providers) for
+    # OIDC clients instead of redirecting straight to the default provider.
+    oidc_native_auth = true
 
     # Keep one-off OAuth repair commands out of this public repository.
     [global.well_known]

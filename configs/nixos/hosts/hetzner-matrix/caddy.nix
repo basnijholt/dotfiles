@@ -21,6 +21,9 @@ in
         reverse_proxy /_matrix/* localhost:8008
         # Stylesheet and script of Tuwunel's SSO pages (UIA confirmation, sign-in).
         reverse_proxy /_tuwunel/sso/* localhost:8008
+        # Tuwunel's built-in OIDC authorization server (MSC3861 / next-gen auth).
+        reverse_proxy /_tuwunel/oidc/* localhost:8008
+        reverse_proxy /.well-known/openid-configuration localhost:8008
         reverse_proxy /v1/local-mindroom/* localhost:8776
 
         handle /.well-known/matrix/server {
@@ -56,7 +59,7 @@ in
         root * /var/www/mindroom
         # Keep the website's SPA fallback from rewriting API/discovery requests.
         @siteFiles {
-          not path /_matrix/* /_tuwunel/sso/* /v1/local-mindroom/* /.well-known/matrix/* /livekit/* /
+          not path /_matrix/* /_tuwunel/sso/* /_tuwunel/oidc/* /.well-known/openid-configuration /v1/local-mindroom/* /.well-known/matrix/* /livekit/* /
           file {path} /index.html
         }
         rewrite @siteFiles {file_match.relative}
