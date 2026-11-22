@@ -1,4 +1,4 @@
-{ ... }:
+{ dotfilesRev ? "main", ... }:
 
 let
   constants = import ./constants.nix;
@@ -108,7 +108,27 @@ in
     # Matrix push gateway for native mobile clients.
     virtualHosts."${pushDomain}" = {
       extraConfig = ''
-        reverse_proxy localhost:5000
+        # AGPL-3.0 section 13 source offer for Sygnal v0.17.0 + MindroomApnsPushkin.
+        @sourceOffer {
+          method GET HEAD
+          path /
+        }
+        handle @sourceOffer {
+          header Content-Type "text/plain; charset=utf-8"
+          respond 200 {
+            body <<EOF
+            MindRoom Matrix push gateway (Sygnal v0.17.0, AGPL-3.0, with MindroomApnsPushkin).
+            Corresponding source:
+            - Sygnal v0.17.0: https://github.com/element-hq/sygnal/tree/v0.17.0
+            - MindroomApnsPushkin: https://github.com/basnijholt/dotfiles/blob/${dotfilesRev}/configs/nixos/hosts/hetzner-matrix/mindroom_pushkin.py
+            EOF
+            close
+          }
+        }
+
+        handle {
+          reverse_proxy localhost:5000
+        }
       '';
     };
   };

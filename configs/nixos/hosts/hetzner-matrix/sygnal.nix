@@ -5,6 +5,7 @@ let
   inherit (constants) iosPushAppId;
 
   sygnalImage = "docker.io/matrixdotorg/sygnal@sha256:141f5e72fdf99a28e29ca87f3a46c19ed1cf21d5074aa3ef9df7c067e0c1c46a";
+  mindroomPushkin = ./mindroom_pushkin.py;
 
   sygnalConfigTemplate = pkgs.writeText "sygnal.yaml" ''
     log:
@@ -51,7 +52,7 @@ let
 
     apps:
       ${iosPushAppId}:
-        type: apns
+        type: mindroom_pushkin.MindroomApnsPushkin
         keyfile: /sygnal/sygnal-apns-key.p8
         key_id: $SYGNAL_APNS_KEY_ID
         team_id: $SYGNAL_APNS_TEAM_ID
@@ -74,6 +75,7 @@ in
 
     restartTriggers = [
       sygnalConfigTemplate
+      mindroomPushkin
       config.age.secrets.sygnal-env.file
       config.age.secrets.sygnal-apns-key.file
     ];
@@ -86,6 +88,7 @@ in
     script = ''
       install -d -m 0750 /run/sygnal
       install -m 0400 ${config.age.secrets.sygnal-apns-key.path} /run/sygnal/sygnal-apns-key.p8
+      install -m 0444 ${mindroomPushkin} /run/sygnal/mindroom_pushkin.py
       set -a
       . ${config.age.secrets.sygnal-env.path}
       set +a
@@ -101,6 +104,8 @@ in
     autoStart = true;
     environment = {
       PYTHONUNBUFFERED = "1";
+      PYTHONDONTWRITEBYTECODE = "1";
+      PYTHONPATH = "/sygnal";
       SYGNAL_CONF = "/sygnal/sygnal.yaml";
     };
     ports = [ "127.0.0.1:5000:5000" ];
@@ -109,6 +114,10 @@ in
 
   systemd.services.podman-sygnal = {
     after = [ "network-online.target" "sygnal-setup.service" ];
+    restartTriggers = [
+      sygnalConfigTemplate
+      mindroomPushkin
+    ];
     requires = [ "sygnal-setup.service" ];
     wants = [ "network-online.target" ];
     serviceConfig.ExecCondition = ''
