@@ -71,7 +71,7 @@ in
 
       "inkling-2:mini-vllm":
         name: "Inkling 2 Mini · vLLM (HyperInkling)"
-        description: "INT4 GPTQ, DSpark, 128K context, GPU 0 only."
+        description: "INT4 GPTQ, DSpark, 128K context, async off, GPU 0 only."
         cmd: "${hyperinkling} ''${PORT}"
         cmdStop: "${pkgs.docker}/bin/docker stop -t 60 llama-swap-hyperinkling"
         proxy: "http://127.0.0.1:''${PORT}"
