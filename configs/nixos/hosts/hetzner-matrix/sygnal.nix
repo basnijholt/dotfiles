@@ -52,7 +52,7 @@ let
 
     apps:
       ${iosPushAppId}:
-        type: mindroom_pushkin.MindroomApnsPushkin
+        type: $SYGNAL_APNS_TYPE
         keyfile: /sygnal/sygnal-apns-key.p8
         key_id: $SYGNAL_APNS_KEY_ID
         team_id: $SYGNAL_APNS_TEAM_ID
@@ -71,6 +71,8 @@ in
 
   systemd.services.sygnal-setup = {
     description = "Prepare Sygnal runtime configuration";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
     before = [ "podman-sygnal.service" ];
 
     restartTriggers = [
@@ -92,6 +94,17 @@ in
       set -a
       . ${config.age.secrets.sygnal-env.path}
       set +a
+      if [ -f /run/sygnal/mindroom_pushkin.py ] && ${pkgs.podman}/bin/podman run --rm --entrypoint python \
+        -e PYTHONDONTWRITEBYTECODE=1 \
+        -e PYTHONPATH=/sygnal \
+        -v /run/sygnal/mindroom_pushkin.py:/sygnal/mindroom_pushkin.py:ro \
+        ${sygnalImage} \
+        -c 'from sygnal.apnspushkin import ApnsPushkin; from mindroom_pushkin import MindroomApnsPushkin; assert issubclass(MindroomApnsPushkin, ApnsPushkin)'; then
+        export SYGNAL_APNS_TYPE="mindroom_pushkin.MindroomApnsPushkin"
+      else
+        echo "WARNING: mindroom_pushkin failed import check; falling back to stock apns pushkin" >&2
+        export SYGNAL_APNS_TYPE="apns"
+      fi
       ${pkgs.envsubst}/bin/envsubst \
         -o /run/sygnal/sygnal.yaml \
         -i ${sygnalConfigTemplate}

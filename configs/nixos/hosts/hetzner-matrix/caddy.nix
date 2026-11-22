@@ -1,8 +1,12 @@
-{ dotfilesRev ? "main", ... }:
+{ pkgs, ... }:
 
 let
   constants = import ./constants.nix;
   inherit (constants) siteDomain appDomain chatDomain pushDomain demoDomain demoTuwunelPort chatPublishedPath rtcJwtPort;
+  pushkinSourceDir = pkgs.runCommandLocal "mindroom-pushkin-source" { } ''
+    mkdir -p "$out"
+    cp ${./mindroom_pushkin.py} "$out/mindroom_pushkin.py"
+  '';
 in
 {
   systemd.tmpfiles.rules = [
@@ -120,10 +124,19 @@ in
             MindRoom Matrix push gateway (Sygnal v0.17.0, AGPL-3.0, with MindroomApnsPushkin).
             Corresponding source:
             - Sygnal v0.17.0: https://github.com/element-hq/sygnal/tree/v0.17.0
-            - MindroomApnsPushkin: https://github.com/basnijholt/dotfiles/blob/${dotfilesRev}/configs/nixos/hosts/hetzner-matrix/mindroom_pushkin.py
+            - MindroomApnsPushkin: https://${pushDomain}/mindroom_pushkin.py
             EOF
-            close
           }
+        }
+
+        @pushkinSource {
+          method GET HEAD
+          path /mindroom_pushkin.py
+        }
+        handle @pushkinSource {
+          root * ${pushkinSourceDir}
+          header Content-Type "text/plain; charset=utf-8"
+          file_server
         }
 
         handle {

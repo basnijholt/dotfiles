@@ -212,7 +212,6 @@
 
         # Hetzner Cloud VPS (ARM) - Tuwunel Matrix homeserver for MindRoom
         hetzner-matrix = mkHostArm [
-          { _module.args.dotfilesRev = self.rev or "main"; }
           ragenix.nixosModules.default
           disko.nixosModules.disko
           ./hosts/hetzner-matrix/disko.nix
