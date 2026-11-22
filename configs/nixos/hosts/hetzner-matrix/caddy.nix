@@ -1,13 +1,8 @@
-{ pkgs, ... }:
+{ mindroom-sygnal, ... }:
 
 let
   constants = import ./constants.nix;
   inherit (constants) siteDomain appDomain chatDomain pushDomain demoDomain demoTuwunelPort chatPublishedPath rtcJwtPort;
-  pushkinSourceDir = pkgs.runCommandLocal "mindroom-pushkin-source" { } ''
-    mkdir -p "$out"
-    cp ${./mindroom_pushkin.py} "$out/mindroom_pushkin.py"
-    cp ${./mindroom_pushkin_loader.py} "$out/mindroom_pushkin_loader.py"
-  '';
 in
 {
   systemd.tmpfiles.rules = [
@@ -113,7 +108,7 @@ in
     # Matrix push gateway for native mobile clients.
     virtualHosts."${pushDomain}" = {
       extraConfig = ''
-        # AGPL-3.0 section 13 source offer for Sygnal v0.17.0 + MindroomApnsPushkin.
+        # AGPL-3.0 section 13 source offer for Sygnal v0.17.0 + mindroom-sygnal.
         @sourceOffer {
           method GET HEAD
           path /
@@ -122,23 +117,12 @@ in
           header Content-Type "text/plain; charset=utf-8"
           respond 200 {
             body <<EOF
-            MindRoom Matrix push gateway (Sygnal v0.17.0, AGPL-3.0, with MindroomApnsPushkin).
+            MindRoom Matrix push gateway (Sygnal v0.17.0, AGPL-3.0, with mindroom-sygnal).
             Corresponding source:
             - Sygnal v0.17.0: https://github.com/element-hq/sygnal/tree/v0.17.0
-            - MindroomApnsPushkin: https://${pushDomain}/mindroom_pushkin.py
-            - Loader: https://${pushDomain}/mindroom_pushkin_loader.py
+            - mindroom-sygnal: https://github.com/mindroom-ai/mindroom-sygnal/tree/${mindroom-sygnal.rev}
             EOF
           }
-        }
-
-        @pushkinSource {
-          method GET HEAD
-          path /mindroom_pushkin.py /mindroom_pushkin_loader.py
-        }
-        handle @pushkinSource {
-          root * ${pushkinSourceDir}
-          header Content-Type "text/plain; charset=utf-8"
-          file_server
         }
 
         handle {

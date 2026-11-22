@@ -31,6 +31,10 @@
       url = "github:basnijholt/zfs-tenant";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    mindroom-sygnal = {
+      url = "github:mindroom-ai/mindroom-sygnal";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # NOTE: Do NOT use inputs.nixpkgs.follows here - nixos-raspberrypi needs
     # its own forked nixpkgs with boot.loader.raspberryPi support
     nixos-raspberrypi.url = "github:nvmd/nixos-raspberrypi/main";
@@ -47,6 +51,7 @@
       ragenix,
       zfs-unlock,
       zfs-tenant,
+      mindroom-sygnal,
       nixos-raspberrypi,
       ...
     }:
@@ -76,6 +81,7 @@
         extraModules:
         lib.nixosSystem {
           system = "aarch64-linux";
+          specialArgs = { inherit mindroom-sygnal; };
           modules = commonModules home-manager ++ extraModules;
         };
 

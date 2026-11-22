@@ -1,12 +1,11 @@
-{ config, pkgs, ... }:
+{ config, pkgs, mindroom-sygnal, ... }:
 
 let
   constants = import ./constants.nix;
   inherit (constants) iosPushAppId;
 
   sygnalImage = "docker.io/matrixdotorg/sygnal@sha256:141f5e72fdf99a28e29ca87f3a46c19ed1cf21d5074aa3ef9df7c067e0c1c46a";
-  mindroomPushkin = ./mindroom_pushkin.py;
-  mindroomPushkinLoader = ./mindroom_pushkin_loader.py;
+  mindroomSygnalPkg = mindroom-sygnal.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
   sygnalConfigTemplate = pkgs.writeText "sygnal.yaml" ''
     log:
@@ -64,8 +63,7 @@ let
 
   sygnalRestartTriggers = [
     sygnalConfigTemplate
-    mindroomPushkin
-    mindroomPushkinLoader
+    mindroomSygnalPkg
     config.age.secrets.sygnal-env.file
     config.age.secrets.sygnal-apns-key.file
   ];
@@ -92,8 +90,8 @@ in
     script = ''
       install -d -m 0750 /run/sygnal
       install -m 0400 ${config.age.secrets.sygnal-apns-key.path} /run/sygnal/sygnal-apns-key.p8
-      install -m 0444 ${mindroomPushkin} /run/sygnal/mindroom_pushkin.py
-      install -m 0444 ${mindroomPushkinLoader} /run/sygnal/mindroom_pushkin_loader.py
+      install -m 0444 ${mindroomSygnalPkg}/mindroom_pushkin.py /run/sygnal/mindroom_pushkin.py
+      install -m 0444 ${mindroomSygnalPkg}/mindroom_pushkin_loader.py /run/sygnal/mindroom_pushkin_loader.py
       set -a
       . ${config.age.secrets.sygnal-env.path}
       set +a

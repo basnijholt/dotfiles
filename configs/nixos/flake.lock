@@ -234,6 +234,26 @@
         "type": "github"
       }
     },
+    "mindroom-sygnal": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795330742,
+        "narHash": "sha256-RpTAfdhXYTHw1vnSxoed6a7d3kDJ/nRcujEx2yfjgZs=",
+        "owner": "mindroom-ai",
+        "repo": "mindroom-sygnal",
+        "rev": "6e79c8ac387a3b4110aab607b6d5dcf8cc6d6c3e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mindroom-ai",
+        "repo": "mindroom-sygnal",
+        "type": "github"
+      }
+    },
     "nixos-images": {
       "inputs": {
         "nixos-stable": [
@@ -360,6 +380,7 @@
         "disko": "disko",
         "home-manager": "home-manager",
         "home-manager-pi": "home-manager-pi",
+        "mindroom-sygnal": "mindroom-sygnal",
         "nixos-raspberrypi": "nixos-raspberrypi",
         "nixpkgs": "nixpkgs_3",
         "ragenix": "ragenix",
