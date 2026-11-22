@@ -48,7 +48,7 @@ in
       # (stacks: club-3090-vllm/swap). Source: https://github.com/Pento95/HyperInkling
       "inkling-2:mini-vllm":
         name: "Inkling 2 Mini · vLLM (HyperInkling)"
-        description: "INT4 GPTQ, DSpark, 128K context, async off, GPU 0 only."
+        description: "INT4 GPTQ, DSpark, 128K context, GPU 0 only."
         cmd: "${vllmSwap} start inkling ''${PORT}"
         proxy: "http://127.0.0.1:''${PORT}"
         useModelName: "inkling-2-mini"
