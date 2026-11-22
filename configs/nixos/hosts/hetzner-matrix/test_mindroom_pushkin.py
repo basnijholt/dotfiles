@@ -18,6 +18,7 @@
 
 import asyncio
 import copy
+import importlib
 import logging
 import unittest
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -317,15 +318,20 @@ class MindroomApnsPushkinTestCase(unittest.IsolatedAsyncioTestCase):
         ok = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
         self.assertIsInstance(ok, MindroomApnsPushkin)
 
-        # 2. Import failure -> logs error and falls back to stock ApnsPushkin
-        with patch("mindroom_pushkin_loader.importlib.import_module", side_effect=ImportError("broken")):
-            fallback_import = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
-        self.assertIs(type(fallback_import), ApnsPushkin)
+        real_import = importlib.import_module
 
-        # 3. SyntaxError on import -> falls back to stock ApnsPushkin
-        with patch("mindroom_pushkin_loader.importlib.import_module", side_effect=SyntaxError("bad syntax")):
-            fallback_syntax = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
-        self.assertIs(type(fallback_syntax), ApnsPushkin)
+        def _fail_pushkin(exc: Exception) -> Callable[..., Any]:
+            def _imp(name: str, *args: Any, **kwargs: Any) -> Any:
+                if name == "mindroom_pushkin":
+                    raise exc
+                return real_import(name, *args, **kwargs)
+            return _imp
+
+        # 2. ImportError / SyntaxError on pushkin import -> falls back to stock ApnsPushkin
+        for exc in (ImportError("broken"), SyntaxError("bad syntax")):
+            with patch("importlib.import_module", side_effect=_fail_pushkin(exc)):
+                fb = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
+            self.assertIs(type(fb), ApnsPushkin)
 
         # 4. Constructor raising -> logs error and falls back to stock ApnsPushkin
         with patch.object(MindroomApnsPushkin, "__init__", side_effect=RuntimeError("boom")):
