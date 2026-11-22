@@ -6,6 +6,7 @@ let
 
   # HyperInkling: a vLLM sm86 port of Inkling 2 Mini with an INT4 GPTQ checkpoint and the
   # DSpark drafter. It needs a GPU to itself, so it gets GPU 0; GPU 1 keeps Whisper.
+  # At GPU_UTIL 0.88 128K needs the vision tower in host RAM (+27 ms per image).
   # The checkpoint is downloaded by hand, like the vllm-swap models:
   #   hf download Pentium95/Inkling-2-Mini-W4A16-g128-gptq --revision <rev> --local-dir <dir>
   # Source: https://github.com/Pento95/HyperInkling
@@ -21,6 +22,7 @@ let
       --shm-size 16g \
       -e MODEL=/models/inkling -e HOST=0.0.0.0 -e PORT=8000 \
       -e MAX_LEN=131072 -e MAX_SEQS=4 -e GPU_UTIL=0.88 -e KV_OFFLOAD_GB=0 \
+      -e HYPERINKLING_VISION_HOST=1 \
       -v ${hyperinklingCheckpoint}:/models/inkling:ro \
       -v llama-swap-hyperinkling-jit:/cache \
       ghcr.io/pento95/hyperinkling:0.1.1@sha256:ec5c0501c193d01228fdb1b855c2097030b88127525f5b3f69cafcc787801d8c
