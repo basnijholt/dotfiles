@@ -308,5 +308,30 @@ class MindroomApnsPushkinTestCase(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual([r.time_to_live for r in self.sent[APP_ID]], expected_ttls)
 
 
+    async def test_safe_loader_fallback(self) -> None:
+        loader_cfg = {
+            **self.sygnal.config["apps"][APP_ID],
+            "type": "mindroom_pushkin_loader.SafeApnsPushkin",
+        }
+        # 1. Valid pushkin -> returns MindroomApnsPushkin
+        ok = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
+        self.assertIsInstance(ok, MindroomApnsPushkin)
+
+        # 2. Import failure -> logs error and falls back to stock ApnsPushkin
+        with patch("mindroom_pushkin_loader.importlib.import_module", side_effect=ImportError("broken")):
+            fallback_import = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
+        self.assertIs(type(fallback_import), ApnsPushkin)
+
+        # 3. SyntaxError on import -> falls back to stock ApnsPushkin
+        with patch("mindroom_pushkin_loader.importlib.import_module", side_effect=SyntaxError("bad syntax")):
+            fallback_syntax = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
+        self.assertIs(type(fallback_syntax), ApnsPushkin)
+
+        # 4. Constructor raising -> logs error and falls back to stock ApnsPushkin
+        with patch.object(MindroomApnsPushkin, "__init__", side_effect=RuntimeError("boom")):
+            fallback_ctor = await self._await(self.sygnal._make_pushkin(APP_ID, loader_cfg))
+        self.assertIs(type(fallback_ctor), ApnsPushkin)
+
+
 if __name__ == "__main__":
     unittest.main()

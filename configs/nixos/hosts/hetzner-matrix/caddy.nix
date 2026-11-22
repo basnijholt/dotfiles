@@ -6,6 +6,7 @@ let
   pushkinSourceDir = pkgs.runCommandLocal "mindroom-pushkin-source" { } ''
     mkdir -p "$out"
     cp ${./mindroom_pushkin.py} "$out/mindroom_pushkin.py"
+    cp ${./mindroom_pushkin_loader.py} "$out/mindroom_pushkin_loader.py"
   '';
 in
 {
@@ -125,13 +126,14 @@ in
             Corresponding source:
             - Sygnal v0.17.0: https://github.com/element-hq/sygnal/tree/v0.17.0
             - MindroomApnsPushkin: https://${pushDomain}/mindroom_pushkin.py
+            - Loader: https://${pushDomain}/mindroom_pushkin_loader.py
             EOF
           }
         }
 
         @pushkinSource {
           method GET HEAD
-          path /mindroom_pushkin.py
+          path /mindroom_pushkin.py /mindroom_pushkin_loader.py
         }
         handle @pushkinSource {
           root * ${pushkinSourceDir}
