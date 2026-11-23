@@ -241,11 +241,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795330742,
-        "narHash": "sha256-RpTAfdhXYTHw1vnSxoed6a7d3kDJ/nRcujEx2yfjgZs=",
+        "lastModified": 1795419592,
+        "narHash": "sha256-RLbi3bmTa+63KkRGnONMIgSKatyOK7B6xUmr71E+5Hc=",
         "owner": "mindroom-ai",
         "repo": "mindroom-sygnal",
-        "rev": "6e79c8ac387a3b4110aab607b6d5dcf8cc6d6c3e",
+        "rev": "d58caccf7fcf7aaa8e306075c1c87289f78f0338",
         "type": "github"
       },
       "original": {
