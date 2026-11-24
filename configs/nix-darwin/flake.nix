@@ -121,6 +121,7 @@
             {
               networking.hostName = "marcellas-macbook-air";
               networking.computerName = "Marcella’s MacBook Air";
+              local.skipCasks = [ "inkscape" ];
             }
           ];
         };

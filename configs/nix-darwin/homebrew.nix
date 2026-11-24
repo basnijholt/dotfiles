@@ -1,7 +1,13 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
-  homebrew = {
+  # Casks a host leaves out of the shared list below
+  options.local.skipCasks = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = [ ];
+  };
+
+  config.homebrew = {
     enable = true;
     onActivation = {
       autoUpdate = true;
@@ -113,7 +119,7 @@
     );
 
     # GUI Applications (Casks)
-    casks = [
+    casks = lib.subtractLists config.local.skipCasks ([
       "1password-cli" # 1Password CLI
       "adobe-creative-cloud" # Adobe suite
       "airflow" # Video transcoder
@@ -201,7 +207,7 @@
           "google-drive" # Cloud storage
           "xquartz" # X11 server
         ]
-    );
+    ));
 
     # Additional repositories
     taps = [
