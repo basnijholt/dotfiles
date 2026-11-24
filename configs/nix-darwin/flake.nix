@@ -122,6 +122,28 @@
               networking.hostName = "marcellas-macbook-air";
               networking.computerName = "Marcella’s MacBook Air";
               local.skipCasks = [ "inkscape" ];
+              homebrew.taps = [ "mindroom-ai/tap" ];
+              homebrew.extraConfig = ''
+                cask "mindroom-ai/tap/mindroom-chat", trusted: true
+              '';
+              # Apps from her old MacBook Air that the shared list lacks
+              homebrew.casks = [
+                "adobe-acrobat-reader"
+                "adobe-digital-editions"
+                "calibre"
+                "chatgpt"
+                "disk-inventory-x"
+                "keyboard-maestro"
+                "microsoft-edge"
+                "notion"
+                "onedrive"
+                "stats"
+                "sublime-text"
+                "the-unarchiver"
+                "void"
+                "webtorrent"
+                "whatsapp"
+              ];
             }
           ];
         };
