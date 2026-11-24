@@ -18,6 +18,7 @@ configs/hypr
 configs/karabiner
 configs/macos-hotkey-app-switcher/hotkeys.conf
 configs/mako
+configs/nix-darwin
 configs/nixos
 configs/syncthing
 scripts/git-credential-gitea.sh
