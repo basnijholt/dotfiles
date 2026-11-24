@@ -113,6 +113,17 @@
             }
           ];
         };
+        # Marcella's M5 MacBook Air
+        "marcellas-macbook-air" = mkDarwin {
+          privacyApps = true;
+          primaryUser = "marcellaholm";
+          extraModules = [
+            {
+              networking.hostName = "marcellas-macbook-air";
+              networking.computerName = "Marcella’s MacBook Air";
+            }
+          ];
+        };
       };
     };
 }
