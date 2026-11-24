@@ -51,7 +51,16 @@ if [[ $- == *i* ]]; then
         alias ss='open -b com.apple.ScreenSaver.Engine'
         alias switch-agent-cli-ip="${HOME}/dotfiles/scripts/switch-agent-cli-ip.py"
         alias tun='autossh -N -M 0 -o "ServerAliveInterval 30" -o "ServerAliveCountMax 3" -L 8888:localhost:9999 cw'
-        alias nixswitch="sudo darwin-rebuild switch --flake ~/dotfiles/configs/nix-darwin"
+        # The public branch leaves out nix-darwin, so a checkout of it builds from main on GitHub
+        nixswitch() {
+            local flake="$HOME/dotfiles/configs/nix-darwin"
+            local args=()
+            if [[ ! -d "$flake" ]]; then
+                flake="github:basnijholt/dotfiles?dir=configs/nix-darwin"
+                args=(--refresh)
+            fi
+            sudo darwin-rebuild switch "${args[@]}" --flake "$flake"
+        }
         alias nixupdate="cd ~/dotfiles/configs/nix-darwin && nix flake update --extra-experimental-features nix-command --extra-experimental-features flakes && nixswitch && cd -"
         nosleep() {
             sudo pmset -a disablesleep 1
