@@ -59,12 +59,12 @@
             # Tracks master, not releases: release tags lag master by hours
             # and skip build numbers. version is the build number (commit
             # count) of rev; update-overrides.py updates both.
-            version = "12622";
+            version = "12679";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              rev = "19bc41dbb41e858eebc269b49ccdec1f0d28880c";
-              hash = "sha256-Q2oEX5NqQXvZOZod6QvpuKLon1VWEqECwlVjW7cZyZQ=";
+              rev = "af5c58347fdbc2cd19e65b278e81c8f528f8a175";
+              hash = "sha256-J1qhQA0R3reHa93RBpEHAxJW2cVbj855mtY2EdfoO84=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
