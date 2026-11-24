@@ -145,7 +145,6 @@
       "thaw" # Menu bar manager
       "karabiner-elements" # Keyboard customizer
       "keepingyouawake" # Prevent sleep
-      "keyboard-maestro" # Automation tool
       "licecap" # Screen recorder
       "lulu" # Firewall
       "macfuse" # Filesystem in userspace
