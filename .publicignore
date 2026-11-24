@@ -16,7 +16,6 @@ configs/atuin/zfs
 configs/git/gitconfig-personal
 configs/hypr
 configs/karabiner
-configs/keyboard-maestro
 configs/macos-hotkey-app-switcher/hotkeys.conf
 configs/mako
 configs/nix-darwin

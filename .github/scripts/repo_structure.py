@@ -26,7 +26,6 @@ descriptions = {
     "hypr": "Hyprland window manager config",
     "iterm": "iTerm2 profiles",
     "karabiner": "Keyboard customization for macOS",
-    "keyboard-maestro": "Keyboard Maestro macros and configurations",
     "lazygit": "lazygit configuration",
     "mako": "Wayland notifications (mako)",
     "mamba": "Mamba package manager settings",

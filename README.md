@@ -47,7 +47,6 @@ There is a lot of stuff in this repository, but things I won't go without are:
 - [keychain](https://www.funtoo.org/Funtoo:Keychain) for SSH key management
 - [direnv](https://github.com/direnv/direnv/) for managing environment variables (especially for Python (`uv` and `micromamba`))
 - [zoxide](https://github.com/ajeetdsouza/zoxide) for jumping around directories (alternative to [`zsh-z`](https://github.com/agkozak/zsh-z))
-- [Keyboard Maestro](https://www.keyboardmaestro.com/) for keyboard shortcuts to switch between applications
 - [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) for syntax highlighting
 - [nix-darwin](https://github.com/nix-darwin/nix-darwin) for declarative macOS configuration
 
@@ -194,7 +193,6 @@ This will give you an interactive Zsh session within an Ubuntu container, config
 │   ├── hypr                         # Hyprland window manager config
 │   ├── iterm                        # iTerm2 profiles
 │   ├── karabiner                    # Keyboard customization for macOS
-│   ├── keyboard-maestro             # Keyboard Maestro macros and configurations
 │   ├── lazygit                      # lazygit configuration
 │   ├── mako                         # Wayland notifications (mako)
 │   ├── mamba                        # Mamba package manager settings
