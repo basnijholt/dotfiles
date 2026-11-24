@@ -129,10 +129,8 @@
               # Apps from her old MacBook Air that the shared list lacks
               homebrew.casks = [
                 "adobe-acrobat-reader"
-                "adobe-digital-editions"
                 "calibre"
                 "chatgpt"
-                "disk-inventory-x"
                 "keyboard-maestro"
                 "microsoft-edge"
                 "notion"
