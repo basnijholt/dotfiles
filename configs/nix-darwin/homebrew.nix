@@ -28,7 +28,6 @@
       "bandwhich" # Per-process network monitor
       "bat" # Better cat with syntax highlighting
       "blueutil" # Bluetooth utility
-      "brew-cask-completion" # Completion for brew cask
       "btop" # System monitor
       "cloudflared" # Cloudflare tunnel
       "cmake" # Build system
