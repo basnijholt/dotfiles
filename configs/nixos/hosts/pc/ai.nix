@@ -3,6 +3,7 @@
 
 let
   vllmSwap = "/var/lib/vllm-swap/current/bin/vllm-swap";
+  atomicInkling = "/home/basnijholt/.cache/huggingface/hub/models--AtomicChat--Inkling-2-Mini-GGUF/snapshots/309509848b3151419aa26d069eb03db57fd29a00";
 in
 {
   imports = [ ./vllm-swap.nix ];
@@ -65,6 +66,36 @@ in
       # Source: https://huggingface.co/unsloth/Inkling-2-Mini-GGUF/tree/main/Mainline_Support
       # Sampling follows Unsloth's recommendation (temp 1.0, no truncation).
       # Reasoning depth is the request's reasoning_effort (default high).
+      # AtomicChat's per-tensor "Atomic Dynamic" quant: AD-Q6_K matches Q8_0 quality
+      # (97.6% top-1 vs BF16) at 23.8 GB, so with --fit it sits fully on the two GPUs
+      # with no experts on the CPU. Pinned to a repo revision; download it by hand:
+      #   hf download AtomicChat/Inkling-2-Mini-GGUF Inkling-2-Mini-AD-Q6_K.gguf \
+      #     mmproj-Inkling-2-Mini-F16.gguf --revision <rev>
+      # Source: https://huggingface.co/AtomicChat/Inkling-2-Mini-GGUF
+      "inkling-2:mini-atomic":
+        name: "Inkling 2 Mini · llama.cpp (AtomicChat AD-Q6_K)"
+        description: "AD-Q6_K GGUF, 128K context, vision, both GPUs."
+        cmd: |
+          ${pkgs.llama-cpp}/bin/llama-server
+          --model ${atomicInkling}/Inkling-2-Mini-AD-Q6_K.gguf
+          --mmproj ${atomicInkling}/mmproj-Inkling-2-Mini-F16.gguf
+          --port ''${PORT}
+          --ctx-size 131072
+          --fit on
+          --fit-target 2048,2048
+          --parallel 1
+          --batch-size 2048
+          --ubatch-size 512
+          --flash-attn on
+          --cache-type-k q8_0
+          --cache-type-v q8_0
+          --split-mode layer
+          --temp 1.0
+          --top-p 1.0
+          --top-k 0
+          --min-p 0.0
+          --jinja
+
       "inkling-2:mini":
         name: "Inkling 2 Mini · llama.cpp"
         description: "UD-Q8_K_XL GGUF with vision support."
