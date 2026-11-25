@@ -3,6 +3,27 @@
 let
   constants = import ./constants.nix;
   inherit (constants) siteDomain appDomain chatDomain pushDomain demoDomain demoTuwunelPort chatPublishedPath rtcJwtPort;
+
+  # Temporary MSC4127 compatibility shim (remove after 2026-12-25):
+  # Capacitor native apps older than mindroom-chat v2026.11.414 (including live App Store
+  # 2026.11.404 and mindroom-chat-legacy) send ?access_token= on authenticated media GET/HEAD
+  # requests instead of Authorization: Bearer. Promote a single valid query token to a Bearer
+  # header before stripping it from the upstream query string.
+  legacyMediaQueryTokenShim = upstream: ''
+    @legacyMediaQueryToken {
+      method GET HEAD
+      path /_matrix/client/v1/media/download/* /_matrix/client/v1/media/thumbnail/*
+      not header Authorization *
+      expression `{http.request.uri.query.access_token}.matches("^[A-Za-z0-9._~+/=-]+$") && !{http.request.uri.query}.matches("(^|&)access_token(=|&|$).*&access_token(=|&|$)")`
+    }
+    handle @legacyMediaQueryToken {
+      route {
+        request_header Authorization "Bearer {http.request.uri.query.access_token}"
+        uri query -access_token
+        reverse_proxy ${upstream}
+      }
+    }
+  '';
 in
 {
   systemd.tmpfiles.rules = [
@@ -17,6 +38,7 @@ in
       extraConfig = ''
         # More specific than the homeserver route; Caddy forwards websocket upgrades.
         reverse_proxy /_matrix/client/unstable/fi.mau.as_sync localhost:29331
+        ${legacyMediaQueryTokenShim "localhost:8008"}
         # Tuwunel serves MatrixRTC transport discovery, including CORS preflights.
         reverse_proxy /_matrix/* localhost:8008
         # Stylesheet and script of Tuwunel's SSO pages (UIA confirmation, sign-in).
@@ -73,6 +95,7 @@ in
         @demoRegistration path /_matrix/client/r0/register* /_matrix/client/v3/register* /_matrix/client/unstable/register*
         respond @demoRegistration 403
 
+        ${legacyMediaQueryTokenShim "localhost:${toString demoTuwunelPort}"}
         reverse_proxy /_matrix/* localhost:${toString demoTuwunelPort}
 
         handle /.well-known/matrix/server {
