@@ -91,6 +91,21 @@ in
     '';
   };
 
+  # common/services.nix sets freeSwapThreshold = 10, which with 111 GiB of
+  # total swap (15.7 GiB zram + 96 GiB NVMe) waits until >100 GiB of swap is
+  # filled — pc froze at 40+ GiB swap and tripped the AMD hardware watchdog.
+  # 70% free fires once >~33 GiB swap is used (zram full + ~18 GiB NVMe) while
+  # <10% RAM is available.
+  services.earlyoom = {
+    freeSwapThreshold = lib.mkForce 70;
+    extraArgs = [
+      "--prefer"
+      "^(node|tsc|eslint|vitest|pytest|chromium|cargo|rustc|cc1plus)$"
+      "--avoid"
+      "^(systemd|sshd|mindroom|Hyprland|sway|tuwunel)$"
+    ];
+  };
+
   systemd.tmpfiles.rules = [
     "d /var/lib/club-3090-vllm 0755 root root -"
     "d /var/lib/club-3090-vllm/models 0755 root root -"
