@@ -46,11 +46,19 @@
   # parallel pytest/tsc/vitest/eslint runs hit cgroup limits inside
   # mindroom-shells.slice instead of wedging mindroom or pc.
   #
-  # Matching host-side Incus config on pc (not managed by NixOS):
-  #   incus config set mindroom limits.memory=44GiB
-  #   incus config set mindroom raw.lxc=$'lxc.cgroup2.memory.min = 6G\nlxc.cgroup2.memory.low = 8G'
-  # Container-level memory.min/memory.low let mindroom-chat.service's MemoryMin/
-  # MemoryLow take effect while limits.memory keeps the container from starving pc.
+  # Matching host-side Incus config on pc (not managed by NixOS) — merge into
+  # `raw.lxc` with `incus config edit mindroom` so existing `raw.lxc` lines are
+  # preserved:
+  #   raw.lxc: |
+  #     lxc.cgroup2.memory.min = 6G
+  #     lxc.cgroup2.memory.low = 8G
+  #     lxc.cgroup2.memory.max = 44G
+  #     lxc.cgroup2.memory.swap.max = 8G
+  # Setting memory.max and memory.swap.max explicitly in raw.lxc (rather than
+  # Incus's limits.memory, which sets memory.swap.max = 0) keeps a swap budget
+  # (>= mindroom-shells.slice's 4G) while capping the container below pc's
+  # 62 GiB RAM; memory.min/memory.low let mindroom-chat's MemoryMin/MemoryLow
+  # take effect.
 
   # Delegate cgroup v2 controllers so basnijholt's user manager (uid 1000) can
   # enforce CPU, cpuset, IO, memory, and pids limits on mindroom-shells.slice.
@@ -85,7 +93,9 @@
   };
 
   # Protect mindroom-chat from agent shell pressure and point its shell runner
-  # at basnijholt's user manager and mindroom-shells.slice.
+  # at basnijholt's user manager and mindroom-shells.slice. Negative
+  # OOMScoreAdjust is ignored in an unprivileged Incus container, so OOM
+  # protection relies on mindroom-shells.slice's MemoryMax + host earlyoom's --avoid.
   systemd.services.mindroom-chat = {
     after = [ "user@1000.service" ];
     wants = [ "user@1000.service" ];
@@ -98,7 +108,6 @@
       MemoryLow = "6G";
       CPUWeight = 1000;
       IOWeight = 1000;
-      OOMScoreAdjust = -500;
     };
   };
 
