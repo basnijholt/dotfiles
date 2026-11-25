@@ -1,8 +1,20 @@
-{ mindroom-sygnal, ... }:
+{ config, mindroom-sygnal, ... }:
 
 let
   constants = import ./constants.nix;
   inherit (constants) siteDomain appDomain chatDomain pushDomain demoDomain demoTuwunelPort chatPublishedPath rtcJwtPort;
+
+  # Never persist legacy ?access_token= query params into Caddy access logs.
+  redactedAccessLogFormat = host: ''
+    output file ${config.services.caddy.logDir}/access-${host}.log
+    format filter {
+      fields {
+        request>uri query {
+          delete access_token
+        }
+      }
+    }
+  '';
 
   # Temporary MSC4127 compatibility shim (remove after 2026-12-25):
   # Capacitor native apps older than mindroom-chat v2026.11.414 (including live App Store
@@ -35,6 +47,7 @@ in
 
     # Primary domain website + Matrix API + Matrix well-known
     virtualHosts."${siteDomain}" = {
+      logFormat = redactedAccessLogFormat siteDomain;
       extraConfig = ''
         # More specific than the homeserver route; Caddy forwards websocket upgrades.
         reverse_proxy /_matrix/client/unstable/fi.mau.as_sync localhost:29331
@@ -91,6 +104,7 @@ in
 
     # Demo Matrix homeserver for TestFlight/App Review password-only testing.
     virtualHosts."${demoDomain}" = {
+      logFormat = redactedAccessLogFormat demoDomain;
       extraConfig = ''
         @demoRegistration path /_matrix/client/r0/register* /_matrix/client/v3/register* /_matrix/client/unstable/register*
         respond @demoRegistration 403
