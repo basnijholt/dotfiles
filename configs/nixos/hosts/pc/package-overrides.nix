@@ -22,19 +22,22 @@
               llamaCppSrc = pkgs.fetchFromGitHub {
                 owner = "ggml-org";
                 repo = "llama.cpp";
-                tag = "b12257";
-                hash = "sha256-lOtgL6pGoDaf5wK2y37AyycU0J4BoYvxfVl1h28HbUU=";
+                tag = "b12651";
+                hash = "sha256-GNdA6CFxrkFNSocjHhZT2ML53WkdvTSQBMieitPR1ts=";
               };
             in
             rec {
-              version = "0.40.17";
+              version = "0.40.18";
               src = pkgs.fetchFromGitHub {
                 owner = "ollama";
                 repo = "ollama";
                 rev = "v${version}";
-                hash = "sha256-PyZVSRttWuHG8zrEuKo3Q1r6O1SI8whj1IJV32cHmcU=";
+                hash = "sha256-MO0AsCSNmrjf63NrdYzBDBL/xEftrHAacsf4gSXZf8g=";
               };
               vendorHash = "sha256-1mzJrZUHH2ouP6I+LVojHbft7No5AumqKZVq0I/Ubsg=";
+              # llama.cpp >= b12651 includes nvml.h in ggml-cuda (loaded at
+              # runtime via dlopen), which nixpkgs' ollama does not provide yet.
+              buildInputs = oldAttrs.buildInputs ++ [ pkgs.cudaPackages.cuda_nvml_dev ];
               passthru = oldAttrs.passthru // {
                 inherit llamaCppSrc;
                 llamaCppVersion = llamaCppSrc.tag;
@@ -59,12 +62,12 @@
             # Tracks master, not releases: release tags lag master by hours
             # and skip build numbers. version is the build number (commit
             # count) of rev; update-overrides.py updates both.
-            version = "12679";
+            version = "12802";
             src = pkgs.fetchFromGitHub {
               owner = "ggml-org";
               repo = "llama.cpp";
-              rev = "af5c58347fdbc2cd19e65b278e81c8f528f8a175";
-              hash = "sha256-J1qhQA0R3reHa93RBpEHAxJW2cVbj855mtY2EdfoO84=";
+              rev = "e8d7128fea197f1cdc4dcfb1af3bf33564197e8c";
+              hash = "sha256-CvykOaIFm5+EIbA3eBMgX2Q0AEPC6WOC7l2bGgbrCoU=";
               leaveDotGit = true;
               postFetch = ''
                 git -C "$out" rev-parse --short HEAD > $out/COMMIT
@@ -75,7 +78,7 @@
             # nixpkgs' llama-cpp does not provide yet.
             buildInputs = oldAttrs.buildInputs ++ [ pkgs.cudaPackages.cuda_nvml_dev ];
             npmRoot = "ui/apps/chat";
-            npmDepsHash = "sha256-3kJJJGgPvtoRozjjvXJ97ljxzt0tshwi88UUd1D3VsI=";
+            npmDepsHash = "sha256-A0KFXyMoHXyz6fcqCB4unwAJTLwgcr3BzfT8ULgKcNk=";
             # nixpkgs hardcodes the build number and commit of its own
             # release. Report ours in `llama-server --version`, `/props`,
             # and the web UI; flags appended later win in CMake.
@@ -108,14 +111,14 @@
       # llama-swap from GitHub releases
       llama-swap =
         let
-          version = "275";
+          version = "276";
         in
         pkgs.runCommand "llama-swap" { } ''
           mkdir -p $out/bin
           tar -xzf ${
             pkgs.fetchurl {
               url = "https://github.com/mostlygeek/llama-swap/releases/download/v${version}/llama-swap_${version}_linux_amd64.tar.gz";
-              hash = "sha256-p/pZRuBUeD1MSl4quPPd1GfeCAVRn2tvKkFQiuRT++g=";
+              hash = "sha256-N0k6D3JeQHo6ls8mknzATD5US5pVoRQeJnUQkB90rvg=";
             }
           } -C $out/bin
           chmod +x $out/bin/llama-swap
