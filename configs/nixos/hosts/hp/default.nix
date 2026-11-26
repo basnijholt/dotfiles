@@ -14,6 +14,7 @@
 
     # Host-specific modules (Tier 3)
     ./bumper-acme.nix
+    ./t80-cloud-dns.nix
     ./networking.nix
     ./ups.nix
   ];
