@@ -15,7 +15,7 @@
 let
   robotIP = "192.168.1.125"; # DHCP reservation on the ASUS router
   haIP = "192.168.1.178";
-  haKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBp18lyAIYH6dDVSaMBRBc0g4h+vo9lXS/2FMkmZOjjW ha-t80-net";
+  haKey = (import ../../common/ssh-keys.nix).serviceKeys.haT80;
 
   t80Dns = pkgs.writeShellApplication {
     name = "t80-dns";
