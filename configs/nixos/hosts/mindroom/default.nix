@@ -96,6 +96,8 @@
   # at basnijholt's user manager and mindroom-shells.slice. Negative
   # OOMScoreAdjust is ignored in an unprivileged Incus container, so OOM
   # protection relies on mindroom-shells.slice's MemoryMax + host earlyoom's --avoid.
+  # ExecStopPost tears down mindroom-shells.slice on stop/restart so shells
+  # moved out of mindroom-chat's cgroup do not outlive the service.
   systemd.services.mindroom-chat = {
     after = [ "user@1000.service" ];
     wants = [ "user@1000.service" ];
@@ -104,6 +106,7 @@
         "XDG_RUNTIME_DIR=/run/user/1000"
         "MINDROOM_SHELL_SYSTEMD_SLICE=mindroom-shells.slice"
       ];
+      ExecStopPost = "-${pkgs.systemd}/bin/systemctl --user stop mindroom-shells.slice";
       MemoryMin = "4G";
       MemoryLow = "6G";
       CPUWeight = 1000;

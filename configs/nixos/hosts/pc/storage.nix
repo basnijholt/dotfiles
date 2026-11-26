@@ -100,7 +100,7 @@ in
     freeSwapThreshold = lib.mkForce 70;
     extraArgs = [
       "--prefer"
-      "^(node|tsc|eslint|vitest|pytest|chromium|cargo|rustc|cc1plus)$"
+      "^(node|tsc|eslint|vitest|pytest|chromium|chrome|cargo|rustc|cc1plus)$"
       "--avoid"
       "^(systemd|sshd|mindroom|Hyprland|sway|tuwunel)$"
     ];
