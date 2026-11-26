@@ -84,6 +84,10 @@ in
           "MINDROOM_STORAGE_PATH=/home/basnijholt/.mindroom-lab/mindroom_data"
           "MINDROOM_LOG_FORMAT=json"
           "MINDROOM_TIMING=1"
+          # MindRoom's ~84 worker threads otherwise create 24 glibc malloc arenas
+          # holding 1.3-1.7 GB of freed-but-unreturned fragmentation (fordblks);
+          # capping at 2 prevents arena sprawl without single-arena lock contention.
+          "MALLOC_ARENA_MAX=2"
         ];
         ExecStart = "${mindroom-uv "/home/basnijholt/.mindroom-lab" "run"}";
         Restart = "on-failure";
@@ -113,6 +117,10 @@ in
           "MINDROOM_STORAGE_PATH=/home/basnijholt/.mindroom-chat/mindroom_data"
           "MINDROOM_LOG_FORMAT=json"
           "MINDROOM_TIMING=1"
+          # MindRoom's ~84 worker threads otherwise create 24 glibc malloc arenas
+          # holding 1.3-1.7 GB of freed-but-unreturned fragmentation (fordblks);
+          # capping at 2 prevents arena sprawl without single-arena lock contention.
+          "MALLOC_ARENA_MAX=2"
           "BACKEND_PORT=8766"
           # Public origin this runtime is reachable at (Caddy on host mindroom
           # routes the catch-all of mindroom.lab.mindroom.chat to this API on
