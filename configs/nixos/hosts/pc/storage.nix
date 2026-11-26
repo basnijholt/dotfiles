@@ -102,7 +102,7 @@ in
       "--prefer"
       "^(node|tsc|eslint|vitest|pytest|chromium|chrome|cargo|rustc|cc1plus)$"
       "--avoid"
-      "^(systemd|sshd|mindroom|Hyprland|sway|tuwunel)$"
+      "^(systemd|sshd|mindroom|\\.?Hyprland(-wrapp)?|sway|tuwunel)$"
     ];
   };
 
