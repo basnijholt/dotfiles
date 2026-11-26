@@ -39,8 +39,13 @@
   };
 
   # --- DNS Resolver Defaults ---
-  # Primary: nuc (192.168.1.2), Secondary: hp (192.168.1.3), Fallback: Tailscale
-  networking.nameservers = [ "192.168.1.2" "192.168.1.3" "100.100.100.100" ];
+  # Primary: nuc (192.168.1.2), Secondary: hp (192.168.1.3).
+  # Keep Tailscale MagicDNS (100.100.100.100) out of Global DNS: tailscale0
+  # already configures MagicDNS + DefaultRoute (~.) per-link, whereas
+  # systemd-resolved never fails back once a LAN outage rotates Global's
+  # Current DNS Server to local 100.100.100.100 (which does not serve .local
+  # and answers *.lab.nijho.lt with Tailscale IPs instead of LAN IPs).
+  networking.nameservers = [ "192.168.1.2" "192.168.1.3" ];
   services.resolved = {
     enable = true;
     settings.Resolve = {

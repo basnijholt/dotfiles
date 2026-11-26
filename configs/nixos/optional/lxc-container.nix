@@ -26,7 +26,10 @@
   services.resolved.enable = true;
   networking.useHostResolvConf = lib.mkForce false;
 
-  networking.useDHCP = lib.mkDefault true;
+  # Restrict DHCP to the Incus uplink so Docker veth interfaces do not inherit
+  # DHCP/IPv4LL probing (which causes dhcpcd SEGV crashes on ephemeral veths).
+  networking.useDHCP = lib.mkDefault false;
+  networking.interfaces.eth0.useDHCP = lib.mkDefault true;
 
   # Containers redeploy via comin near-daily; keeping the fleet's 30 days of
   # rollback generations would pin ~30 full closures. A week is plenty here.
