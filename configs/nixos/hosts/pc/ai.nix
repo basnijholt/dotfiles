@@ -640,20 +640,6 @@ in
           --threads 8
           --jinja
 
-      # Uploaded 2025-09-04, size 0.3 GB, max ctx: 2048, layers: 24
-      "embeddinggemma:300m":
-        cmd: |
-          ${pkgs.llama-cpp}/bin/llama-server
-          -hf ggml-org/embeddinggemma-300M-GGUF
-          --port ''${PORT}
-          --embeddings
-          --batch-size 2048
-          --ubatch-size 2048
-        # GPU 1 also holds Whisper and half of vLLM, which caps vLLM's KV cache.
-        env:
-          - "CUDA_VISIBLE_DEVICES=0"
-        ttl: 0
-
       # Uploaded 2026-10-06, size 0.3 GB, max ctx: 8192
       # Text only: --no-mmproj skips the 0.6 GB vision/audio projector. Needs
       # gemma-embedding2 support (ggml-org/llama.cpp#30054). A non-causal model
@@ -794,7 +780,6 @@ in
         swap: false       # Don't swap models within this group
         exclusive: false  # Don't unload other groups when loading this
         members:
-          - "embeddinggemma:300m"
           - "embeddinggemma-2"
   '';
 

@@ -22,7 +22,7 @@ input-device-name = "q9,brio,logitech,airpods,macbook"
 output-device-name = "iloud,airpods,dell,macbook"
 
 # RAG / memory
-embedding-model = "embeddinggemma:300m"
+embedding-model = "embeddinggemma-2"
 
 [transcribe]
 extra-instructions = """
