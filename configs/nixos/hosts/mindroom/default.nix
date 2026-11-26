@@ -56,7 +56,7 @@
   #     lxc.cgroup2.memory.swap.max = 8G
   # Setting memory.max and memory.swap.max explicitly in raw.lxc (rather than
   # Incus's limits.memory, which sets memory.swap.max = 0) keeps a swap budget
-  # (>= mindroom-shells.slice's 4G) while capping the container below pc's
+  # (>= mindroom-shells.slice's 2G) while capping the container below pc's
   # 62 GiB RAM; memory.min/memory.low let mindroom-chat's MemoryMin/MemoryLow
   # take effect.
 
@@ -70,20 +70,32 @@
 
   # Delegate cgroup v2 controllers so basnijholt's user manager (uid 1000) can
   # enforce CPU, cpuset, IO, memory, and pids limits on mindroom-shells.slice.
+  # Override upstream OOMScoreAdjust=100 back to 0 so container-level kernel OOM
+  # never penalizes systemd --user above shell workers (adj=0).
   systemd.services."user@1000" = {
     overrideStrategy = "asDropin";
     restartIfChanged = false;
-    serviceConfig.Delegate = "cpu cpuset io memory pids";
+    serviceConfig = {
+      Delegate = "cpu cpuset io memory pids";
+      OOMScoreAdjust = 0;
+    };
   };
 
-  # Cap agent shell subprocesses; leaves threads 0-3 untouched for mindroom-chat
-  # and pc interactivity while giving shells 20 threads.
+  # Override systemd user manager's DefaultOOMScoreAdjust=200 so user-session
+  # services (dbus-broker-launch, gpg-agent, etc.) are not killed ahead of
+  # shell workers on container-level kernel OOM.
+  systemd.user.settings.Manager.DefaultOOMScoreAdjust = 0;
+
+  # Cap agent shell subprocesses well below the 44G container limit so OOM stays
+  # inside mindroom-shells.slice even with ~15G of non-shell baseline
+  # (mindroom-chat, /dev/shm, Docker); leaves threads 0-3 untouched for
+  # mindroom-chat and pc interactivity while giving shells 20 threads.
   systemd.user.slices.mindroom-shells = {
     description = "MindRoom agent shell subprocesses";
     sliceConfig = {
-      MemoryHigh = "28G";
-      MemoryMax = "34G";
-      MemorySwapMax = "4G";
+      MemoryHigh = "18G";
+      MemoryMax = "24G";
+      MemorySwapMax = "2G";
       AllowedCPUs = "4-23";
       CPUWeight = 1;
       IOWeight = 1;
