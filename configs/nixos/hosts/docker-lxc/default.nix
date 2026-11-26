@@ -10,9 +10,6 @@
   ];
 
   networking.hostName = lib.mkForce "docker-lxc";
-  # Docker veth interfaces must not inherit the Incus uplink's DHCP policy.
-  networking.useDHCP = lib.mkForce false;
-  networking.interfaces.eth0.useDHCP = true;
   networking.firewall.allowedTCPPorts = [ 9001 ];
   # Containers reach this host through its own address (Uptime Kuma checking lab URLs,
   # cf's Kuma sync calling 192.168.1.6:3001). Docker relays that hairpin traffic through
