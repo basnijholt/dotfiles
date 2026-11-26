@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 
 {
   imports = [
@@ -59,6 +59,14 @@
   # (>= mindroom-shells.slice's 4G) while capping the container below pc's
   # 62 GiB RAM; memory.min/memory.low let mindroom-chat's MemoryMin/MemoryLow
   # take effect.
+
+  # common/services.nix enables earlyoom globally, but inside this container it
+  # fires before mindroom-shells.slice hits MemoryMax and picks tiny user
+  # services (dbus-broker-launch oom_score_adj=200, systemd --user adj=100) over
+  # multi-GiB shell workers (adj=0), tearing down the user bus and every shell
+  # scope (2026-11-26). Let mindroom-shells.slice MemoryMax + pc's host earlyoom
+  # handle OOM instead.
+  services.earlyoom.enable = lib.mkForce false;
 
   # Delegate cgroup v2 controllers so basnijholt's user manager (uid 1000) can
   # enforce CPU, cpuset, IO, memory, and pids limits on mindroom-shells.slice.
