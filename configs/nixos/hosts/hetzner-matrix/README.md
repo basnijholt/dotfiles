@@ -130,6 +130,7 @@ Current managed secrets:
 - `sso-apple-secret.age`
 - `sygnal-env.age`
 - `sygnal-apns-key.age`
+- `sygnal-fcm-service-account.age`
 - `signal-appservice-env.age`
 - `whatsapp-appservice-env.age`
 - `telegram-appservice-env.age`
@@ -180,7 +181,7 @@ Sygnal runs locally in a Podman container and is exposed via:
 
 `https://push.mindroom.chat/_matrix/push/v1/notify`
 
-Startup is intentionally gated. The `podman-sygnal` unit is skipped when the APNs key file is empty, either secret contains `CHANGE_ME`, or `SYGNAL_APNS_KEY_ID` is missing. The remaining environment variables below must also be present and valid for push notifications to work.
+Startup is intentionally gated. The `podman-sygnal` unit is skipped when the APNs key or FCM service-account file is empty, any Sygnal secret contains `CHANGE_ME`, or `SYGNAL_APNS_KEY_ID` is missing. The remaining environment variables below must also be present and valid for push notifications to work.
 
 `sygnal-env.age` should decrypt to:
 
@@ -192,6 +193,8 @@ SYGNAL_APNS_PLATFORM=production
 ```
 
 `sygnal-apns-key.age` should decrypt to the Apple `.p8` private key contents for the same App ID / team.
+
+`sygnal-fcm-service-account.age` should decrypt to the GCP service-account JSON key (`mindroom-sygnal-fcm@mindroom-468605.iam.gserviceaccount.com`, role `roles/firebasecloudmessaging.admin`) used for Android FCM HTTP v1 push delivery.
 
 After updating both secrets:
 
@@ -206,6 +209,12 @@ MindRoom iOS client values:
 - `push.ios.gatewayUrl=https://push.mindroom.chat/_matrix/push/v1/notify`
 - `push.ios.appId=chat.mindroom.app`
 - APNs topic / bundle ID: `chat.mindroom.app`
+
+MindRoom Android client values:
+
+- `push.android.gatewayUrl=https://push.mindroom.chat/_matrix/push/v1/notify`
+- `push.android.appId=com.mindroom_ai.app`
+- Firebase / GCP project ID: `mindroom-468605`
 
 ### Matrix bridges
 

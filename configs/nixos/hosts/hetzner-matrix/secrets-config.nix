@@ -77,6 +77,12 @@
       group = "root";
       mode = "0400";
     };
+    sygnal-fcm-service-account = {
+      file = ./secrets/sygnal-fcm-service-account.age;
+      owner = "root";
+      group = "root";
+      mode = "0400";
+    };
     signal-appservice-env-tuwunel = {
       file = ./secrets/signal-appservice-env.age;
       owner = "tuwunel";

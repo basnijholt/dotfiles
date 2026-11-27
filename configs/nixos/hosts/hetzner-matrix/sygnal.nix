@@ -2,7 +2,7 @@
 
 let
   constants = import ./constants.nix;
-  inherit (constants) iosPushAppId;
+  inherit (constants) iosPushAppId androidPushAppId androidFcmProjectId;
 
   sygnalImage = "docker.io/matrixdotorg/sygnal@sha256:141f5e72fdf99a28e29ca87f3a46c19ed1cf21d5074aa3ef9df7c067e0c1c46a";
   mindroomSygnalPkg = mindroom-sygnal.packages.${pkgs.stdenv.hostPlatform.system}.default;
@@ -59,6 +59,11 @@ let
         topic: $SYGNAL_APNS_TOPIC
         platform: $SYGNAL_APNS_PLATFORM
         convert_device_token_to_hex: false
+      ${androidPushAppId}:
+        type: mindroom_pushkin_loader.SafeFcmPushkin
+        api_version: v1
+        project_id: ${androidFcmProjectId}
+        service_account_file: /sygnal/sygnal-fcm-service-account.json
   '';
 
   sygnalRestartTriggers = [
@@ -66,6 +71,7 @@ let
     mindroomSygnalPkg
     config.age.secrets.sygnal-env.file
     config.age.secrets.sygnal-apns-key.file
+    config.age.secrets.sygnal-fcm-service-account.file
   ];
 in
 {
@@ -90,7 +96,9 @@ in
     script = ''
       install -d -m 0750 /run/sygnal
       install -m 0400 ${config.age.secrets.sygnal-apns-key.path} /run/sygnal/sygnal-apns-key.p8
+      install -m 0400 ${config.age.secrets.sygnal-fcm-service-account.path} /run/sygnal/sygnal-fcm-service-account.json
       install -m 0444 ${mindroomSygnalPkg}/mindroom_pushkin.py /run/sygnal/mindroom_pushkin.py
+      install -m 0444 ${mindroomSygnalPkg}/mindroom_fcm_pushkin.py /run/sygnal/mindroom_fcm_pushkin.py
       install -m 0444 ${mindroomSygnalPkg}/mindroom_pushkin_loader.py /run/sygnal/mindroom_pushkin_loader.py
       set -a
       . ${config.age.secrets.sygnal-env.path}
@@ -123,6 +131,8 @@ in
     serviceConfig.ExecCondition = ''
       ${pkgs.bash}/bin/bash -lc '[ -s ${config.age.secrets.sygnal-apns-key.path} ] \
         && ! grep -q "CHANGE_ME" ${config.age.secrets.sygnal-apns-key.path} \
+        && [ -s ${config.age.secrets.sygnal-fcm-service-account.path} ] \
+        && ! grep -q "CHANGE_ME" ${config.age.secrets.sygnal-fcm-service-account.path} \
         && grep -q "^SYGNAL_APNS_KEY_ID=" ${config.age.secrets.sygnal-env.path} \
         && ! grep -q "CHANGE_ME" ${config.age.secrets.sygnal-env.path}'
     '';

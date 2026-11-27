@@ -12,6 +12,7 @@ in
   "sso-apple-secret.age".publicKeys = recipients;
   "sygnal-env.age".publicKeys = recipients;
   "sygnal-apns-key.age".publicKeys = recipients;
+  "sygnal-fcm-service-account.age".publicKeys = recipients;
   "signal-appservice-env.age".publicKeys = recipients;
   "whatsapp-appservice-env.age".publicKeys = recipients;
   "telegram-appservice-env.age".publicKeys = recipients;
