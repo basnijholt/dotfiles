@@ -56,9 +56,9 @@
   #     lxc.cgroup2.memory.swap.max = 8G
   # Setting memory.max and memory.swap.max explicitly in raw.lxc (rather than
   # Incus's limits.memory, which sets memory.swap.max = 0) keeps a swap budget
-  # (>= mindroom-shells.slice's 2G) while capping the container below pc's
-  # 62 GiB RAM; memory.min/memory.low let mindroom-chat's MemoryMin/MemoryLow
-  # take effect.
+  # for non-shell container services (mindroom-shells.slice sets MemorySwapMax=0)
+  # while capping the container below pc's 62 GiB RAM; memory.min/memory.low let
+  # mindroom-chat's MemoryMin/MemoryLow take effect.
 
   # common/services.nix enables earlyoom globally, but inside this container it
   # fires before mindroom-shells.slice hits MemoryMax and picks tiny user
@@ -90,12 +90,15 @@
   # inside mindroom-shells.slice even with ~15G of non-shell baseline
   # (mindroom-chat, /dev/shm, Docker); leaves threads 0-3 untouched for
   # mindroom-chat and pc interactivity while giving shells 20 threads.
+  # Omit MemoryHigh (cgroup v2 MemoryHigh throttles every process in the shared
+  # slice at ~95% memory stall between high and max without triggering OOM,
+  # freezing even tiny shells) and set MemorySwapMax = 0 so a runaway worker
+  # hitting MemoryMax is OOM-killed cleanly instead of thrashing swap.
   systemd.user.slices.mindroom-shells = {
     description = "MindRoom agent shell subprocesses";
     sliceConfig = {
-      MemoryHigh = "18G";
       MemoryMax = "24G";
-      MemorySwapMax = "2G";
+      MemorySwapMax = "0";
       AllowedCPUs = "4-23";
       CPUWeight = 1;
       IOWeight = 1;
@@ -131,6 +134,41 @@
       MemoryLow = "6G";
       CPUWeight = 1000;
       IOWeight = 1000;
+    };
+  };
+
+  # Prune orphaned pytest tmpfs directories in /dev/shm left behind by killed
+  # runs so stale fixtures do not fill container RAM and swap.
+  systemd.services.mindroom-shm-cleanup = {
+    description = "Prune orphaned pytest directories in /dev/shm";
+    path = [ pkgs.coreutils pkgs.findutils pkgs.gnugrep ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "basnijholt";
+      Group = "users";
+    };
+    script = ''
+      base="/dev/shm/pytest-of-basnijholt"
+      if [ ! -d "$base" ] || [ -L "$base" ]; then exit 0; fi
+      current=""
+      if [ -L "$base/pytest-current" ]; then
+        current="$(readlink -f -- "$base/pytest-current" || true)"
+      fi
+      for dir in "$base"/pytest-[0-9]*; do
+        if [ ! -d "$dir" ] || [ -L "$dir" ]; then continue; fi
+        if [ -n "$current" ] && [ "$(readlink -f -- "$dir" || true)" = "$current" ]; then continue; fi
+        if find "$dir" -mmin -60 -print -quit | grep -q .; then continue; fi
+        chmod -R u+w -- "$dir" || true
+        rm -rf -- "$dir"
+      done
+    '';
+  };
+
+  systemd.timers.mindroom-shm-cleanup = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "15min";
+      OnUnitActiveSec = "15min";
     };
   };
 
