@@ -17,7 +17,7 @@ configs/nixos/
 |--------|------|-------------|
 | `pc` | Physical | Desktop/workstation (NVIDIA, Hyprland, AI services) |
 | `nuc` | Physical | Media box (Kodi, ZFS, desktop + power management) and primary LAN DNS (CoreDNS on `192.168.1.2`) |
-| `hp` | Physical | Headless server (ZFS, virtualization + power management), secondary LAN DNS (CoreDNS on `192.168.1.3`, with the Bumper redirect for the Ecovacs robot), print server and UPS server |
+| `hp` | Physical | Headless server (ZFS, virtualization + power management), secondary LAN DNS (CoreDNS on `192.168.1.3`), print server and UPS server |
 | `nas` | Physical | Primary NAS: ZFS pools, fleet backup target, replication + watchdogs |
 | `hp-incus` | Incus VM | HP config for Incus VM testing |
 | `nuc-incus` | Incus VM | NUC config for Incus VM testing |

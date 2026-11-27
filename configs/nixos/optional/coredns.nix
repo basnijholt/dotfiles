@@ -28,13 +28,6 @@
 let
   wildcardIP = "192.168.1.6";
 
-  # Ecovacs robot vacuum: point its cloud domains at the self-hosted Bumper
-  # server (stacks repo, runs on hp) instead of Ecovacs. Scoped to the robot's
-  # IP so the rest of the LAN still resolves these domains normally.
-  bumperIP = "192.168.1.3";
-  ecovacsRobotIPs = [ "192.168.1.125" ]; # DHCP reservation on the ASUS router
-  ecovacsZones = "ecouser.net ecouser.com ecovacs.com ecovacs.net aliyuncs.com aliyun.com local.nijho.lt";
-
   localZone = pkgs.writeText "local.zone" ''
     $ORIGIN local.
     @               900   IN  SOA   ns hostadmin 1 900 300 604800 900
@@ -112,42 +105,6 @@ in
         template ANY ANY {
           rcode NOERROR
         }
-      }
-
-      ${ecovacsZones} {
-        bind ${listenIP}
-        view ecovacs-robot {
-          expr client_ip() in [${lib.concatMapStringsSep ", " (ip: "'${ip}'") ecovacsRobotIPs}]
-        }
-        log
-        template IN A {
-          answer "{{ .Name }} 60 IN A ${bumperIP}"
-        }
-        # No AAAA (or any other record type), so the robot cannot reach Ecovacs over IPv6
-        template ANY ANY {
-          rcode NOERROR
-        }
-      }
-
-      ${ecovacsZones} {
-        bind ${listenIP}
-        forward . 1.1.1.1 8.8.8.8
-        cache 300
-        errors
-      }
-
-      # Log every other DNS question from the robot while investigating local
-      # control paths. The WAN block still prevents the resolved endpoints from
-      # being reached directly.
-      . {
-        bind ${listenIP}
-        view ecovacs-robot-catchall {
-          expr client_ip() in [${lib.concatMapStringsSep ", " (ip: "'${ip}'") ecovacsRobotIPs}]
-        }
-        log
-        forward . 1.1.1.1 8.8.8.8
-        cache 60
-        errors
       }
 
       . {
