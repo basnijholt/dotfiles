@@ -4,6 +4,8 @@
   chatDomain = "chat.mindroom.chat";
   pushDomain = "push.mindroom.chat";
   iosPushAppId = "chat.mindroom.app";
+  androidPushAppId = "com.mindroom_ai.app";
+  androidFcmProjectId = "mindroom-468605";
   demoDomain = "demo.mindroom.chat";
   demoTuwunelPort = 8018;
   rtcJwtPort = 8090;
