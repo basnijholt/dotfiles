@@ -51,6 +51,7 @@ in
           # node (for the t3 launcher and node-based providers) comes from Homebrew
           PATH = "${bunBin}:/opt/homebrew/bin:/run/current-system/sw/bin:/usr/bin:/bin:/usr/sbin:/sbin";
           T3CODE_HOME = "${homeDir}/.t3";
+          DO_NOT_TRACK = "1";
         };
       };
     };

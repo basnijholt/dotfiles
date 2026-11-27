@@ -57,6 +57,7 @@
   # --- Shell & Terminal ---
   programs.zsh.enable = true;
   programs.direnv.enable = true;
+  environment.variables.DO_NOT_TRACK = "1";
 
   # --- Fonts ---
   fonts.packages = with pkgs; [

@@ -19,6 +19,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export OLLAMA_KEEP_ALIVE="1h"
 export LESS="-R"  # Enable colors in less (avoid --mouse, breaks text selection)
 export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1  # Disable Claude Code auto-updater and telemetry
+export DO_NOT_TRACK=1  # Opt out of CLI/app telemetry (https://consoledonottrack.com)
 
 # Make nix-ld libraries available to nix Python (e.g., pipx-installed agent-cli with sounddevice)
 if [[ -d "/run/current-system/sw/share/nix-ld/lib" ]]; then
