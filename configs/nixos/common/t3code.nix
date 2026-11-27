@@ -33,6 +33,7 @@ in
       environment = {
         PATH = lib.mkForce "${bunBin}:${systemBin}";
         T3CODE_HOME = "${homeDir}/.t3";
+        DO_NOT_TRACK = "1";
         # Pick a live agent for each Git connection: forwarded ones die with their session.
         GIT_SSH_COMMAND = ''SSH_AUTH_SOCK="$(${./ssh-agent-sock.sh})" ssh'';
       };
