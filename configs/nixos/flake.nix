@@ -220,6 +220,7 @@
         hetzner-matrix = mkHostArm [
           ragenix.nixosModules.default
           disko.nixosModules.disko
+          mindroom-sygnal.nixosModules.default
           ./hosts/hetzner-matrix/disko.nix
           ./hosts/hetzner-matrix/default.nix
           ./hosts/hetzner-matrix/hardware-configuration.nix

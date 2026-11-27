@@ -196,7 +196,7 @@ SYGNAL_APNS_PLATFORM=production
 
 `sygnal-fcm-service-account.age` should decrypt to the GCP service-account JSON key (`mindroom-sygnal-fcm@mindroom-468605.iam.gserviceaccount.com`, role `roles/firebasecloudmessaging.admin`) used for Android FCM HTTP v1 push delivery.
 
-After updating both secrets:
+After updating the Sygnal secrets:
 
 ```bash
 sudo systemctl restart sygnal-setup podman-sygnal caddy
