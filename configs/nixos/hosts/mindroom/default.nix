@@ -141,7 +141,7 @@
   # runs so stale fixtures do not fill container RAM and swap.
   systemd.services.mindroom-shm-cleanup = {
     description = "Prune orphaned pytest directories in /dev/shm";
-    path = [ pkgs.coreutils pkgs.findutils pkgs.gnugrep ];
+    path = [ pkgs.coreutils pkgs.findutils ];
     serviceConfig = {
       Type = "oneshot";
       User = "basnijholt";
@@ -150,17 +150,22 @@
     script = ''
       base="/dev/shm/pytest-of-basnijholt"
       if [ ! -d "$base" ] || [ -L "$base" ]; then exit 0; fi
-      current=""
-      if [ -L "$base/pytest-current" ]; then
-        current="$(readlink -f -- "$base/pytest-current" || true)"
-      fi
+      failed=0
       for dir in "$base"/pytest-[0-9]*; do
         if [ ! -d "$dir" ] || [ -L "$dir" ]; then continue; fi
-        if [ -n "$current" ] && [ "$(readlink -f -- "$dir" || true)" = "$current" ]; then continue; fi
-        if find "$dir" -mmin -60 -print -quit | grep -q .; then continue; fi
-        chmod -R u+w -- "$dir" || true
-        rm -rf -- "$dir"
+        if [ -f "$dir/.lock" ] && [ ! -L "$dir/.lock" ]; then
+          pid=""
+          { read -r pid < "$dir/.lock"; } 2>/dev/null || true
+          if [[ "$pid" =~ ^[1-9][0-9]*$ ]] && kill -0 "$pid" 2>/dev/null; then continue; fi
+        fi
+        if [ -n "$(find "$dir" -mmin -15 -print -quit 2>/dev/null)" ]; then continue; fi
+        chmod -R u+rwX -- "$dir" || true
+        if ! rm -rf -- "$dir"; then
+          echo "mindroom-shm-cleanup: failed to remove $dir" >&2
+          failed=1
+        fi
       done
+      exit "$failed"
     '';
   };
 
