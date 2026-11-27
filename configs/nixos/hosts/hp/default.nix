@@ -13,7 +13,6 @@
     (import ../../optional/coredns.nix { listenIP = "192.168.1.3"; })
 
     # Host-specific modules (Tier 3)
-    ./bumper-acme.nix
     ./networking.nix
     ./ups.nix
   ];
